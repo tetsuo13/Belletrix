@@ -1,0 +1,67 @@
+﻿@model List<Bennett.AbroadAdvisor.Models.StudentModel>
+
+@{
+    ViewBag.Title = "List";
+}
+
+@section Body {
+    <div class="row">
+        <div class="col-lg-8">
+            <h1>Students <small>@Model.Count.ToString("N0") total</small></h1>
+        </div>
+        <div class="col-lg-4 text-right">
+            <a href="@Url.Action("Add", "Student")"><i class="fa fa-plus-circle"></i> Add Student</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <ol class="breadcrumb">
+                <li><a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+                <li class="active"><i class="fa fa-users"></i> Students</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover table-striped tablesorter">
+            <thead>
+                <tr>
+                    <th>Name <i class="fa fa-sort"></i></th>
+                    <th>Email <i class="fa fa-sort"></i></th>
+                    <th>Entering <i class="fa fa-sort"></i></th>
+                    <th>Graduating <i class="fa fa-sort"></i></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var student in Model)
+                {
+                    <tr>
+                        <td>@student.LastName, @student.FirstName @student.MiddleName</td>
+                        <td>
+                            @if (String.IsNullOrEmpty(student.Email))
+                            {
+                                <text>&mdash;</text>
+                            }
+                            else
+                            {
+                                <a href="mailto:@student.Email">@student.Email</a>
+                            }
+                        </td>
+                        <td>@student.EnteringYear</td>
+                        <td>
+                            @if (student.GraduatingYear == default(short))
+                            {
+                                <text>&mdash;</text>
+                            }
+                            else
+                            {
+                                @student.GraduatingYear
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
