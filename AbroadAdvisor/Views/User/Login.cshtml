@@ -5,6 +5,10 @@
     
     Layout = null;
     ViewBag.Title = "AbroadAdvisor";
+
+    string strHostName = System.Net.Dns.GetHostName();
+    IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+    IPAddress ipAddress = ipHostInfo.AddressList[0];
 }
 
 <!DOCTYPE html>
@@ -36,6 +40,7 @@
     </style>
 </head>
 <body>
+    <h1>@ipAddress.ToString()</h1>
 
     <div class="login">
         <div class="login-container clearfix">
