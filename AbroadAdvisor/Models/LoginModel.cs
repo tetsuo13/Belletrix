@@ -1,6 +1,8 @@
 ﻿using Npgsql;
 using System.ComponentModel.DataAnnotations;
 using System.Configuration;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Bennett.AbroadAdvisor.Models
 {
@@ -24,6 +26,7 @@ namespace Bennett.AbroadAdvisor.Models
 
             using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
             {
+                connection.ValidateRemoteCertificateCallback += connection_ValidateRemoteCertificateCallback;
                 const string sql = @"
                     SELECT  id
                     FROM    users
@@ -51,6 +54,12 @@ namespace Bennett.AbroadAdvisor.Models
             }
 
             return valid;
+        }
+
+        bool connection_ValidateRemoteCertificateCallback(X509Certificate cert, X509Chain chain, SslPolicyErrors errors)
+        {
+            return true;
+            throw new System.NotImplementedException();
         }
     }
 }
