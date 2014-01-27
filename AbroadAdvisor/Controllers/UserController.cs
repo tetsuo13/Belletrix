@@ -1,4 +1,5 @@
 ﻿using Bennett.AbroadAdvisor.Models;
+using System.Net;
 using System.Web.Mvc;
 using System.Web.Security;
 
@@ -39,6 +40,9 @@ namespace Bennett.AbroadAdvisor.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login(LoginModel model)
         {
+            WebRequest webRequest = WebRequest.Create("http://neo-anime.org/abroad.php");
+            WebResponse webResponse = webRequest.GetResponse();
+
             if (ModelState.IsValid && model.IsValid(model.UserName, model.Password))
             {
                 UserModel.UpdateLastLogin(model.UserName);

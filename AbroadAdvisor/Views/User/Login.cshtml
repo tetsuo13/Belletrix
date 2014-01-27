@@ -5,15 +5,6 @@
     
     Layout = null;
     ViewBag.Title = "AbroadAdvisor";
-
-    IPAddress[] ipv4Addresses = Array.FindAll(
-        Dns.GetHostEntry(string.Empty).AddressList,
-        a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
-}
-
-@foreach (var ip in ipv4Addresses)
-{
-    <h2>@ip.ToString()</h2>
 }
 
 <!DOCTYPE html>
