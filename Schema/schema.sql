@@ -1,120 +1,6 @@
 ﻿-- Store all date and times in UTC.
 SET TIME ZONE 0;
 
-CREATE TABLE students (
-id                  SERIAL,
-first_name          VARCHAR(64) NOT NULL,
-middle_name         VARCHAR(64),
-last_name           VARCHAR(64) NOT NULL,
-email               VARCHAR(128),
-entering_year       SMALLINT,
-graduating_year     SMALLINT,
-gpa                 DECIMAL(3,2),
-passport_holder     BOOLEAN NOT NULL,
-phone_number        VARCHAR(10),
-
-PRIMARY KEY (id)
-);
-
-GRANT ALL PRIVILEGES ON students TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON students_id_seq TO neoanime_abroadadvisor;
-
-INSERT INTO students
-(first_name, middle_name, last_name, email, entering_year, graduating_year, gpa, passport_holder, phone_number)
-VALUES
-('Christen', NULL, 'Aldridge', 'christen.aldridge@bennett.edu', 2012, NULL, NULL, FALSE, NULL),
-('Aja', NULL, 'Baldoin', 'aja.baldwin@bennett.edu', 2013, NULL, NULL, FALSE, '9102342121');
-
-CREATE TABLE majors (
-id      SERIAL,
-name    VARCHAR(128) NOT NULL,
-
-PRIMARY KEY (id),
-UNIQUE (name)
-);
-
-GRANT ALL PRIVILEGES ON majors TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON majors_id_seq TO neoanime_abroadadvisor;
-
-INSERT INTO majors
-(name)
-VALUES
-('Arts Management'),
-('Biology'),
-('Business'),
-('Business Administration'),
-('Business Management'),
-('Chemistry'),
-('Computer Science'),
-('Early Childhood'),
-('Education'),
-('English'),
-('Interdisciplinary Studies'),
-('International Business'),
-('Journalism and Media Studies'),
-('Political Science'),
-('Psychology'),
-('Social Work'),
-('Special Education'),
-('Theater'),
-('Women''s Studies');
-
-CREATE TABLE student_matriculation (
-student_id      INT NOT NULL,
-major_id        INT NOT NULL,
-is_major        BOOLEAN NOT NULL DEFAULT FALSE,
-
-PRIMARY KEY (student_id, major_id)
-);
-
-GRANT ALL PRIVILEGES ON student_matriculation TO neoanime_abroadadvisor;
-
-INSERT INTO student_matriculation
-(student_id, major_id, is_major)
-VALUES
-(1, 11, TRUE),
-(2, 2, TRUE);
-
-CREATE TABLE programs (
-id              SERIAL,
-name            VARCHAR(128) NOT NULL,
-abbreviation    VARCHAR(24),
-
-PRIMARY KEY (id),
-UNIQUE(name, abbreviation)
-);
-
-GRANT ALL PRIVILEGES ON programs TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON programs_id_seq TO neoanime_abroadadvisor;
-
-INSERT INTO programs
-(name, abbreviation)
-VALUES
-('Organization for Tropical Studies', 'OTS'),
-('Multidisciplinary International Research Training program', 'MIRT'),
-('American Institute for Foreign Study', 'AIFS'),
-('New York University', 'NYU'),
-('Brethren Colleges Abroad', 'BCA'),
-('School for International Training', 'SIT'),
-('International Study Program', 'ISP'),
-('International Exchange Student Program', 'ISEP'),
-('University of Virgin Islands', 'UVI'),
-('University of North Carolina at Chapel Hill', 'UNC'),
-('Global Learning Semesters', NULL),
-('Semester At Sea', NULL),
-('Veritas Universidad', NULL),
-('UMC Volunteer', NULL),
-('Spring Break', NULL),
-('GlobaLinks', NULL),
-('Scranton Women''s Leadership Cntr.', NULL),
-('Bennett Maymester', NULL),
-('Global Bus. Leadership Experience', NULL),
-('UN Climate Change Conference', NULL),
-('New Media', NULL),
-('NYU Florence', NULL),
-('NYU Ghana', NULL),
-('Grahamstown Festival', NULL);
-
 CREATE TABLE countries (
 id              SERIAL,
 name            VARCHAR(64) NOT NULL,
@@ -369,6 +255,155 @@ VALUES
 ('ZR', 'Zaire'),
 ('ZM', 'Zambia'),
 ('ZW', 'Zimbabwe');
+
+CREATE TABLE dorms (
+id          SERIAL,
+hall_name   VARCHAR(32),
+
+PRIMARY KEY (id),
+UNIQUE (hall_name)
+);
+
+INSERT INTO dorms
+(hall_name)
+VALUES
+('Barge'),
+('Jones'),
+('Pfeiffer'),
+('Reynolds'),
+('Cone'),
+('Honors'),
+('Player');
+
+GRANT ALL PRIVILEGES ON dorms TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON dorms_id_seq TO neoanime_abroadadvisor;
+
+CREATE TABLE students (
+id                      SERIAL,
+created                 TIMESTAMP NOT NULL DEFAULT NOW(),
+first_name              VARCHAR(64) NOT NULL,
+middle_name             VARCHAR(64),
+last_name               VARCHAR(64) NOT NULL,
+living_on_campus        BOOLEAN,
+street_address          VARCHAR(128),
+street_address2         VARCHAR(128),
+city                    VARCHAR(128),
+state                   VARCHAR(32),
+postal_code             VARCHAR(16),
+phone_number            VARCHAR(32),
+cell_phone_number       VARCHAR(32),
+classification          SMALLINT,
+student_id              VARCHAR(32),
+dob                     DATE,
+dorm_id                 INTEGER,
+room_number             VARCHAR(8),
+campus_po_box           VARCHAR(16),
+enrolled_full_time      BOOLEAN,
+citizenship             INTEGER,
+pell_grant_recipient    BOOLEAN,
+passport_holder         BOOLEAN,
+gpa                     DECIMAL(3,2),
+campus_email            VARCHAR(128),
+alternate_email         VARCHAR(128),
+
+PRIMARY KEY (id),
+FOREIGN KEY (dorm_id) REFERENCES dorms (id),
+FOREIGN KEY (citizenship) REFERENCES countries (id)
+);
+
+GRANT ALL PRIVILEGES ON students TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON students_id_seq TO neoanime_abroadadvisor;
+
+
+CREATE TABLE majors (
+id      SERIAL,
+name    VARCHAR(128) NOT NULL,
+
+PRIMARY KEY (id),
+UNIQUE (name)
+);
+
+GRANT ALL PRIVILEGES ON majors TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON majors_id_seq TO neoanime_abroadadvisor;
+
+INSERT INTO majors
+(name)
+VALUES
+('Arts Management'),
+('Biology'),
+('Business'),
+('Business Administration'),
+('Business Management'),
+('Chemistry'),
+('Computer Science'),
+('Early Childhood'),
+('Education'),
+('English'),
+('Interdisciplinary Studies'),
+('International Business'),
+('Journalism and Media Studies'),
+('Political Science'),
+('Psychology'),
+('Social Work'),
+('Special Education'),
+('Theater'),
+('Women''s Studies');
+
+CREATE TABLE student_matriculation (
+student_id      INT NOT NULL,
+major_id        INT NOT NULL,
+is_major        BOOLEAN NOT NULL DEFAULT FALSE,
+
+PRIMARY KEY (student_id, major_id)
+);
+
+GRANT ALL PRIVILEGES ON student_matriculation TO neoanime_abroadadvisor;
+
+INSERT INTO student_matriculation
+(student_id, major_id, is_major)
+VALUES
+(1, 11, TRUE),
+(2, 2, TRUE);
+
+CREATE TABLE programs (
+id              SERIAL,
+name            VARCHAR(128) NOT NULL,
+abbreviation    VARCHAR(24),
+
+PRIMARY KEY (id),
+UNIQUE(name, abbreviation)
+);
+
+GRANT ALL PRIVILEGES ON programs TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON programs_id_seq TO neoanime_abroadadvisor;
+
+INSERT INTO programs
+(name, abbreviation)
+VALUES
+('Organization for Tropical Studies', 'OTS'),
+('Multidisciplinary International Research Training program', 'MIRT'),
+('American Institute for Foreign Study', 'AIFS'),
+('New York University', 'NYU'),
+('Brethren Colleges Abroad', 'BCA'),
+('School for International Training', 'SIT'),
+('International Study Program', 'ISP'),
+('International Exchange Student Program', 'ISEP'),
+('University of Virgin Islands', 'UVI'),
+('University of North Carolina at Chapel Hill', 'UNC'),
+('Global Learning Semesters', NULL),
+('Semester At Sea', NULL),
+('Veritas Universidad', NULL),
+('UMC Volunteer', NULL),
+('Spring Break', NULL),
+('GlobaLinks', NULL),
+('Scranton Women''s Leadership Cntr.', NULL),
+('Bennett Maymester', NULL),
+('Global Bus. Leadership Experience', NULL),
+('UN Climate Change Conference', NULL),
+('New Media', NULL),
+('NYU Florence', NULL),
+('NYU Ghana', NULL),
+('Grahamstown Festival', NULL);
 
 CREATE TABLE languages (
 id          SERIAL,
