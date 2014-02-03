@@ -1,11 +1,13 @@
-﻿@{
+﻿@using Bennett.AbroadAdvisor.Models;
+
+@{
     Layout = null;
     string siteTitle = "AbroadAdvisor";
     string pageTitle = siteTitle;
-    Bennett.AbroadAdvisor.Models.UserModel user = (Bennett.AbroadAdvisor.Models.UserModel)Session["User"];
+    UserModel user = Session["User"] as UserModel;
 }
 
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
@@ -107,7 +109,7 @@
                             <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="#"><i class="fa fa-user"></i> Profile</a></li>
+                            <li><a href="@Url.Action("Profile", "User")"><i class="fa fa-user"></i> Profile</a></li>
                             <li><a href="#"><i class="fa fa-envelope"></i> Inbox <span class="badge">7</span></a></li>
                             <li><a href="#"><i class="fa fa-gear"></i> Settings</a></li>
                             <li class="divider"></li>

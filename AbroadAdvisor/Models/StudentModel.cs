@@ -3,14 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Configuration;
-using System.Text;
 using System.Linq;
+using System.Text;
 
 namespace Bennett.AbroadAdvisor.Models
 {
     public class StudentModel
     {
-        [Required]
+        [Key]
         public int Id { get; set; }
 
         public DateTime Created { get; set; }
@@ -208,6 +208,7 @@ namespace Bennett.AbroadAdvisor.Models
             Dictionary<string, string> columns = new Dictionary<string, string>();
             List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
 
+            AddParameter(sql, parameters, columns, "created", NpgsqlTypes.NpgsqlDbType.Timestamp, DateTime.Now.ToUniversalTime(), 0);
             AddParameter(sql, parameters, columns, "first_name", NpgsqlTypes.NpgsqlDbType.Varchar, student.FirstName, 64);
             AddParameter(sql, parameters, columns, "last_name", NpgsqlTypes.NpgsqlDbType.Varchar, student.LastName, 64);
 
@@ -325,7 +326,7 @@ namespace Bennett.AbroadAdvisor.Models
                         command.ExecuteNonQuery();
                     }
 
-                    EventLogModel.Add(connection, transaction, userId, EventLogModel.EventType.AddStudent,
+                    EventLogModel.Add(connection, userId, EventLogModel.EventType.AddStudent,
                             String.Format("Created {0} {1}", student.FirstName, student.LastName));
 
                     transaction.Commit();

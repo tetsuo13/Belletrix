@@ -1,4 +1,6 @@
-﻿@model Bennett.AbroadAdvisor.Models.StudentModel
+﻿@using Bennett.AbroadAdvisor.Models;
+
+@model StudentModel
 
 @{
     ViewBag.Title = "Add";
@@ -46,21 +48,21 @@
                 </div>
                 
                 <div class="form-group">
-                    @Html.LabelFor(s => s.Email)
-                    @Html.TextBoxFor(s => s.Email, new { @class = "form-control" })
+                    @Html.LabelFor(s => s.CampusEmail)
+                    @Html.TextBoxFor(s => s.CampusEmail, new { @class = "form-control" })
                 </div>
                 
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="form-group">
-                            @Html.LabelFor(s => s.EnteringYear)
-                            @Html.TextBoxFor(s => s.EnteringYear, new { @class = "form-control", placeholder = DateTime.Now.AddYears(-1).Year })
+                            @Html.LabelFor(s => s.Classification)
+                            @Html.TextBoxFor(s => s.Classification, new { @class = "form-control", placeholder = DateTime.Now.AddYears(-1).Year })
                         </div>
                     </div>
                     <div class="col-lg-6">
                         <div class="form-group">
-                            @Html.LabelFor(s => s.GraduatingYear)
-                            @Html.TextBoxFor(s => s.GraduatingYear, new { @class = "form-control", placeholder = DateTime.Now.AddYears(3).Year })
+                            @Html.LabelFor(s => s.Classification)
+                            @Html.TextBoxFor(s => s.Classification, new { @class = "form-control", placeholder = DateTime.Now.AddYears(3).Year })
                         </div>
                     </div>
                 </div>

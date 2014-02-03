@@ -5,17 +5,20 @@ using System.Configuration;
 
 namespace Bennett.AbroadAdvisor.Models
 {
-    public class DormModel
+    public class CountryModel
     {
         [Key]
         public int Id { get; set; }
 
         [Required]
-        public string HallName { get; set; }
+        public string Name { get; set; }
 
-        public static List<DormModel> GetDorms()
+        [Required]
+        public string Abbreviation { get; set; }
+
+        public static List<CountryModel> GetCountries()
         {
-            List<DormModel> dorms = new List<DormModel>();
+            List<CountryModel> countries = new List<CountryModel>();
 
             string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
 
@@ -24,9 +27,9 @@ namespace Bennett.AbroadAdvisor.Models
                 using (NpgsqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = @"
-                        SELECT      id, hall_name
-                        FROM        dorms
-                        ORDER BY    hall_name";
+                        SELECT      id, name, abbreviation
+                        FROM        countries
+                        ORDER BY    name";
 
                     connection.Open();
 
@@ -34,17 +37,18 @@ namespace Bennett.AbroadAdvisor.Models
                     {
                         while (reader.Read())
                         {
-                            dorms.Add(new DormModel()
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                    HallName = reader.GetString(reader.GetOrdinal("hall_name"))
-                                });
+                            countries.Add(new CountryModel()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                Name = reader.GetString(reader.GetOrdinal("name")),
+                                Abbreviation = reader.GetString(reader.GetOrdinal("abbreviation"))
+                            });
                         }
                     }
                 }
             }
 
-            return dorms;
+            return countries;
         }
     }
 }

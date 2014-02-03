@@ -1,18 +1,18 @@
 ﻿@using Bennett.AbroadAdvisor.Models;
 
-@model List<StudentModel>
+@model List<UserModel>
 
 @{
-    ViewBag.Title = "List";
+    ViewBag.Title = "UserList";
 }
 
 @section Body {
     <div class="row">
         <div class="col-lg-8">
-            <h1>Students <small>@Model.Count.ToString("N0") total</small></h1>
+            <h1>Users <small>@Model.Count.ToString("N0") total</small></h1>
         </div>
         <div class="col-lg-4 text-right">
-            <a href="@Url.Action("Add", "Student")"><i class="fa fa-plus-circle"></i> Add Student</a>
+            <a href="@Url.Action("Add", "User")"><i class="fa fa-plus-circle"></i> Add User</a>
         </div>
     </div>
 

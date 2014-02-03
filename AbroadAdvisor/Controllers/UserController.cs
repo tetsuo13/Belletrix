@@ -11,27 +11,6 @@ namespace Bennett.AbroadAdvisor.Controllers
         [AllowAnonymous]
         public ActionResult Login()
         {
-            //string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
-            //Dictionary<string, string> majors = new Dictionary<string, string>();
-
-            //using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
-            //{
-            //    string sql = "SELECT * FROM programs";
-
-            //    connection.Open();
-
-            //    using (NpgsqlCommand command = new NpgsqlCommand(sql, connection))
-            //    {
-            //        NpgsqlDataReader reader = command.ExecuteReader();
-
-            //        while (reader.Read())
-            //        {
-            //            majors.Add(reader.GetString(reader.GetOrdinal("Name")),
-            //                reader["Abbreviation"].ToString());
-            //        }
-            //    }
-            //}
-
             return View();
         }
 
@@ -56,6 +35,39 @@ namespace Bennett.AbroadAdvisor.Controllers
         {
             FormsAuthentication.SignOut();
             return RedirectToAction("Login", "User");
+        }
+
+        public ActionResult Profile()
+        {
+            return View(Session["User"]);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Profile(UserModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                UserModel currentUser = Session["User"] as UserModel;
+                model.Id = currentUser.Id;
+                UserModel.Update(model, currentUser.IsAdmin);
+                Session["User"] = model;
+                return RedirectToAction("Index", "Home");
+            }
+
+            ModelState.AddModelError("", "Errors");
+            return View(model);
+        }
+
+        public ActionResult Add()
+        {
+            return View();
+        }
+
+        public ActionResult List()
+        {
+            ViewBag.ActivePage = "students";
+            return View(UserModel.GetUsers());
         }
     }
 }
