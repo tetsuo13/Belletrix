@@ -47,25 +47,162 @@
                     </div>
                 </div>
                 
-                <div class="form-group">
-                    @Html.LabelFor(s => s.CampusEmail)
-                    @Html.TextBoxFor(s => s.CampusEmail, new { @class = "form-control" })
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            @Html.LabelFor(s => s.PhoneNumber)
+                            @Html.TextBoxFor(s => s.PhoneNumber, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            @Html.LabelFor(s => s.CellPhoneNumber)
+                            @Html.TextBoxFor(s => s.CellPhoneNumber, new { @class = "form-control" })
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="form-group">
-                            @Html.LabelFor(s => s.Classification)
-                            @Html.TextBoxFor(s => s.Classification, new { @class = "form-control", placeholder = DateTime.Now.AddYears(-1).Year })
+                            @Html.LabelFor(s => s.LivingOnCampus)
+                            @Html.DropDownListFor(s => s.LivingOnCampus, new SelectList(
+                                new[]
+                                {
+                                    new { Value = true, Text = "On-Campus" },
+                                    new { Value = false, Text = "Off-Campus" }
+                                },
+                                "Value",
+                                "Text",
+                                Model))
                         </div>
                     </div>
                     <div class="col-lg-6">
                         <div class="form-group">
-                            @Html.LabelFor(s => s.Classification)
-                            @Html.TextBoxFor(s => s.Classification, new { @class = "form-control", placeholder = DateTime.Now.AddYears(3).Year })
+                            @Html.LabelFor(s => s.EnrolledFullTime)
+                            @Html.DropDownListFor(s => s.EnrolledFullTime, new SelectList(
+                                new[]
+                                {
+                                    new { Value = true, Text = "Full-time Student" },
+                                    new { Value = false, Text = "Part-time Student" }
+                                },
+                                "Value",
+                                "Text",
+                                Model))
                         </div>
                     </div>
                 </div>
+                
+                <div class="row">
+                    @Html.LabelFor(s => s.StreetAddress)
+                    @Html.TextBoxFor(s => s.StreetAddress, new { @class = "form-control" })
+                    @Html.TextBoxFor(s => s.StreetAddress2, new { @class = "form-control" })
+
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            @Html.TextBoxFor(s => s.City, new { @class = "form-control", placeholder = "City" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            @Html.TextBoxFor(s => s.State, new { @class = "form-control", placeholder = "State" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            @Html.TextBoxFor(s => s.PostalCode, new { @class = "form-control", placeholder = "Postal Code" })
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            @Html.LabelFor(s => s.DormId)
+                            @Html.DropDownListFor(s => s.DormId, ViewBag.DormHalls as SelectList)
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            @Html.LabelFor(s => s.RoomNumber)
+                            @Html.TextBoxFor(s => s.RoomNumber, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            @Html.LabelFor(s => s.CampusPoBox)
+                            @Html.TextBoxFor(s => s.CampusPoBox, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            @Html.LabelFor(s => s.PhoneNumber)
+                            @Html.TextBoxFor(s => s.PhoneNumber, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            @Html.LabelFor(s => s.CellPhoneNumber)
+                            @Html.TextBoxFor(s => s.CellPhoneNumber, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    @Html.LabelFor(s => s.Citizenship)
+                    @Html.DropDownListFor(s => s.Citizenship, ViewBag.Countries as SelectList)
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            @Html.LabelFor(s => s.PellGrantRecipient)
+                            @Html.DropDownListFor(s => s.PellGrantRecipient, new SelectList(
+                                new[]
+                                {
+                                    new { Value = true, Text = "Yes" },
+                                    new { Value = false, Text = "No" }
+                                },
+                                "Value",
+                                "Text",
+                                Model))
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            @Html.LabelFor(s => s.HasPassport)
+                            @Html.DropDownListFor(s => s.HasPassport, new SelectList(
+                                new[]
+                                {
+                                    new { Value = true, Text = "Yes" },
+                                    new { Value = false, Text = "No" }
+                                },
+                                "Value",
+                                "Text",
+                                Model))
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    @Html.LabelFor(s => s.Gpa)
+                    @Html.TextBoxFor(s => s.Gpa, new { @class = "form-control" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(s => s.CampusEmail)
+                    @Html.TextBoxFor(s => s.CampusEmail, new { @class = "form-control" })
+                </div>
+                
+                <div class="form-group">
+                    @Html.LabelFor(s => s.AlternateEmail)
+                    @Html.TextBoxFor(s => s.AlternateEmail, new { @class = "form-control" })
+                </div>
+                
+                
                 
                 <div class="form-group">
                     @Html.LabelFor(s => s.PhoneNumber)

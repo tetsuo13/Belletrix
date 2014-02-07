@@ -15,6 +15,8 @@ namespace Bennett.AbroadAdvisor.Controllers
         public ActionResult Add()
         {
             ViewBag.ActivePage = "students";
+            ViewBag.Countries = new SelectList(CountryModel.GetCountries(), "Id", "Name");
+            ViewBag.DormHalls = new SelectList(DormModel.GetDorms(), "Id", "HallName");
             return View();
         }
 

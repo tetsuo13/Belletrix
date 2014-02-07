@@ -26,9 +26,11 @@ namespace Bennett.AbroadAdvisor.Models
         [StringLength(64)]
         public string LastName { get; set; }
 
+        [Display(Name = "Living")]
         public bool LivingOnCampus { get; set; }
 
         [StringLength(128)]
+        [Display(Name = "Local Address")]
         public string StreetAddress { get; set; }
 
         [StringLength(128)]
@@ -44,44 +46,57 @@ namespace Bennett.AbroadAdvisor.Models
         public string PostalCode { get; set; }
 
         [StringLength(32)]
+        [Display(Name = "Telephone #")]
         public string PhoneNumber { get; set; }
 
         [StringLength(32)]
+        [Display(Name = "Cell Phone #")]
         public string CellPhoneNumber { get; set; }
 
         [Range(1000, 9999)]
         public int Classification { get; set; }
 
         [StringLength(32)]
+        [Display(Name = "Student ID")]
         public string StudentId { get; set; }
 
+        [Display(Name = "Date of Birth")]
         public DateTime DateOfBirth { get; set; }
 
+        [Display(Name = "Dorm Hall")]
         public int DormId { get; set; }
 
         [StringLength(8)]
+        [Display(Name = "Room #")]
         public string RoomNumber { get; set; }
 
         [StringLength(16)]
+        [Display(Name = "Campus PO Box")]
         public string CampusPoBox { get; set; }
 
+        [Display(Name = "Enrolled as a")]
         public bool EnrolledFullTime { get; set; }
 
         public int Citizenship { get; set; }
 
+        [Display(Name = "Are you a Pell Grant Recipient?")]
         public bool PellGrantRecipient { get; set; }
 
+        [Display(Name = "Do you have a passport?")]
         public bool HasPassport { get; set; }
 
         [Range(0.00, 9.99)]
+        [Display(Name = "Current GPA")]
         public decimal Gpa { get; set; }
 
         [StringLength(128)]
         [EmailAddress]
+        [Display(Name = "Bennett College Email")]
         public string CampusEmail { get; set; }
 
         [StringLength(128)]
         [EmailAddress]
+        [Display(Name = "Alternative Email")]
         public string AlternateEmail { get; set; }
 
         private static string StringOrDefault(NpgsqlDataReader reader, string column)
