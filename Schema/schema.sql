@@ -359,11 +359,6 @@ PRIMARY KEY (student_id, major_id)
 
 GRANT ALL PRIVILEGES ON student_matriculation TO neoanime_abroadadvisor;
 
-INSERT INTO student_matriculation
-(student_id, major_id, is_major)
-VALUES
-(1, 11, TRUE),
-(2, 2, TRUE);
 
 CREATE TABLE programs (
 id              SERIAL,

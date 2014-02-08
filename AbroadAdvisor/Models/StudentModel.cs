@@ -27,7 +27,7 @@ namespace Bennett.AbroadAdvisor.Models
         public string LastName { get; set; }
 
         [Display(Name = "Living")]
-        public bool LivingOnCampus { get; set; }
+        public bool? LivingOnCampus { get; set; }
 
         [StringLength(128)]
         [Display(Name = "Local Address")]
@@ -54,17 +54,18 @@ namespace Bennett.AbroadAdvisor.Models
         public string CellPhoneNumber { get; set; }
 
         [Range(1000, 9999)]
-        public int Classification { get; set; }
+        [Display(Name = "Entering Year")]
+        public int? Classification { get; set; }
 
         [StringLength(32)]
         [Display(Name = "Student ID")]
         public string StudentId { get; set; }
 
         [Display(Name = "Date of Birth")]
-        public DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
 
         [Display(Name = "Dorm Hall")]
-        public int DormId { get; set; }
+        public int? DormId { get; set; }
 
         [StringLength(8)]
         [Display(Name = "Room #")]
@@ -75,19 +76,19 @@ namespace Bennett.AbroadAdvisor.Models
         public string CampusPoBox { get; set; }
 
         [Display(Name = "Enrolled as a")]
-        public bool EnrolledFullTime { get; set; }
+        public bool? EnrolledFullTime { get; set; }
 
-        public int Citizenship { get; set; }
+        public int? Citizenship { get; set; }
 
         [Display(Name = "Are you a Pell Grant Recipient?")]
-        public bool PellGrantRecipient { get; set; }
+        public bool? PellGrantRecipient { get; set; }
 
         [Display(Name = "Do you have a passport?")]
-        public bool HasPassport { get; set; }
+        public bool? HasPassport { get; set; }
 
         [Range(0.00, 9.99)]
         [Display(Name = "Current GPA")]
-        public decimal Gpa { get; set; }
+        public decimal? Gpa { get; set; }
 
         [StringLength(128)]
         [EmailAddress]
@@ -98,6 +99,12 @@ namespace Bennett.AbroadAdvisor.Models
         [EmailAddress]
         [Display(Name = "Alternative Email")]
         public string AlternateEmail { get; set; }
+
+        [Display(Name = "Major")]
+        public int? Major { get; set; }
+
+        [Display(Name = "Minor")]
+        public int? Minor { get; set; }
 
         private static string StringOrDefault(NpgsqlDataReader reader, string column)
         {
@@ -193,7 +200,7 @@ namespace Bennett.AbroadAdvisor.Models
                             student.CampusPoBox = StringOrDefault(reader, "campus_po_box");
                             student.EnrolledFullTime = BoolOrDefault(reader, "enrolled_full_time");
                             student.Citizenship = IntOrDefault(reader, "citizenship");
-                            student.PellGrantRecipient = BoolOrDefault(reader, "pell_grant_citizenship");
+                            student.PellGrantRecipient = BoolOrDefault(reader, "pell_grant_recipient");
                             student.HasPassport = BoolOrDefault(reader, "passport_holder");
                             student.CampusEmail = StringOrDefault(reader, "campus_email");
                             student.AlternateEmail = StringOrDefault(reader, "alternate_email");
@@ -232,7 +239,10 @@ namespace Bennett.AbroadAdvisor.Models
                 AddParameter(sql, parameters, columns, "middle_name", NpgsqlTypes.NpgsqlDbType.Varchar, student.MiddleName, 64);
             }
 
-            AddParameter(sql, parameters, columns, "living_on_campus", NpgsqlTypes.NpgsqlDbType.Boolean, student.LivingOnCampus, 0);
+            if (student.LivingOnCampus.HasValue)
+            {
+                AddParameter(sql, parameters, columns, "living_on_campus", NpgsqlTypes.NpgsqlDbType.Boolean, student.LivingOnCampus, 0);
+            }
 
             if (!String.IsNullOrEmpty(student.StreetAddress))
             {
@@ -269,9 +279,9 @@ namespace Bennett.AbroadAdvisor.Models
                 AddParameter(sql, parameters, columns, "cell_phone_number", NpgsqlTypes.NpgsqlDbType.Varchar, student.CellPhoneNumber, 32);
             }
 
-            if (student.Classification > 0)
+            if (student.Classification.HasValue)
             {
-                AddParameter(sql, parameters, columns, "classification", NpgsqlTypes.NpgsqlDbType.Smallint, student.Classification, 0);
+                AddParameter(sql, parameters, columns, "classification", NpgsqlTypes.NpgsqlDbType.Smallint, student.Classification.Value, 0);
             }
 
             if (!String.IsNullOrEmpty(student.StudentId))
@@ -279,14 +289,14 @@ namespace Bennett.AbroadAdvisor.Models
                 AddParameter(sql, parameters, columns, "student_id", NpgsqlTypes.NpgsqlDbType.Varchar, student.StudentId, 32);
             }
 
-            if (student.DateOfBirth != default(DateTime))
+            if (student.DateOfBirth.HasValue)
             {
-                AddParameter(sql, parameters, columns, "dob", NpgsqlTypes.NpgsqlDbType.Date, student.DateOfBirth, 0);
+                AddParameter(sql, parameters, columns, "dob", NpgsqlTypes.NpgsqlDbType.Date, student.DateOfBirth.Value, 0);
             }
 
-            if (student.DormId > 0)
+            if (student.DormId.HasValue)
             {
-                AddParameter(sql, parameters, columns, "dorm_id", NpgsqlTypes.NpgsqlDbType.Integer, student.DormId, 0);
+                AddParameter(sql, parameters, columns, "dorm_id", NpgsqlTypes.NpgsqlDbType.Integer, student.DormId.Value, 0);
             }
 
             if (!String.IsNullOrEmpty(student.RoomNumber))
@@ -299,18 +309,29 @@ namespace Bennett.AbroadAdvisor.Models
                 AddParameter(sql, parameters, columns, "campus_po_box", NpgsqlTypes.NpgsqlDbType.Varchar, student.CampusPoBox, 16);
             }
 
-            if (student.Citizenship > 0)
+            if (student.Citizenship.HasValue)
             {
-                AddParameter(sql, parameters, columns, "citizenship", NpgsqlTypes.NpgsqlDbType.Integer, student.Citizenship, 0);
+                AddParameter(sql, parameters, columns, "citizenship", NpgsqlTypes.NpgsqlDbType.Integer, student.Citizenship.Value, 0);
             }
 
-            AddParameter(sql, parameters, columns, "enrolled_full_time", NpgsqlTypes.NpgsqlDbType.Boolean, student.EnrolledFullTime, 0);
-            AddParameter(sql, parameters, columns, "pell_grant_recipient", NpgsqlTypes.NpgsqlDbType.Boolean, student.PellGrantRecipient, 0);
-            AddParameter(sql, parameters, columns, "passport_holder", NpgsqlTypes.NpgsqlDbType.Boolean, student.HasPassport, 0);
-
-            if (student.Gpa != default(decimal))
+            if (student.EnrolledFullTime.HasValue)
             {
-                AddParameter(sql, parameters, columns, "gpa", NpgsqlTypes.NpgsqlDbType.Double, student.Gpa, 0);
+                AddParameter(sql, parameters, columns, "enrolled_full_time", NpgsqlTypes.NpgsqlDbType.Boolean, student.EnrolledFullTime.Value, 0);
+            }
+
+            if (student.PellGrantRecipient.HasValue)
+            {
+                AddParameter(sql, parameters, columns, "pell_grant_recipient", NpgsqlTypes.NpgsqlDbType.Boolean, student.PellGrantRecipient.Value, 0);
+            }
+
+            if (student.HasPassport.HasValue)
+            {
+                AddParameter(sql, parameters, columns, "passport_holder", NpgsqlTypes.NpgsqlDbType.Boolean, student.HasPassport.Value, 0);
+            }
+
+            if (student.Gpa.HasValue)
+            {
+                AddParameter(sql, parameters, columns, "gpa", NpgsqlTypes.NpgsqlDbType.Double, student.Gpa.Value, 0);
             }
 
             if (!String.IsNullOrEmpty(student.CampusEmail))

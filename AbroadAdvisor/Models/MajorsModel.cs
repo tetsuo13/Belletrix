@@ -5,7 +5,7 @@ using System.Configuration;
 
 namespace Bennett.AbroadAdvisor.Models
 {
-    public class CountryModel
+    public class MajorsModel
     {
         [Key]
         public int Id { get; set; }
@@ -13,12 +13,9 @@ namespace Bennett.AbroadAdvisor.Models
         [Required]
         public string Name { get; set; }
 
-        [Required]
-        public string Abbreviation { get; set; }
-
-        public static List<CountryModel> GetCountries()
+        public static List<MajorsModel> GetMajors()
         {
-            List<CountryModel> countries = new List<CountryModel>();
+            List<MajorsModel> majors = new List<MajorsModel>();
 
             string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
 
@@ -27,12 +24,9 @@ namespace Bennett.AbroadAdvisor.Models
                 using (NpgsqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = @"
-                        SELECT      id, name, abbreviation
-                        FROM        countries
-                        ORDER BY    CASE abbreviation
-                                        WHEN 'US' THEN 1
-                                        ELSE 2
-                                    END, name";
+                        SELECT      id, name
+                        FROM        majors
+                        ORDER BY    name";
 
                     connection.Open();
 
@@ -40,18 +34,17 @@ namespace Bennett.AbroadAdvisor.Models
                     {
                         while (reader.Read())
                         {
-                            countries.Add(new CountryModel()
+                            majors.Add(new MajorsModel()
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                Name = reader.GetString(reader.GetOrdinal("name")),
-                                Abbreviation = reader.GetString(reader.GetOrdinal("abbreviation"))
+                                Name = reader.GetString(reader.GetOrdinal("name"))
                             });
                         }
                     }
                 }
             }
 
-            return countries;
+            return majors;
         }
     }
 }

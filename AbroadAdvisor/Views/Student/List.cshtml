@@ -37,7 +37,9 @@
                 @foreach (var student in Model)
                 {
                     <tr>
-                        <td>@student.LastName, @student.FirstName @student.MiddleName</td>
+                        <td>
+                            <a href="@Url.Action("Index", "Home")">@student.LastName, @student.FirstName @student.MiddleName</a>
+                        </td>
                         <td>
                             @if (String.IsNullOrEmpty(student.CampusEmail))
                             {

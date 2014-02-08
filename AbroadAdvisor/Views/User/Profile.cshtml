@@ -61,20 +61,20 @@
 
                 <div class="form-group">
                     @Html.LabelFor(s => s.Login)
-                    @Html.TextBoxFor(s => s.Login, new { @class = "form-control", @readonly = "readonly" })
+                    <p class="form-control-static">@Model.Login</p>
                 </div>
 
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
                             @Html.LabelFor(s => s.Created)
-                            @Html.TextBoxFor(s => s.Created, new { @class = "form-control", @readonly = "readonly" })
+                            <p class="form-control-static">@Model.Created</p>
                         </div>
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
                             @Html.LabelFor(s => s.LastLogin)
-                            @Html.TextBoxFor(s => s.LastLogin, new { @class = "form-control", @readonly = "readonly" })
+                            <p class="form-control-static">@Model.LastLogin</p>
                         </div>
                     </div>
                 </div>
