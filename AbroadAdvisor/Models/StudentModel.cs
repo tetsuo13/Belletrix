@@ -43,14 +43,17 @@ namespace Bennett.AbroadAdvisor.Models
         public string State { get; set; }
 
         [StringLength(16)]
+        [DataType(DataType.PostalCode)]
         public string PostalCode { get; set; }
 
         [StringLength(32)]
         [Display(Name = "Telephone #")]
+        [DataType(DataType.PhoneNumber)]
         public string PhoneNumber { get; set; }
 
         [StringLength(32)]
         [Display(Name = "Cell Phone #")]
+        [DataType(DataType.PhoneNumber)]
         public string CellPhoneNumber { get; set; }
 
         [Range(1000, 9999)]
@@ -62,6 +65,7 @@ namespace Bennett.AbroadAdvisor.Models
         public string StudentId { get; set; }
 
         [Display(Name = "Date of Birth")]
+        [DataType(DataType.Date)]
         public DateTime? DateOfBirth { get; set; }
 
         [Display(Name = "Dorm Hall")]
@@ -106,44 +110,46 @@ namespace Bennett.AbroadAdvisor.Models
         [Display(Name = "Minor")]
         public int? Minor { get; set; }
 
+        private Dictionary<string, string> columns;
+        private List<NpgsqlParameter> parameters;
+
         private static string StringOrDefault(NpgsqlDataReader reader, string column)
         {
             int ord = reader.GetOrdinal(column);
 
             if (reader.IsDBNull(ord))
             {
-                return default(string);
+                return null;
             }
 
             return reader.GetString(ord);
         }
 
-        private static bool BoolOrDefault(NpgsqlDataReader reader, string column)
+        private static bool? BoolOrDefault(NpgsqlDataReader reader, string column)
         {
             int ord = reader.GetOrdinal(column);
 
             if (reader.IsDBNull(ord))
             {
-                return false;
+                return null;
             }
 
             return reader.GetBoolean(ord);
         }
 
-        private static int IntOrDefault(NpgsqlDataReader reader, string column)
+        private static int? IntOrDefault(NpgsqlDataReader reader, string column)
         {
             int ord = reader.GetOrdinal(column);
 
             if (reader.IsDBNull(ord))
             {
-                return default(int);
+                return null;
             }
 
             return reader.GetInt32(ord);
         }
 
-        private static void AddParameter(StringBuilder sql, List<NpgsqlParameter> parameters,
-            Dictionary<string, string> columns, string columnName, NpgsqlTypes.NpgsqlDbType columnType,
+        private void AddParameter(StringBuilder sql, string columnName, NpgsqlTypes.NpgsqlDbType columnType,
             object columnValue, int columnLength)
         {
             string parameterName = String.Format("@{0}", columnName);
@@ -159,7 +165,47 @@ namespace Bennett.AbroadAdvisor.Models
             }
         }
 
-        public static List<StudentModel> GetStudents()
+        public void SaveChanges(int userId)
+        {
+            string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
+
+            StringBuilder sql = new StringBuilder(@"UPDATE students SET ");
+
+            PrepareColumns(ref sql);
+
+            foreach (KeyValuePair<string, string> pair in columns)
+            {
+                sql.Append(String.Format("{0} = {1}, ", pair.Key, pair.Value));
+            }
+
+            // Remove the trailing comma and space.
+            sql.Length -= 2;
+
+            sql.Append(" WHERE id = @Id");
+            parameters.Add(new NpgsqlParameter("@Id", NpgsqlTypes.NpgsqlDbType.Integer) { Value = Id });
+
+            using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
+            {
+                connection.Open();
+
+                using (NpgsqlTransaction transaction = connection.BeginTransaction())
+                {
+                    using (NpgsqlCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = sql.ToString();
+                        command.Parameters.AddRange(parameters.ToArray());
+                        command.ExecuteNonQuery();
+                    }
+
+                    EventLogModel.Add(connection, userId, EventLogModel.EventType.EditStudent,
+                            String.Format("Updated {0} {1}", FirstName, LastName));
+
+                    transaction.Commit();
+                }
+            }
+        }
+
+        public static List<StudentModel> GetStudents(int? id = null)
         {
             List<StudentModel> students = new List<StudentModel>();
             string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
@@ -168,10 +214,18 @@ namespace Bennett.AbroadAdvisor.Models
             {
                 using (NpgsqlCommand command = connection.CreateCommand())
                 {
-                    command.CommandText = @"
-                        SELECT      *
-                        FROM        students
-                        ORDER BY    last_name, first_name";
+                    StringBuilder sql = new StringBuilder(@"
+                        SELECT  *
+                        FROM    students ");
+
+                    if (id != null)
+                    {
+                        sql.Append("WHERE id = @Id ");
+                    }
+
+                    sql.Append("ORDER BY last_name, first_name");
+
+                    command.CommandText = sql.ToString();
                     connection.Open();
 
                     using (NpgsqlDataReader reader = command.ExecuteReader())
@@ -222,127 +276,13 @@ namespace Bennett.AbroadAdvisor.Models
             return students;
         }
 
-        public static void Create(StudentModel student, int userId)
+        public void Save(int userId)
         {
             string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
 
             StringBuilder sql = new StringBuilder(@"INSERT INTO students (");
-            Dictionary<string, string> columns = new Dictionary<string, string>();
-            List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
-
-            AddParameter(sql, parameters, columns, "created", NpgsqlTypes.NpgsqlDbType.Timestamp, DateTime.Now.ToUniversalTime(), 0);
-            AddParameter(sql, parameters, columns, "first_name", NpgsqlTypes.NpgsqlDbType.Varchar, student.FirstName, 64);
-            AddParameter(sql, parameters, columns, "last_name", NpgsqlTypes.NpgsqlDbType.Varchar, student.LastName, 64);
-
-            if (!String.IsNullOrEmpty(student.MiddleName))
-            {
-                AddParameter(sql, parameters, columns, "middle_name", NpgsqlTypes.NpgsqlDbType.Varchar, student.MiddleName, 64);
-            }
-
-            if (student.LivingOnCampus.HasValue)
-            {
-                AddParameter(sql, parameters, columns, "living_on_campus", NpgsqlTypes.NpgsqlDbType.Boolean, student.LivingOnCampus, 0);
-            }
-
-            if (!String.IsNullOrEmpty(student.StreetAddress))
-            {
-                AddParameter(sql, parameters, columns, "street_address", NpgsqlTypes.NpgsqlDbType.Varchar, student.StreetAddress, 128);
-            }
-
-            if (!String.IsNullOrEmpty(student.StreetAddress2))
-            {
-                AddParameter(sql, parameters, columns, "street_address2", NpgsqlTypes.NpgsqlDbType.Varchar, student.StreetAddress2, 128);
-            }
-
-            if (!String.IsNullOrEmpty(student.City))
-            {
-                AddParameter(sql, parameters, columns, "city", NpgsqlTypes.NpgsqlDbType.Varchar, student.City, 128);
-            }
-
-            if (!String.IsNullOrEmpty(student.State))
-            {
-                AddParameter(sql, parameters, columns, "state", NpgsqlTypes.NpgsqlDbType.Varchar, student.State, 32);
-            }
-
-            if (!String.IsNullOrEmpty(student.PostalCode))
-            {
-                AddParameter(sql, parameters, columns, "postal_code", NpgsqlTypes.NpgsqlDbType.Varchar, student.PostalCode, 16);
-            }
-
-            if (!String.IsNullOrEmpty(student.PhoneNumber))
-            {
-                AddParameter(sql, parameters, columns, "phone_number", NpgsqlTypes.NpgsqlDbType.Varchar, student.PhoneNumber, 32);
-            }
-
-            if (!String.IsNullOrEmpty(student.CellPhoneNumber))
-            {
-                AddParameter(sql, parameters, columns, "cell_phone_number", NpgsqlTypes.NpgsqlDbType.Varchar, student.CellPhoneNumber, 32);
-            }
-
-            if (student.Classification.HasValue)
-            {
-                AddParameter(sql, parameters, columns, "classification", NpgsqlTypes.NpgsqlDbType.Smallint, student.Classification.Value, 0);
-            }
-
-            if (!String.IsNullOrEmpty(student.StudentId))
-            {
-                AddParameter(sql, parameters, columns, "student_id", NpgsqlTypes.NpgsqlDbType.Varchar, student.StudentId, 32);
-            }
-
-            if (student.DateOfBirth.HasValue)
-            {
-                AddParameter(sql, parameters, columns, "dob", NpgsqlTypes.NpgsqlDbType.Date, student.DateOfBirth.Value, 0);
-            }
-
-            if (student.DormId.HasValue)
-            {
-                AddParameter(sql, parameters, columns, "dorm_id", NpgsqlTypes.NpgsqlDbType.Integer, student.DormId.Value, 0);
-            }
-
-            if (!String.IsNullOrEmpty(student.RoomNumber))
-            {
-                AddParameter(sql, parameters, columns, "room_number", NpgsqlTypes.NpgsqlDbType.Varchar, student.RoomNumber, 8);
-            }
-
-            if (!String.IsNullOrEmpty(student.CampusPoBox))
-            {
-                AddParameter(sql, parameters, columns, "campus_po_box", NpgsqlTypes.NpgsqlDbType.Varchar, student.CampusPoBox, 16);
-            }
-
-            if (student.Citizenship.HasValue)
-            {
-                AddParameter(sql, parameters, columns, "citizenship", NpgsqlTypes.NpgsqlDbType.Integer, student.Citizenship.Value, 0);
-            }
-
-            if (student.EnrolledFullTime.HasValue)
-            {
-                AddParameter(sql, parameters, columns, "enrolled_full_time", NpgsqlTypes.NpgsqlDbType.Boolean, student.EnrolledFullTime.Value, 0);
-            }
-
-            if (student.PellGrantRecipient.HasValue)
-            {
-                AddParameter(sql, parameters, columns, "pell_grant_recipient", NpgsqlTypes.NpgsqlDbType.Boolean, student.PellGrantRecipient.Value, 0);
-            }
-
-            if (student.HasPassport.HasValue)
-            {
-                AddParameter(sql, parameters, columns, "passport_holder", NpgsqlTypes.NpgsqlDbType.Boolean, student.HasPassport.Value, 0);
-            }
-
-            if (student.Gpa.HasValue)
-            {
-                AddParameter(sql, parameters, columns, "gpa", NpgsqlTypes.NpgsqlDbType.Double, student.Gpa.Value, 0);
-            }
-
-            if (!String.IsNullOrEmpty(student.CampusEmail))
-            {
-                AddParameter(sql, parameters, columns, "campus_email", NpgsqlTypes.NpgsqlDbType.Varchar, student.CampusEmail, 128);
-            }
-
-            if (!String.IsNullOrEmpty(student.AlternateEmail))
-            {
-                AddParameter(sql, parameters, columns, "alternate_email", NpgsqlTypes.NpgsqlDbType.Varchar, student.AlternateEmail, 128);
-            }
+            
+            PrepareColumns(ref sql);
 
             sql.Append(String.Join(", ", columns.Select(x => x.Key)));
             sql.Append(") VALUES (");
@@ -363,10 +303,130 @@ namespace Bennett.AbroadAdvisor.Models
                     }
 
                     EventLogModel.Add(connection, userId, EventLogModel.EventType.AddStudent,
-                            String.Format("Created {0} {1}", student.FirstName, student.LastName));
+                            String.Format("Created {0} {1}", FirstName, LastName));
 
                     transaction.Commit();
                 }
+            }
+        }
+
+        private void PrepareColumns(ref StringBuilder sql)
+        {
+            columns = new Dictionary<string, string>();
+            parameters = new List<NpgsqlParameter>();
+
+            AddParameter(sql, "created", NpgsqlTypes.NpgsqlDbType.Timestamp, DateTime.Now.ToUniversalTime(), 0);
+            AddParameter(sql, "first_name", NpgsqlTypes.NpgsqlDbType.Varchar, FirstName, 64);
+            AddParameter(sql, "last_name", NpgsqlTypes.NpgsqlDbType.Varchar, LastName, 64);
+
+            if (!String.IsNullOrEmpty(MiddleName))
+            {
+                AddParameter(sql, "middle_name", NpgsqlTypes.NpgsqlDbType.Varchar, MiddleName, 64);
+            }
+
+            if (LivingOnCampus.HasValue)
+            {
+                AddParameter(sql, "living_on_campus", NpgsqlTypes.NpgsqlDbType.Boolean, LivingOnCampus, 0);
+            }
+
+            if (!String.IsNullOrEmpty(StreetAddress))
+            {
+                AddParameter(sql, "street_address", NpgsqlTypes.NpgsqlDbType.Varchar, StreetAddress, 128);
+            }
+
+            if (!String.IsNullOrEmpty(StreetAddress2))
+            {
+                AddParameter(sql, "street_address2", NpgsqlTypes.NpgsqlDbType.Varchar, StreetAddress2, 128);
+            }
+
+            if (!String.IsNullOrEmpty(City))
+            {
+                AddParameter(sql, "city", NpgsqlTypes.NpgsqlDbType.Varchar, City, 128);
+            }
+
+            if (!String.IsNullOrEmpty(State))
+            {
+                AddParameter(sql, "state", NpgsqlTypes.NpgsqlDbType.Varchar, State, 32);
+            }
+
+            if (!String.IsNullOrEmpty(PostalCode))
+            {
+                AddParameter(sql, "postal_code", NpgsqlTypes.NpgsqlDbType.Varchar, PostalCode, 16);
+            }
+
+            if (!String.IsNullOrEmpty(PhoneNumber))
+            {
+                AddParameter(sql, "phone_number", NpgsqlTypes.NpgsqlDbType.Varchar, PhoneNumber, 32);
+            }
+
+            if (!String.IsNullOrEmpty(CellPhoneNumber))
+            {
+                AddParameter(sql, "cell_phone_number", NpgsqlTypes.NpgsqlDbType.Varchar, CellPhoneNumber, 32);
+            }
+
+            if (Classification.HasValue)
+            {
+                AddParameter(sql, "classification", NpgsqlTypes.NpgsqlDbType.Smallint, Classification.Value, 0);
+            }
+
+            if (!String.IsNullOrEmpty(StudentId))
+            {
+                AddParameter(sql, "student_id", NpgsqlTypes.NpgsqlDbType.Varchar, StudentId, 32);
+            }
+
+            if (DateOfBirth.HasValue)
+            {
+                AddParameter(sql, "dob", NpgsqlTypes.NpgsqlDbType.Date, DateOfBirth.Value, 0);
+            }
+
+            if (DormId.HasValue)
+            {
+                AddParameter(sql, "dorm_id", NpgsqlTypes.NpgsqlDbType.Integer, DormId.Value, 0);
+            }
+
+            if (!String.IsNullOrEmpty(RoomNumber))
+            {
+                AddParameter(sql, "room_number", NpgsqlTypes.NpgsqlDbType.Varchar, RoomNumber, 8);
+            }
+
+            if (!String.IsNullOrEmpty(CampusPoBox))
+            {
+                AddParameter(sql, "campus_po_box", NpgsqlTypes.NpgsqlDbType.Varchar, CampusPoBox, 16);
+            }
+
+            if (Citizenship.HasValue)
+            {
+                AddParameter(sql, "citizenship", NpgsqlTypes.NpgsqlDbType.Integer, Citizenship.Value, 0);
+            }
+
+            if (EnrolledFullTime.HasValue)
+            {
+                AddParameter(sql, "enrolled_full_time", NpgsqlTypes.NpgsqlDbType.Boolean, EnrolledFullTime.Value, 0);
+            }
+
+            if (PellGrantRecipient.HasValue)
+            {
+                AddParameter(sql, "pell_grant_recipient", NpgsqlTypes.NpgsqlDbType.Boolean, PellGrantRecipient.Value, 0);
+            }
+
+            if (HasPassport.HasValue)
+            {
+                AddParameter(sql, "passport_holder", NpgsqlTypes.NpgsqlDbType.Boolean, HasPassport.Value, 0);
+            }
+
+            if (Gpa.HasValue)
+            {
+                AddParameter(sql, "gpa", NpgsqlTypes.NpgsqlDbType.Double, Gpa.Value, 0);
+            }
+
+            if (!String.IsNullOrEmpty(CampusEmail))
+            {
+                AddParameter(sql, "campus_email", NpgsqlTypes.NpgsqlDbType.Varchar, CampusEmail, 128);
+            }
+
+            if (!String.IsNullOrEmpty(AlternateEmail))
+            {
+                AddParameter(sql, "alternate_email", NpgsqlTypes.NpgsqlDbType.Varchar, AlternateEmail, 128);
             }
         }
     }

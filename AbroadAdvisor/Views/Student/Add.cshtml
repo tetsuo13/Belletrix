@@ -26,7 +26,7 @@
         </div>
     </div>
 
-    @using (Html.BeginForm("Add", "Student", FormMethod.Post, new { role = "form" }))
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { role = "form" }))
     {
         @Html.AntiForgeryToken()
         @Html.ValidationSummary()

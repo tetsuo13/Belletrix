@@ -280,7 +280,7 @@ GRANT ALL PRIVILEGES ON dorms_id_seq TO neoanime_abroadadvisor;
 
 CREATE TABLE students (
 id                      SERIAL,
-created                 TIMESTAMP NOT NULL DEFAULT NOW(),
+created                 TIMESTAMP NOT NULL,
 first_name              VARCHAR(64) NOT NULL,
 middle_name             VARCHAR(64),
 last_name               VARCHAR(64) NOT NULL,
@@ -492,7 +492,7 @@ VALUES
 
 CREATE TABLE event_log (
 id          SERIAL,
-date        TIMESTAMP NOT NULL DEFAULT NOW(),
+date        TIMESTAMP NOT NULL,
 user_id     INT NOT NULL,
 type        INT NOT NULL,
 action      VARCHAR(512) NOT NULL,

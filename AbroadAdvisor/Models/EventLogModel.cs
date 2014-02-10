@@ -20,6 +20,46 @@ namespace Bennett.AbroadAdvisor.Models
         public int ReferenceId { get; set; }
         public string Action { get; set; }
 
+        public List<EventLogModel> GetEvents()
+        {
+            List<EventLogModel> events = new List<EventLogModel>();
+            string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
+
+            using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
+            {
+                using (NpgsqlCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = @"
+                        SELECT      id, date, user_id, type, action
+                        FROM        event_log
+                        ORDER BY    date DESC";
+                    connection.Open();
+
+                    using (NpgsqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string type = "";
+
+                            switch (reader.Int32(reader.GetOrdinal("type")))
+                            {
+                                case EventType.AddStudent:
+                                    type = "Added"
+                            }
+                            StudentModel student = new StudentModel()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                FirstName = reader.GetString(reader.GetOrdinal("first_name")),
+                                LastName = reader.GetString(reader.GetOrdinal("last_name"))
+                            };
+                        }
+                    }
+                }
+            }
+
+            return events;
+        }
+
         public static void Add(NpgsqlConnection connection, int userId, EventType eventType, string action)
         {
             using (NpgsqlCommand command = connection.CreateCommand())

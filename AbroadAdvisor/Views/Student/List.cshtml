@@ -38,7 +38,7 @@
                 {
                     <tr>
                         <td>
-                            <a href="@Url.Action("Index", "Home")">@student.LastName, @student.FirstName @student.MiddleName</a>
+                            <a href="@Url.Action("Edit", "Student", new { id = student.Id })">@student.LastName, @student.FirstName @student.MiddleName</a>
                         </td>
                         <td>
                             @if (String.IsNullOrEmpty(student.CampusEmail))

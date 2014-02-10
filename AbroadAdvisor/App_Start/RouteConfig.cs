@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.Security.Policy;
+using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace Bennett.AbroadAdvisor
@@ -12,8 +13,13 @@ namespace Bennett.AbroadAdvisor
 
             routes.MapRoute(
                 name: "Default",
-                url: "{controller}/{action}",
-                defaults: new { controller = "User", action = "Login" }
+                url: "{controller}/{action}/{id}",
+                defaults: new
+                {
+                    controller = "User",
+                    action = "Login",
+                    id = UrlParameter.Optional
+                }
             );
         }
     }

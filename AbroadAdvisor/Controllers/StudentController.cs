@@ -1,4 +1,6 @@
 ﻿using Bennett.AbroadAdvisor.Models;
+using System.Collections.Generic;
+using System.Net;
 using System.Web.Mvc;
 
 namespace Bennett.AbroadAdvisor.Controllers
@@ -6,15 +8,50 @@ namespace Bennett.AbroadAdvisor.Controllers
     [Authorize]
     public class StudentController : Controller
     {
-        public ActionResult List()
+        public StudentController()
         {
             ViewBag.ActivePage = "students";
+        }
+
+        public ActionResult List()
+        {
             return View(StudentModel.GetStudents());
+        }
+
+        public ActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            List<StudentModel> student = StudentModel.GetStudents(id);
+
+            if (student.Count == 0)
+            {
+                return HttpNotFound();
+            }
+
+            PrepareDropDowns();
+            return View("Add", student[0]);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(StudentModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                model.SaveChanges((Session["User"] as UserModel).Id);
+                return RedirectToAction("List");
+            }
+
+            PrepareDropDowns();
+            return View(model);
         }
 
         public ActionResult Add()
         {
-            ViewBag.ActivePage = "students";
             PrepareDropDowns();
             return View();
         }
@@ -25,7 +62,7 @@ namespace Bennett.AbroadAdvisor.Controllers
         {
             if (ModelState.IsValid)
             {
-                StudentModel.Create(model, (Session["User"] as UserModel).Id);
+                model.Save((Session["User"] as UserModel).Id);
                 return RedirectToAction("List");
             }
 
