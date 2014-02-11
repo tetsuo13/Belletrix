@@ -1,4 +1,6 @@
-﻿@{
+﻿@using Bennett.AbroadAdvisor.Models;
+
+@{
     ViewBag.Title = "Index";
 }
 
@@ -13,6 +15,33 @@
                 </div>
                 <div class="panel-body">
                     <div class="list-group">
+                        @foreach (EventLogModel eventLog in ViewBag.RecentActivity)
+                        {
+                            string action = String.Empty;
+                            string personName = String.Empty;
+                            string iconClass = String.Empty;
+                            
+                            switch (eventLog.Type)
+                            {
+                                case (int)EventLogModel.EventType.AddStudent:
+                                    action = "added";
+                                    personName = eventLog.Student.FirstName + " " + eventLog.Student.LastName;
+                                    iconClass = "fa fa-user";
+                                    break;
+                                    
+                                case (int)EventLogModel.EventType.EditStudent:
+                                    action = "modified";
+                                    personName = eventLog.Student.FirstName + " " + eventLog.Student.LastName;
+                                    iconClass = "fa fa-user";
+                                    break;
+                            }
+                            
+                            <a href="#" class="list-group-item">
+                                <span class="badge">@eventLog.RelativeDate</span>
+                                <i class="@iconClass"></i> @eventLog.ModifiedBy.FirstName @action @personName
+                            </a>
+                        }
+                        @*
                         <a href="#" class="list-group-item">
                             <span class="badge">just now</span>
                             <i class="fa fa-calendar"></i> Calendar updated
@@ -45,10 +74,13 @@
                             <span class="badge">two days ago</span>
                             <i class="fa fa-check"></i> Completed task: "fix error on sales page"
                         </a>
+                        *@
                     </div>
+                    @*
                     <div class="text-right">
                         <a href="#">View All Activity <i class="fa fa-arrow-circle-right"></i></a>
                     </div>
+                    *@
                 </div>
             </div>
         </div>

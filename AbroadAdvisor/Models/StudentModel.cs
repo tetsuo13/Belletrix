@@ -92,7 +92,7 @@ namespace Bennett.AbroadAdvisor.Models
 
         [Range(0.00, 9.99)]
         [Display(Name = "Current GPA")]
-        public decimal? Gpa { get; set; }
+        public double? Gpa { get; set; }
 
         [StringLength(128)]
         [EmailAddress]
@@ -197,8 +197,7 @@ namespace Bennett.AbroadAdvisor.Models
                         command.ExecuteNonQuery();
                     }
 
-                    EventLogModel.Add(connection, userId, EventLogModel.EventType.EditStudent,
-                            String.Format("Updated {0} {1}", FirstName, LastName));
+                    EventLogModel.AddStudentEvent(connection, userId, Id, EventLogModel.EventType.EditStudent);
 
                     transaction.Commit();
                 }
@@ -245,6 +244,7 @@ namespace Bennett.AbroadAdvisor.Models
                             student.StreetAddress2 = StringOrDefault(reader, "street_address2");
                             student.City = StringOrDefault(reader, "city");
                             student.State = StringOrDefault(reader, "state");
+                            student.PostalCode = StringOrDefault(reader, "postal_code");
                             student.PhoneNumber = StringOrDefault(reader, "phone_number");
                             student.CellPhoneNumber = StringOrDefault(reader, "cell_phone_number");
                             student.Classification = IntOrDefault(reader, "classification");
@@ -259,12 +259,19 @@ namespace Bennett.AbroadAdvisor.Models
                             student.CampusEmail = StringOrDefault(reader, "campus_email");
                             student.AlternateEmail = StringOrDefault(reader, "alternate_email");
                             student.Created = reader.GetDateTime(reader.GetOrdinal("created"));
+                            student.Major = IntOrDefault(reader, "major_id");
+                            student.Minor = IntOrDefault(reader, "minor_id");
 
                             int ord = reader.GetOrdinal("gpa");
-
                             if (!reader.IsDBNull(ord))
                             {
-                                student.Gpa = reader.GetDecimal(ord);
+                                student.Gpa = Convert.ToDouble(reader["gpa"]);
+                            }
+
+                            ord = reader.GetOrdinal("dob");
+                            if (!reader.IsDBNull(ord))
+                            {
+                                student.DateOfBirth = reader.GetDateTime(ord);
                             }
 
                             students.Add(student);
@@ -281,13 +288,14 @@ namespace Bennett.AbroadAdvisor.Models
             string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
 
             StringBuilder sql = new StringBuilder(@"INSERT INTO students (");
-            
+
             PrepareColumns(ref sql);
 
             sql.Append(String.Join(", ", columns.Select(x => x.Key)));
             sql.Append(") VALUES (");
             sql.Append(String.Join(", ", columns.Select(x => x.Value)));
-            sql.Append(")");
+            sql.Append(") ");
+            sql.Append("RETURNING id");
 
             using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
             {
@@ -295,15 +303,16 @@ namespace Bennett.AbroadAdvisor.Models
 
                 using (NpgsqlTransaction transaction = connection.BeginTransaction())
                 {
+                    int studentId;
+
                     using (NpgsqlCommand command = connection.CreateCommand())
                     {
                         command.CommandText = sql.ToString();
                         command.Parameters.AddRange(parameters.ToArray());
-                        command.ExecuteNonQuery();
+                        studentId = (int)command.ExecuteScalar();
                     }
 
-                    EventLogModel.Add(connection, userId, EventLogModel.EventType.AddStudent,
-                            String.Format("Created {0} {1}", FirstName, LastName));
+                    EventLogModel.AddStudentEvent(connection, userId, studentId, EventLogModel.EventType.AddStudent);
 
                     transaction.Commit();
                 }
@@ -416,7 +425,16 @@ namespace Bennett.AbroadAdvisor.Models
 
             if (Gpa.HasValue)
             {
-                AddParameter(sql, "gpa", NpgsqlTypes.NpgsqlDbType.Double, Gpa.Value, 0);
+                string parameterName = String.Format("@{0}", "gpa");
+                columns.Add("gpa", parameterName);
+                NpgsqlParameter parameter = new NpgsqlParameter(parameterName, NpgsqlTypes.NpgsqlDbType.Double)
+                {
+                    Scale = 3,
+                    Precision = 2,
+                    Value = Gpa.Value
+                };
+
+                parameters.Add(parameter);
             }
 
             if (!String.IsNullOrEmpty(CampusEmail))
@@ -427,6 +445,16 @@ namespace Bennett.AbroadAdvisor.Models
             if (!String.IsNullOrEmpty(AlternateEmail))
             {
                 AddParameter(sql, "alternate_email", NpgsqlTypes.NpgsqlDbType.Varchar, AlternateEmail, 128);
+            }
+
+            if (Major.HasValue)
+            {
+                AddParameter(sql, "major_id", NpgsqlTypes.NpgsqlDbType.Integer, Major.Value, 0);
+            }
+
+            if (Minor.HasValue)
+            {
+                AddParameter(sql, "minor_id", NpgsqlTypes.NpgsqlDbType.Integer, Minor.Value, 0);
             }
         }
     }

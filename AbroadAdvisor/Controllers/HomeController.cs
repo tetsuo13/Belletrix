@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using Bennett.AbroadAdvisor.Models;
 using System.Web.Mvc;
 
 namespace Bennett.AbroadAdvisor.Controllers
@@ -12,6 +9,7 @@ namespace Bennett.AbroadAdvisor.Controllers
         public ActionResult Index()
         {
             ViewBag.ActivePage = "dashboard";
+            ViewBag.RecentActivity = EventLogModel.GetEvents();
             return View();
         }
     }

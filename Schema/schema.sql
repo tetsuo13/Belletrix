@@ -278,42 +278,6 @@ VALUES
 GRANT ALL PRIVILEGES ON dorms TO neoanime_abroadadvisor;
 GRANT ALL PRIVILEGES ON dorms_id_seq TO neoanime_abroadadvisor;
 
-CREATE TABLE students (
-id                      SERIAL,
-created                 TIMESTAMP NOT NULL,
-first_name              VARCHAR(64) NOT NULL,
-middle_name             VARCHAR(64),
-last_name               VARCHAR(64) NOT NULL,
-living_on_campus        BOOLEAN,
-street_address          VARCHAR(128),
-street_address2         VARCHAR(128),
-city                    VARCHAR(128),
-state                   VARCHAR(32),
-postal_code             VARCHAR(16),
-phone_number            VARCHAR(32),
-cell_phone_number       VARCHAR(32),
-classification          SMALLINT,
-student_id              VARCHAR(32),
-dob                     DATE,
-dorm_id                 INTEGER,
-room_number             VARCHAR(8),
-campus_po_box           VARCHAR(16),
-enrolled_full_time      BOOLEAN,
-citizenship             INTEGER,
-pell_grant_recipient    BOOLEAN,
-passport_holder         BOOLEAN,
-gpa                     DECIMAL(3,2),
-campus_email            VARCHAR(128),
-alternate_email         VARCHAR(128),
-
-PRIMARY KEY (id),
-FOREIGN KEY (dorm_id) REFERENCES dorms (id),
-FOREIGN KEY (citizenship) REFERENCES countries (id)
-);
-
-GRANT ALL PRIVILEGES ON students TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON students_id_seq TO neoanime_abroadadvisor;
-
 
 CREATE TABLE majors (
 id      SERIAL,
@@ -349,15 +313,46 @@ VALUES
 ('Theater'),
 ('Women''s Studies');
 
-CREATE TABLE student_matriculation (
-student_id      INT NOT NULL,
-major_id        INT NOT NULL,
-is_major        BOOLEAN NOT NULL DEFAULT FALSE,
 
-PRIMARY KEY (student_id, major_id)
+CREATE TABLE students (
+id                      SERIAL,
+created                 TIMESTAMP NOT NULL,
+first_name              VARCHAR(64) NOT NULL,
+middle_name             VARCHAR(64),
+last_name               VARCHAR(64) NOT NULL,
+living_on_campus        BOOLEAN,
+street_address          VARCHAR(128),
+street_address2         VARCHAR(128),
+city                    VARCHAR(128),
+state                   VARCHAR(32),
+postal_code             VARCHAR(16),
+phone_number            VARCHAR(32),
+cell_phone_number       VARCHAR(32),
+classification          INT,
+student_id              VARCHAR(32),
+dob                     DATE,
+dorm_id                 INTEGER,
+room_number             VARCHAR(8),
+campus_po_box           VARCHAR(16),
+enrolled_full_time      BOOLEAN,
+citizenship             INTEGER,
+pell_grant_recipient    BOOLEAN,
+passport_holder         BOOLEAN,
+gpa                     DECIMAL(3,2),
+campus_email            VARCHAR(128),
+alternate_email         VARCHAR(128),
+major_id                INT,
+minor_id                INT,
+
+PRIMARY KEY (id),
+FOREIGN KEY (dorm_id) REFERENCES dorms (id),
+FOREIGN KEY (citizenship) REFERENCES countries (id),
+FOREIGN KEY (major_id) REFERENCES majors (id),
+FOREIGN KEY (minor_id) REFERENCES majors (id)
 );
 
-GRANT ALL PRIVILEGES ON student_matriculation TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON students TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON students_id_seq TO neoanime_abroadadvisor;
 
 
 CREATE TABLE programs (
@@ -493,11 +488,15 @@ VALUES
 CREATE TABLE event_log (
 id          SERIAL,
 date        TIMESTAMP NOT NULL,
-user_id     INT NOT NULL,
+modified_by INT NOT NULL,
+student_id  INT,
+user_id     INT,
 type        INT NOT NULL,
-action      VARCHAR(512) NOT NULL,
+action      VARCHAR(512),
 
 PRIMARY KEY (id),
+FOREIGN KEY (modified_by) REFERENCES users (id),
+FOREIGN KEY (student_id) REFERENCES students (id),
 FOREIGN KEY (user_id) REFERENCES users (id)
 );
 

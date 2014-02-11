@@ -47,7 +47,7 @@ namespace Bennett.AbroadAdvisor.Controllers
             }
 
             PrepareDropDowns();
-            return View(model);
+            return View("Add", model);
         }
 
         public ActionResult Add()
@@ -66,7 +66,7 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return RedirectToAction("List");
             }
 
-            ModelState.AddModelError("", "There were errors adding the student.");
+            //ModelState.AddModelError("", "There were errors adding the student.");
             PrepareDropDowns();
             return View(model);
         }
