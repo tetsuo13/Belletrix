@@ -153,13 +153,13 @@ namespace Bennett.AbroadAdvisor.Models
             return users[0];
         }
 
-        public static void Update(UserModel model, bool isAdmin)
+        public void SaveChanges(bool isAdmin)
         {
             string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
 
             using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
             {
-                bool updatePassword = !String.IsNullOrEmpty(model.Password);
+                bool updatePassword = !String.IsNullOrEmpty(Password);
 
                 StringBuilder sql = new StringBuilder(@"
                     UPDATE  users
@@ -182,22 +182,60 @@ namespace Bennett.AbroadAdvisor.Models
                 using (NpgsqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = sql.ToString();
-                    command.Parameters.Add("@FirstName", NpgsqlTypes.NpgsqlDbType.Varchar, 64).Value = model.FirstName;
-                    command.Parameters.Add("@LastName", NpgsqlTypes.NpgsqlDbType.Varchar, 64).Value = model.LastName;
-                    command.Parameters.Add("@Email", NpgsqlTypes.NpgsqlDbType.Varchar, 128).Value = model.Email;
-                    command.Parameters.Add("@Id", NpgsqlTypes.NpgsqlDbType.Integer).Value = model.Id;
+                    command.Parameters.Add("@FirstName", NpgsqlTypes.NpgsqlDbType.Varchar, 64).Value = FirstName;
+                    command.Parameters.Add("@LastName", NpgsqlTypes.NpgsqlDbType.Varchar, 64).Value = LastName;
+                    command.Parameters.Add("@Email", NpgsqlTypes.NpgsqlDbType.Varchar, 128).Value = Email;
+                    command.Parameters.Add("@Id", NpgsqlTypes.NpgsqlDbType.Integer).Value = Id;
 
                     if (updatePassword)
                     {
                         command.Parameters.Add("@Password", NpgsqlTypes.NpgsqlDbType.Char, 256).Value =
-                            UserModel.CalculatePasswordHash(model.Password);
+                            UserModel.CalculatePasswordHash(Password);
                     }
 
                     if (isAdmin)
                     {
-                        command.Parameters.Add("@Admin", NpgsqlTypes.NpgsqlDbType.Boolean).Value = model.IsAdmin;
-                        command.Parameters.Add("@Active", NpgsqlTypes.NpgsqlDbType.Boolean).Value = model.IsActive;
+                        command.Parameters.Add("@Admin", NpgsqlTypes.NpgsqlDbType.Boolean).Value = IsAdmin;
+                        command.Parameters.Add("@Active", NpgsqlTypes.NpgsqlDbType.Boolean).Value = IsActive;
                     }
+
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void Save()
+        {
+            string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
+
+            using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
+            {
+                using (NpgsqlCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = @"
+                        INSERT INTO users
+                        (
+                            first_name, last_name, login,
+                            password, created, email,
+                            admin, active
+                        )
+                        VALUES
+                        (
+                            @FirstName, @LastName, @Login,
+                            @Password, @Created, @Email,
+                            @Admin, @Active
+                        )";
+
+                    command.Parameters.Add("@FirstName", NpgsqlTypes.NpgsqlDbType.Varchar, 64).Value = FirstName;
+                    command.Parameters.Add("@LastName", NpgsqlTypes.NpgsqlDbType.Varchar, 64).Value = LastName;
+                    command.Parameters.Add("@Login", NpgsqlTypes.NpgsqlDbType.Varchar, 24).Value = Login;
+                    command.Parameters.Add("@Password", NpgsqlTypes.NpgsqlDbType.Char, 256).Value =
+                        CalculatePasswordHash(Password);
+                    command.Parameters.Add("@Created", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
+                    command.Parameters.Add("@Email", NpgsqlTypes.NpgsqlDbType.Varchar, 128).Value = Email;
+                    command.Parameters.Add("@Admin", NpgsqlTypes.NpgsqlDbType.Boolean).Value = IsAdmin;
+                    command.Parameters.Add("@Active", NpgsqlTypes.NpgsqlDbType.Boolean).Value = IsActive;
 
                     connection.Open();
                     command.ExecuteNonQuery();

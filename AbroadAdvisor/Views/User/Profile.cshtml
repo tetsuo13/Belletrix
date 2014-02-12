@@ -3,6 +3,9 @@
 @model UserModel
 
 @{
+    bool addingUser = Model == null || Model.Id == default(int);
+    string submitButtonText = addingUser ? "Add Profile" : "Update Profile";
+    string actionName = addingUser ? "Add" : "Edit";
     ViewBag.Title = "Settings";
 }
 
@@ -11,7 +14,7 @@
         <div class="col-lg-8">
             <h1>Profile</h1>
         </div>
-        @if (Model.IsAdmin)
+        @if (addingUser || Model.IsAdmin)
         {
             <div class="col-lg-4 text-right">
                 <a href="@Url.Action("List", "User")"><i class="fa fa-plus-circle"></i> User List</a>
@@ -23,7 +26,7 @@
     <div class="row">
         <div class="col-lg-6">
 
-            @using (Html.BeginForm("Profile", "User", FormMethod.Post, new { role = "form" }))
+            @using (Html.BeginForm(actionName, "User", FormMethod.Post, new { role = "form" }))
             {
                 @Html.AntiForgeryToken()
                 @Html.ValidationSummary()
@@ -61,25 +64,36 @@
 
                 <div class="form-group">
                     @Html.LabelFor(s => s.Login)
-                    <p class="form-control-static">@Model.Login</p>
+
+                    @if (addingUser)
+                    {
+                        @Html.TextBoxFor(s => s.Login, new { @class = "form-control" })
+                    }
+                    else
+                    {
+                        <p class="form-control-static">@Model.Login</p>
+                    }
                 </div>
 
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            @Html.LabelFor(s => s.Created)
-                            <p class="form-control-static">@Model.Created</p>
+                if (!addingUser)
+                {
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                @Html.LabelFor(s => s.Created)
+                                <p class="form-control-static">@Model.Created.ToLocalTime()</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                @Html.LabelFor(s => s.LastLogin)
+                                <p class="form-control-static">@Model.LastLogin.ToLocalTime()</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            @Html.LabelFor(s => s.LastLogin)
-                            <p class="form-control-static">@Model.LastLogin</p>
-                        </div>
-                    </div>
-                </div>
+                }
                 
-                if (Model.IsAdmin)
+                if (addingUser || Model.IsAdmin)
                 {
                     <div class="row">
                         <div class="col-lg-6">
@@ -101,7 +115,7 @@
                     </div>
                 }
                 
-                <button type="submit" class="btn btn-default">Update Profile</button>
+                <button type="submit" class="btn btn-default">@submitButtonText</button>
             }
         </div>
     </div>

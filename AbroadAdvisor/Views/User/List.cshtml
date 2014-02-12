@@ -1,6 +1,6 @@
 ﻿@using Bennett.AbroadAdvisor.Models;
 
-@model List<UserModel>
+@model IList<UserModel>
 
 @{
     ViewBag.Title = "UserList";
@@ -20,7 +20,7 @@
         <div class="col-lg-12">
             <ol class="breadcrumb">
                 <li><a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-                <li class="active"><i class="fa fa-users"></i> Students</li>
+                <li class="active"><i class="fa fa-users"></i> Users</li>
             </ol>
         </div>
     </div>
@@ -30,22 +30,38 @@
             <thead>
                 <tr>
                     <th>Name <i class="fa fa-sort"></i></th>
-                    <th>Email <i class="fa fa-sort"></i></th>
+                    <th>Login <i class="fa fa-sort"></i></th>
+                    <th>Created <i class="fa fa-sort"></i></th>
+                    <th>Last Login <i class="fa fa-sort"></i></th>
+                    <th>Admin <i class="fa fa-sort"></i></th>
+                    <th>Active <i class="fa fa-sort"></i></th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var student in Model)
+                @foreach (var user in Model)
                 {
                     <tr>
-                        <td>@student.LastName, @student.FirstName @student.MiddleName</td>
                         <td>
-                            @if (String.IsNullOrEmpty(student.CampusEmail))
+                            <a href="@Url.Action("Edit", "User", new { username = user.Login })">@user.FirstName @user.LastName</a>
+                        </td>
+                        <td>@user.Login</td>
+                        <td>@user.Created.ToLocalTime()</td>
+                        <td>
+                            @if (user.LastLogin != default(DateTime))
                             {
-                                <text>&mdash;</text>
+                                @user.LastLogin.ToLocalTime()
                             }
-                            else
+                        </td>
+                        <td>
+                            @if (user.IsAdmin)
                             {
-                                <a href="mailto:@student.CampusEmail">@student.CampusEmail</a>
+                                <i class="fa fa-check"></i>
+                            }
+                        </td>
+                        <td>
+                            @if (user.IsActive)
+                            {
+                                <i class="fa fa-check"></i>
                             }
                         </td>
                     </tr>

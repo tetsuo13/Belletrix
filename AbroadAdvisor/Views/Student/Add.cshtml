@@ -11,6 +11,7 @@
     <script>
         $(function () {
             $('#dob').datepicker();
+            $('#initial-meeting').datepicker();
         });
     </script>
 }
@@ -108,10 +109,18 @@
                     @Html.DropDownListFor(s => s.Citizenship, ViewBag.Countries as SelectList, "Please Select", new { @class = "form-control" })
                 </div>
 
-                <div class="form-group">
-                    <div class="input-append date">
-                        @Html.LabelFor(s => s.DateOfBirth)
-                        @Html.TextBoxFor(s => s.DateOfBirth, new { @class = "form-control", id = "dob" })
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            @Html.LabelFor(s => s.DateOfBirth)
+                            @Html.TextBoxFor(s => s.DateOfBirth, new { @class = "form-control", id = "dob" })
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            @Html.LabelFor(s => s.InitialMeeting)
+                            @Html.TextBoxFor(s => s.InitialMeeting, new { @class = "form-control", id = "initial-meeting" })
+                        </div>
                     </div>
                 </div>
             </div>
