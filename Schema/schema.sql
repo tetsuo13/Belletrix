@@ -486,6 +486,23 @@ INSERT INTO users
 VALUES
 ('Andrei', 'Nicholson', 'anicholson', '741a86856f1185fb9e29cee6d95e978177147787060e1ec42d0e88b516214ebd', 'contact@andreinicholson.com', TRUE);
 
+
+CREATE TABLE student_notes (
+id          SERIAL,
+student_id  INT NOT NULL,
+created_by  INT NOT NULL,
+entry_date  TIMESTAMP NOT NULL,
+note        TEXT NOT NULL,
+
+PRIMARY KEY (id),
+FOREIGN KEY (student_id) REFERENCES students (id),
+FOREIGN KEY (created_by) REFERENCES users (id)
+);
+
+GRANT ALL PRIVILEGES ON student_notes TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON student_notes_id_seq TO neoanime_abroadadvisor;
+
+
 CREATE TABLE event_log (
 id          SERIAL,
 date        TIMESTAMP NOT NULL,

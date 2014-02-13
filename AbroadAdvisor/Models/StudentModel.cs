@@ -16,7 +16,7 @@ namespace Bennett.AbroadAdvisor.Models
         public DateTime Created { get; set; }
 
         [Display(Name = "Initial Meeting")]
-        public DateTime InitialMeeting { get; set; }
+        public DateTime? InitialMeeting { get; set; }
 
         [Required]
         [StringLength(64)]
@@ -337,9 +337,9 @@ namespace Bennett.AbroadAdvisor.Models
             AddParameter(sql, "first_name", NpgsqlTypes.NpgsqlDbType.Varchar, FirstName, 64);
             AddParameter(sql, "last_name", NpgsqlTypes.NpgsqlDbType.Varchar, LastName, 64);
 
-            if (InitialMeeting != default(DateTime))
+            if (InitialMeeting.HasValue)
             {
-                AddParameter(sql, "initial_meeting", NpgsqlTypes.NpgsqlDbType.Date, InitialMeeting, 0);
+                AddParameter(sql, "initial_meeting", NpgsqlTypes.NpgsqlDbType.Date, InitialMeeting.Value, 0);
             }
 
             if (!String.IsNullOrEmpty(MiddleName))

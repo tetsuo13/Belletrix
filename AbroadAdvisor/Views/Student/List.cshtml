@@ -6,6 +6,17 @@
     ViewBag.Title = "List";
 }
 
+@section FooterScript {
+    <script>
+        $(function () {
+            'use strict';
+
+            $('a.studentlisttooltop').tooltip();
+            $('a.studentlistmodal').modal();
+        });
+    </script>
+}
+
 @section Body {
     <div class="row">
         <div class="col-lg-8">
@@ -31,6 +42,7 @@
                 <tr>
                     <th>Name <i class="fa fa-sort"></i></th>
                     <th>Email <i class="fa fa-sort"></i></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -50,9 +62,18 @@
                                 <a href="mailto:@student.CampusEmail">@student.CampusEmail</a>
                             }
                         </td>
+                        <td>
+                            <a href="@Url.Action("List", "Note", new { studentId = student.Id })"
+                               data-toggle="modal" data-target="#noteModal"
+                               class="studentlisttooltop studentlistmodel" data-placement="top"
+                               title="Notes"><i class="fa fa-book"></i></a>
+                        </td>
                     </tr>
                 }
             </tbody>
         </table>
+    </div>
+
+    <div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     </div>
 }

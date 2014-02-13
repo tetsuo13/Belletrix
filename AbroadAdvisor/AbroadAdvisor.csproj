@@ -131,6 +131,7 @@
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\NoteController.cs" />
     <Compile Include="Controllers\StudentController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Global.asax.cs">
@@ -141,6 +142,7 @@
     <Compile Include="Models\EventLogModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\MajorsModel.cs" />
+    <Compile Include="Models\NoteModel.cs" />
     <Compile Include="Models\StudentModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -178,6 +180,7 @@
     <Content Include="Views\Student\Add.cshtml" />
     <Content Include="Views\User\Profile.cshtml" />
     <Content Include="Views\User\List.cshtml" />
+    <Content Include="Views\Note\List.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
