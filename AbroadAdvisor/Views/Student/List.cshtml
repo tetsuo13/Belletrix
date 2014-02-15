@@ -1,6 +1,6 @@
 ﻿@using Bennett.AbroadAdvisor.Models;
 
-@model List<StudentModel>
+@model IList<StudentModel>
 
 @{
     ViewBag.Title = "List";
@@ -13,6 +13,11 @@
 
             $('a.studentlisttooltop').tooltip();
             $('a.studentlistmodal').modal();
+
+            // Load cached modal content and then refetch remote content.
+            $(document.body).on('hidden.bs.modal', function () {
+                $('#noteModal').removeData('bs.modal');
+            });
         });
     </script>
 }
@@ -74,6 +79,6 @@
         </table>
     </div>
 
-    <div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    </div>
+    @* Student notes modal inserted here by Bootstrap JS. *@
+    <div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
 }

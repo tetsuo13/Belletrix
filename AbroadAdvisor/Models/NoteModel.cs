@@ -3,14 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Configuration;
-using System.Linq;
-using System.Web;
 
 namespace Bennett.AbroadAdvisor.Models
 {
     public class NoteModel
     {
-        [Key]
         public int Id { get; set; }
 
         public int StudentId { get; set; }
@@ -71,6 +68,38 @@ namespace Bennett.AbroadAdvisor.Models
             }
 
             return notes;
+        }
+
+        public void Save(int userId)
+        {
+            string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
+
+            using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
+            {
+                using (NpgsqlCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = @"
+                        INSERT INTO student_notes
+                        (
+                            student_id, created_by, entry_date,
+                            note
+                        )
+                        VALUES
+                        (
+                            @StudentId, @CreatedBy, @EntryDate,
+                            @Note
+                        )";
+
+                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = StudentId;
+                    command.Parameters.Add("@CreatedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = userId;
+                    command.Parameters.Add("@EntryDate", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
+                    command.Parameters.Add("@Note", NpgsqlTypes.NpgsqlDbType.Text).Value = Note;
+
+                    connection.Open();
+
+                    command.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

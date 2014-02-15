@@ -4,62 +4,51 @@
 
 @{
     // http://support.appharbor.com/kb/tips-and-tricks/application-server-ips-ec2-configuration
+    // https://www.siteloader.net/login
     // http://tidy.eideus.com/
     
     Layout = null;
     ViewBag.Title = "AbroadAdvisor";
 }
 
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     @Styles.Render("~/bundles/css")
     <style>
-        .login {
-            margin: 0 auto;
-            max-width: 362px;
-            border: 12px solid rgba(0, 0, 0, 0.45);
-            border-radius: 5px;
-            position: relative;
-            -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-            -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        .login-form {
+            width: 310px;
         }
-        .login-container {
-            padding: 40px 30px 30px;
-            margin: 0 auto;
-            background-color: #fff;
-            border: 1px solid #e5e5e5;
-            -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-            -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        .login-form h2 {
+            font-weight: 100;
         }
     </style>
 </head>
 <body>
 
-    <div class="login">
-        <div class="login-container clearfix">
-            <div>
-                @using (Html.BeginForm("Login", "User", FormMethod.Post, new { @class = "form-signin", role = "form" }))
-                {
-                    @Html.AntiForgeryToken()
-                    @Html.ValidationSummary()
-
-                    <div class="input-group">
-                        @Html.TextBoxFor(u => u.UserName, new { @class = "form-control", placeholder = "User name" })
-                    </div>
-
-                    <div class="input-group">
-                        @Html.PasswordFor(u => u.Password, new { @class = "form-control", placeholder = "Password" })
-                    </div>
-
-                    <input type="submit" value="Sign in" class="btn btn-block" />
-                }
-            </div>
+    <div class="center-block login-form">
+        <div class="text-center">
+            <h2>@ViewBag.Title</h2>
         </div>
+
+        @using (Html.BeginForm("Login", "User", FormMethod.Post, new { @class = "form-signin", role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary()
+
+            <div class="form-group">
+                @Html.TextBoxFor(u => u.UserName, new { @class = "form-control", placeholder = "User name" })
+            </div>
+
+            <div class="form-group">
+                @Html.PasswordFor(u => u.Password, new { @class = "form-control", placeholder = "Password" })
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg">Sign in</button>
+        }
     </div>
 
     @Scripts.Render("~/bundles/js")

@@ -5,6 +5,7 @@
 @{
     ViewBag.Title = "List";
     Layout = null;
+    UserModel user = Session["User"] as UserModel;
 }
 
 <div class="modal-dialog">
@@ -14,17 +15,39 @@
             <h4 class="modal-title" id="myModalLabel">Notes for @ViewBag.Student.FirstName @ViewBag.Student.LastName</h4>
         </div>
         <div class="modal-body">
-            @Html.BeginForm("Add", "Note", FormMethod.Post, new { id = "newnote" })
-            {
-            }
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Add New Note</h3>
+                </div>
+                <div class="panel-body">
+                    @using (Html.BeginForm("Add", "Note", FormMethod.Post, new { id = "newnote" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="StudentId" value="@ViewBag.Student.Id" />
+
+                        @Html.TextArea("Note", new { @class = "form-control", rows = 5 })
+                    }
+
+                    <button type="button" class="btn btn-primary">Add New Note</button>
+                </div>
+            </div>
 
             @foreach (var note in Model)
             {
+                <div class="list-group">
+                    <a href="#" class="list-group-item">
+                        <h4 class="list-group-item-heading">
+                            @note.CreatedBy.FirstName
+                            @note.CreatedBy.LastName
+                            @note.EntryDate.ToLocalTime().ToString("MMM d, yyyy h:mm:ss tt")
+                        </h4>
+                        <p class="list-group-item-text">@note.Note</p>
+                    </a>
+                </div>
             }
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
         </div>
     </div>
 </div>
@@ -33,13 +56,10 @@
     $(function () {
         'use strict';
 
-        $('#newnote').submit(function (e) {
-            e.preventDefault();
-            $.post('somewhere',
-                $('#newnote').serialize(),
-                function () {
-                }
-            );
+        $('button.btn-primary').click(function () {
+            $('#newnote').submit();
         });
+
+        Bennett.AbroadAdvisor.handleNewNote('#newnote', 'textarea#Note', '@user.FirstName', '@user.LastName');
     });
 </script>

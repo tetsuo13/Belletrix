@@ -54,6 +54,10 @@
                     </li>*@
                 </ul>
 
+                <p class="nav navbar-fixed-bottom" style="padding: 3px; color: #818181;">
+                    v @ViewContext.Controller.GetType().Assembly.GetName().Version
+                </p>
+
                 <ul class="nav navbar-nav navbar-right navbar-user">
                     @*<li class="dropdown messages-dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-envelope"></i> Messages <span class="badge">7</span> <b class="caret"></b></a>
