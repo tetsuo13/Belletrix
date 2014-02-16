@@ -13,6 +13,18 @@
     <meta name="viewport" content="width=device-width" />
     <title>@pageTitle</title>
     @Styles.Render("~/bundles/css")
+    <style>
+        @*
+            Because the following attributes as defined in font-awesome.css
+            only work from localhost, publishing causes them to 404. Final
+            location is "/Content/fonts" but font-awesome.css uses "/fonts".
+        *@
+        @@font-face {
+            font-family: 'FontAwesome';
+            src: url('@Url.Content("~/Content/fonts/fontawesome-webfont.eot?v=4.0.3")');
+            src: url('@Url.Content("~/Content/fonts/fontawesome-webfont.eot?#iefix&v=4.0.3")') format('embedded-opentype'), url('@Url.Content("~/Content/fonts/fontawesome-webfont.woff?v=4.0.3")') format('woff'), url('@Url.Content("~/Content/fonts/fontawesome-webfont.ttf?v=4.0.3")') format('truetype'), url('@Url.Content("~/Content/fonts/fontawesome-webfont.svg?v=4.0.3#fontawesomeregular")') format('svg');
+        }
+    </style>
     @RenderSection("HeaderStyle", false)
 </head>
 <body>
@@ -54,9 +66,10 @@
                     </li>*@
                 </ul>
 
-                <p class="nav navbar-fixed-bottom" style="padding: 3px; color: #818181;">
-                    v @ViewContext.Controller.GetType().Assembly.GetName().Version
-                </p>
+                @*<p class="nav navbar-fixed-bottom" style="padding: 3px; color: #818181;">
+                    &copy; @((DateTime.Now).Year)
+                    (v @ViewContext.Controller.GetType().Assembly.GetName().Version)
+                </p>*@
 
                 <ul class="nav navbar-nav navbar-right navbar-user">
                     @*<li class="dropdown messages-dropdown">
