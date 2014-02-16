@@ -71,7 +71,7 @@
                     }
                     else
                     {
-                        <p class="form-control-static">@Model.Login</p>
+                        @Html.TextBoxFor(s => s.Login, new { @class = "form-control", @readonly = "readonly" })
                     }
                 </div>
 
