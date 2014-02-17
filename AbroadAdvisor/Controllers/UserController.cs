@@ -117,7 +117,7 @@ namespace Bennett.AbroadAdvisor.Controllers
             {
                 UserModel currentUser = Session["User"] as UserModel;
                 model.SaveChanges(currentUser.IsAdmin);
-                return RedirectToAction("Profile");
+                return RedirectToAction("Index", "Home");
             }
 
             return View("Profile", model);
