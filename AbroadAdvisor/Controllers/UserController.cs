@@ -43,23 +43,6 @@ namespace Bennett.AbroadAdvisor.Controllers
             return View(Session["User"]);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        new public ActionResult Profile(UserModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                UserModel currentUser = Session["User"] as UserModel;
-                model.Id = currentUser.Id;
-                model.SaveChanges(currentUser.IsAdmin);
-                Session["User"] = model;
-                return RedirectToAction("Index", "Home");
-            }
-
-            ModelState.AddModelError("", "Errors");
-            return View(model);
-        }
-
         public ActionResult Add()
         {
             UserModel currentUser = Session["User"] as UserModel;
@@ -116,7 +99,9 @@ namespace Bennett.AbroadAdvisor.Controllers
             if (ModelState.IsValid)
             {
                 UserModel currentUser = Session["User"] as UserModel;
+                model.Id = currentUser.Id;
                 model.SaveChanges(currentUser.IsAdmin);
+                Session["User"] = model;
                 return RedirectToAction("Index", "Home");
             }
 
