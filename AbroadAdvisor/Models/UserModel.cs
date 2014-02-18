@@ -45,9 +45,11 @@ namespace Bennett.AbroadAdvisor.Models
         public string Email { get; set; }
 
         [Required]
+        [Display(Name = "Administrator?")]
         public bool IsAdmin { get; set; }
 
         [Required]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; }
 
         public static string CalculatePasswordHash(string password)
