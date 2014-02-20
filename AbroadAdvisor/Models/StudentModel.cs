@@ -274,13 +274,13 @@ namespace Bennett.AbroadAdvisor.Models
                             ord = reader.GetOrdinal("dob");
                             if (!reader.IsDBNull(ord))
                             {
-                                student.DateOfBirth = reader.GetDateTime(ord);
+                                student.DateOfBirth = reader.GetDateTime(ord).ToLocalTime();
                             }
 
                             ord = reader.GetOrdinal("initial_meeting");
                             if (!reader.IsDBNull(ord))
                             {
-                                student.InitialMeeting = reader.GetDateTime(ord);
+                                student.InitialMeeting = reader.GetDateTime(ord).ToLocalTime();
                             }
 
                             students.Add(student);
@@ -351,7 +351,7 @@ namespace Bennett.AbroadAdvisor.Models
 
             if (InitialMeeting.HasValue)
             {
-                AddParameter(sql, "initial_meeting", NpgsqlTypes.NpgsqlDbType.Date, InitialMeeting.Value, 0);
+                AddParameter(sql, "initial_meeting", NpgsqlTypes.NpgsqlDbType.Date, InitialMeeting.Value.ToUniversalTime(), 0);
             }
 
             if (!String.IsNullOrWhiteSpace(MiddleName))
@@ -411,7 +411,7 @@ namespace Bennett.AbroadAdvisor.Models
 
             if (DateOfBirth.HasValue)
             {
-                AddParameter(sql, "dob", NpgsqlTypes.NpgsqlDbType.Date, DateOfBirth.Value, 0);
+                AddParameter(sql, "dob", NpgsqlTypes.NpgsqlDbType.Date, DateOfBirth.Value.ToUniversalTime(), 0);
             }
 
             if (DormId.HasValue)
