@@ -328,23 +328,35 @@ namespace Bennett.AbroadAdvisor.Models
             }
         }
 
+        private string CapitalizeFirstLetter(string value)
+        {
+            value = value.Trim();
+
+            if (value.Length == 1)
+            {
+                return value.ToUpper();
+            }
+
+            return value.Substring(0, 1).ToUpper() + value.Substring(1);
+        }
+
         private void PrepareColumns(ref StringBuilder sql)
         {
             columns = new Dictionary<string, string>();
             parameters = new List<NpgsqlParameter>();
 
             AddParameter(sql, "created", NpgsqlTypes.NpgsqlDbType.Timestamp, DateTime.Now.ToUniversalTime(), 0);
-            AddParameter(sql, "first_name", NpgsqlTypes.NpgsqlDbType.Varchar, FirstName, 64);
-            AddParameter(sql, "last_name", NpgsqlTypes.NpgsqlDbType.Varchar, LastName, 64);
+            AddParameter(sql, "first_name", NpgsqlTypes.NpgsqlDbType.Varchar, CapitalizeFirstLetter(FirstName), 64);
+            AddParameter(sql, "last_name", NpgsqlTypes.NpgsqlDbType.Varchar, CapitalizeFirstLetter(LastName), 64);
 
             if (InitialMeeting.HasValue)
             {
                 AddParameter(sql, "initial_meeting", NpgsqlTypes.NpgsqlDbType.Date, InitialMeeting.Value, 0);
             }
 
-            if (!String.IsNullOrEmpty(MiddleName))
+            if (!String.IsNullOrWhiteSpace(MiddleName))
             {
-                AddParameter(sql, "middle_name", NpgsqlTypes.NpgsqlDbType.Varchar, MiddleName, 64);
+                AddParameter(sql, "middle_name", NpgsqlTypes.NpgsqlDbType.Varchar, CapitalizeFirstLetter(MiddleName), 64);
             }
 
             if (LivingOnCampus.HasValue)
@@ -352,39 +364,39 @@ namespace Bennett.AbroadAdvisor.Models
                 AddParameter(sql, "living_on_campus", NpgsqlTypes.NpgsqlDbType.Boolean, LivingOnCampus, 0);
             }
 
-            if (!String.IsNullOrEmpty(StreetAddress))
+            if (!String.IsNullOrWhiteSpace(StreetAddress))
             {
-                AddParameter(sql, "street_address", NpgsqlTypes.NpgsqlDbType.Varchar, StreetAddress, 128);
+                AddParameter(sql, "street_address", NpgsqlTypes.NpgsqlDbType.Varchar, CapitalizeFirstLetter(StreetAddress), 128);
             }
 
-            if (!String.IsNullOrEmpty(StreetAddress2))
+            if (!String.IsNullOrWhiteSpace(StreetAddress2))
             {
-                AddParameter(sql, "street_address2", NpgsqlTypes.NpgsqlDbType.Varchar, StreetAddress2, 128);
+                AddParameter(sql, "street_address2", NpgsqlTypes.NpgsqlDbType.Varchar, CapitalizeFirstLetter(StreetAddress2), 128);
             }
 
-            if (!String.IsNullOrEmpty(City))
+            if (!String.IsNullOrWhiteSpace(City))
             {
-                AddParameter(sql, "city", NpgsqlTypes.NpgsqlDbType.Varchar, City, 128);
+                AddParameter(sql, "city", NpgsqlTypes.NpgsqlDbType.Varchar, CapitalizeFirstLetter(City), 128);
             }
 
-            if (!String.IsNullOrEmpty(State))
+            if (!String.IsNullOrWhiteSpace(State))
             {
-                AddParameter(sql, "state", NpgsqlTypes.NpgsqlDbType.Varchar, State, 32);
+                AddParameter(sql, "state", NpgsqlTypes.NpgsqlDbType.Varchar, CapitalizeFirstLetter(State), 32);
             }
 
-            if (!String.IsNullOrEmpty(PostalCode))
+            if (!String.IsNullOrWhiteSpace(PostalCode))
             {
-                AddParameter(sql, "postal_code", NpgsqlTypes.NpgsqlDbType.Varchar, PostalCode, 16);
+                AddParameter(sql, "postal_code", NpgsqlTypes.NpgsqlDbType.Varchar, PostalCode.Trim(), 16);
             }
 
-            if (!String.IsNullOrEmpty(PhoneNumber))
+            if (!String.IsNullOrWhiteSpace(PhoneNumber))
             {
-                AddParameter(sql, "phone_number", NpgsqlTypes.NpgsqlDbType.Varchar, PhoneNumber, 32);
+                AddParameter(sql, "phone_number", NpgsqlTypes.NpgsqlDbType.Varchar, PhoneNumber.Trim(), 32);
             }
 
-            if (!String.IsNullOrEmpty(CellPhoneNumber))
+            if (!String.IsNullOrWhiteSpace(CellPhoneNumber))
             {
-                AddParameter(sql, "cell_phone_number", NpgsqlTypes.NpgsqlDbType.Varchar, CellPhoneNumber, 32);
+                AddParameter(sql, "cell_phone_number", NpgsqlTypes.NpgsqlDbType.Varchar, CellPhoneNumber.Trim(), 32);
             }
 
             if (Classification.HasValue)
@@ -392,9 +404,9 @@ namespace Bennett.AbroadAdvisor.Models
                 AddParameter(sql, "classification", NpgsqlTypes.NpgsqlDbType.Smallint, Classification.Value, 0);
             }
 
-            if (!String.IsNullOrEmpty(StudentId))
+            if (!String.IsNullOrWhiteSpace(StudentId))
             {
-                AddParameter(sql, "student_id", NpgsqlTypes.NpgsqlDbType.Varchar, StudentId, 32);
+                AddParameter(sql, "student_id", NpgsqlTypes.NpgsqlDbType.Varchar, StudentId.Trim(), 32);
             }
 
             if (DateOfBirth.HasValue)
@@ -407,14 +419,14 @@ namespace Bennett.AbroadAdvisor.Models
                 AddParameter(sql, "dorm_id", NpgsqlTypes.NpgsqlDbType.Integer, DormId.Value, 0);
             }
 
-            if (!String.IsNullOrEmpty(RoomNumber))
+            if (!String.IsNullOrWhiteSpace(RoomNumber))
             {
-                AddParameter(sql, "room_number", NpgsqlTypes.NpgsqlDbType.Varchar, RoomNumber, 8);
+                AddParameter(sql, "room_number", NpgsqlTypes.NpgsqlDbType.Varchar, RoomNumber.Trim(), 8);
             }
 
-            if (!String.IsNullOrEmpty(CampusPoBox))
+            if (!String.IsNullOrWhiteSpace(CampusPoBox))
             {
-                AddParameter(sql, "campus_po_box", NpgsqlTypes.NpgsqlDbType.Varchar, CampusPoBox, 16);
+                AddParameter(sql, "campus_po_box", NpgsqlTypes.NpgsqlDbType.Varchar, CampusPoBox.Trim(), 16);
             }
 
             if (Citizenship.HasValue)
@@ -451,14 +463,14 @@ namespace Bennett.AbroadAdvisor.Models
                 parameters.Add(parameter);
             }
 
-            if (!String.IsNullOrEmpty(CampusEmail))
+            if (!String.IsNullOrWhiteSpace(CampusEmail))
             {
-                AddParameter(sql, "campus_email", NpgsqlTypes.NpgsqlDbType.Varchar, CampusEmail, 128);
+                AddParameter(sql, "campus_email", NpgsqlTypes.NpgsqlDbType.Varchar, CampusEmail.Trim(), 128);
             }
 
-            if (!String.IsNullOrEmpty(AlternateEmail))
+            if (!String.IsNullOrWhiteSpace(AlternateEmail))
             {
-                AddParameter(sql, "alternate_email", NpgsqlTypes.NpgsqlDbType.Varchar, AlternateEmail, 128);
+                AddParameter(sql, "alternate_email", NpgsqlTypes.NpgsqlDbType.Varchar, AlternateEmail.Trim(), 128);
             }
 
             if (Major.HasValue)
