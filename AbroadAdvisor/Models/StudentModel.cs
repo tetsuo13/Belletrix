@@ -207,7 +207,7 @@ namespace Bennett.AbroadAdvisor.Models
             }
         }
 
-        public static List<StudentModel> GetStudents(int? id = null)
+        public static List<StudentModel> GetStudents(int? id)
         {
             List<StudentModel> students = new List<StudentModel>();
             string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
@@ -220,9 +220,10 @@ namespace Bennett.AbroadAdvisor.Models
                         SELECT  *
                         FROM    students ");
 
-                    if (id != null)
+                    if (id.HasValue)
                     {
                         sql.Append("WHERE id = @Id ");
+                        command.Parameters.Add("@Id", NpgsqlTypes.NpgsqlDbType.Integer).Value = id.Value;
                     }
 
                     sql.Append("ORDER BY last_name, first_name");

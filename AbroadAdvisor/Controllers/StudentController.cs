@@ -15,7 +15,7 @@ namespace Bennett.AbroadAdvisor.Controllers
 
         public ActionResult List()
         {
-            return View(StudentModel.GetStudents());
+            return View(StudentModel.GetStudents(null));
         }
 
         public ActionResult Edit(int? id)
@@ -25,7 +25,7 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            List<StudentModel> student = StudentModel.GetStudents(id);
+            List<StudentModel> student = StudentModel.GetStudents(id.Value);
 
             if (student.Count == 0)
             {
