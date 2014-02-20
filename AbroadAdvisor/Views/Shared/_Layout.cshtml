@@ -144,5 +144,11 @@
 
     @Scripts.Render("~/bundles/js")
     @RenderSection("FooterScript", false)
+
+    <script>
+        $(function () {
+            Bennett.AbroadAdvisor.initPinger('@Url.Action("Ping", "Home")');
+        });
+    </script>
 </body>
 </html>

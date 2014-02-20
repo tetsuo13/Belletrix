@@ -6,6 +6,9 @@ window.Bennett = window.Bennett || {};
 (function (AbroadAdvisor, $) {
     'use strict';
 
+    // Number of milliseconds between pinging the server.
+    var idleKillerInterval = 1000 * 60 * 15;
+
     /**
      * @param {string} formSelector
      * @param {string} noteSelector
@@ -43,5 +46,24 @@ window.Bennett = window.Bennett || {};
                 }
             );
         });
+    };
+
+    /**
+     * Have the server process something often.
+     *
+     * This is to avoid the application pool from shutting down after a period
+     * of inactivity.
+     *
+     * @param {string} pingUrl
+     * @public
+     */
+    AbroadAdvisor.initPinger = function (pingUrl) {
+        setInterval(function () {
+            $.ajax({
+                url: pingUrl,
+                cache: false,
+                type: 'GET'
+            });
+        }, idleKillerInterval);
     };
 })(window.Bennett.AbroadAdvisor = window.Bennett.AbroadAdvisor || {}, jQuery, undefined);
