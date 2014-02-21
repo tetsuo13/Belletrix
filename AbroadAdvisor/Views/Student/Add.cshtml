@@ -153,8 +153,29 @@
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group">
+                                    @Html.LabelFor(s => s.Gpa)
+                                    @Html.TextBoxFor(s => s.Gpa, new { @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    @Html.LabelFor(s => s.EnteringYear)
+                                    @Html.DropDownListFor(s => s.EnteringYear, ViewBag.EnteringYears as SelectList, "Please Select", new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    @Html.LabelFor(s => s.GraduatingYear)
+                                    @Html.DropDownListFor(s => s.GraduatingYear, ViewBag.GraduatingYears as SelectList, "Please Select", new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
                                     @Html.LabelFor(s => s.Classification)
-                                    @Html.TextBoxFor(s => s.Classification, new { @class = "form-control" })
+                                    @Html.DropDownListFor(s => s.Classification, ViewBag.Classifications as SelectList, "Please Select", new { @class = "form-control" })
                                 </div>
                             </div>
                         </div>
@@ -203,11 +224,6 @@
                                         Model), "Please Select", new { @class = "form-control" })
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="form-group">
-                            @Html.LabelFor(s => s.Gpa)
-                            @Html.TextBoxFor(s => s.Gpa, new { @class = "form-control" })
                         </div>
 
                         <div class="row">

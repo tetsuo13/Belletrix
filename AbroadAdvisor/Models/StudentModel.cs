@@ -59,8 +59,16 @@ namespace Bennett.AbroadAdvisor.Models
         [DataType(DataType.PhoneNumber)]
         public string CellPhoneNumber { get; set; }
 
-        [Range(1000, 9999)]
+        [Range(1900, 3000)]
         [Display(Name = "Entering Year")]
+        public int? EnteringYear { get; set; }
+
+        [Range(1900, 3000)]
+        [Display(Name = "Graduating Year")]
+        public int? GraduatingYear { get; set; }
+
+        [Range(0, 3)]
+        [Display(Name = "Classification")]
         public int? Classification { get; set; }
 
         [StringLength(32)]
@@ -258,6 +266,8 @@ namespace Bennett.AbroadAdvisor.Models
                             student.PostalCode = StringOrDefault(reader, "postal_code");
                             student.PhoneNumber = StringOrDefault(reader, "phone_number");
                             student.CellPhoneNumber = StringOrDefault(reader, "cell_phone_number");
+                            student.EnteringYear = IntOrDefault(reader, "entering_year");
+                            student.GraduatingYear = IntOrDefault(reader, "graduating_year");
                             student.Classification = IntOrDefault(reader, "classification");
                             student.StudentId = StringOrDefault(reader, "student_id");
                             student.DormId = IntOrDefault(reader, "dorm_id");
@@ -485,9 +495,19 @@ namespace Bennett.AbroadAdvisor.Models
                 AddParameter(sql, "cell_phone_number", NpgsqlTypes.NpgsqlDbType.Varchar, CellPhoneNumber.Trim(), 32);
             }
 
+            if (EnteringYear.HasValue)
+            {
+                AddParameter(sql, "entering_year", NpgsqlTypes.NpgsqlDbType.Integer, EnteringYear.Value, 0);
+            }
+
+            if (GraduatingYear.HasValue)
+            {
+                AddParameter(sql, "graduating_year", NpgsqlTypes.NpgsqlDbType.Integer, GraduatingYear.Value, 0);
+            }
+
             if (Classification.HasValue)
             {
-                AddParameter(sql, "classification", NpgsqlTypes.NpgsqlDbType.Smallint, Classification.Value, 0);
+                AddParameter(sql, "classification", NpgsqlTypes.NpgsqlDbType.Integer, Classification.Value, 0);
             }
 
             if (!String.IsNullOrWhiteSpace(StudentId))

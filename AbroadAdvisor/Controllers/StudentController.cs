@@ -1,5 +1,7 @@
 ﻿using Bennett.AbroadAdvisor.Models;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Web.Mvc;
 
@@ -66,7 +68,6 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return RedirectToAction("List");
             }
 
-            //ModelState.AddModelError("", "There were errors adding the student.");
             PrepareDropDowns();
             return View(model);
         }
@@ -75,6 +76,10 @@ namespace Bennett.AbroadAdvisor.Controllers
         {
             ViewBag.Countries = new SelectList(CountryModel.GetCountries(), "Id", "Name");
             ViewBag.DormHalls = new SelectList(DormModel.GetDorms(), "Id", "HallName");
+
+            ViewBag.EnteringYears = new SelectList(Enumerable.Range(1990, (DateTime.Now.Year - 1990)).Reverse());
+            ViewBag.GraduatingYears = new SelectList(Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 6)).Reverse());
+            ViewBag.Classifications = new SelectList(StudentClassificationModel.GetClassifications(), "Id", "name");
             
             List<MajorsModel> majors = MajorsModel.GetMajors();
             ViewBag.AvailableMajors = majors;

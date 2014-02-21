@@ -13,6 +13,8 @@ UNIQUE (name, abbreviation)
 GRANT ALL PRIVILEGES ON countries TO neoanime_abroadadvisor;
 GRANT ALL PRIVILEGES ON countries_id_seq TO neoanime_abroadadvisor;
 
+COMMENT ON TABLE countries IS 'Available countries in ISO 3166-1 along with Alpha-2 code';
+
 INSERT INTO countries
 (abbreviation, name)
 VALUES
@@ -264,6 +266,8 @@ PRIMARY KEY (id),
 UNIQUE (hall_name)
 );
 
+COMMENT ON TABLE dorms IS 'Available dorms';
+
 INSERT INTO dorms
 (hall_name)
 VALUES
@@ -286,6 +290,8 @@ name    VARCHAR(128) NOT NULL,
 PRIMARY KEY (id),
 UNIQUE (name)
 );
+
+COMMENT ON TABLE majors IS 'Available majors';
 
 GRANT ALL PRIVILEGES ON majors TO neoanime_abroadadvisor;
 GRANT ALL PRIVILEGES ON majors_id_seq TO neoanime_abroadadvisor;
@@ -329,6 +335,8 @@ state                   VARCHAR(32),
 postal_code             VARCHAR(16),
 phone_number            VARCHAR(32),
 cell_phone_number       VARCHAR(32),
+entering_year           INT,
+graduating_year         INT,
 classification          INT,
 student_id              VARCHAR(32),
 dob                     DATE,
@@ -352,6 +360,11 @@ FOREIGN KEY (major_id) REFERENCES majors (id),
 FOREIGN KEY (minor_id) REFERENCES majors (id)
 );
 
+COMMENT ON TABLE students IS 'Student master';
+COMMENT ON COLUMN students.entering_year IS 'Year that student started at the institution';
+COMMENT ON COLUMN students.graduating_year IS 'Year that student will be or has already graduated';
+COMMENT ON COLUMN students.classification IS '0 - 3, for freshmen up to senior';
+
 GRANT ALL PRIVILEGES ON students TO neoanime_abroadadvisor;
 GRANT ALL PRIVILEGES ON students_id_seq TO neoanime_abroadadvisor;
 
@@ -364,10 +377,11 @@ is_major    BOOLEAN NOT NULL,
 PRIMARY KEY (student_id, major_id)
 );
 
+COMMENT ON TABLE matriculation IS 'Student major/minor cross reference';
+
 GRANT ALL PRIVILEGES ON matriculation TO neoanime_abroadadvisor;
 
 
--- http://stackoverflow.com/a/6673029
 CREATE TABLE users (
 id          SERIAL,
 first_name  VARCHAR(64) NOT NULL,
@@ -383,6 +397,17 @@ active      BOOLEAN NOT NULL DEFAULT TRUE,
 PRIMARY KEY (id),
 UNIQUE (login)
 );
+
+COMMENT ON TABLE users IS 'Logins and information about users of the application';
+COMMENT ON COLUMN users.first_name IS 'Given name';
+COMMENT ON COLUMN users.last_name IS 'Family name';
+COMMENT ON COLUMN users.login IS 'Username used to log into the application';
+COMMENT ON COLUMN users.password IS 'One-way hash of password (https://stackoverflow.com/a/6673029)';
+COMMENT ON COLUMN users.created IS 'Date that the user profile was created';
+COMMENT ON COLUMN users.last_login IS 'Date that the user last logged in to the application';
+COMMENT ON COLUMN users.email IS 'Email address for user';
+COMMENT ON COLUMN users.admin IS 'Administrator access?';
+COMMENT ON COLUMN users.active IS 'Active status dictates whether the user can even log in';
 
 GRANT ALL PRIVILEGES ON users TO neoanime_abroadadvisor;
 GRANT ALL PRIVILEGES ON users_id_seq TO neoanime_abroadadvisor;
@@ -406,6 +431,11 @@ FOREIGN KEY (student_id) REFERENCES students (id),
 FOREIGN KEY (created_by) REFERENCES users (id)
 );
 
+COMMENT ON TABLE student_notes IS 'Arbitrary notes attached to students';
+COMMENT ON COLUMN student_notes.student_id IS 'Student ID for note';
+COMMENT ON COLUMN student_notes.created_by IS 'User ID who created the note';
+COMMENT ON COLUMN student_notes.entry_date IS 'Date that the note was created';
+
 GRANT ALL PRIVILEGES ON student_notes TO neoanime_abroadadvisor;
 GRANT ALL PRIVILEGES ON student_notes_id_seq TO neoanime_abroadadvisor;
 
@@ -424,6 +454,8 @@ FOREIGN KEY (modified_by) REFERENCES users (id),
 FOREIGN KEY (student_id) REFERENCES students (id),
 FOREIGN KEY (user_id) REFERENCES users (id)
 );
+
+COMMENT ON TABLE event_log IS 'Application event logging table';
 
 GRANT ALL PRIVILEGES ON event_log TO neoanime_abroadadvisor;
 GRANT ALL PRIVILEGES ON event_log_id_seq TO neoanime_abroadadvisor;
