@@ -20,7 +20,7 @@ namespace Bennett.AbroadAdvisor.Controllers
         [HttpGet]
         public string Ping()
         {
-            return "pong";
+            return PingModel.Ping();
         }
     }
 }
