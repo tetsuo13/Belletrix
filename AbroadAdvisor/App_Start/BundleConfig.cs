@@ -10,10 +10,12 @@ namespace Bennett.AbroadAdvisor.App_Start
                 "~/Scripts/jquery-{version}.js",
                 "~/Scripts/bootstrap.js",
                 "~/Scripts/bootstrap-datepicker.js",
+                "~/Scripts/bootstrap-multiselect.js",
                 "~/Scripts/AbroadAdvisor.js"));
 
             bundles.Add(new StyleBundle("~/bundles/css").Include(
                 "~/Content/css/bootstrap.css",
+                "~/Content/css/bootstrap-multiselect.css",
                 "~/Content/css/sb-admin.css",
                 "~/Content/css/font-awesome.min.css",
                 "~/Content/css/datepicker.css"));

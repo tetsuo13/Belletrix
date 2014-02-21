@@ -356,6 +356,17 @@ GRANT ALL PRIVILEGES ON students TO neoanime_abroadadvisor;
 GRANT ALL PRIVILEGES ON students_id_seq TO neoanime_abroadadvisor;
 
 
+CREATE TABLE matriculation (
+student_id  INTEGER NOT NULL,
+major_id    INTEGER NOT NULL,
+is_major    BOOLEAN NOT NULL,
+
+PRIMARY KEY (student_id, major_id)
+);
+
+GRANT ALL PRIVILEGES ON matriculation TO neoanime_abroadadvisor;
+
+
 -- http://stackoverflow.com/a/6673029
 CREATE TABLE users (
 id          SERIAL,

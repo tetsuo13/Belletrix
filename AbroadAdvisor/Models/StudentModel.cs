@@ -107,11 +107,11 @@ namespace Bennett.AbroadAdvisor.Models
         [Display(Name = "Alternative Email")]
         public string AlternateEmail { get; set; }
 
-        [Display(Name = "Major")]
-        public int? Major { get; set; }
+        [Display(Name = "Majors")]
+        public IEnumerable<int> SelectedMajors { get; set; }
 
-        [Display(Name = "Minor")]
-        public int? Minor { get; set; }
+        [Display(Name = "Minors")]
+        public IEnumerable<int> SelectedMinors { get; set; }
 
         private Dictionary<string, string> columns;
         private List<NpgsqlParameter> parameters;
@@ -200,6 +200,12 @@ namespace Bennett.AbroadAdvisor.Models
                         command.ExecuteNonQuery();
                     }
 
+                    // Always call the next two functions. User may be removing
+                    // all majors/minors from a student which previous has some
+                    // selected.
+                    SaveStudentMajors(connection, Id, SelectedMajors, true);
+                    SaveStudentMajors(connection, Id, SelectedMinors, false);
+
                     EventLogModel.AddStudentEvent(connection, userId, Id, EventLogModel.EventType.EditStudent);
 
                     transaction.Commit();
@@ -214,6 +220,8 @@ namespace Bennett.AbroadAdvisor.Models
 
             using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
             {
+                connection.Open();
+
                 using (NpgsqlCommand command = connection.CreateCommand())
                 {
                     StringBuilder sql = new StringBuilder(@"
@@ -229,7 +237,6 @@ namespace Bennett.AbroadAdvisor.Models
                     sql.Append("ORDER BY last_name, first_name");
 
                     command.CommandText = sql.ToString();
-                    connection.Open();
 
                     using (NpgsqlDataReader reader = command.ExecuteReader())
                     {
@@ -263,8 +270,6 @@ namespace Bennett.AbroadAdvisor.Models
                             student.CampusEmail = StringOrDefault(reader, "campus_email");
                             student.AlternateEmail = StringOrDefault(reader, "alternate_email");
                             student.Created = reader.GetDateTime(reader.GetOrdinal("created"));
-                            student.Major = IntOrDefault(reader, "major_id");
-                            student.Minor = IntOrDefault(reader, "minor_id");
 
                             int ord = reader.GetOrdinal("gpa");
                             if (!reader.IsDBNull(ord))
@@ -286,6 +291,42 @@ namespace Bennett.AbroadAdvisor.Models
 
                             students.Add(student);
                         }
+                    }
+                }
+
+                for (int i = 0; i < students.Count; i++)
+                {
+                    using (NpgsqlCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = @"
+                            SELECT  major_id, is_major
+                            FROM    matriculation
+                            WHERE   student_id = @StudentId";
+
+                        command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = students[i].Id;
+
+                        List<int> majors = new List<int>();
+                        List<int> minors = new List<int>();
+
+                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                int majorId = reader.GetInt32(reader.GetOrdinal("major_id"));
+
+                                if (reader.GetBoolean(reader.GetOrdinal("is_major")))
+                                {
+                                    majors.Add(majorId);
+                                }
+                                else
+                                {
+                                    minors.Add(majorId);
+                                }
+                            }
+                        }
+
+                        students[i].SelectedMajors = majors.AsEnumerable();
+                        students[i].SelectedMinors = minors.AsEnumerable();
                     }
                 }
             }
@@ -322,9 +363,53 @@ namespace Bennett.AbroadAdvisor.Models
                         studentId = (int)command.ExecuteScalar();
                     }
 
+                    if (SelectedMajors != null)
+                    {
+                        SaveStudentMajors(connection, Id, SelectedMajors, true);
+                    }
+
+                    if (SelectedMinors != null)
+                    {
+                        SaveStudentMajors(connection, Id, SelectedMinors, false);
+                    }
+
                     EventLogModel.AddStudentEvent(connection, userId, studentId, EventLogModel.EventType.AddStudent);
 
                     transaction.Commit();
+                }
+            }
+        }
+
+        private void SaveStudentMajors(NpgsqlConnection connection, int studentId, IEnumerable<int> majors, bool isMajor)
+        {
+            using (NpgsqlCommand command = connection.CreateCommand())
+            {
+                command.CommandText = @"
+                    DELETE FROM matriculation
+                    WHERE   student_id = @StudentId AND
+                            is_major = @IsMajor";
+
+                command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+                command.Parameters.Add("@IsMajor", NpgsqlTypes.NpgsqlDbType.Boolean).Value = isMajor;
+                command.ExecuteNonQuery();
+            }
+
+            if (majors != null && majors.Cast<int>().Count() > 0)
+            {
+                using (NpgsqlCommand command = connection.CreateCommand())
+                {
+                    StringBuilder sql = new StringBuilder("INSERT INTO matriculation (student_id, major_id, is_major) VALUES ");
+                    List<string> values = new List<string>();
+
+                    foreach (int majorId in majors)
+                    {
+                        values.Add(String.Format("({0}, {1}, '{2}')", studentId, majorId, isMajor ? 1 : 0));
+                    }
+
+                    sql.Append(String.Join(",", values));
+
+                    command.CommandText = sql.ToString();
+                    command.ExecuteNonQuery();
                 }
             }
         }
@@ -472,16 +557,6 @@ namespace Bennett.AbroadAdvisor.Models
             if (!String.IsNullOrWhiteSpace(AlternateEmail))
             {
                 AddParameter(sql, "alternate_email", NpgsqlTypes.NpgsqlDbType.Varchar, AlternateEmail.Trim(), 128);
-            }
-
-            if (Major.HasValue)
-            {
-                AddParameter(sql, "major_id", NpgsqlTypes.NpgsqlDbType.Integer, Major.Value, 0);
-            }
-
-            if (Minor.HasValue)
-            {
-                AddParameter(sql, "minor_id", NpgsqlTypes.NpgsqlDbType.Integer, Minor.Value, 0);
             }
         }
     }

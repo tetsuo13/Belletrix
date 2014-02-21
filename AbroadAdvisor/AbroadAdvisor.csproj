@@ -142,6 +142,7 @@
     <Compile Include="Models\EventLogModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\MajorsModel.cs" />
+    <Compile Include="Models\MatriculationModel.cs" />
     <Compile Include="Models\NoteModel.cs" />
     <Compile Include="Models\StudentModel.cs" />
     <Compile Include="Models\UserModel.cs" />
@@ -151,6 +152,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Content Include="Content\css\bootstrap-multiselect.css" />
     <Content Include="Content\css\bootstrap.css" />
     <Content Include="Content\css\datepicker.css" />
     <Content Include="Content\css\font-awesome.css" />
@@ -161,6 +163,7 @@
     <None Include="Scripts\jquery-2.0.3.intellisense.js" />
     <Content Include="Scripts\AbroadAdvisor.js" />
     <Content Include="Scripts\bootstrap-datepicker.js" />
+    <Content Include="Scripts\bootstrap-multiselect.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\jquery-2.0.3.js" />
     <Content Include="Scripts\jquery-2.0.3.min.js" />

@@ -75,7 +75,10 @@ namespace Bennett.AbroadAdvisor.Controllers
         {
             ViewBag.Countries = new SelectList(CountryModel.GetCountries(), "Id", "Name");
             ViewBag.DormHalls = new SelectList(DormModel.GetDorms(), "Id", "HallName");
-            ViewBag.Majors = new SelectList(MajorsModel.GetMajors(), "Id", "Name");
+            
+            List<MajorsModel> majors = MajorsModel.GetMajors();
+            ViewBag.AvailableMajors = majors;
+            ViewBag.AvailableMinors = majors;
         }
     }
 }

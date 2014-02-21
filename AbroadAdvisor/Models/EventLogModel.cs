@@ -115,7 +115,7 @@ namespace Bennett.AbroadAdvisor.Models
                                 Action = action
                             };
 
-                            eventLog.RelativeDate = CalculateRelativeDate(eventLog.EventDate);
+                            eventLog.RelativeDate = CalculateRelativeDate(eventLog.EventDate.ToUniversalTime());
 
                             events.Add(eventLog);
                         }
