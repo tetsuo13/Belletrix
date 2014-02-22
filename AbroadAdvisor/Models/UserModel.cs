@@ -1,8 +1,8 @@
-﻿using Npgsql;
+﻿using Bennett.AbroadAdvisor.Core;
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Configuration;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -71,19 +71,18 @@ namespace Bennett.AbroadAdvisor.Models
 
         public static void UpdateLastLogin(string username)
         {
-            string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
-
-            using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
+            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
-                const string sql = @"
-                    UPDATE  users
-                    SET     last_login = @LastLogin
-                    WHERE   login = @Username";
-
-                using (NpgsqlCommand command = new NpgsqlCommand(sql, connection))
+                using (NpgsqlCommand command = connection.CreateCommand())
                 {
+                    command.CommandText = @"
+                        UPDATE  users
+                        SET     last_login = @LastLogin
+                        WHERE   login = @Username";
+
                     command.Parameters.Add("@LastLogin", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
                     command.Parameters.Add("@Username", NpgsqlTypes.NpgsqlDbType.Varchar, 24).Value = username;
+
                     connection.Open();
                     command.ExecuteNonQuery();
                 }
@@ -93,9 +92,8 @@ namespace Bennett.AbroadAdvisor.Models
         public static List<UserModel> GetUsers(string username = null)
         {
             List<UserModel> users = new List<UserModel>();
-            string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
+            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
                 string sql = @"
                     SELECT  id, first_name, last_name,
@@ -157,9 +155,7 @@ namespace Bennett.AbroadAdvisor.Models
 
         public void SaveChanges(bool isAdmin)
         {
-            string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
-
-            using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
+            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
                 bool updatePassword = !String.IsNullOrEmpty(Password);
 
@@ -209,9 +205,7 @@ namespace Bennett.AbroadAdvisor.Models
 
         public void Save()
         {
-            string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
-
-            using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
+            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
                 using (NpgsqlCommand command = connection.CreateCommand())
                 {

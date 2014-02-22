@@ -1,7 +1,7 @@
-﻿using Npgsql;
+﻿using Bennett.AbroadAdvisor.Core;
+using Npgsql;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Configuration;
 
 namespace Bennett.AbroadAdvisor.Models
 {
@@ -17,9 +17,7 @@ namespace Bennett.AbroadAdvisor.Models
         {
             List<DormModel> dorms = new List<DormModel>();
 
-            string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
-
-            using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
+            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
                 using (NpgsqlCommand command = connection.CreateCommand())
                 {
@@ -35,10 +33,10 @@ namespace Bennett.AbroadAdvisor.Models
                         while (reader.Read())
                         {
                             dorms.Add(new DormModel()
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                    HallName = reader.GetString(reader.GetOrdinal("hall_name"))
-                                });
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                HallName = reader.GetString(reader.GetOrdinal("hall_name"))
+                            });
                         }
                     }
                 }

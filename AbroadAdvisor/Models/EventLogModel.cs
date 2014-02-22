@@ -1,7 +1,7 @@
-﻿using Npgsql;
+﻿using Bennett.AbroadAdvisor.Core;
+using Npgsql;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 
 namespace Bennett.AbroadAdvisor.Models
 {
@@ -36,9 +36,8 @@ namespace Bennett.AbroadAdvisor.Models
         public static List<EventLogModel> GetEvents()
         {
             List<EventLogModel> events = new List<EventLogModel>();
-            string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
+            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
                 using (NpgsqlCommand command = connection.CreateCommand())
                 {

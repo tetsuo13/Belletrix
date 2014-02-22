@@ -1,6 +1,6 @@
-﻿using Npgsql;
+﻿using Bennett.AbroadAdvisor.Core;
+using Npgsql;
 using System.ComponentModel.DataAnnotations;
-using System.Configuration;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 
@@ -22,20 +22,20 @@ namespace Bennett.AbroadAdvisor.Models
         public bool IsValid(string username, string password)
         {
             bool valid = false;
-            string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
+            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
                 connection.ValidateRemoteCertificateCallback += connection_ValidateRemoteCertificateCallback;
-                const string sql = @"
-                    SELECT  id
-                    FROM    users
-                    WHERE   login = @Username AND
-                            password = @Password AND
-                            active = TRUE";
 
-                using (NpgsqlCommand command = new NpgsqlCommand(sql, connection))
+                using (NpgsqlCommand command = connection.CreateCommand())
                 {
+                    command.CommandText = @"
+                        SELECT  id
+                        FROM    users
+                        WHERE   login = @Username AND
+                                password = @Password AND
+                                active = TRUE";
+
                     command.Parameters.Add("@Username", NpgsqlTypes.NpgsqlDbType.Varchar, 24).Value = username;
 
                     string hashedPassword = UserModel.CalculatePasswordHash(password);

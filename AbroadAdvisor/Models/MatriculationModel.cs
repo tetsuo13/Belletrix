@@ -1,6 +1,6 @@
-﻿using Npgsql;
+﻿using Bennett.AbroadAdvisor.Core;
+using Npgsql;
 using System.Collections.Generic;
-using System.Configuration;
 
 namespace Bennett.AbroadAdvisor.Models
 {
@@ -14,9 +14,7 @@ namespace Bennett.AbroadAdvisor.Models
         {
             List<MatriculationModel> declarations = new List<MatriculationModel>();
 
-            string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
-
-            using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
+            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
                 using (NpgsqlCommand command = connection.CreateCommand())
                 {

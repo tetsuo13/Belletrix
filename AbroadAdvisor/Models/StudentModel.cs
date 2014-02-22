@@ -1,8 +1,8 @@
-﻿using Npgsql;
+﻿using Bennett.AbroadAdvisor.Core;
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Configuration;
 using System.Linq;
 using System.Text;
 
@@ -178,8 +178,6 @@ namespace Bennett.AbroadAdvisor.Models
 
         public void SaveChanges(int userId)
         {
-            string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
-
             StringBuilder sql = new StringBuilder(@"UPDATE students SET ");
 
             PrepareColumns(ref sql);
@@ -195,7 +193,7 @@ namespace Bennett.AbroadAdvisor.Models
             sql.Append(" WHERE id = @Id");
             parameters.Add(new NpgsqlParameter("@Id", NpgsqlTypes.NpgsqlDbType.Integer) { Value = Id });
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
+            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
                 connection.Open();
 
@@ -224,9 +222,8 @@ namespace Bennett.AbroadAdvisor.Models
         public static List<StudentModel> GetStudents(int? id)
         {
             List<StudentModel> students = new List<StudentModel>();
-            string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
+            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
                 connection.Open();
 
@@ -346,8 +343,6 @@ namespace Bennett.AbroadAdvisor.Models
 
         public void Save(int userId)
         {
-            string dsn = ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
-
             StringBuilder sql = new StringBuilder(@"INSERT INTO students (");
 
             PrepareColumns(ref sql);
@@ -358,7 +353,7 @@ namespace Bennett.AbroadAdvisor.Models
             sql.Append(") ");
             sql.Append("RETURNING id");
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(dsn))
+            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
                 connection.Open();
 

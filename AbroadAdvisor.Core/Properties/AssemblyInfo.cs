@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Bennett.AbroadAdvisor")]
+[assembly: AssemblyTitle("Bennett.AbroadAdvisor.Core")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Andrei Nicholson")]
-[assembly: AssemblyProduct("Bennett.AbroadAdvisor")]
+[assembly: AssemblyProduct("Bennett.AbroadAdvisor.Core")]
 [assembly: AssemblyCopyright("Copyright © Andrei Nicholson 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -19,4 +19,4 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("675f2644-e74f-4374-8db2-04aade0690c4")]
+[assembly: Guid("a02288e4-88b2-4959-b210-9a8556ac5497")]
