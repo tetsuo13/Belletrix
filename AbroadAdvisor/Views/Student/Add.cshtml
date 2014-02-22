@@ -93,27 +93,6 @@
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    @Html.LabelFor(s => s.DormId)
-                                    @Html.DropDownListFor(s => s.DormId, ViewBag.DormHalls as SelectList, "Please Select", new { @class = "form-control" })
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    @Html.LabelFor(s => s.RoomNumber)
-                                    @Html.TextBoxFor(s => s.RoomNumber, new { @class = "form-control" })
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    @Html.LabelFor(s => s.CampusPoBox)
-                                    @Html.TextBoxFor(s => s.CampusPoBox, new { @class = "form-control" })
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="form-group">
                             @Html.LabelFor(s => s.Citizenship)
                             @Html.DropDownListFor(s => s.Citizenship, ViewBag.Countries as SelectList, "Please Select", new { @class = "form-control" })

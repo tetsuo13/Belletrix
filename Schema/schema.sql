@@ -258,30 +258,6 @@ VALUES
 ('ZM', 'Zambia'),
 ('ZW', 'Zimbabwe');
 
-CREATE TABLE dorms (
-id          SERIAL,
-hall_name   VARCHAR(32),
-
-PRIMARY KEY (id),
-UNIQUE (hall_name)
-);
-
-COMMENT ON TABLE dorms IS 'Available dorms';
-
-INSERT INTO dorms
-(hall_name)
-VALUES
-('Barge'),
-('Jones'),
-('Pfeiffer'),
-('Reynolds'),
-('Cone'),
-('Honors'),
-('Player');
-
-GRANT ALL PRIVILEGES ON dorms TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON dorms_id_seq TO neoanime_abroadadvisor;
-
 
 CREATE TABLE majors (
 id      SERIAL,
@@ -340,9 +316,6 @@ graduating_year         INT,
 classification          INT,
 student_id              VARCHAR(32),
 dob                     DATE,
-dorm_id                 INTEGER,
-room_number             VARCHAR(8),
-campus_po_box           VARCHAR(16),
 enrolled_full_time      BOOLEAN,
 citizenship             INTEGER,
 pell_grant_recipient    BOOLEAN,
@@ -354,7 +327,6 @@ major_id                INT,
 minor_id                INT,
 
 PRIMARY KEY (id),
-FOREIGN KEY (dorm_id) REFERENCES dorms (id),
 FOREIGN KEY (citizenship) REFERENCES countries (id),
 FOREIGN KEY (major_id) REFERENCES majors (id),
 FOREIGN KEY (minor_id) REFERENCES majors (id)

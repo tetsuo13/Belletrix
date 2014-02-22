@@ -79,17 +79,6 @@ namespace Bennett.AbroadAdvisor.Models
         [DataType(DataType.Date)]
         public DateTime? DateOfBirth { get; set; }
 
-        [Display(Name = "Dorm Hall")]
-        public int? DormId { get; set; }
-
-        [StringLength(8)]
-        [Display(Name = "Room #")]
-        public string RoomNumber { get; set; }
-
-        [StringLength(16)]
-        [Display(Name = "Campus PO Box")]
-        public string CampusPoBox { get; set; }
-
         [Display(Name = "Enrolled as a")]
         public bool? EnrolledFullTime { get; set; }
 
@@ -267,9 +256,6 @@ namespace Bennett.AbroadAdvisor.Models
                             student.GraduatingYear = IntOrDefault(reader, "graduating_year");
                             student.Classification = IntOrDefault(reader, "classification");
                             student.StudentId = StringOrDefault(reader, "student_id");
-                            student.DormId = IntOrDefault(reader, "dorm_id");
-                            student.RoomNumber = StringOrDefault(reader, "room_number");
-                            student.CampusPoBox = StringOrDefault(reader, "campus_po_box");
                             student.EnrolledFullTime = BoolOrDefault(reader, "enrolled_full_time");
                             student.Citizenship = IntOrDefault(reader, "citizenship");
                             student.PellGrantRecipient = BoolOrDefault(reader, "pell_grant_recipient");
@@ -513,21 +499,6 @@ namespace Bennett.AbroadAdvisor.Models
             if (DateOfBirth.HasValue)
             {
                 AddParameter(sql, "dob", NpgsqlTypes.NpgsqlDbType.Date, DateOfBirth.Value.ToUniversalTime(), 0);
-            }
-
-            if (DormId.HasValue)
-            {
-                AddParameter(sql, "dorm_id", NpgsqlTypes.NpgsqlDbType.Integer, DormId.Value, 0);
-            }
-
-            if (!String.IsNullOrWhiteSpace(RoomNumber))
-            {
-                AddParameter(sql, "room_number", NpgsqlTypes.NpgsqlDbType.Varchar, RoomNumber.Trim(), 8);
-            }
-
-            if (!String.IsNullOrWhiteSpace(CampusPoBox))
-            {
-                AddParameter(sql, "campus_po_box", NpgsqlTypes.NpgsqlDbType.Varchar, CampusPoBox.Trim(), 16);
             }
 
             if (Citizenship.HasValue)
