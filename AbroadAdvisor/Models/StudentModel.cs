@@ -287,13 +287,13 @@ namespace Bennett.AbroadAdvisor.Models
                             ord = reader.GetOrdinal("dob");
                             if (!reader.IsDBNull(ord))
                             {
-                                student.DateOfBirth = reader.GetDateTime(ord).ToLocalTime();
+                                student.DateOfBirth = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
                             }
 
                             ord = reader.GetOrdinal("initial_meeting");
                             if (!reader.IsDBNull(ord))
                             {
-                                student.InitialMeeting = reader.GetDateTime(ord).ToLocalTime();
+                                student.InitialMeeting = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
                             }
 
                             students.Add(student);

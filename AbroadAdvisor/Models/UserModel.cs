@@ -125,7 +125,7 @@ namespace Bennett.AbroadAdvisor.Models
                                 FirstName = reader.GetString(reader.GetOrdinal("first_name")),
                                 LastName = reader.GetString(reader.GetOrdinal("last_name")),
                                 Login = reader.GetString(reader.GetOrdinal("login")),
-                                Created = reader.GetDateTime(reader.GetOrdinal("created")).ToLocalTime(),
+                                Created = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("created"))),
                                 Email = reader.GetString(reader.GetOrdinal("email")),
                                 IsAdmin = reader.GetBoolean(reader.GetOrdinal("admin")),
                                 IsActive = reader.GetBoolean(reader.GetOrdinal("active"))
@@ -135,7 +135,7 @@ namespace Bennett.AbroadAdvisor.Models
 
                             if (!reader.IsDBNull(ord))
                             {
-                                user.LastLogin = reader.GetDateTime(ord).ToLocalTime();
+                                user.LastLogin = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
                             }
 
                             users.Add(user);

@@ -106,7 +106,7 @@ namespace Bennett.AbroadAdvisor.Models
                             EventLogModel eventLog = new EventLogModel()
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                EventDate = reader.GetDateTime(reader.GetOrdinal("date")).ToLocalTime(),
+                                EventDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("date"))),
                                 ModifiedBy = modifiedBy,
                                 Student = student,
                                 User = user,

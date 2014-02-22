@@ -45,11 +45,11 @@
                             <a href="@Url.Action("Edit", "User", new { username = user.Login })">@user.FirstName @user.LastName</a>
                         </td>
                         <td>@user.Login</td>
-                        <td>@user.Created.ToLocalTime()</td>
+                        <td>@user.Created</td>
                         <td>
                             @if (user.LastLogin != default(DateTime))
                             {
-                                @user.LastLogin.ToLocalTime()
+                                @user.LastLogin
                             }
                         </td>
                         <td>

@@ -49,7 +49,7 @@ namespace Bennett.AbroadAdvisor.Models
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("id")),
                                 StudentId = studentId,
-                                EntryDate = reader.GetDateTime(reader.GetOrdinal("entry_date")),
+                                EntryDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("entry_date"))),
                                 Note = reader.GetString(reader.GetOrdinal("note"))
                             };
 

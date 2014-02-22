@@ -39,7 +39,7 @@
                         <h4 class="list-group-item-heading">
                             @note.CreatedBy.FirstName
                             @note.CreatedBy.LastName
-                            @note.EntryDate.ToLocalTime().ToString("MMM d, yyyy h:mm:ss tt")
+                            @note.EntryDate.ToString("MMM d, yyyy h:mm:ss tt")
                         </h4>
                         <p class="list-group-item-text">@note.Note</p>
                     </a>
