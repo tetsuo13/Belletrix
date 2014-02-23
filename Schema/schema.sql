@@ -296,6 +296,47 @@ VALUES
 ('Women''s Studies');
 
 
+CREATE TABLE languages (
+id          SERIAL,
+name        VARCHAR(32) NOT NULL,
+
+PRIMARY KEY (id),
+UNIQUE (name)
+);
+
+GRANT ALL PRIVILEGES ON languages TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON languages_id_seq TO neoanime_abroadadvisor;
+
+INSERT INTO languages
+(name)
+VALUES
+('Mandarin'),
+('Spanish'),
+('English'),
+('Hindi'),
+('Arabic'),
+('Portuguese'),
+('Bengali'),
+('Russian'),
+('Japanese'),
+('Punjabi'),
+('German'),
+('Javanese'),
+('Wu'),
+('Malay/Indonesian'),
+('Telugu'),
+('Vietnamese'),
+('Korean'),
+('French'),
+('Marathi'),
+('Tamil'),
+('Urdu'),
+('Persian'),
+('Turkish'),
+('Italian'),
+('Cantonese');
+
+
 CREATE TABLE students (
 id                      SERIAL,
 created                 TIMESTAMP NOT NULL,
@@ -339,6 +380,18 @@ COMMENT ON COLUMN students.classification IS '0 - 3, for freshmen up to senior';
 
 GRANT ALL PRIVILEGES ON students TO neoanime_abroadadvisor;
 GRANT ALL PRIVILEGES ON students_id_seq TO neoanime_abroadadvisor;
+
+
+CREATE TABLE student_fluent_languages (
+student_id      INT NOT NULL,
+language_id     INT NOT NULL,
+
+PRIMARY KEY (student_id, language_id)
+);
+
+COMMENT ON TABLE student_fluent_languages IS 'Languages that students declare fluency';
+
+GRANT ALL PRIVILEGES ON student_fluent_languages TO neoanime_abroadadvisor;
 
 
 CREATE TABLE matriculation (

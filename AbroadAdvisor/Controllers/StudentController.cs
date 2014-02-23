@@ -75,6 +75,7 @@ namespace Bennett.AbroadAdvisor.Controllers
         private void PrepareDropDowns()
         {
             ViewBag.Countries = new SelectList(CountryModel.GetCountries(), "Id", "Name");
+            ViewBag.Languages = LanguageModel.GetLanguages();
 
             ViewBag.EnteringYears = new SelectList(Enumerable.Range(1990, (DateTime.Now.Year - 1990)).Reverse());
             ViewBag.GraduatingYears = new SelectList(Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 6)).Reverse());

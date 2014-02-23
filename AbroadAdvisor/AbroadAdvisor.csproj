@@ -142,6 +142,7 @@
     </Compile>
     <Compile Include="Models\CountryModel.cs" />
     <Compile Include="Models\EventLogModel.cs" />
+    <Compile Include="Models\LanguageModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\MajorsModel.cs" />
     <Compile Include="Models\MatriculationModel.cs" />

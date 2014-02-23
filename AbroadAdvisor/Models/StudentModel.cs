@@ -113,6 +113,9 @@ namespace Bennett.AbroadAdvisor.Models
         [Display(Name = "Minors")]
         public IEnumerable<int> SelectedMinors { get; set; }
 
+        [Display(Name = "Fluency")]
+        public IEnumerable<int> SelectedLanguages { get; set; }
+
         private Dictionary<string, string> columns;
         private List<NpgsqlParameter> parameters;
 
@@ -204,6 +207,8 @@ namespace Bennett.AbroadAdvisor.Models
                     SaveStudentMajors(connection, Id, SelectedMajors, true);
                     SaveStudentMajors(connection, Id, SelectedMinors, false);
 
+                    SaveStudentLanguages(connection, Id, SelectedLanguages);
+
                     EventLogModel.AddStudentEvent(connection, userId, Id, EventLogModel.EventType.EditStudent);
 
                     transaction.Commit();
@@ -290,44 +295,82 @@ namespace Bennett.AbroadAdvisor.Models
                     }
                 }
 
-                for (int i = 0; i < students.Count; i++)
-                {
-                    using (NpgsqlCommand command = connection.CreateCommand())
-                    {
-                        command.CommandText = @"
-                            SELECT  major_id, is_major
-                            FROM    matriculation
-                            WHERE   student_id = @StudentId";
-
-                        command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = students[i].Id;
-
-                        List<int> majors = new List<int>();
-                        List<int> minors = new List<int>();
-
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                int majorId = reader.GetInt32(reader.GetOrdinal("major_id"));
-
-                                if (reader.GetBoolean(reader.GetOrdinal("is_major")))
-                                {
-                                    majors.Add(majorId);
-                                }
-                                else
-                                {
-                                    minors.Add(majorId);
-                                }
-                            }
-                        }
-
-                        students[i].SelectedMajors = majors.AsEnumerable();
-                        students[i].SelectedMinors = minors.AsEnumerable();
-                    }
-                }
+                PopulateStudentMajorsMinors(connection, ref students);
+                PopulateStudentLanguages(connection, ref students);
             }
 
             return students;
+        }
+
+        private static void PopulateStudentLanguages(NpgsqlConnection connection, ref List<StudentModel> students)
+        {
+            using (NpgsqlCommand command = connection.CreateCommand())
+            {
+                command.CommandText = @"
+                    SELECT  language_id
+                    FROM    student_fluent_languages
+                    WHERE   student_id = @StudentId";
+
+                command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer);
+                command.Prepare();
+
+                for (int i = 0; i < students.Count; i++)
+                {
+                    List<int> languages = new List<int>();
+                    command.Parameters[0].Value = students[i].Id;
+
+                    using (NpgsqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            languages.Add(reader.GetInt32(reader.GetOrdinal("language_id")));
+                        }
+                    }
+
+                    students[i].SelectedLanguages = languages.AsEnumerable();
+                }
+            }
+        }
+
+        private static void PopulateStudentMajorsMinors(NpgsqlConnection connection, ref List<StudentModel> students)
+        {
+            using (NpgsqlCommand command = connection.CreateCommand())
+            {
+                command.CommandText = @"
+                    SELECT  major_id, is_major
+                    FROM    matriculation
+                    WHERE   student_id = @StudentId";
+
+                command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer);
+                command.Prepare();
+
+                for (int i = 0; i < students.Count; i++)
+                {
+                    List<int> majors = new List<int>();
+                    List<int> minors = new List<int>();
+                    command.Parameters[0].Value = students[i].Id;
+
+                    using (NpgsqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int majorId = reader.GetInt32(reader.GetOrdinal("major_id"));
+
+                            if (reader.GetBoolean(reader.GetOrdinal("is_major")))
+                            {
+                                majors.Add(majorId);
+                            }
+                            else
+                            {
+                                minors.Add(majorId);
+                            }
+                        }
+                    }
+
+                    students[i].SelectedMajors = majors.AsEnumerable();
+                    students[i].SelectedMinors = minors.AsEnumerable();
+                }
+            }
         }
 
         public void Save(int userId)
@@ -359,17 +402,54 @@ namespace Bennett.AbroadAdvisor.Models
 
                     if (SelectedMajors != null)
                     {
-                        SaveStudentMajors(connection, Id, SelectedMajors, true);
+                        SaveStudentMajors(connection, studentId, SelectedMajors, true);
                     }
 
                     if (SelectedMinors != null)
                     {
-                        SaveStudentMajors(connection, Id, SelectedMinors, false);
+                        SaveStudentMajors(connection, studentId, SelectedMinors, false);
+                    }
+
+                    if (SelectedLanguages != null)
+                    {
+                        SaveStudentLanguages(connection, studentId, SelectedLanguages);
                     }
 
                     EventLogModel.AddStudentEvent(connection, userId, studentId, EventLogModel.EventType.AddStudent);
 
                     transaction.Commit();
+                }
+            }
+        }
+
+        private void SaveStudentLanguages(NpgsqlConnection connection, int studentId, IEnumerable<int> languages)
+        {
+            using (NpgsqlCommand command = connection.CreateCommand())
+            {
+                command.CommandText = @"
+                    DELETE FROM student_fluent_languages
+                    WHERE student_id = @StudentId";
+
+                command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+                command.ExecuteNonQuery();
+            }
+
+            if (languages != null && languages.Cast<int>().Count() > 0)
+            {
+                using (NpgsqlCommand command = connection.CreateCommand())
+                {
+                    List<string> values = new List<string>();
+
+                    foreach (int languageId in languages)
+                    {
+                        values.Add(String.Format("({0}, {1})", studentId, languageId));
+                    }
+
+                    StringBuilder sql = new StringBuilder("INSERT INTO student_fluent_languages (student_id, language_id) VALUES ");
+                    sql.Append(String.Join(",", values));
+
+                    command.CommandText = sql.ToString();
+                    command.ExecuteNonQuery();
                 }
             }
         }
