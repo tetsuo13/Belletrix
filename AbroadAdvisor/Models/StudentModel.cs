@@ -16,6 +16,8 @@ namespace Bennett.AbroadAdvisor.Models
         public DateTime Created { get; set; }
 
         [Display(Name = "Initial Meeting")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:M/d/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime? InitialMeeting { get; set; }
 
         [Required]
@@ -77,6 +79,7 @@ namespace Bennett.AbroadAdvisor.Models
 
         [Display(Name = "Date of Birth")]
         [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:M/d/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime? DateOfBirth { get; set; }
 
         [Display(Name = "Enrolled as a")]

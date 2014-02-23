@@ -11,8 +11,11 @@
 @section FooterScript {
     <script>
         $(function () {
-            $.each(['#dob', '#initial-meeting'], function (i, val) {
-                $(val).datepicker();
+            $.each(['#DateOfBirth', '#InitialMeeting'], function (i, val) {
+                $(val).addClass('form-control');
+                $(val).datepicker({
+                    format: 'm/d/yyyy'
+                });
             });
             $('.multiselect').multiselect({
                 numberDisplayed: 1,
@@ -102,13 +105,13 @@
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     @Html.LabelFor(s => s.DateOfBirth)
-                                    @Html.TextBoxFor(s => s.DateOfBirth, new { @class = "form-control", id = "dob" })
+                                    @Html.EditorFor(s => s.DateOfBirth)
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     @Html.LabelFor(s => s.InitialMeeting)
-                                    @Html.TextBoxFor(s => s.InitialMeeting, new { @class = "form-control", id = "initial-meeting" })
+                                    @Html.EditorFor(s => s.InitialMeeting)
                                 </div>
                             </div>
                         </div>
