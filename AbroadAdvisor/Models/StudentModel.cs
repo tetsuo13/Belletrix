@@ -116,6 +116,9 @@ namespace Bennett.AbroadAdvisor.Models
         [Display(Name = "Fluency")]
         public IEnumerable<int> SelectedLanguages { get; set; }
 
+        [Display(Name = "Desired Language Abroad")]
+        public IEnumerable<int> SelectedDesiredLanguages { get; set; }
+
         private Dictionary<string, string> columns;
         private List<NpgsqlParameter> parameters;
 
@@ -207,7 +210,8 @@ namespace Bennett.AbroadAdvisor.Models
                     SaveStudentMajors(connection, Id, SelectedMajors, true);
                     SaveStudentMajors(connection, Id, SelectedMinors, false);
 
-                    SaveStudentLanguages(connection, Id, SelectedLanguages);
+                    SaveStudentLanguages(connection, Id, "student_fluent_languages", SelectedLanguages);
+                    SaveStudentLanguages(connection, Id, "student_desired_languages", SelectedDesiredLanguages);
 
                     EventLogModel.AddStudentEvent(connection, userId, Id, EventLogModel.EventType.EditStudent);
 
@@ -297,6 +301,7 @@ namespace Bennett.AbroadAdvisor.Models
 
                 PopulateStudentMajorsMinors(connection, ref students);
                 PopulateStudentLanguages(connection, ref students);
+                PopulateDesiredStudentLanguages(connection, ref students);
             }
 
             return students;
@@ -328,6 +333,36 @@ namespace Bennett.AbroadAdvisor.Models
                     }
 
                     students[i].SelectedLanguages = languages.AsEnumerable();
+                }
+            }
+        }
+
+        private static void PopulateDesiredStudentLanguages(NpgsqlConnection connection, ref List<StudentModel> students)
+        {
+            using (NpgsqlCommand command = connection.CreateCommand())
+            {
+                command.CommandText = @"
+                    SELECT  language_id
+                    FROM    student_desired_languages
+                    WHERE   student_id = @StudentId";
+
+                command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer);
+                command.Prepare();
+
+                for (int i = 0; i < students.Count; i++)
+                {
+                    List<int> languages = new List<int>();
+                    command.Parameters[0].Value = students[i].Id;
+
+                    using (NpgsqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            languages.Add(reader.GetInt32(reader.GetOrdinal("language_id")));
+                        }
+                    }
+
+                    students[i].SelectedDesiredLanguages = languages.AsEnumerable();
                 }
             }
         }
@@ -412,7 +447,12 @@ namespace Bennett.AbroadAdvisor.Models
 
                     if (SelectedLanguages != null)
                     {
-                        SaveStudentLanguages(connection, studentId, SelectedLanguages);
+                        SaveStudentLanguages(connection, studentId, "student_fluent_languages", SelectedLanguages);
+                    }
+
+                    if (SelectedDesiredLanguages != null)
+                    {
+                        SaveStudentLanguages(connection, studentId, "student_desired_languages", SelectedDesiredLanguages);
                     }
 
                     EventLogModel.AddStudentEvent(connection, userId, studentId, EventLogModel.EventType.AddStudent);
@@ -422,13 +462,15 @@ namespace Bennett.AbroadAdvisor.Models
             }
         }
 
-        private void SaveStudentLanguages(NpgsqlConnection connection, int studentId, IEnumerable<int> languages)
+        private void SaveStudentLanguages(NpgsqlConnection connection, int studentId, string tableName,
+            IEnumerable<int> languages)
         {
             using (NpgsqlCommand command = connection.CreateCommand())
             {
-                command.CommandText = @"
-                    DELETE FROM student_fluent_languages
-                    WHERE student_id = @StudentId";
+                command.CommandText = String.Format(@"
+                    DELETE FROM {0}
+                    WHERE student_id = @StudentId",
+                    tableName);
 
                 command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
                 command.ExecuteNonQuery();
@@ -445,7 +487,8 @@ namespace Bennett.AbroadAdvisor.Models
                         values.Add(String.Format("({0}, {1})", studentId, languageId));
                     }
 
-                    StringBuilder sql = new StringBuilder("INSERT INTO student_fluent_languages (student_id, language_id) VALUES ");
+                    StringBuilder sql = new StringBuilder();
+                    sql.Append("INSERT INTO ").Append(tableName).Append(" (student_id, language_id) VALUES ");
                     sql.Append(String.Join(",", values));
 
                     command.CommandText = sql.ToString();

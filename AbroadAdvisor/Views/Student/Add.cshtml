@@ -110,6 +110,8 @@
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group">
+                                    @Html.LabelFor(s => s.SelectedDesiredLanguages)
+                                    @Html.ListBoxFor(s => s.SelectedDesiredLanguages, new MultiSelectList(ViewBag.Languages, "Id", "Name"), new { @class = "multiselect", multiple = "multiple" })
                                 </div>
                             </div>
                         </div>
