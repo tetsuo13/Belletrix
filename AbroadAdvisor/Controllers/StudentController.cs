@@ -15,6 +15,7 @@ namespace Bennett.AbroadAdvisor.Controllers
             ViewBag.ActivePage = "students";
         }
 
+        [OutputCache(Duration = 14400, Location = System.Web.UI.OutputCacheLocation.Server)]
         public ActionResult List()
         {
             return View(StudentModel.GetStudents(null));
@@ -45,6 +46,7 @@ namespace Bennett.AbroadAdvisor.Controllers
             if (ModelState.IsValid)
             {
                 model.SaveChanges((Session["User"] as UserModel).Id);
+                Response.RemoveOutputCacheItem(Url.Action("List"));
                 return RedirectToAction("List");
             }
 
@@ -65,6 +67,7 @@ namespace Bennett.AbroadAdvisor.Controllers
             if (ModelState.IsValid)
             {
                 model.Save((Session["User"] as UserModel).Id);
+                Response.RemoveOutputCacheItem(Url.Action("List"));
                 return RedirectToAction("List");
             }
 
