@@ -293,7 +293,8 @@ VALUES
 ('Social Work'),
 ('Special Education'),
 ('Theater'),
-('Women''s Studies');
+('Women''s Studies'),
+('Undecided & Entrepreneurial Studies');
 
 
 CREATE TABLE languages (
@@ -334,7 +335,8 @@ VALUES
 ('Persian'),
 ('Turkish'),
 ('Italian'),
-('Cantonese');
+('Cantonese'),
+('Hausa');
 
 
 CREATE TABLE students (
@@ -364,13 +366,9 @@ passport_holder         BOOLEAN,
 gpa                     DECIMAL(3,2),
 campus_email            VARCHAR(128),
 alternate_email         VARCHAR(128),
-major_id                INT,
-minor_id                INT,
 
 PRIMARY KEY (id),
-FOREIGN KEY (citizenship) REFERENCES countries (id),
-FOREIGN KEY (major_id) REFERENCES majors (id),
-FOREIGN KEY (minor_id) REFERENCES majors (id)
+FOREIGN KEY (citizenship) REFERENCES countries (id)
 );
 
 COMMENT ON TABLE students IS 'Student master';
