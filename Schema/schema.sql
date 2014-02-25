@@ -392,6 +392,18 @@ COMMENT ON TABLE student_fluent_languages IS 'Languages that students declare fl
 GRANT ALL PRIVILEGES ON student_fluent_languages TO neoanime_abroadadvisor;
 
 
+CREATE TABLE student_desired_languages (
+student_id      INT NOT NULL,
+language_id     INT NOT NULL,
+
+PRIMARY KEY (student_id, language_id)
+);
+
+COMMENT ON TABLE student_desired_languages IS 'Languages that students would like to study abroad';
+
+GRANT ALL PRIVILEGES ON student_desired_languages TO neoanime_abroadadvisor;
+
+
 CREATE TABLE matriculation (
 student_id  INTEGER NOT NULL,
 major_id    INTEGER NOT NULL,
