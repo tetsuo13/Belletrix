@@ -80,8 +80,8 @@ namespace Bennett.AbroadAdvisor.Controllers
             ViewBag.Countries = new SelectList(CountryModel.GetCountries(), "Id", "Name");
             ViewBag.Languages = LanguageModel.GetLanguages();
 
-            ViewBag.EnteringYears = new SelectList(Enumerable.Range(1990, (DateTime.Now.Year - 1990)).Reverse());
-            ViewBag.GraduatingYears = new SelectList(Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 6)).Reverse());
+            ViewBag.EnteringYears = new SelectList(Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 2)).Reverse());
+            ViewBag.GraduatingYears = new SelectList(Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 7)).Reverse());
             ViewBag.Classifications = new SelectList(StudentClassificationModel.GetClassifications(), "Id", "name");
             
             List<MajorsModel> majors = MajorsModel.GetMajors();
