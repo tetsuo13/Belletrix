@@ -2,6 +2,7 @@
 using Npgsql;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Bennett.AbroadAdvisor.Models
 {
@@ -13,7 +14,7 @@ namespace Bennett.AbroadAdvisor.Models
         [Required]
         public string Name { get; set; }
 
-        public static List<MajorsModel> GetMajors()
+        public static IEnumerable<MajorsModel> GetMajors()
         {
             List<MajorsModel> majors = new List<MajorsModel>();
 
@@ -42,7 +43,7 @@ namespace Bennett.AbroadAdvisor.Models
                 }
             }
 
-            return majors;
+            return majors.AsEnumerable();
         }
     }
 }

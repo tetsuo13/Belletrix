@@ -20,14 +20,14 @@ namespace Bennett.AbroadAdvisor.Models
         [DisplayFormat(DataFormatString = "{0:M/d/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime? InitialMeeting { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "First name is required")]
         [StringLength(64)]
         public string FirstName { get; set; }
 
         [StringLength(64)]
         public string MiddleName { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Last name is required")]
         [StringLength(64)]
         public string LastName { get; set; }
 
@@ -119,6 +119,19 @@ namespace Bennett.AbroadAdvisor.Models
         [Display(Name = "Desired Language Abroad")]
         public IEnumerable<int> SelectedDesiredLanguages { get; set; }
 
+        [Display(Name = "Country")]
+        public IEnumerable<int> StudyAbroadCountry { get; set; }
+
+        [Display(Name = "Year")]
+        public IEnumerable<int> StudyAbroadYear { get; set; }
+
+        /// <summary>
+        /// Values will be indexes from
+        /// StudentStudyAbroadWishlistModel.PeriodValue
+        /// </summary>
+        [Display(Name = "Semester")]
+        public IEnumerable<int> StudyAbroadPeriod { get; set; }
+
         private Dictionary<string, string> columns;
         private List<NpgsqlParameter> parameters;
 
@@ -204,11 +217,12 @@ namespace Bennett.AbroadAdvisor.Models
                         command.ExecuteNonQuery();
                     }
 
-                    // Always call the next two functions. User may be removing
-                    // all majors/minors from a student which previous has some
-                    // selected.
+                    // Always call the next two functions. User may be
+                    // removing all values from a student which previous has
+                    // some selected.
                     SaveStudentMajors(connection, Id, SelectedMajors, true);
                     SaveStudentMajors(connection, Id, SelectedMinors, false);
+                    SaveStudyAbroadDestinations(connection, Id, StudyAbroadCountry, StudyAbroadYear, StudyAbroadPeriod);
 
                     SaveStudentLanguages(connection, Id, "student_fluent_languages", SelectedLanguages);
                     SaveStudentLanguages(connection, Id, "student_desired_languages", SelectedDesiredLanguages);
@@ -302,6 +316,7 @@ namespace Bennett.AbroadAdvisor.Models
                 PopulateStudentMajorsMinors(connection, ref students);
                 PopulateStudentLanguages(connection, ref students);
                 PopulateDesiredStudentLanguages(connection, ref students);
+                PopulateStudyAbroadDestinations(connection, ref students);
             }
 
             return students;
@@ -455,9 +470,107 @@ namespace Bennett.AbroadAdvisor.Models
                         SaveStudentLanguages(connection, studentId, "student_desired_languages", SelectedDesiredLanguages);
                     }
 
+                    int countriesCount = StudyAbroadCountry.Cast<int>().Count();
+
+                    if (countriesCount > 0 &&
+                        countriesCount == StudyAbroadYear.Cast<int>().Count() &&
+                        countriesCount == StudyAbroadPeriod.Cast<int>().Count())
+                    {
+                        // The default if the user doesn't selecting anything
+                        // at all is that all three enumerables will have a
+                        // single element of value zero.
+                        if (StudyAbroadCountry.ElementAt(0) > 0 && StudyAbroadYear.ElementAt(0) > 0)
+                        {
+                            SaveStudyAbroadDestinations(connection, studentId, StudyAbroadCountry, StudyAbroadYear,
+                                StudyAbroadPeriod);
+                        }
+                    }
+
                     EventLogModel.AddStudentEvent(connection, userId, studentId, EventLogModel.EventType.AddStudent);
 
                     transaction.Commit();
+                }
+            }
+        }
+
+        private static void PopulateStudyAbroadDestinations(NpgsqlConnection connection, ref List<StudentModel> students)
+        {
+            using (NpgsqlCommand command = connection.CreateCommand())
+            {
+                command.CommandText = @"
+                    SELECT  country_id, year, period
+                    FROM    student_study_abroad_wishlist
+                    WHERE   student_id = @StudentId";
+
+                command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer);
+                command.Prepare();
+
+                for (int i = 0; i < students.Count; i++)
+                {
+                    List<int> countries = new List<int>();
+                    List<int> years = new List<int>();
+                    List<int> periods = new List<int>();
+
+                    command.Parameters[0].Value = students[i].Id;
+
+                    using (NpgsqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            countries.Add(reader.GetInt32(reader.GetOrdinal("country_id")));
+                            years.Add(reader.GetInt32(reader.GetOrdinal("year")));
+                            periods.Add(reader.GetInt32(reader.GetOrdinal("period")));
+                        }
+                    }
+
+                    students[i].StudyAbroadCountry = countries.AsEnumerable();
+                    students[i].StudyAbroadYear = years.AsEnumerable();
+                    students[i].StudyAbroadPeriod = periods.AsEnumerable();
+                }
+            }
+        }
+
+        private void SaveStudyAbroadDestinations(NpgsqlConnection connection, int studentId,
+            IEnumerable<int> countries, IEnumerable<int> years, IEnumerable<int> periods)
+        {
+            using (NpgsqlCommand command = connection.CreateCommand())
+            {
+                command.CommandText = @"
+                    DELETE FROM student_study_abroad_wishlist
+                    WHERE student_id = @StudentId";
+
+                command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+                command.ExecuteNonQuery();
+            }
+
+            using (NpgsqlCommand command = connection.CreateCommand())
+            {
+                command.CommandText = @"
+                    INSERT INTO student_study_abroad_wishlist
+                    (
+                        student_id, country_id, year, period
+                    )
+                    VALUES
+                    (
+                        @StudentId, @CountryId, @Year, @Period
+                    )";
+
+                command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+                command.Parameters.Add("@CountryId", NpgsqlTypes.NpgsqlDbType.Integer);
+                command.Parameters.Add("@Year", NpgsqlTypes.NpgsqlDbType.Integer);
+                command.Parameters.Add("@Period", NpgsqlTypes.NpgsqlDbType.Integer);
+
+                command.Prepare();
+
+                int countriesCount = countries.Cast<int>().Count();
+
+                for (int i = 0; i < countriesCount; i++)
+                {
+                    command.Parameters[1].Value = countries.ElementAt(i);
+                    command.Parameters[2].Value = years.ElementAt(i);
+                    command.Parameters[3].Value = periods.ElementAt(i);
+
+                    command.ExecuteNonQuery();
                 }
             }
         }

@@ -18,7 +18,8 @@ namespace Bennett.AbroadAdvisor.App_Start
                 "~/Content/css/bootstrap-multiselect.css",
                 "~/Content/css/sb-admin.css",
                 "~/Content/css/font-awesome.min.css",
-                "~/Content/css/datepicker.css"));
+                "~/Content/css/datepicker.css",
+                "~/Content/css/AbroadAdvisor.css"));
         }
     }
 }

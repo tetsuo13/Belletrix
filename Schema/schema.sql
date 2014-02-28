@@ -405,9 +405,9 @@ GRANT ALL PRIVILEGES ON student_desired_languages TO neoanime_abroadadvisor;
 
 
 CREATE TABLE matriculation (
-student_id  INTEGER NOT NULL,
-major_id    INTEGER NOT NULL,
-is_major    BOOLEAN NOT NULL,
+student_id  INT NOT NULL,
+major_id    INT NOT NULL,
+is_major    INT NOT NULL,
 
 PRIMARY KEY (student_id, major_id)
 );
@@ -415,6 +415,26 @@ PRIMARY KEY (student_id, major_id)
 COMMENT ON TABLE matriculation IS 'Student major/minor cross reference';
 
 GRANT ALL PRIVILEGES ON matriculation TO neoanime_abroadadvisor;
+
+
+CREATE TABLE student_study_abroad_wishlist (
+student_id  INT NOT NULL,
+country_id  INT NOT NULL,
+year        INT NOT NULL,
+period      INT NOT NULL,
+
+PRIMARY KEY (student_id, country_id, year, period),
+FOREIGN KEY (student_id) REFERENCES students (id),
+FOREIGN KEY (country_id) REFERENCES countries (id)
+);
+
+COMMENT ON TABLE student_study_abroad_wishlist IS 'Location and semesters that students wish to study abroad to';
+COMMENT ON COLUMN student_study_abroad_wishlist.student_id IS 'Student ID';
+COMMENT ON COLUMN student_study_abroad_wishlist.country_id IS 'Country ID';
+COMMENT ON COLUMN student_study_abroad_wishlist.year IS 'Desired four digit year';
+COMMENT ON COLUMN student_study_abroad_wishlist.period IS 'One of StudentStudyAbroadWishlistModel.PeriodValue';
+
+GRANT ALL PRIVILEGES ON student_study_abroad_wishlist TO neoanime_abroadadvisor;
 
 
 CREATE TABLE users (

@@ -64,6 +64,25 @@ namespace Bennett.AbroadAdvisor.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Add(StudentModel model)
         {
+            if (model.StudyAbroadCountry != null &&
+                model.StudyAbroadCountry.Cast<int>().Count() == 1 &&
+                model.StudyAbroadCountry.ElementAt(0) == 0)
+            {
+                model.StudyAbroadCountry = null;
+            }
+
+            if (model.StudyAbroadYear != null &&
+                model.StudyAbroadYear.Cast<int>().Count() == 1 &&
+                model.StudyAbroadYear.ElementAt(0) == 0)
+            {
+                model.StudyAbroadYear = null;
+            }
+
+            if (model.StudyAbroadCountry == null)
+            {
+                model.StudyAbroadPeriod = null;
+            }
+
             if (ModelState.IsValid)
             {
                 model.Save((Session["User"] as UserModel).Id);
@@ -82,9 +101,10 @@ namespace Bennett.AbroadAdvisor.Controllers
 
             ViewBag.EnteringYears = new SelectList(Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 2)).Reverse());
             ViewBag.GraduatingYears = new SelectList(Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 7)).Reverse());
-            ViewBag.Classifications = new SelectList(StudentClassificationModel.GetClassifications(), "Id", "name");
+            ViewBag.Classifications = new SelectList(StudentClassificationModel.GetClassifications(), "Id", "Name");
+            ViewBag.Semesters = StudentStudyAbroadWishlistModel.GetPeriods();
             
-            List<MajorsModel> majors = MajorsModel.GetMajors();
+            IEnumerable<MajorsModel> majors = MajorsModel.GetMajors();
             ViewBag.AvailableMajors = majors;
             ViewBag.AvailableMinors = majors;
         }

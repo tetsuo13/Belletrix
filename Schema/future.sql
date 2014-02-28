@@ -38,26 +38,32 @@ VALUES
 ('NYU Ghana', NULL),
 ('Grahamstown Festival', NULL);
 
-CREATE TABLE languages (
+
+CREATE TABLE program_types (
 id          SERIAL,
-name        VARCHAR(64) NOT NULL,
+name        VARCHAR(32) NOT NULL,
+short_term  BOOLEAN NOT NULL,
 
 PRIMARY KEY (id),
 UNIQUE (name)
 );
 
-GRANT ALL PRIVILEGES ON languages TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON languages_id_seq TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON program_types TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON program_types_id_seq TO neoanime_abroadadvisor;
 
-INSERT INTO languages
-(name)
+INSERT INTO program_types
+(name, short_term)
 VALUES
-('Chinese'),
-('French'),
-('Italian'),
-('Japanese'),
-('Korean'),
-('Spanish');
+('Maymester', TRUE),
+('Spring Break', TRUE),
+('Internship', TRUE),
+('Research Experience (Short-Term)', TRUE),
+('Research Experience (Long-Term)', FALSE),
+('Semester', FALSE),
+('Summer', TRUE),
+('Other', TRUE),
+('Academic Year', FALSE);
+
 
 CREATE TABLE advising (
 id              SERIAL,
@@ -86,14 +92,19 @@ GRANT ALL PRIVILEGES ON regions TO neoanime_abroadadvisor;
 GRANT ALL PRIVILEGES ON regions_id_seq TO neoanime_abroadadvisor;
 
 CREATE TABLE study_abroad (
+id                  SERIAL NOT NULL,
 student_id          INT NOT NULL,
-start_date          DATE NOT NULL,
-end_date            DATE NOT NULL,
+semester            INT NOT NULL,
+year                INT NOT NULL,
+start_date          DATE,
+end_date            DATE,
 credit_bearing      BOOL NOT NULL,
 country_id          INT NOT NULL,
 region_id           INT,
 program_id          INT NOT NULL,
 
+PRIMARY KEY (id),
+UNIQUE (student_id, semester, year),
 FOREIGN KEY (student_id) REFERENCES students (id),
 FOREIGN KEY (country_id) REFERENCES countries (id),
 FOREIGN KEY (region_id) REFERENCES regions (id),
@@ -101,3 +112,14 @@ FOREIGN KEY (program_id) REFERENCES programs (id)
 );
 
 GRANT ALL PRIVILEGES ON study_abroad TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON study_abroad_id_seq TO neoanime_abroadadvisor;
+
+CREATE TABLE study_abroad_program_types (
+study_abroad_id     INT NOT NULL,
+program_type_id     INT NOT NULL,
+
+PRIMARY KEY (study_abroad_id, program_type_id),
+FOREIGN KEY (program_type_id) REFERENCES program_types (id)
+);
+
+GRANT ALL PRIVILEGES ON study_abroad_program_types TO neoanime_abroadadvisor;

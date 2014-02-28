@@ -150,6 +150,7 @@
     <Compile Include="Models\PingModel.cs" />
     <Compile Include="Models\StudentClassificationModel.cs" />
     <Compile Include="Models\StudentModel.cs" />
+    <Compile Include="Models\StudentStudyAbroadWishlistModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -157,6 +158,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Content Include="Content\css\AbroadAdvisor.css" />
     <Content Include="Content\css\bootstrap-multiselect.css" />
     <Content Include="Content\css\bootstrap.css" />
     <Content Include="Content\css\datepicker.css" />
