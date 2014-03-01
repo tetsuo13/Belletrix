@@ -55,6 +55,8 @@ namespace Bennett.AbroadAdvisor.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(StudentModel model)
         {
+            CheckStudyAbroadDestinations(ref model);
+
             if (ModelState.IsValid)
             {
                 model.SaveChanges((Session["User"] as UserModel).Id);
@@ -75,6 +77,20 @@ namespace Bennett.AbroadAdvisor.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Add(StudentModel model)
         {
+            CheckStudyAbroadDestinations(ref model);
+
+            if (ModelState.IsValid)
+            {
+                model.Save((Session["User"] as UserModel).Id);
+                return RedirectToAction("List");
+            }
+
+            PrepareDropDowns();
+            return View(model);
+        }
+
+        private void CheckStudyAbroadDestinations(ref StudentModel model)
+        {
             if (model.StudyAbroadCountry != null &&
                 model.StudyAbroadCountry.Cast<int>().Count() == 1 &&
                 model.StudyAbroadCountry.ElementAt(0) == 0)
@@ -93,15 +109,6 @@ namespace Bennett.AbroadAdvisor.Controllers
             {
                 model.StudyAbroadPeriod = null;
             }
-
-            if (ModelState.IsValid)
-            {
-                model.Save((Session["User"] as UserModel).Id);
-                return RedirectToAction("List");
-            }
-
-            PrepareDropDowns();
-            return View(model);
         }
 
         private void PrepareDropDowns()
@@ -114,9 +121,8 @@ namespace Bennett.AbroadAdvisor.Controllers
             ViewBag.Classifications = new SelectList(StudentClassificationModel.GetClassifications(), "Id", "Name");
             ViewBag.Semesters = StudentStudyAbroadWishlistModel.GetPeriods();
             
-            IEnumerable<MajorsModel> majors = MajorsModel.GetMajors();
-            ViewBag.AvailableMajors = majors;
-            ViewBag.AvailableMinors = majors;
+            ViewBag.AvailableMajors = MajorsModel.GetMajors();
+            ViewBag.AvailableMinors = MinorsModel.GetMinors();
         }
     }
 }

@@ -543,34 +543,37 @@ namespace Bennett.AbroadAdvisor.Models
                 command.ExecuteNonQuery();
             }
 
-            using (NpgsqlCommand command = connection.CreateCommand())
+            if (countries != null)
             {
-                command.CommandText = @"
-                    INSERT INTO student_study_abroad_wishlist
-                    (
-                        student_id, country_id, year, period
-                    )
-                    VALUES
-                    (
-                        @StudentId, @CountryId, @Year, @Period
-                    )";
-
-                command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
-                command.Parameters.Add("@CountryId", NpgsqlTypes.NpgsqlDbType.Integer);
-                command.Parameters.Add("@Year", NpgsqlTypes.NpgsqlDbType.Integer);
-                command.Parameters.Add("@Period", NpgsqlTypes.NpgsqlDbType.Integer);
-
-                command.Prepare();
-
-                int countriesCount = countries.Cast<int>().Count();
-
-                for (int i = 0; i < countriesCount; i++)
+                using (NpgsqlCommand command = connection.CreateCommand())
                 {
-                    command.Parameters[1].Value = countries.ElementAt(i);
-                    command.Parameters[2].Value = years.ElementAt(i);
-                    command.Parameters[3].Value = periods.ElementAt(i);
+                    command.CommandText = @"
+                        INSERT INTO student_study_abroad_wishlist
+                        (
+                            student_id, country_id, year, period
+                        )
+                        VALUES
+                        (
+                            @StudentId, @CountryId, @Year, @Period
+                        )";
 
-                    command.ExecuteNonQuery();
+                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+                    command.Parameters.Add("@CountryId", NpgsqlTypes.NpgsqlDbType.Integer);
+                    command.Parameters.Add("@Year", NpgsqlTypes.NpgsqlDbType.Integer);
+                    command.Parameters.Add("@Period", NpgsqlTypes.NpgsqlDbType.Integer);
+
+                    command.Prepare();
+
+                    int countriesCount = countries.Cast<int>().Count();
+
+                    for (int i = 0; i < countriesCount; i++)
+                    {
+                        command.Parameters[1].Value = countries.ElementAt(i);
+                        command.Parameters[2].Value = years.ElementAt(i);
+                        command.Parameters[3].Value = periods.ElementAt(i);
+
+                        command.ExecuteNonQuery();
+                    }
                 }
             }
         }

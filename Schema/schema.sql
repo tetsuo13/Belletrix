@@ -297,6 +297,47 @@ VALUES
 ('Undecided & Entrepreneurial Studies');
 
 
+CREATE TABLE minors (
+id      SERIAL,
+name    VARCHAR(128) NOT NULL,
+
+PRIMARY KEY (id),
+UNIQUE (name)
+);
+
+COMMENT ON TABLE minors IS 'Available minors';
+
+GRANT ALL PRIVILEGES ON minors TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON minors_id_seq TO neoanime_abroadadvisor;
+
+INSERT INTO minors
+(name)
+VALUES
+('Arts Management'),
+('Biology'),
+('Business'),
+('Business Administration'),
+('Business Management'),
+('Chemistry'),
+('Computer Science'),
+('Early Childhood'),
+('Education'),
+('English'),
+('Interdisciplinary Studies'),
+('International Business'),
+('Journalism and Media Studies'),
+('Political Science'),
+('Psychology'),
+('Social Work'),
+('Special Education'),
+('Theater'),
+('Women''s Studies'),
+('Undecided & Entrepreneurial Studies'),
+('Entrepreneurial Studies'),
+('Global Studies'),
+('Spanish');
+
+
 CREATE TABLE languages (
 id          SERIAL,
 name        VARCHAR(32) NOT NULL,
@@ -409,7 +450,7 @@ student_id  INT NOT NULL,
 major_id    INT NOT NULL,
 is_major    INT NOT NULL,
 
-PRIMARY KEY (student_id, major_id)
+PRIMARY KEY (student_id, major_id, is_major)
 );
 
 COMMENT ON TABLE matriculation IS 'Student major/minor cross reference';

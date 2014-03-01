@@ -146,6 +146,7 @@
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\MajorsModel.cs" />
     <Compile Include="Models\MatriculationModel.cs" />
+    <Compile Include="Models\MinorsModel.cs" />
     <Compile Include="Models\NoteModel.cs" />
     <Compile Include="Models\PingModel.cs" />
     <Compile Include="Models\StudentClassificationModel.cs" />
