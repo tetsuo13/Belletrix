@@ -68,7 +68,7 @@
                         <td>
                             @if (Request.Browser.CanInitiateVoiceCall)
                             {
-                                <a href="tel:@student.CellPhoneNumber">@student.CellPhoneNumber</a>
+                                <a href="tel:@student.CellPhoneNumber">@(Formatter.PhoneNumber(student.CellPhoneNumber))</a>
                             }
                             else
                             {
