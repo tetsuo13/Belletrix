@@ -16,31 +16,38 @@ namespace Bennett.AbroadAdvisor.Models
 
         public static IEnumerable<MinorsModel> GetMinors()
         {
-            List<MinorsModel> minors = new List<MinorsModel>();
+            ApplicationCache cacheProvider = new ApplicationCache();
+            string cacheId = "Languages";
+            List<MinorsModel> minors = cacheProvider.Get(cacheId, () => new List<MinorsModel>());
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+            if (minors.Count == 0)
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                 {
-                    command.CommandText = @"
+                    using (NpgsqlCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = @"
                         SELECT      id, name
                         FROM        minors
                         ORDER BY    name";
 
-                    connection.Open();
+                        connection.Open();
 
-                    using (NpgsqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
+                        using (NpgsqlDataReader reader = command.ExecuteReader())
                         {
-                            minors.Add(new MinorsModel()
+                            while (reader.Read())
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                Name = reader.GetString(reader.GetOrdinal("name"))
-                            });
+                                minors.Add(new MinorsModel()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                    Name = reader.GetString(reader.GetOrdinal("name"))
+                                });
+                            }
                         }
                     }
                 }
+
+                cacheProvider.Set(cacheId, minors);
             }
 
             return minors.AsEnumerable();

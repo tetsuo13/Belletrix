@@ -15,31 +15,38 @@ namespace Bennett.AbroadAdvisor.Models
 
         public static List<LanguageModel> GetLanguages()
         {
-            List<LanguageModel> languages = new List<LanguageModel>();
+            ApplicationCache cacheProvider = new ApplicationCache();
+            string cacheId = "Languages";
+            List<LanguageModel> languages = cacheProvider.Get(cacheId, () => new List<LanguageModel>());
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+            if (languages.Count == 0)
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                 {
-                    command.CommandText = @"
+                    using (NpgsqlCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = @"
                         SELECT      id, name
                         FROM        languages
                         ORDER BY    name";
 
-                    connection.Open();
+                        connection.Open();
 
-                    using (NpgsqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
+                        using (NpgsqlDataReader reader = command.ExecuteReader())
                         {
-                            languages.Add(new LanguageModel()
+                            while (reader.Read())
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                Name = reader.GetString(reader.GetOrdinal("name"))
-                            });
+                                languages.Add(new LanguageModel()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                    Name = reader.GetString(reader.GetOrdinal("name"))
+                                });
+                            }
                         }
                     }
                 }
+
+                cacheProvider.Set(cacheId, languages);
             }
 
             return languages;

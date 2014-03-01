@@ -16,31 +16,38 @@ namespace Bennett.AbroadAdvisor.Models
 
         public static IEnumerable<MajorsModel> GetMajors()
         {
-            List<MajorsModel> majors = new List<MajorsModel>();
+            ApplicationCache cacheProvider = new ApplicationCache();
+            string cacheId = "Languages";
+            List<MajorsModel> majors = cacheProvider.Get(cacheId, () => new List<MajorsModel>());
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+            if (majors.Count == 0)
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                 {
-                    command.CommandText = @"
+                    using (NpgsqlCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = @"
                         SELECT      id, name
                         FROM        majors
                         ORDER BY    name";
 
-                    connection.Open();
+                        connection.Open();
 
-                    using (NpgsqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
+                        using (NpgsqlDataReader reader = command.ExecuteReader())
                         {
-                            majors.Add(new MajorsModel()
+                            while (reader.Read())
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                Name = reader.GetString(reader.GetOrdinal("name"))
-                            });
+                                majors.Add(new MajorsModel()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                    Name = reader.GetString(reader.GetOrdinal("name"))
+                                });
+                            }
                         }
                     }
                 }
+
+                cacheProvider.Set(cacheId, majors);
             }
 
             return majors.AsEnumerable();

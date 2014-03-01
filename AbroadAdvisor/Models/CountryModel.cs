@@ -18,13 +18,17 @@ namespace Bennett.AbroadAdvisor.Models
 
         public static List<CountryModel> GetCountries()
         {
-            List<CountryModel> countries = new List<CountryModel>();
+            ApplicationCache cacheProvider = new ApplicationCache();
+            string cacheId = "Countries";
+            List<CountryModel> countries = cacheProvider.Get(cacheId, () => new List<CountryModel>());
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+            if (countries.Count == 0)
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                 {
-                    command.CommandText = @"
+                    using (NpgsqlCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = @"
                         SELECT      id, name, abbreviation
                         FROM        countries
                         ORDER BY    CASE abbreviation
@@ -33,21 +37,24 @@ namespace Bennett.AbroadAdvisor.Models
                                         ELSE 3
                                     END, name";
 
-                    connection.Open();
+                        connection.Open();
 
-                    using (NpgsqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
+                        using (NpgsqlDataReader reader = command.ExecuteReader())
                         {
-                            countries.Add(new CountryModel()
+                            while (reader.Read())
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                Name = reader.GetString(reader.GetOrdinal("name")),
-                                Abbreviation = reader.GetString(reader.GetOrdinal("abbreviation"))
-                            });
+                                countries.Add(new CountryModel()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                    Name = reader.GetString(reader.GetOrdinal("name")),
+                                    Abbreviation = reader.GetString(reader.GetOrdinal("abbreviation"))
+                                });
+                            }
                         }
                     }
                 }
+
+                cacheProvider.Set(cacheId, countries);
             }
 
             return countries;
