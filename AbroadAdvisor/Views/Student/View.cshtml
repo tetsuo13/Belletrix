@@ -1,0 +1,39 @@
+﻿@using Bennett.AbroadAdvisor.Models;
+
+@model StudentModel
+
+@{
+    ViewBag.Title = "View";
+}
+
+@section Body {
+    <div class="row">
+        <div class="col-lg-8">
+
+        </div>
+        <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <address>
+                        @if (Model.Classification.HasValue)
+                        {
+                            @((ViewBag.Classifications as SelectList).Where(c => c.Value == Model.Classification.Value.ToString()).First().Text)
+                            <br />
+                        }
+                        <strong class="h2">@Model.FirstName @Model.MiddleName @Model.LastName</strong>
+                        @if (!String.IsNullOrEmpty(Model.CampusEmail))
+                        {
+                            <br />
+                            <a href="mailto:@Model.CampusEmail">@Model.CampusEmail</a>
+                        }
+                        @if (!String.IsNullOrEmpty(Model.AlternateEmail))
+                        {
+                            <br />
+                            <a href="mailto:@Model.AlternateEmail">@Model.AlternateEmail</a>
+                        }
+                    </address>
+                </div>
+            </div>
+        </div>
+    </div>
+}

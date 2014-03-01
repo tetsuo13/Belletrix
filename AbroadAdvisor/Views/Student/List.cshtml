@@ -48,7 +48,7 @@
                 <tr>
                     <th>Name <i class="fa fa-sort"></i></th>
                     <th>Email <i class="fa fa-sort"></i></th>
-                    <th>Phone Number <i class="fa fa-sort"></i></th>
+                    <th>Cell Phone <i class="fa fa-sort"></i></th>
                     <th></th>
                 </tr>
             </thead>
@@ -57,24 +57,29 @@
                 {
                     <tr>
                         <td>
-                            <a href="@Url.Action("Edit", "Student", new { id = student.Id })">@student.LastName, @student.FirstName @student.MiddleName</a>
+                            <a href="@Url.Action("View", "Student", new { id = student.Id })">@student.LastName, @student.FirstName @student.MiddleName</a>
                         </td>
                         <td>
-                            @if (String.IsNullOrEmpty(student.CampusEmail))
-                            {
-                                <text>&mdash;</text>
-                            }
-                            else
+                            @if (!String.IsNullOrEmpty(student.CampusEmail))
                             {
                                 <a href="mailto:@student.CampusEmail">@student.CampusEmail</a>
                             }
                         </td>
-                        <td>@Formatter.PhoneNumber(student.PhoneNumber)</td>
+                        <td>@Formatter.PhoneNumber(student.CellPhoneNumber)</td>
                         <td>
-                            <a href="@Url.Action("List", "Note", new { studentId = student.Id })"
-                               data-toggle="modal" data-target="#noteModal"
-                               class="studentlisttooltop studentlistmodel" data-placement="top"
-                               title="Notes"><i class="fa fa-book"></i></a>
+                            <ul class="list-inline" style="margin-bottom: 0">
+                                <li>
+                                    <a href="@Url.Action("List", "Note", new { studentId = student.Id })"
+                                       data-toggle="modal" data-target="#noteModal"
+                                       class="studentlisttooltop studentlistmodel" data-placement="top"
+                                       title="Notes"><i class="fa fa-book"></i></a>
+                                </li>
+                                <li>
+                                    <a href="@Url.Action("Edit", "Student", new { id = student.Id })"
+                                       class="studentlisttooltop" data-placement="top"
+                                       title="Edit"><i class="fa fa-pencil"></i></a>
+                                </li>
+                            </ul>
                         </td>
                     </tr>
                 }

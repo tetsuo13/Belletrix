@@ -191,6 +191,7 @@
     <Content Include="Views\User\Profile.cshtml" />
     <Content Include="Views\User\List.cshtml" />
     <Content Include="Views\Note\List.cshtml" />
+    <Content Include="Views\Student\View.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

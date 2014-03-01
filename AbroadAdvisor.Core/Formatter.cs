@@ -20,7 +20,7 @@ namespace Bennett.AbroadAdvisor.Core
         {
             if (String.IsNullOrWhiteSpace(number) || number.Length != 10)
             {
-                return String.Empty;
+                return number;
             }
             return String.Format("{0:(###) ###-####}", Double.Parse(number));
         }
