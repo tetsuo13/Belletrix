@@ -65,7 +65,16 @@
                                 <a href="mailto:@student.CampusEmail">@student.CampusEmail</a>
                             }
                         </td>
-                        <td>@Formatter.PhoneNumber(student.CellPhoneNumber)</td>
+                        <td>
+                            @if (Request.Browser.CanInitiateVoiceCall)
+                            {
+                                <a href="tel:@student.CellPhoneNumber">@student.CellPhoneNumber</a>
+                            }
+                            else
+                            {
+                                @(Formatter.PhoneNumber(student.CellPhoneNumber))
+                            }
+                        </td>
                         <td>
                             <ul class="list-inline" style="margin-bottom: 0">
                                 <li>

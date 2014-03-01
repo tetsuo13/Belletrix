@@ -17,7 +17,7 @@ namespace Bennett.AbroadAdvisor.Models
 
         [Display(Name = "Initial Meeting")]
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:M/d/yyyy}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime? InitialMeeting { get; set; }
 
         [Required(ErrorMessage = "First name is required")]
@@ -79,7 +79,7 @@ namespace Bennett.AbroadAdvisor.Models
 
         [Display(Name = "Date of Birth")]
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:M/d/yyyy}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime? DateOfBirth { get; set; }
 
         [Display(Name = "Enrolled as a")]

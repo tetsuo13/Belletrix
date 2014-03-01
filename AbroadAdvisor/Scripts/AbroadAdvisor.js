@@ -12,17 +12,12 @@ window.Bennett = window.Bennett || {};
     AbroadAdvisor.initStudentAddEdit = function () {
         /// <summary>Initialize student add/edit page.</summary>
 
-        $.each(['#DateOfBirth', '#InitialMeeting'], function (i, val) {
-            $(val).addClass('form-control');
-            $(val).datepicker({
-                format: 'm/d/yyyy'
-            });
-        });
-
         $('.multiselect').multiselect({
             numberDisplayed: 1,
             buttonContainer: '<div class="button-default" />'
         });
+
+        $('input[type=date], input[type=email]').addClass('form-control');
 
         $('a#studyAbroadDestinations').click(function (e) {
             e.preventDefault();
