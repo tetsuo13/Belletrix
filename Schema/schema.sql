@@ -256,7 +256,8 @@ VALUES
 ('YU', 'Yugoslavia'),
 ('ZR', 'Zaire'),
 ('ZM', 'Zambia'),
-('ZW', 'Zimbabwe');
+('ZW', 'Zimbabwe'),
+('', 'Anywhere');
 
 
 CREATE TABLE majors (
@@ -377,7 +378,8 @@ VALUES
 ('Turkish'),
 ('Italian'),
 ('Cantonese'),
-('Hausa');
+('Hausa'),
+('Kiswahili');
 
 
 CREATE TABLE students (

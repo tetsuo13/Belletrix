@@ -29,7 +29,8 @@ namespace Bennett.AbroadAdvisor.Models
                         FROM        countries
                         ORDER BY    CASE abbreviation
                                         WHEN 'US' THEN 1
-                                        ELSE 2
+                                        WHEN '' THEN 2
+                                        ELSE 3
                                     END, name";
 
                     connection.Open();
