@@ -10,6 +10,8 @@ namespace Bennett.AbroadAdvisor.Models
 {
     public class StudentModel
     {
+        private const string CacheId = "Students";
+
         [Key]
         public int Id { get; set; }
 
@@ -227,99 +229,130 @@ namespace Bennett.AbroadAdvisor.Models
                     SaveStudentLanguages(connection, Id, "student_fluent_languages", SelectedLanguages);
                     SaveStudentLanguages(connection, Id, "student_desired_languages", SelectedDesiredLanguages);
 
-                    EventLogModel.AddStudentEvent(connection, userId, Id, EventLogModel.EventType.EditStudent);
+                    EventLogModel eventLog = new EventLogModel();
+                    eventLog.AddStudentEvent(connection, userId, Id, EventLogModel.EventType.EditStudent);
 
                     transaction.Commit();
+
+                    ApplicationCache cacheProvider = new ApplicationCache();
+                    Dictionary<int, StudentModel> students = cacheProvider.Get(CacheId, () => new Dictionary<int, StudentModel>());
+                    students[Id] = this;
+                    cacheProvider.Set(CacheId, students);
                 }
             }
         }
 
         public static List<StudentModel> GetStudents(int? id)
         {
-            List<StudentModel> students = new List<StudentModel>();
+            ApplicationCache cacheProvider = new ApplicationCache();
+            Dictionary<int, StudentModel> students = cacheProvider.Get(CacheId, () => new Dictionary<int, StudentModel>());
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+            if (students.Count == 0)
             {
-                connection.Open();
+                List<StudentModel> studentList = new List<StudentModel>();
 
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                 {
-                    StringBuilder sql = new StringBuilder(@"
-                        SELECT  *
-                        FROM    students ");
+                    connection.Open();
 
-                    if (id.HasValue)
+                    using (NpgsqlCommand command = connection.CreateCommand())
                     {
-                        sql.Append("WHERE id = @Id ");
-                        command.Parameters.Add("@Id", NpgsqlTypes.NpgsqlDbType.Integer).Value = id.Value;
-                    }
+                        StringBuilder sql = new StringBuilder(@"
+                            SELECT  *
+                            FROM    students ");
 
-                    sql.Append("ORDER BY last_name, first_name");
-
-                    command.CommandText = sql.ToString();
-
-                    using (NpgsqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
+                        if (id.HasValue)
                         {
-                            StudentModel student = new StudentModel()
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                FirstName = reader.GetString(reader.GetOrdinal("first_name")),
-                                LastName = reader.GetString(reader.GetOrdinal("last_name"))
-                            };
+                            sql.Append("WHERE id = @Id ");
+                            command.Parameters.Add("@Id", NpgsqlTypes.NpgsqlDbType.Integer).Value = id.Value;
+                        }
 
-                            student.MiddleName = StringOrDefault(reader, "middle_name");
-                            student.LivingOnCampus = BoolOrDefault(reader, "living_on_campus");
-                            student.StreetAddress = StringOrDefault(reader, "street_address");
-                            student.StreetAddress2 = StringOrDefault(reader, "street_address2");
-                            student.City = StringOrDefault(reader, "city");
-                            student.State = StringOrDefault(reader, "state");
-                            student.PostalCode = StringOrDefault(reader, "postal_code");
-                            student.PhoneNumber = StringOrDefault(reader, "phone_number");
-                            student.CellPhoneNumber = StringOrDefault(reader, "cell_phone_number");
-                            student.EnteringYear = IntOrDefault(reader, "entering_year");
-                            student.GraduatingYear = IntOrDefault(reader, "graduating_year");
-                            student.Classification = IntOrDefault(reader, "classification");
-                            student.StudentId = StringOrDefault(reader, "student_id");
-                            student.EnrolledFullTime = BoolOrDefault(reader, "enrolled_full_time");
-                            student.Citizenship = IntOrDefault(reader, "citizenship");
-                            student.PellGrantRecipient = BoolOrDefault(reader, "pell_grant_recipient");
-                            student.HasPassport = BoolOrDefault(reader, "passport_holder");
-                            student.CampusEmail = StringOrDefault(reader, "campus_email");
-                            student.AlternateEmail = StringOrDefault(reader, "alternate_email");
-                            student.Created = reader.GetDateTime(reader.GetOrdinal("created"));
+                        sql.Append("ORDER BY last_name, first_name");
 
-                            int ord = reader.GetOrdinal("gpa");
-                            if (!reader.IsDBNull(ord))
+                        command.CommandText = sql.ToString();
+
+                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
                             {
-                                student.Gpa = Convert.ToDouble(reader["gpa"]);
+                                StudentModel student = new StudentModel()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("first_name")),
+                                    LastName = reader.GetString(reader.GetOrdinal("last_name"))
+                                };
+
+                                student.MiddleName = StringOrDefault(reader, "middle_name");
+                                student.LivingOnCampus = BoolOrDefault(reader, "living_on_campus");
+                                student.StreetAddress = StringOrDefault(reader, "street_address");
+                                student.StreetAddress2 = StringOrDefault(reader, "street_address2");
+                                student.City = StringOrDefault(reader, "city");
+                                student.State = StringOrDefault(reader, "state");
+                                student.PostalCode = StringOrDefault(reader, "postal_code");
+                                student.PhoneNumber = StringOrDefault(reader, "phone_number");
+                                student.CellPhoneNumber = StringOrDefault(reader, "cell_phone_number");
+                                student.EnteringYear = IntOrDefault(reader, "entering_year");
+                                student.GraduatingYear = IntOrDefault(reader, "graduating_year");
+                                student.Classification = IntOrDefault(reader, "classification");
+                                student.StudentId = StringOrDefault(reader, "student_id");
+                                student.EnrolledFullTime = BoolOrDefault(reader, "enrolled_full_time");
+                                student.Citizenship = IntOrDefault(reader, "citizenship");
+                                student.PellGrantRecipient = BoolOrDefault(reader, "pell_grant_recipient");
+                                student.HasPassport = BoolOrDefault(reader, "passport_holder");
+                                student.CampusEmail = StringOrDefault(reader, "campus_email");
+                                student.AlternateEmail = StringOrDefault(reader, "alternate_email");
+                                student.Created = reader.GetDateTime(reader.GetOrdinal("created"));
+
+                                int ord = reader.GetOrdinal("gpa");
+                                if (!reader.IsDBNull(ord))
+                                {
+                                    student.Gpa = Convert.ToDouble(reader["gpa"]);
+                                }
+
+                                ord = reader.GetOrdinal("dob");
+                                if (!reader.IsDBNull(ord))
+                                {
+                                    student.DateOfBirth = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
+                                }
+
+                                ord = reader.GetOrdinal("initial_meeting");
+                                if (!reader.IsDBNull(ord))
+                                {
+                                    student.InitialMeeting = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
+                                }
+
+                                studentList.Add(student);
                             }
-
-                            ord = reader.GetOrdinal("dob");
-                            if (!reader.IsDBNull(ord))
-                            {
-                                student.DateOfBirth = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
-                            }
-
-                            ord = reader.GetOrdinal("initial_meeting");
-                            if (!reader.IsDBNull(ord))
-                            {
-                                student.InitialMeeting = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
-                            }
-
-                            students.Add(student);
                         }
                     }
+
+                    PopulateStudentMajorsMinors(connection, ref studentList);
+                    PopulateStudentLanguages(connection, ref studentList);
+                    PopulateDesiredStudentLanguages(connection, ref studentList);
+                    PopulateStudyAbroadDestinations(connection, ref studentList);
                 }
 
-                PopulateStudentMajorsMinors(connection, ref students);
-                PopulateStudentLanguages(connection, ref students);
-                PopulateDesiredStudentLanguages(connection, ref students);
-                PopulateStudyAbroadDestinations(connection, ref students);
+                foreach (StudentModel student in studentList)
+                {
+                    students.Add(student.Id, student);
+                }
+
+                cacheProvider.Set(CacheId, students);
             }
 
-            return students;
+            if (id.HasValue)
+            {
+                List<StudentModel> studentReturn = new List<StudentModel>();
+
+                if (students.ContainsKey(id.Value))
+                {
+                    studentReturn.Add(students[id.Value]);
+                }
+
+                return studentReturn;
+            }
+
+            return students.Select(x => x.Value).ToList();
         }
 
         private static void PopulateStudentLanguages(NpgsqlConnection connection, ref List<StudentModel> students)
@@ -486,9 +519,15 @@ namespace Bennett.AbroadAdvisor.Models
                         }
                     }
 
-                    EventLogModel.AddStudentEvent(connection, userId, studentId, EventLogModel.EventType.AddStudent);
+                    EventLogModel eventLog = new EventLogModel();
+                    eventLog.AddStudentEvent(connection, userId, studentId, EventLogModel.EventType.AddStudent);
 
                     transaction.Commit();
+
+                    ApplicationCache cacheProvider = new ApplicationCache();
+                    Dictionary<int, StudentModel> students = cacheProvider.Get(CacheId, () => new Dictionary<int, StudentModel>());
+                    students.Add(Id, this);
+                    cacheProvider.Set(CacheId, students);
                 }
             }
         }

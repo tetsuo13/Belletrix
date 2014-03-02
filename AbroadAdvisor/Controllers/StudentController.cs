@@ -95,19 +95,19 @@ namespace Bennett.AbroadAdvisor.Controllers
                 model.StudyAbroadCountry.Cast<int>().Count() == 1 &&
                 model.StudyAbroadCountry.ElementAt(0) == 0)
             {
-                model.StudyAbroadCountry = null;
+                model.StudyAbroadCountry = Enumerable.Empty<int>();
             }
 
             if (model.StudyAbroadYear != null &&
                 model.StudyAbroadYear.Cast<int>().Count() == 1 &&
                 model.StudyAbroadYear.ElementAt(0) == 0)
             {
-                model.StudyAbroadYear = null;
+                model.StudyAbroadYear = Enumerable.Empty<int>();
             }
 
             if (model.StudyAbroadCountry == null)
             {
-                model.StudyAbroadPeriod = null;
+                model.StudyAbroadPeriod = Enumerable.Empty<int>();
             }
         }
 

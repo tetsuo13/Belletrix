@@ -7,6 +7,8 @@ namespace Bennett.AbroadAdvisor.Models
 {
     public class EventLogModel
     {
+        private const string CacheId = "EventLog";
+
         public enum EventType
         {
             AddStudent,
@@ -35,13 +37,16 @@ namespace Bennett.AbroadAdvisor.Models
 
         public static List<EventLogModel> GetEvents()
         {
-            List<EventLogModel> events = new List<EventLogModel>();
+            ApplicationCache cacheProvider = new ApplicationCache();
+            List<EventLogModel> events = cacheProvider.Get(CacheId, () => new List<EventLogModel>());
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+            if (events.Count == 0)
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                 {
-                    command.CommandText = @"
+                    using (NpgsqlCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = @"
                         SELECT          e.id, e.date, e.modified_by,
                                         e.student_id, e.user_id, e.type,
                                         e.action, u.first_name, u.last_name,
@@ -59,64 +64,67 @@ namespace Bennett.AbroadAdvisor.Models
                         ORDER BY        date DESC
                         LIMIT           6";
 
-                    connection.Open();
+                        connection.Open();
 
-                    using (NpgsqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
+                        using (NpgsqlDataReader reader = command.ExecuteReader())
                         {
-                            UserModel modifiedBy = new UserModel()
+                            while (reader.Read())
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("modified_by")),
-                                FirstName = reader.GetString(reader.GetOrdinal("first_name")),
-                                LastName = reader.GetString(reader.GetOrdinal("last_name"))
-                            };
-
-                            int ord = reader.GetOrdinal("action");
-                            string action = null;
-                            if (!reader.IsDBNull(ord))
-                            {
-                                action = reader.GetString(ord);
-                            }
-
-                            StudentModel student = null;
-                            ord = reader.GetOrdinal("student_id");
-                            if (!reader.IsDBNull(ord))
-                            {
-                                student = new StudentModel()
+                                UserModel modifiedBy = new UserModel()
                                 {
-                                    Id = reader.GetInt32(ord),
-                                    FirstName = reader.GetString(reader.GetOrdinal("student_first_name")),
-                                    LastName = reader.GetString(reader.GetOrdinal("student_last_name"))
+                                    Id = reader.GetInt32(reader.GetOrdinal("modified_by")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("first_name")),
+                                    LastName = reader.GetString(reader.GetOrdinal("last_name"))
                                 };
-                            }
 
-                            UserModel user = null;
-                            ord = reader.GetOrdinal("user_id");
-                            if (!reader.IsDBNull(ord))
-                            {
-                                user = new UserModel()
+                                int ord = reader.GetOrdinal("action");
+                                string action = null;
+                                if (!reader.IsDBNull(ord))
                                 {
-                                    Id = reader.GetInt32(ord),
-                                    FirstName = reader.GetString(reader.GetOrdinal("user_first_name")),
-                                    LastName = reader.GetString(reader.GetOrdinal("user_last_name"))
+                                    action = reader.GetString(ord);
+                                }
+
+                                StudentModel student = null;
+                                ord = reader.GetOrdinal("student_id");
+                                if (!reader.IsDBNull(ord))
+                                {
+                                    student = new StudentModel()
+                                    {
+                                        Id = reader.GetInt32(ord),
+                                        FirstName = reader.GetString(reader.GetOrdinal("student_first_name")),
+                                        LastName = reader.GetString(reader.GetOrdinal("student_last_name"))
+                                    };
+                                }
+
+                                UserModel user = null;
+                                ord = reader.GetOrdinal("user_id");
+                                if (!reader.IsDBNull(ord))
+                                {
+                                    user = new UserModel()
+                                    {
+                                        Id = reader.GetInt32(ord),
+                                        FirstName = reader.GetString(reader.GetOrdinal("user_first_name")),
+                                        LastName = reader.GetString(reader.GetOrdinal("user_last_name"))
+                                    };
+                                }
+
+                                EventLogModel eventLog = new EventLogModel()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                    EventDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("date"))),
+                                    ModifiedBy = modifiedBy,
+                                    Student = student,
+                                    User = user,
+                                    Type = reader.GetInt32(reader.GetOrdinal("type")),
+                                    Action = action
                                 };
+
+                                eventLog.RelativeDate = CalculateRelativeDate(eventLog.EventDate.ToUniversalTime());
+
+                                events.Add(eventLog);
                             }
 
-                            EventLogModel eventLog = new EventLogModel()
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                EventDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("date"))),
-                                ModifiedBy = modifiedBy,
-                                Student = student,
-                                User = user,
-                                Type = reader.GetInt32(reader.GetOrdinal("type")),
-                                Action = action
-                            };
-
-                            eventLog.RelativeDate = CalculateRelativeDate(eventLog.EventDate.ToUniversalTime());
-
-                            events.Add(eventLog);
+                            cacheProvider.Set(CacheId, events);
                         }
                     }
                 }
@@ -186,8 +194,7 @@ namespace Bennett.AbroadAdvisor.Models
             return years <= 1 ? "one year ago" : years + " years ago";
         }
 
-        public static void AddStudentEvent(NpgsqlConnection connection, int modifiedBy, int studentId,
-            EventType eventType)
+        public void AddStudentEvent(NpgsqlConnection connection, int modifiedBy, int studentId, EventType eventType)
         {
             using (NpgsqlCommand command = connection.CreateCommand())
             {
@@ -207,6 +214,11 @@ namespace Bennett.AbroadAdvisor.Models
                 command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
 
                 command.ExecuteNonQuery();
+
+                ApplicationCache cacheProvider = new ApplicationCache();
+                List<EventLogModel> events = cacheProvider.Get(CacheId, () => new List<EventLogModel>());
+                events.Add(this);
+                cacheProvider.Set(CacheId, events);
             }
         }
     }
