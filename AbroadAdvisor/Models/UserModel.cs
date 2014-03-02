@@ -27,6 +27,9 @@ namespace Bennett.AbroadAdvisor.Models
         [Editable(false)]
         public string Login { get; set; }
 
+        public int PasswordIterations { get; set; }
+        public string PasswordSalt { get; set; }
+
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
@@ -51,23 +54,6 @@ namespace Bennett.AbroadAdvisor.Models
         [Required]
         [Display(Name = "Active")]
         public bool IsActive { get; set; }
-
-        public static string CalculatePasswordHash(string password)
-        {
-            StringBuilder result = new StringBuilder();
-
-            using (SHA256 sha = new SHA256Managed())
-            {
-                byte[] hash = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
-
-                for (int i = 0; i < hash.Length; i++)
-                {
-                    result.Append(hash[i].ToString("x2"));
-                }
-            }
-
-            return result.ToString();
-        }
 
         public static void UpdateLastLogin(string username)
         {
@@ -95,10 +81,13 @@ namespace Bennett.AbroadAdvisor.Models
 
             using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
+                connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+
                 string sql = @"
                     SELECT  id, first_name, last_name,
                             created, last_login, email,
-                            admin, active, login
+                            admin, active, login,
+                            password_iterations, password_salt, password_hash
                     FROM    users ";
 
                 if (username != null)
@@ -128,7 +117,10 @@ namespace Bennett.AbroadAdvisor.Models
                                 Created = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("created"))),
                                 Email = reader.GetString(reader.GetOrdinal("email")),
                                 IsAdmin = reader.GetBoolean(reader.GetOrdinal("admin")),
-                                IsActive = reader.GetBoolean(reader.GetOrdinal("active"))
+                                IsActive = reader.GetBoolean(reader.GetOrdinal("active")),
+                                PasswordIterations = reader.GetInt32(reader.GetOrdinal("password_iterations")),
+                                PasswordSalt = reader.GetString(reader.GetOrdinal("password_salt")),
+                                Password = reader.GetString(reader.GetOrdinal("password_hash"))
                             };
 
                             int ord = reader.GetOrdinal("last_login");
@@ -150,13 +142,21 @@ namespace Bennett.AbroadAdvisor.Models
         public static UserModel GetUser(string username)
         {
             List<UserModel> users = UserModel.GetUsers(username);
-            return users[0];
+            
+            if (users.Count == 1)
+            {
+                return users[0];
+            }
+
+            throw new Exception("User not found");
         }
 
         public void SaveChanges(bool isAdmin)
         {
             using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
+                connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+
                 bool updatePassword = !String.IsNullOrEmpty(Password);
 
                 StringBuilder sql = new StringBuilder(@"
@@ -167,12 +167,15 @@ namespace Bennett.AbroadAdvisor.Models
 
                 if (updatePassword)
                 {
-                    sql.Append(", password = @Password ");
+                    sql.Append(", password_iterations = @PasswordIterations ");
+                    sql.Append(", password_salt = @PasswordSalt ");
+                    sql.Append(", password_hash = @PasswordHash ");
                 }
 
                 if (isAdmin)
                 {
-                    sql.Append(", admin = @Admin, active = @Active ");
+                    sql.Append(", admin = @Admin");
+                    sql.Append(", active = @Active ");
                 }
 
                 sql.Append("WHERE id = @Id");
@@ -187,8 +190,15 @@ namespace Bennett.AbroadAdvisor.Models
 
                     if (updatePassword)
                     {
-                        command.Parameters.Add("@Password", NpgsqlTypes.NpgsqlDbType.Char, 256).Value =
-                            UserModel.CalculatePasswordHash(Password);
+                        string hash = PasswordHash.CreateHash(Password);
+                        string[] split = hash.Split(':');
+
+                        command.Parameters.Add("@PasswordIterations", NpgsqlTypes.NpgsqlDbType.Integer).Value =
+                            split[PasswordHash.ITERATION_INDEX];
+                        command.Parameters.Add("@PasswordSalt", NpgsqlTypes.NpgsqlDbType.Char, 32).Value =
+                            split[PasswordHash.SALT_INDEX];
+                        command.Parameters.Add("@PasswordHash", NpgsqlTypes.NpgsqlDbType.Char, 32).Value =
+                            split[PasswordHash.PBKDF2_INDEX];
                     }
 
                     if (isAdmin)
@@ -207,31 +217,41 @@ namespace Bennett.AbroadAdvisor.Models
         {
             using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
+                connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+
                 using (NpgsqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = @"
                         INSERT INTO users
                         (
                             first_name, last_name, login,
-                            password, created, email,
-                            admin, active
+                            created, email, admin, active,
+                            password_iterations, password_salt, password_hash
                         )
                         VALUES
                         (
                             @FirstName, @LastName, @Login,
-                            @Password, @Created, @Email,
-                            @Admin, @Active
+                            @Created, @Email, @Admin, @Active,
+                            @PasswordIterations, @PasswordSalt, @PasswordHash
                         )";
 
                     command.Parameters.Add("@FirstName", NpgsqlTypes.NpgsqlDbType.Varchar, 64).Value = FirstName.Trim();
                     command.Parameters.Add("@LastName", NpgsqlTypes.NpgsqlDbType.Varchar, 64).Value = LastName.Trim();
                     command.Parameters.Add("@Login", NpgsqlTypes.NpgsqlDbType.Varchar, 24).Value = Login.Trim();
-                    command.Parameters.Add("@Password", NpgsqlTypes.NpgsqlDbType.Char, 256).Value =
-                        CalculatePasswordHash(Password);
                     command.Parameters.Add("@Created", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
                     command.Parameters.Add("@Email", NpgsqlTypes.NpgsqlDbType.Varchar, 128).Value = Email.Trim();
                     command.Parameters.Add("@Admin", NpgsqlTypes.NpgsqlDbType.Boolean).Value = IsAdmin;
                     command.Parameters.Add("@Active", NpgsqlTypes.NpgsqlDbType.Boolean).Value = IsActive;
+
+                    string hash = PasswordHash.CreateHash(Password);
+                    string[] split = hash.Split(':');
+
+                    command.Parameters.Add("@PasswordIterations", NpgsqlTypes.NpgsqlDbType.Integer).Value =
+                        split[PasswordHash.ITERATION_INDEX];
+                    command.Parameters.Add("@PasswordSalt", NpgsqlTypes.NpgsqlDbType.Char, 32).Value =
+                        split[PasswordHash.SALT_INDEX];
+                    command.Parameters.Add("@PasswordHash", NpgsqlTypes.NpgsqlDbType.Char, 32).Value =
+                        split[PasswordHash.PBKDF2_INDEX];
 
                     connection.Open();
                     command.ExecuteNonQuery();

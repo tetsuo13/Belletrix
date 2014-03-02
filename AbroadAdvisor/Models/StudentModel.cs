@@ -208,6 +208,7 @@ namespace Bennett.AbroadAdvisor.Models
 
             using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
+                connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
                 connection.Open();
 
                 using (NpgsqlTransaction transaction = connection.BeginTransaction())
@@ -253,7 +254,7 @@ namespace Bennett.AbroadAdvisor.Models
 
                 using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                 {
-                    connection.Open();
+                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
 
                     using (NpgsqlCommand command = connection.CreateCommand())
                     {
@@ -270,6 +271,7 @@ namespace Bennett.AbroadAdvisor.Models
                         sql.Append("ORDER BY last_name, first_name");
 
                         command.CommandText = sql.ToString();
+                        connection.Open();
 
                         using (NpgsqlDataReader reader = command.ExecuteReader())
                         {
@@ -470,6 +472,7 @@ namespace Bennett.AbroadAdvisor.Models
 
             using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
+                connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
                 connection.Open();
 
                 using (NpgsqlTransaction transaction = connection.BeginTransaction())

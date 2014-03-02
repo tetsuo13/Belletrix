@@ -1,4 +1,6 @@
-﻿using Bennett.AbroadAdvisor.Models;
+﻿using Bennett.AbroadAdvisor.Core;
+using Bennett.AbroadAdvisor.Models;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Web.Mvc;
@@ -20,12 +22,24 @@ namespace Bennett.AbroadAdvisor.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login(LoginModel model)
         {
-            if (ModelState.IsValid && model.IsValid(model.UserName, model.Password))
+            if (ModelState.IsValid)
             {
-                UserModel.UpdateLastLogin(model.UserName);
-                FormsAuthentication.SetAuthCookie(model.UserName, true);
-                Session["User"] = UserModel.GetUser(model.UserName);
-                return RedirectToAction("Index", "Home");
+                try
+                {
+                    UserModel user = UserModel.GetUser(model.UserName);
+                    string correctHash = user.PasswordIterations + ":" + user.PasswordSalt + ":" + user.Password;
+
+                    if (PasswordHash.ValidatePassword(model.Password, correctHash))
+                    {
+                        UserModel.UpdateLastLogin(model.UserName);
+                        FormsAuthentication.SetAuthCookie(model.UserName, true);
+                        Session["User"] = UserModel.GetUser(model.UserName);
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+                catch (Exception)
+                {
+                }
             }
 
             ModelState.AddModelError("", "Invalid login credentials");

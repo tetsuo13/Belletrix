@@ -44,6 +44,8 @@ namespace Bennett.AbroadAdvisor.Models
             {
                 using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                 {
+                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+
                     using (NpgsqlCommand command = connection.CreateCommand())
                     {
                         command.CommandText = @"
@@ -196,6 +198,8 @@ namespace Bennett.AbroadAdvisor.Models
 
         public void AddStudentEvent(NpgsqlConnection connection, int modifiedBy, int studentId, EventType eventType)
         {
+            connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+
             using (NpgsqlCommand command = connection.CreateCommand())
             {
                 command.CommandText = @"

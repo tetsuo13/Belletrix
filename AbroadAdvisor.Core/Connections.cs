@@ -1,4 +1,6 @@
 ﻿using System.Configuration;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Bennett.AbroadAdvisor.Core
 {
@@ -21,6 +23,13 @@ namespace Bennett.AbroadAdvisor.Core
                 {
                     return ConfigurationManager.ConnectionStrings["Production"].ConnectionString;
                 }
+            }
+
+            public static bool connection_ValidateRemoteCertificateCallback(X509Certificate cert, X509Chain chain,
+                SslPolicyErrors errors)
+            {
+                return true;
+                throw new System.NotImplementedException();
             }
         }
     }

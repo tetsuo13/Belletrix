@@ -481,16 +481,18 @@ GRANT ALL PRIVILEGES ON student_study_abroad_wishlist TO neoanime_abroadadvisor;
 
 
 CREATE TABLE users (
-id          SERIAL,
-first_name  VARCHAR(64) NOT NULL,
-last_name   VARCHAR(64) NOT NULL,
-login       VARCHAR(24) NOT NULL,
-password    CHAR(256) NOT NULL,
-created     TIMESTAMP NOT NULL,
-last_login  TIMESTAMP,
-email       VARCHAR(128) NOT NULL,
-admin       BOOLEAN NOT NULL DEFAULT FALSE,
-active      BOOLEAN NOT NULL DEFAULT TRUE,
+id                      SERIAL,
+first_name              VARCHAR(64) NOT NULL,
+last_name               VARCHAR(64) NOT NULL,
+login                   VARCHAR(24) NOT NULL,
+password_iterations     INTEGER NOT NULL,
+password_salt           CHAR(32) NOT NULL,
+password_hash           CHAR(32) NOT NULL,
+created                 TIMESTAMP NOT NULL,
+last_login              TIMESTAMP,
+email                   VARCHAR(128) NOT NULL,
+admin                   BOOLEAN NOT NULL DEFAULT FALSE,
+active                  BOOLEAN NOT NULL DEFAULT TRUE,
 
 PRIMARY KEY (id),
 UNIQUE (login)
@@ -500,7 +502,7 @@ COMMENT ON TABLE users IS 'Logins and information about users of the application
 COMMENT ON COLUMN users.first_name IS 'Given name';
 COMMENT ON COLUMN users.last_name IS 'Family name';
 COMMENT ON COLUMN users.login IS 'Username used to log into the application';
-COMMENT ON COLUMN users.password IS 'One-way hash of password (https://stackoverflow.com/a/6673029)';
+COMMENT ON COLUMN users.password_hash IS 'Hash of password';
 COMMENT ON COLUMN users.created IS 'Date that the user profile was created';
 COMMENT ON COLUMN users.last_login IS 'Date that the user last logged in to the application';
 COMMENT ON COLUMN users.email IS 'Email address for user';
@@ -512,9 +514,9 @@ GRANT ALL PRIVILEGES ON users_id_seq TO neoanime_abroadadvisor;
 
 -- Password is the same as the login.
 INSERT INTO users
-(first_name, last_name, login, password, created, email, admin)
+(first_name, last_name, login, password_iterations, password_salt, password_hash, created, email, admin)
 VALUES
-('Andrei', 'Nicholson', 'anicholson', '741a86856f1185fb9e29cee6d95e978177147787060e1ec42d0e88b516214ebd', NOW(), 'contact@andreinicholson.com', TRUE);
+('Andrei', 'Nicholson', 'anicholson', 1000, 'og85e2R6TvXl+8SuOqv3EWTc7eWX3aje', 'RzfdfsXpQQTg1E+n3wnLMEZbjJoEkqEf', NOW(), 'contact@andreinicholson.com', TRUE);
 
 
 CREATE TABLE student_notes (
