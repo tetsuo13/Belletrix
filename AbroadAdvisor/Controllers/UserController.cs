@@ -29,7 +29,7 @@ namespace Bennett.AbroadAdvisor.Controllers
                     UserModel user = UserModel.GetUser(model.UserName);
                     string correctHash = user.PasswordIterations + ":" + user.PasswordSalt + ":" + user.Password;
 
-                    if (PasswordHash.ValidatePassword(model.Password, correctHash))
+                    if (user.IsActive && PasswordHash.ValidatePassword(model.Password, correctHash))
                     {
                         UserModel.UpdateLastLogin(model.UserName);
                         FormsAuthentication.SetAuthCookie(model.UserName, true);
@@ -54,7 +54,30 @@ namespace Bennett.AbroadAdvisor.Controllers
 
         new public ActionResult Profile()
         {
+            ViewBag.Action = "Profile";
             return View(Session["User"]);
+        }
+
+        /// <summary>
+        /// Edit your own profile.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        new public ActionResult Profile(UserModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                UserModel currentUser = Session["User"] as UserModel;
+                model.Id = currentUser.Id;
+                model.SaveChanges(currentUser.IsAdmin);
+                Session["User"] = model;
+                return RedirectToAction("Index", "Home");
+            }
+
+            ViewBag.Action = "Profile";
+            return View("Profile", model);
         }
 
         public ActionResult Add()
@@ -66,6 +89,7 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
+            ViewBag.Action = "Add";
             return View("Profile");
         }
 
@@ -86,6 +110,7 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return RedirectToAction("List");
             }
 
+            ViewBag.Action = "Add";
             return View("Add", model);
         }
 
@@ -103,9 +128,15 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return HttpNotFound();
             }
 
+            ViewBag.Action = "Edit";
             return View("Profile", user[0]);
         }
 
+        /// <summary>
+        /// Edit someone else's profile.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(UserModel model)
@@ -113,12 +144,11 @@ namespace Bennett.AbroadAdvisor.Controllers
             if (ModelState.IsValid)
             {
                 UserModel currentUser = Session["User"] as UserModel;
-                model.Id = currentUser.Id;
                 model.SaveChanges(currentUser.IsAdmin);
-                Session["User"] = model;
                 return RedirectToAction("Index", "Home");
             }
 
+            ViewBag.Action = "Edit";
             return View("Profile", model);
         }
 

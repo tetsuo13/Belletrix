@@ -5,7 +5,6 @@
 @{
     bool addingUser = Model == null || Model.Id == default(int);
     string submitButtonText = addingUser ? "Add Profile" : "Update Profile";
-    string actionName = addingUser ? "Add" : "Edit";
     ViewBag.Title = "Settings";
 }
 
@@ -23,10 +22,15 @@
         }
     </div>
 
-    @using (Html.BeginForm(actionName, "User", FormMethod.Post, new { role = "form" }))
+    @using (Html.BeginForm(ViewBag.Action as String, "User", FormMethod.Post, new { role = "form" }))
     {
         @Html.AntiForgeryToken()
         @Html.ValidationSummary()
+        
+        if (!addingUser)
+        {
+            @Html.HiddenFor(s => s.Id)
+        }
 
         <div class="row">
             <div class="col-lg-6">
