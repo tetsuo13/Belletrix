@@ -28,8 +28,7 @@ namespace Bennett.AbroadAdvisor.Core
             public static bool connection_ValidateRemoteCertificateCallback(X509Certificate cert, X509Chain chain,
                 SslPolicyErrors errors)
             {
-                return true;
-                throw new System.NotImplementedException();
+                return cert.Subject.Contains("bluehost.com");
             }
         }
     }
