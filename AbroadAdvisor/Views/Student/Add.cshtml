@@ -162,13 +162,13 @@
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     @Html.LabelFor(s => s.StudyAbroadYear)
-                                    @Html.DropDownListFor(s => s.StudyAbroadYear, ViewBag.GraduatingYears as SelectList, "Please Select", new { @class = "form-control" })
+                                    @Html.DropDownListFor(s => s.StudyAbroadYear, ViewBag.StudyAbroadYears as SelectList, "Please Select", new { @class = "form-control" })
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     @Html.LabelFor(s => s.StudyAbroadPeriod)
-                                    @Html.DropDownListFor(s => s.StudyAbroadPeriod, new SelectList(ViewBag.Semesters, "Id", "Name"), "Please Select", new { @class = "form-control" })
+                                    @Html.DropDownListFor(s => s.StudyAbroadPeriod, new SelectList(ViewBag.StudyAbroadSemesters, "Id", "Name"), "Please Select", new { @class = "form-control" })
                                 </div>
                             </div>
                             <div class="col-lg-1">

@@ -113,16 +113,25 @@ namespace Bennett.AbroadAdvisor.Controllers
 
         private void PrepareDropDowns()
         {
+            List<object> years = Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 7))
+                .Reverse()
+                .Select(i => new { Id = i, Name = i.ToString() })
+                .ToList<object>();
+
             ViewBag.Countries = new SelectList(CountryModel.GetCountries(), "Id", "Name");
             ViewBag.Languages = LanguageModel.GetLanguages();
 
             ViewBag.EnteringYears = new SelectList(Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 2)).Reverse());
-            ViewBag.GraduatingYears = new SelectList(Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 7)).Reverse());
+            ViewBag.GraduatingYears = new SelectList(years, "Id", "Name");
             ViewBag.Classifications = new SelectList(StudentClassificationModel.GetClassifications(), "Id", "Name");
-            ViewBag.Semesters = StudentStudyAbroadWishlistModel.GetPeriods();
             
             ViewBag.AvailableMajors = MajorsModel.GetMajors();
             ViewBag.AvailableMinors = MinorsModel.GetMinors();
+
+            List<object> studyYears = new List<object>(years);
+            studyYears.Insert(0, new { Id = 1, Name = "Any Year" });
+            ViewBag.StudyAbroadYears = new SelectList(studyYears, "Id", "Name");
+            ViewBag.StudyAbroadSemesters = StudentStudyAbroadWishlistModel.GetPeriodsWithCatchAll();
         }
     }
 }

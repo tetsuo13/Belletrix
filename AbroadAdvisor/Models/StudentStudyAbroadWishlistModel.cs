@@ -8,6 +8,8 @@ namespace Bennett.AbroadAdvisor.Models
 {
     public class StudentStudyAbroadWishlistModel
     {
+        public const int CatchAllValue = 99;
+
         public enum PeriodValue
         {
             Fall,
@@ -36,6 +38,18 @@ namespace Bennett.AbroadAdvisor.Models
             }
 
             return periods.AsEnumerable();
+        }
+
+        public static IEnumerable<object> GetPeriodsWithCatchAll()
+        {
+            List<object> catchAll = new List<object>()
+            {
+                new { Id = CatchAllValue, Name = "Any Semester" }
+            };
+
+            IEnumerable<object> periods = catchAll;
+
+            return periods.Concat(GetPeriods());
         }
     }
 }
