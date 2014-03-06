@@ -11,7 +11,7 @@ namespace Bennett.AbroadAdvisor.Core
     public class Analytics
     {
 #if !DEBUG
-        [Conditional("FALSE")]
+        [Conditional("TRUE")]
 #endif
         public static void TrackPageView(HttpRequestBase request, string pageTitle, string username)
         {
