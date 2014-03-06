@@ -20,7 +20,7 @@ namespace Bennett.AbroadAdvisor.Core
 
             tracker.setIp(request.UserHostAddress);
             tracker.setBrowserLanguage(request.UserLanguages);
-            tracker.setUrl(request.Url.ToString());
+            tracker.setUrl(request.Url.Scheme + "://" + request.Url.Host + request.Url.PathAndQuery);
             tracker.setBrowserHasCookies(request.Cookies.Count > 0);
             tracker.setUserAgent(request.UserAgent);
 
