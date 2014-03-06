@@ -1,6 +1,5 @@
 ﻿using Piwik.Tracker;
 using System;
-using System.Diagnostics;
 using System.Web;
 
 namespace Bennett.AbroadAdvisor.Core
@@ -10,11 +9,12 @@ namespace Bennett.AbroadAdvisor.Core
     /// </summary>
     public class Analytics
     {
-#if !DEBUG
-        [Conditional("TRUE")]
-#endif
         public static void TrackPageView(HttpRequestBase request, string pageTitle, string username)
         {
+#if DEBUG
+            return;
+#endif
+
             PiwikTracker.URL = "http://analytics.andreinicholson.com";
             PiwikTracker tracker = new PiwikTracker(17);
 
