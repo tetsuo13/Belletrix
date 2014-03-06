@@ -5,9 +5,14 @@ using System.Web;
 
 namespace Bennett.AbroadAdvisor.Core
 {
+    /// <summary>
+    /// Record analytics server-side. Only functions when not in DEBUG.
+    /// </summary>
     public class Analytics
     {
-        [Conditional("!DEBUG")]
+#if !DEBUG
+        [Conditional("FALSE")]
+#endif
         public static void TrackPageView(HttpRequestBase request, string pageTitle, string username)
         {
             PiwikTracker.URL = "http://analytics.andreinicholson.com";
