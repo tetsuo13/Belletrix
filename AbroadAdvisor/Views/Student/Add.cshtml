@@ -156,7 +156,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     @Html.LabelFor(s => s.StudyAbroadCountry)
-                                    @Html.DropDownListFor(s => s.StudyAbroadCountry, ViewBag.Countries as SelectList, "Please Select", new { @class = "form-control" })
+                                    @Html.DropDownGroupList("StudyAbroadCountry", ViewBag.StudyAbroadPlaces as IEnumerable<GroupedSelectListItem>, "Please Select", new { @class = "form-control" })
                                 </div>
                             </div>
                             <div class="col-lg-3">

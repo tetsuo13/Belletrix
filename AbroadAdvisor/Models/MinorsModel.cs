@@ -17,7 +17,7 @@ namespace Bennett.AbroadAdvisor.Models
         public static IEnumerable<MinorsModel> GetMinors()
         {
             ApplicationCache cacheProvider = new ApplicationCache();
-            string cacheId = "Languages";
+            string cacheId = "Minors";
             List<MinorsModel> minors = cacheProvider.Get(cacheId, () => new List<MinorsModel>());
 
             if (minors.Count == 0)

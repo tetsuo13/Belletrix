@@ -17,7 +17,7 @@ namespace Bennett.AbroadAdvisor.Models
         public static IEnumerable<MajorsModel> GetMajors()
         {
             ApplicationCache cacheProvider = new ApplicationCache();
-            string cacheId = "Languages";
+            string cacheId = "Majors";
             List<MajorsModel> majors = cacheProvider.Get(cacheId, () => new List<MajorsModel>());
 
             if (majors.Count == 0)

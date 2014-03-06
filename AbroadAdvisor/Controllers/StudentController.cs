@@ -118,7 +118,9 @@ namespace Bennett.AbroadAdvisor.Controllers
                 .Select(i => new { Id = i, Name = i.ToString() })
                 .ToList<object>();
 
-            ViewBag.Countries = new SelectList(CountryModel.GetCountries(), "Id", "Name");
+            List<CountryModel> countries = CountryModel.GetCountries();
+
+            ViewBag.Countries = new SelectList(countries, "Id", "Name");
             ViewBag.Languages = LanguageModel.GetLanguages();
 
             ViewBag.EnteringYears = new SelectList(Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 2)).Reverse());
@@ -130,8 +132,27 @@ namespace Bennett.AbroadAdvisor.Controllers
 
             List<object> studyYears = new List<object>(years);
             studyYears.Insert(0, new { Id = 1, Name = "Any Year" });
+
             ViewBag.StudyAbroadYears = new SelectList(studyYears, "Id", "Name");
             ViewBag.StudyAbroadSemesters = StudentStudyAbroadWishlistModel.GetPeriodsWithCatchAll();
+
+            List<GroupedSelectListItem> places = CountryModel.GetRegions().Select(r => new GroupedSelectListItem()
+                {
+                    GroupKey = "1",
+                    GroupName = "Regions",
+                    Text = r.Name,
+                    Value = r.Id.ToString()
+                }).ToList();
+
+            places.AddRange(countries.Select(c => new GroupedSelectListItem()
+                {
+                    GroupKey = "2",
+                    GroupName = "Countries",
+                    Text = c.Name,
+                    Value = c.Id.ToString()
+                }));
+
+            ViewBag.StudyAbroadPlaces = places;
         }
     }
 }
