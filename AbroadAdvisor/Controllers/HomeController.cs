@@ -1,4 +1,5 @@
-﻿using Bennett.AbroadAdvisor.Models;
+﻿using Bennett.AbroadAdvisor.Core;
+using Bennett.AbroadAdvisor.Models;
 using System.Web.Mvc;
 
 namespace Bennett.AbroadAdvisor.Controllers
@@ -8,6 +9,7 @@ namespace Bennett.AbroadAdvisor.Controllers
     {
         public ActionResult Index()
         {
+            Analytics.TrackPageView(Request, "Dashboard", (Session["User"] as UserModel).Login);
             ViewBag.ActivePage = "dashboard";
             ViewBag.RecentActivity = EventLogModel.GetEvents();
             return View();

@@ -14,6 +14,7 @@ namespace Bennett.AbroadAdvisor.Controllers
         [AllowAnonymous]
         public ActionResult Login()
         {
+            Analytics.TrackPageView(Request, "AbroadAdvisor", null);
             return View();
         }
 
@@ -42,6 +43,7 @@ namespace Bennett.AbroadAdvisor.Controllers
                 }
             }
 
+            Analytics.TrackPageView(Request, "AbroadAdvisor", null);
             ModelState.AddModelError("", "Invalid login credentials");
             return View(model);
         }
@@ -54,6 +56,7 @@ namespace Bennett.AbroadAdvisor.Controllers
 
         new public ActionResult Profile()
         {
+            Analytics.TrackPageView(Request, "Profile", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Profile";
             return View(Session["User"]);
         }
@@ -76,6 +79,7 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            Analytics.TrackPageView(Request, "Profile", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Profile";
             return View("Profile", model);
         }
@@ -89,6 +93,7 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
+            Analytics.TrackPageView(Request, "Add User", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Add";
             return View("Profile");
         }
@@ -110,6 +115,7 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return RedirectToAction("List");
             }
 
+            Analytics.TrackPageView(Request, "Add User", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Add";
             return View("Add", model);
         }
@@ -128,6 +134,7 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return HttpNotFound();
             }
 
+            Analytics.TrackPageView(Request, "Edit User", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Edit";
             return View("Profile", user[0]);
         }
@@ -148,6 +155,7 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            Analytics.TrackPageView(Request, "Edit User", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Edit";
             return View("Profile", model);
         }
@@ -161,6 +169,7 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
+            Analytics.TrackPageView(Request, "User List", (Session["User"] as UserModel).Login);
             return View(UserModel.GetUsers());
         }
     }

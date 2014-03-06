@@ -1,0 +1,3 @@
+[submodule "piwik-dotnet-tracker"]
+	path = piwik-dotnet-tracker
+	url = https://github.com/piwik/piwik-dotnet-tracker.git

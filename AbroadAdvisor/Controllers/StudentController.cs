@@ -1,4 +1,5 @@
-﻿using Bennett.AbroadAdvisor.Models;
+﻿using Bennett.AbroadAdvisor.Core;
+using Bennett.AbroadAdvisor.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,7 @@ namespace Bennett.AbroadAdvisor.Controllers
 
         public ActionResult List()
         {
+            Analytics.TrackPageView(Request, "Student List", (Session["User"] as UserModel).Login);
             return View(StudentModel.GetStudents(null));
         }
 
@@ -30,6 +32,7 @@ namespace Bennett.AbroadAdvisor.Controllers
             }
 
             PrepareDropDowns();
+            Analytics.TrackPageView(Request, "Student", (Session["User"] as UserModel).Login);
             return View(student[0]);
         }
 
@@ -48,6 +51,7 @@ namespace Bennett.AbroadAdvisor.Controllers
             }
 
             PrepareDropDowns();
+            Analytics.TrackPageView(Request, "Student Edit", (Session["User"] as UserModel).Login);
             return View("Add", student[0]);
         }
 
@@ -63,6 +67,7 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return RedirectToAction("List");
             }
 
+            Analytics.TrackPageView(Request, "Student Edit", (Session["User"] as UserModel).Login);
             PrepareDropDowns();
             return View("Add", model);
         }
@@ -70,6 +75,7 @@ namespace Bennett.AbroadAdvisor.Controllers
         public ActionResult Add()
         {
             PrepareDropDowns();
+            Analytics.TrackPageView(Request, "Student Add", (Session["User"] as UserModel).Login);
             return View();
         }
 
@@ -85,6 +91,7 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return RedirectToAction("List");
             }
 
+            Analytics.TrackPageView(Request, "Student Add", (Session["User"] as UserModel).Login);
             PrepareDropDowns();
             return View(model);
         }
