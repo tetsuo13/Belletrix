@@ -7,6 +7,19 @@ namespace Bennett.AbroadAdvisor.Core
     /// <summary>
     /// Record analytics server-side. Only functions when not in DEBUG.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// We use nginx to distribute requests between multiple servers.
+    /// Because of this setup, the <c>Request.UserHostAddress</c> will be the
+    /// IP address of our load-balancer instead of the IP address of the
+    /// remote user. You can use
+    /// <c>Request.ServerVariables["HTTP_X_FORWARDED_FOR"]</c> to access the
+    /// user's IP address.
+    /// </para>
+    /// </remarks>
+    /// <seealso href="http://support.appharbor.com/kb/getting-started/information-about-our-load-balancer">
+    /// Information about our load-balancer
+    /// </seealso>
     public class Analytics
     {
         public static void TrackPageView(HttpRequestBase request, string pageTitle, string username)
@@ -18,7 +31,15 @@ namespace Bennett.AbroadAdvisor.Core
             PiwikTracker.URL = "http://analytics.andreinicholson.com";
             PiwikTracker tracker = new PiwikTracker(17);
 
-            tracker.setIp(request.UserHostAddress);
+            try
+            {
+                tracker.setIp(request.ServerVariables["HTTP_X_FORWARDED_FOR"]);
+            }
+            catch (Exception)
+            {
+                tracker.setIp(request.UserHostAddress);
+            }
+
             tracker.setBrowserLanguage(request.UserLanguages);
             tracker.setUrl(request.Url.Scheme + "://" + request.Url.Host + request.Url.PathAndQuery);
             tracker.setBrowserHasCookies(request.Cookies.Count > 0);
