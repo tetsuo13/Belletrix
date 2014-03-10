@@ -12,16 +12,17 @@ namespace Bennett.AbroadAdvisor.Controllers
     public class UserController : Controller
     {
         [AllowAnonymous]
-        public ActionResult Login()
+        public ActionResult Login(string returnUrl)
         {
             Analytics.TrackPageView(Request, "AbroadAdvisor", null);
+            ViewBag.ReturnUrl = returnUrl;
             return View();
         }
 
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public ActionResult Login(LoginModel model)
+        public ActionResult Login(LoginModel model, string returnUrl)
         {
             if (ModelState.IsValid)
             {
@@ -35,6 +36,16 @@ namespace Bennett.AbroadAdvisor.Controllers
                         UserModel.UpdateLastLogin(model.UserName);
                         FormsAuthentication.SetAuthCookie(model.UserName, true);
                         Session["User"] = UserModel.GetUser(model.UserName);
+
+                        if (Url.IsLocalUrl(returnUrl) &&
+                            returnUrl.Length > 1 &&
+                            returnUrl.StartsWith("/") &&
+                            !returnUrl.StartsWith("//") &&
+                            !returnUrl.StartsWith("/\\"))
+                        {
+                            return Redirect(returnUrl);
+                        }
+
                         return RedirectToAction("Index", "Home");
                     }
                 }
