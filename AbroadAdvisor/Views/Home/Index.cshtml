@@ -16,21 +16,29 @@
                         @foreach (EventLogModel eventLog in ViewBag.RecentActivity)
                         {
                             string action = String.Empty;
-                            string personName = String.Empty;
+                            string personName = eventLog.Student.FirstName + " " + eventLog.Student.LastName;
                             string iconClass = String.Empty;
                             
                             switch (eventLog.Type)
                             {
                                 case (int)EventLogModel.EventType.AddStudent:
                                     action = "added";
-                                    personName = eventLog.Student.FirstName + " " + eventLog.Student.LastName;
                                     iconClass = "fa fa-user";
                                     break;
                                     
                                 case (int)EventLogModel.EventType.EditStudent:
                                     action = "modified";
-                                    personName = eventLog.Student.FirstName + " " + eventLog.Student.LastName;
                                     iconClass = "fa fa-user";
+                                    break;
+                                    
+                                case (int)EventLogModel.EventType.AddStudentExperience:
+                                    action = "created experience for";
+                                    iconClass = "fa fa-plane";
+                                    break;
+                                    
+                                case (int)EventLogModel.EventType.AddStudentNote:
+                                    action = "commented on";
+                                    iconClass = "fa fa-comment";
                                     break;
                             }
                             

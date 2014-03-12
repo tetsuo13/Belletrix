@@ -14,7 +14,9 @@ namespace Bennett.AbroadAdvisor.Models
             AddStudent,
             EditStudent,
             AddUser,
-            EditUser
+            EditUser,
+            AddStudentExperience,
+            AddStudentNote
         };
 
         public int Id { get; set; }
@@ -64,7 +66,7 @@ namespace Bennett.AbroadAdvisor.Models
                         LEFT OUTER JOIN users us ON
                                         e.user_id = us.id
                         ORDER BY        date DESC
-                        LIMIT           6";
+                        LIMIT           8";
 
                         connection.Open();
 

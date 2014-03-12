@@ -52,7 +52,7 @@ namespace Bennett.AbroadAdvisor.Controllers
 
             PrepareDropDowns();
             Analytics.TrackPageView(Request, "Student Edit", (Session["User"] as UserModel).Login);
-            return View("Add", student[0]);
+            return View(student[0]);
         }
 
         [HttpPost]
@@ -69,7 +69,7 @@ namespace Bennett.AbroadAdvisor.Controllers
 
             Analytics.TrackPageView(Request, "Student Edit", (Session["User"] as UserModel).Login);
             PrepareDropDowns();
-            return View("Add", model);
+            return View(model);
         }
 
         public ActionResult Add()
@@ -94,6 +94,18 @@ namespace Bennett.AbroadAdvisor.Controllers
             Analytics.TrackPageView(Request, "Student Add", (Session["User"] as UserModel).Login);
             PrepareDropDowns();
             return View(model);
+        }
+
+        public PartialViewResult StudyAbroad(int id)
+        {
+            ViewBag.Countries = CountryModel.GetCountries();
+            ViewBag.Semesters = StudentStudyAbroadWishlistModel.GetPeriods();
+            ViewBag.Programs = ProgramModel.GetPrograms();
+            ViewBag.ProgramTypes = ProgramTypeModel.GetProgramTypes();
+            ViewBag.StudentId = id;
+            ViewData.Model = StudyAbroadModel.GetAllForStudent(id);
+
+            return PartialView();
         }
 
         private void CheckStudyAbroadDestinations(ref StudentModel model)

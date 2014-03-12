@@ -76,10 +76,13 @@ namespace Bennett.AbroadAdvisor.Models
             using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
                 connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+                connection.Open();
 
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (NpgsqlTransaction transaction = connection.BeginTransaction())
                 {
-                    command.CommandText = @"
+                    using (NpgsqlCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = @"
                         INSERT INTO student_notes
                         (
                             student_id, created_by, entry_date,
@@ -91,14 +94,18 @@ namespace Bennett.AbroadAdvisor.Models
                             @Note
                         )";
 
-                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = StudentId;
-                    command.Parameters.Add("@CreatedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = userId;
-                    command.Parameters.Add("@EntryDate", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
-                    command.Parameters.Add("@Note", NpgsqlTypes.NpgsqlDbType.Text).Value = Note.Trim();
+                        command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = StudentId;
+                        command.Parameters.Add("@CreatedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = userId;
+                        command.Parameters.Add("@EntryDate", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
+                        command.Parameters.Add("@Note", NpgsqlTypes.NpgsqlDbType.Text).Value = Note.Trim();
 
-                    connection.Open();
+                        command.ExecuteNonQuery();
+                    }
 
-                    command.ExecuteNonQuery();
+                    EventLogModel eventLog = new EventLogModel();
+                    eventLog.AddStudentEvent(connection, userId, StudentId, EventLogModel.EventType.AddStudentNote);
+
+                    transaction.Commit();
                 }
             }
         }

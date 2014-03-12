@@ -136,6 +136,7 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Controllers\ExperienceController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\NoteController.cs" />
     <Compile Include="Controllers\StudentController.cs" />
@@ -152,9 +153,12 @@
     <Compile Include="Models\MinorsModel.cs" />
     <Compile Include="Models\NoteModel.cs" />
     <Compile Include="Models\PingModel.cs" />
+    <Compile Include="Models\ProgramModel.cs" />
+    <Compile Include="Models\ProgramTypeModel.cs" />
     <Compile Include="Models\StudentClassificationModel.cs" />
     <Compile Include="Models\StudentModel.cs" />
     <Compile Include="Models\StudentStudyAbroadWishlistModel.cs" />
+    <Compile Include="Models\StudyAbroadModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -198,6 +202,10 @@
     <Content Include="Views\User\List.cshtml" />
     <Content Include="Views\Note\List.cshtml" />
     <Content Include="Views\Student\View.cshtml" />
+    <Content Include="Views\Student\Edit.cshtml" />
+    <Content Include="Views\Student\StudyAbroad.cshtml" />
+    <Content Include="Views\Experience\Active.cshtml" />
+    <Content Include="Views\Experience\Add.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

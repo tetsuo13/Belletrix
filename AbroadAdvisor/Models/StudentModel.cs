@@ -529,6 +529,7 @@ namespace Bennett.AbroadAdvisor.Models
 
                     ApplicationCache cacheProvider = new ApplicationCache();
                     Dictionary<int, StudentModel> students = cacheProvider.Get(CacheId, () => new Dictionary<int, StudentModel>());
+                    Id = studentId;
                     students.Add(studentId, this);
                     cacheProvider.Set(CacheId, students);
                 }
