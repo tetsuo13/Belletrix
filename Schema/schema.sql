@@ -605,7 +605,14 @@ VALUES
 ('New Media', NULL),
 ('NYU Florence', NULL),
 ('NYU Ghana', NULL),
-('Grahamstown Festival', NULL);
+('Grahamstown Festival', NULL),
+('Council on International Educational Exchange', 'CIEE'),
+('CISabroad', 'CIS'),
+('Mid-Atlantic Consortium-Center for Academic Excellence', 'MAC-CAE'),
+('NYU London', NULL),
+('Institute for Future Global Leaders UVI', NULL),
+('Tec de Monterrey', NULL),
+('Global Semesters', NULL);
 
 
 CREATE TABLE program_types (
@@ -648,7 +655,7 @@ city                VARCHAR(64),
 program_id          INT NOT NULL,
 
 PRIMARY KEY (id),
-UNIQUE (student_id, semester, year),
+UNIQUE (student_id, semester, year, country_id),
 FOREIGN KEY (student_id) REFERENCES students (id),
 FOREIGN KEY (country_id) REFERENCES countries (id),
 FOREIGN KEY (program_id) REFERENCES programs (id)
