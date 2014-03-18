@@ -157,6 +157,7 @@
     <Compile Include="Models\ProgramTypeModel.cs" />
     <Compile Include="Models\StudentClassificationModel.cs" />
     <Compile Include="Models\StudentModel.cs" />
+    <Compile Include="Models\StudentSearchModel.cs" />
     <Compile Include="Models\StudentStudyAbroadWishlistModel.cs" />
     <Compile Include="Models\StudyAbroadModel.cs" />
     <Compile Include="Models\UserModel.cs" />

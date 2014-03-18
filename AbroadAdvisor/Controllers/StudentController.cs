@@ -19,7 +19,22 @@ namespace Bennett.AbroadAdvisor.Controllers
         public ActionResult List()
         {
             Analytics.TrackPageView(Request, "Student List", (Session["User"] as UserModel).Login);
+            PrepareDropDowns();
             return View(StudentModel.GetStudents(null));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Search(StudentSearchModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                PrepareDropDowns();
+                Analytics.TrackPageView(Request, "Student List", (Session["User"] as UserModel).Login);
+                return View("List", StudentModel.Search(model));
+            }
+
+            return List();
         }
 
         public ActionResult View(int id)
@@ -31,7 +46,9 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return HttpNotFound();
             }
 
+            ViewBag.StudyAbroad = StudyAbroadModel.GetAllForStudent(id);
             PrepareDropDowns();
+            PrepareStudyAbroadDropDowns();
             Analytics.TrackPageView(Request, "Student", (Session["User"] as UserModel).Login);
             return View(student[0]);
         }
@@ -98,13 +115,9 @@ namespace Bennett.AbroadAdvisor.Controllers
 
         public PartialViewResult StudyAbroad(int id)
         {
-            ViewBag.Countries = CountryModel.GetCountries();
-            ViewBag.Semesters = StudentStudyAbroadWishlistModel.GetPeriods();
-            ViewBag.Programs = ProgramModel.GetPrograms();
-            ViewBag.ProgramTypes = ProgramTypeModel.GetProgramTypes();
             ViewBag.StudentId = id;
             ViewData.Model = StudyAbroadModel.GetAllForStudent(id);
-
+            PrepareStudyAbroadDropDowns();
             return PartialView();
         }
 
@@ -144,6 +157,7 @@ namespace Bennett.AbroadAdvisor.Controllers
 
             ViewBag.EnteringYears = new SelectList(Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 2)).Reverse());
             ViewBag.GraduatingYears = new SelectList(years, "Id", "Name");
+            ViewBag.GraduatingYearsAsEnumerable = years;
             ViewBag.Classifications = new SelectList(StudentClassificationModel.GetClassifications(), "Id", "Name");
             
             ViewBag.AvailableMajors = MajorsModel.GetMajors();
@@ -172,6 +186,14 @@ namespace Bennett.AbroadAdvisor.Controllers
                 }));
 
             ViewBag.StudyAbroadPlaces = places;
+        }
+
+        private void PrepareStudyAbroadDropDowns()
+        {
+            ViewBag.Countries = CountryModel.GetCountries();
+            ViewBag.Semesters = StudentStudyAbroadWishlistModel.GetPeriods();
+            ViewBag.Programs = ProgramModel.GetPrograms();
+            ViewBag.ProgramTypes = ProgramTypeModel.GetProgramTypes();
         }
     }
 }

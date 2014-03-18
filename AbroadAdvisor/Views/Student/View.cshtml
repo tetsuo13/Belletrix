@@ -10,7 +10,95 @@
 @section Body {
     <div class="row">
         <div class="col-lg-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">Study Abroad Experiences</div>
+                <div class="panel-body">
+                    @if ((ViewBag.StudyAbroad as IEnumerable<StudyAbroadModel>).Count<StudyAbroadModel>() > 0)
+                    {
+                        foreach (StudyAbroadModel studyAbroad in ViewBag.StudyAbroad)
+                        {
+                            string semesterName = studyAbroad.Semester.ToString();
+                            
+                            switch (studyAbroad.Semester)
+                            {
+                                case (int)StudentStudyAbroadWishlistModel.PeriodValue.Fall:
+                                    semesterName = "Fall";
+                                    break;
+                                    
+                                case (int)StudentStudyAbroadWishlistModel.PeriodValue.Spring:
+                                    semesterName = "Spring";
+                                    break;
+                                    
+                                case (int)StudentStudyAbroadWishlistModel.PeriodValue.Summer:
+                                    semesterName = "Summer";
+                                    break;
+                                    
+                                case (int)StudentStudyAbroadWishlistModel.PeriodValue.Maymester:
+                                    semesterName = "Maymester";
+                                    break;
+                                    
+                                case (int)StudentStudyAbroadWishlistModel.PeriodValue.AcademicYear:
+                                    semesterName = "Academic Year";
+                                    break;
+                            }
+                            
+                            List<string> programTypes = new List<string>();
+                            
+                            foreach (int programType in studyAbroad.ProgramTypes)
+                            {
+                                programTypes.Add((ViewBag.Programs as IEnumerable<ProgramModel>).Where(p => p.Id == programType).First().Name);
+                            }
+                            
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <strong class="h4">
+                                        @semesterName
+                                        @studyAbroad.Year:
+                                        @if (!String.IsNullOrEmpty(studyAbroad.City))
+                                        {
+                                            @studyAbroad.City@:,
+                                    }
+                                        @((ViewBag.Countries as List<CountryModel>).Where(c => c.Id == studyAbroad.CountryId).First().Name)
+                                    </strong>
+                                    @if (studyAbroad.CreditBearing)
+                                    {
+                                        <span class="label label-success">Credit</span>
+                                    }
 
+                                    @if (studyAbroad.Internship)
+                                    {
+                                        <span class="label label-info">Internship</span>
+                                    }
+
+                                    <div>
+                                        @if (studyAbroad.StartDate.HasValue)
+                                        {
+                                            @studyAbroad.StartDate.Value.ToShortDateString()
+                                        }
+                                        @if (studyAbroad.EndDate.HasValue)
+                                        {
+                                            <text>&ndash;</text>
+                                            @studyAbroad.EndDate.Value.ToShortDateString()
+                                        }
+                                    </div>
+
+                                    <div>
+                                        @((ViewBag.Programs as IEnumerable<ProgramModel>).Where(p => p.Id == studyAbroad.ProgramId).First().Name)
+                                    </div>
+
+                                    <div>
+                                        @if (programTypes.Count > 0)
+                                        {
+                                            @String.Join(", ", programTypes)
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                        }
+                    }
+                </div>
+            </div>
         </div>
         <div class="col-lg-4">
             <div class="panel panel-default">

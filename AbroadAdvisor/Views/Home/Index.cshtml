@@ -43,7 +43,7 @@
                             }
                             
                             <a href="#" class="list-group-item">
-                                <span class="badge" title="@eventLog.EventDate.ToShortDateString() @eventLog.EventDate.ToShortTimeString()">@eventLog.RelativeDate</span>
+                                <span class="badge" title="@eventLog.EventDate.ToString("dddd, MMMM d, yyyy \\a\\t h:mm tt")">@eventLog.RelativeDate</span>
                                 <i class="@iconClass"></i> @eventLog.ModifiedBy.FirstName @action @personName
                             </a>
                         }

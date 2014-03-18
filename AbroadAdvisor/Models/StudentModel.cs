@@ -830,5 +830,46 @@ namespace Bennett.AbroadAdvisor.Models
                 AddParameter(sql, "alternate_email", NpgsqlTypes.NpgsqlDbType.Varchar, AlternateEmail.Trim(), 128);
             }
         }
+
+        public static IEnumerable<StudentModel> Search(StudentSearchModel search)
+        {
+            List<StudentModel> students = new List<StudentModel>();
+            List<StudentModel> allStudents = GetStudents(null);
+            bool filterByGraduatingYears = search.SelectedGraduatingYears != null && search.SelectedGraduatingYears.Count<int>() > 0;
+            bool filterByMajors = search.SelectedMajors != null && search.SelectedMajors.Count<int>() > 0;
+
+            foreach (StudentModel student in allStudents)
+            {
+                bool matchGraduatingYear = false;
+                bool matchMajor = false;
+
+                if (filterByGraduatingYears)
+                {
+                    if (student.GraduatingYear.HasValue &&
+                        search.SelectedGraduatingYears.Any(y => y == student.GraduatingYear.Value))
+                    {
+                        matchGraduatingYear = true;
+                    }
+                }
+
+                if (filterByMajors)
+                {
+                    if (student.SelectedMajors.Count<int>() > 0 &&
+                        student.SelectedMajors.Intersect(search.SelectedMajors).Count<int>() > 0)
+                    {
+                        matchMajor = true;
+                    }
+                }
+
+                if ((!filterByMajors && filterByGraduatingYears & matchGraduatingYear) ||
+                    (!filterByGraduatingYears && filterByMajors & matchMajor) ||
+                    (filterByMajors && filterByGraduatingYears && matchGraduatingYear && matchMajor))
+                {
+                    students.Add(student);
+                }
+            }
+
+            return students;
+        }
     }
 }
