@@ -57,6 +57,25 @@
 		})
 	};
 
+	Student.initStudentList = function () {
+	    /// <summary>Initialize the student list page.</summary>
+
+	    $('a.studentlisttooltop').tooltip();
+	    $('a.studentlistmodal').modal();
+	    $('.collapse').collapse();
+
+	    // Load cached modal content and then refetch remote content.
+	    $(document.body).on('hidden.bs.modal', function () {
+	        $('#noteModal').removeData('bs.modal');
+	    });
+
+	    $('.multiselect').multiselect({
+	        numberDisplayed: 0,
+	        buttonContainer: '<div class="button-default" />',
+	        maxHeight: 300
+	    });
+	};
+
 	Student.addStudyAbroadRows = function (countries, years, periods) {
 		/// <summary>
 		/// Add a country, year, semester row group.

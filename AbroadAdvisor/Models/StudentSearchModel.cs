@@ -9,5 +9,6 @@ namespace Bennett.AbroadAdvisor.Models
     {
         public IEnumerable<int> SelectedMajors { get; set; }
         public IEnumerable<int> SelectedGraduatingYears { get; set; }
+        public IEnumerable<int> SelectedCountries { get; set; }
     }
 }

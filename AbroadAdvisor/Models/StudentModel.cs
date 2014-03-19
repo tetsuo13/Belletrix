@@ -833,40 +833,39 @@ namespace Bennett.AbroadAdvisor.Models
 
         public static IEnumerable<StudentModel> Search(StudentSearchModel search)
         {
-            List<StudentModel> students = new List<StudentModel>();
-            List<StudentModel> allStudents = GetStudents(null);
             bool filterByGraduatingYears = search.SelectedGraduatingYears != null && search.SelectedGraduatingYears.Count<int>() > 0;
             bool filterByMajors = search.SelectedMajors != null && search.SelectedMajors.Count<int>() > 0;
+            bool filterByCountries = search.SelectedCountries != null && search.SelectedCountries.Count<int>() > 0;
 
-            foreach (StudentModel student in allStudents)
+            if (!filterByGraduatingYears && !filterByMajors && !filterByCountries)
             {
-                bool matchGraduatingYear = false;
-                bool matchMajor = false;
+                return Enumerable.Empty<StudentModel>();
+            }
 
-                if (filterByGraduatingYears)
-                {
-                    if (student.GraduatingYear.HasValue &&
-                        search.SelectedGraduatingYears.Any(y => y == student.GraduatingYear.Value))
-                    {
-                        matchGraduatingYear = true;
-                    }
-                }
+            List<StudentModel> students = new List<StudentModel>(GetStudents(null));
 
-                if (filterByMajors)
-                {
-                    if (student.SelectedMajors.Count<int>() > 0 &&
-                        student.SelectedMajors.Intersect(search.SelectedMajors).Count<int>() > 0)
-                    {
-                        matchMajor = true;
-                    }
-                }
+            if (filterByGraduatingYears)
+            {
+                students = students
+                    .Where(x => x.GraduatingYear.HasValue)
+                    .Where(x => search.SelectedGraduatingYears.Any(y => y == x.GraduatingYear.Value))
+                    .ToList();
+            }
 
-                if ((!filterByMajors && filterByGraduatingYears & matchGraduatingYear) ||
-                    (!filterByGraduatingYears && filterByMajors & matchMajor) ||
-                    (filterByMajors && filterByGraduatingYears && matchGraduatingYear && matchMajor))
-                {
-                    students.Add(student);
-                }
+            if (filterByMajors)
+            {
+                students = students
+                    .Where(x => x.SelectedMajors.Count<int>() > 0)
+                    .Where(x => x.SelectedMajors.Intersect(search.SelectedMajors).Count<int>() > 0)
+                    .ToList();
+            }
+
+            if (filterByCountries)
+            {
+                students = students
+                    .Where(x => x.StudyAbroadCountry.Count<int>() > 0)
+                    .Where(x => x.StudyAbroadCountry.Intersect(search.SelectedCountries).Count<int>() > 0)
+                    .ToList();
             }
 
             return students;

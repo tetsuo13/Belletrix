@@ -1,7 +1,4 @@
-﻿/**
- */
-
-window.Bennett = window.Bennett || {};
+﻿window.Bennett = window.Bennett || {};
 
 (function (AbroadAdvisor, $) {
     'use strict';
