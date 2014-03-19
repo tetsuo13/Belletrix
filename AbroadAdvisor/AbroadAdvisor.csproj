@@ -176,6 +176,7 @@
     <Content Include="Content\fonts\fontawesome-webfont.svg" />
     <Content Include="Content\css\sb-admin.css" />
     <Content Include="Global.asax" />
+    <Content Include="Scripts\AbroadAdvisor.Student.js" />
     <None Include="Scripts\jquery-2.0.3.intellisense.js" />
     <Content Include="Scripts\AbroadAdvisor.js" />
     <Content Include="Scripts\bootstrap-datepicker.js" />

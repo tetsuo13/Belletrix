@@ -13,7 +13,8 @@ namespace Bennett.AbroadAdvisor.App_Start
                 "~/Scripts/bootstrap-multiselect.js",
                 "~/Scripts/jquery.tablesorter.js",
                 "~/Scripts/tables.js",
-                "~/Scripts/AbroadAdvisor.js"));
+                "~/Scripts/AbroadAdvisor.js",
+                "~/Scripts/AbroadAdvisor.Student.js"));
 
             bundles.Add(new StyleBundle("~/bundles/css").Include(
                 "~/Content/css/bootstrap.css",
