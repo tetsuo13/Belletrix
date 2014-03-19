@@ -16,9 +16,10 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table table-bordered table-hover table-striped tablesorter">
+        <table class="table table-bordered table-hover table-striped tablesorter table-condensed">
             <thead>
                 <tr>
+                    <th>Student</th>
                     <th>Year</th>
                     <th>Semester</th>
                     <th>Starting</th>
@@ -34,6 +35,31 @@
             <tbody>
                 @foreach (var study in Model)
                 {
+                    string semesterName = study.Semester.ToString();
+
+                    switch (study.Semester)
+                    {
+                        case (int)StudentStudyAbroadWishlistModel.PeriodValue.Fall:
+                            semesterName = "Fall";
+                            break;
+
+                        case (int)StudentStudyAbroadWishlistModel.PeriodValue.Spring:
+                            semesterName = "Spring";
+                            break;
+
+                        case (int)StudentStudyAbroadWishlistModel.PeriodValue.Summer:
+                            semesterName = "Summer";
+                            break;
+
+                        case (int)StudentStudyAbroadWishlistModel.PeriodValue.Maymester:
+                            semesterName = "Maymester";
+                            break;
+
+                        case (int)StudentStudyAbroadWishlistModel.PeriodValue.AcademicYear:
+                            semesterName = "Academic Year";
+                            break;
+
+                    }
                     CountryModel selectedCountry = (ViewBag.Countries as List<CountryModel>).FirstOrDefault(c => c.Id == study.CountryId);
                     string countryName = String.Empty;
 
@@ -63,8 +89,11 @@
                     }
 
                     <tr>
+                        <td>
+                            <a href="@Url.Action("View", "Student", new { id = study.StudentId })">@study.Student.LastName, @study.Student.FirstName @study.Student.MiddleName</a>
+                        </td>
                         <td>@study.Year</td>
-                        <td>@study.Semester</td>
+                        <td>@semesterName</td>
                         <td>
                             @if (study.StartDate != null)
                             {
@@ -102,5 +131,6 @@
                 }
             </tbody>
         </table>
+
     </div>
 }

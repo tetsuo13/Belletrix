@@ -57,6 +57,19 @@
 		})
 	};
 
+	function setupNoteModal() {
+	    // Load cached modal content and then refetch remote content.
+	    $(document.body).on('hidden.bs.modal', function () {
+	        $('#noteModal').removeData('bs.modal');
+	    });
+	}
+
+	Student.initStudentView = function () {
+	    /// <summary>Initialize the student view page.</summary>
+
+	    setupNoteModal();
+	};
+
 	Student.initStudentList = function () {
 	    /// <summary>Initialize the student list page.</summary>
 
@@ -64,10 +77,7 @@
 	    $('a.studentlistmodal').modal();
 	    $('.collapse').collapse();
 
-	    // Load cached modal content and then refetch remote content.
-	    $(document.body).on('hidden.bs.modal', function () {
-	        $('#noteModal').removeData('bs.modal');
-	    });
+	    setupNoteModal();
 
 	    $('.multiselect').multiselect({
 	        numberDisplayed: 0,
