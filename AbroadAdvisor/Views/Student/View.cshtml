@@ -107,6 +107,25 @@
                     }
                 </div>
             </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">Notes</div>
+                <div class="panel-body">
+                        @foreach (NoteModel note in ViewBag.Notes)
+                        {
+                            <p>
+                                @note.Note
+                                <br />
+                                <small class="text-muted">
+                                    by
+                                    @note.CreatedBy.FirstName @note.CreatedBy.LastName
+                                    on
+                                    @note.EntryDate.ToString("dddd, MMMM d, yyyy \\a\\t h:mm tt")
+                                </small>
+                            </p>
+                        }
+                </div>
+            </div>
         </div>
         <div class="col-lg-4">
             <div class="panel panel-default">

@@ -47,6 +47,7 @@ namespace Bennett.AbroadAdvisor.Controllers
             }
 
             ViewBag.StudyAbroad = StudyAbroadModel.GetAllForStudent(id);
+            ViewBag.Notes = NoteModel.GetNotes(id);
             PrepareDropDowns();
             PrepareStudyAbroadDropDowns();
             Analytics.TrackPageView(Request, "Student", (Session["User"] as UserModel).Login);
