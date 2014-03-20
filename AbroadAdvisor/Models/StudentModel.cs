@@ -862,10 +862,17 @@ namespace Bennett.AbroadAdvisor.Models
 
             if (filterByCountries)
             {
-                students = students
-                    .Where(x => x.StudyAbroadCountry.Count<int>() > 0)
-                    .Where(x => x.StudyAbroadCountry.Intersect(search.SelectedCountries).Count<int>() > 0)
+                List<StudyAbroadModel> studyAbroad = StudyAbroadModel.GetAll() as List<StudyAbroadModel>;
+
+                students = studyAbroad
+                    .Where(x => search.SelectedCountries.Any(y => y == x.CountryId))
+                    .Select(x => x.Student)
                     .ToList();
+
+                //students = students
+                //    .Where(x => x.StudyAbroadCountry.Count<int>() > 0)
+                //    .Where(x => x.StudyAbroadCountry.Intersect(search.SelectedCountries).Count<int>() > 0)
+                //    .ToList();
             }
 
             return students;

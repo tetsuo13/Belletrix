@@ -65,17 +65,18 @@
                                         @if (!String.IsNullOrEmpty(studyAbroad.City))
                                         {
                                             @studyAbroad.City@:,
-                                    }
+                                        }
                                         @((ViewBag.Countries as List<CountryModel>).Where(c => c.Id == studyAbroad.CountryId).First().Name)
                                     </strong>
+
                                     @if (studyAbroad.CreditBearing)
                                     {
-                                        <span class="label label-success">Credit</span>
+                                        <span class="label label-success" style="vertical-align: top">Credit</span>
                                     }
 
                                     @if (studyAbroad.Internship)
                                     {
-                                        <span class="label label-info">Internship</span>
+                                        <span class="label label-info" style="vertical-align: top">Internship</span>
                                     }
 
                                     <div>
