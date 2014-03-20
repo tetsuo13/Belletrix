@@ -136,6 +136,7 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Controllers\CacheController.cs" />
     <Compile Include="Controllers\ExperienceController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\NoteController.cs" />
