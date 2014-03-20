@@ -15,7 +15,7 @@ namespace Bennett.AbroadAdvisor.Controllers
             ViewBag.ActivePage = "experiences";
         }
 
-        public ActionResult Active()
+        public ActionResult List()
         {
             Analytics.TrackPageView(Request, "Active Experiences", (Session["User"] as UserModel).Login);
             
@@ -24,7 +24,7 @@ namespace Bennett.AbroadAdvisor.Controllers
             ViewBag.Programs = ProgramModel.GetPrograms();
             ViewBag.ProgramTypes = ProgramTypeModel.GetProgramTypes();
 
-            return View(StudyAbroadModel.GetActive());
+            return View(StudyAbroadModel.GetAll());
         }
 
         public ActionResult Add(int studentId)

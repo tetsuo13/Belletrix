@@ -46,7 +46,7 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return HttpNotFound();
             }
 
-            ViewBag.StudyAbroad = StudyAbroadModel.GetAllForStudent(id);
+            ViewBag.StudyAbroad = StudyAbroadModel.GetAll(id);
             ViewBag.Notes = NoteModel.GetNotes(id);
             PrepareDropDowns();
             PrepareStudyAbroadDropDowns();
@@ -117,7 +117,7 @@ namespace Bennett.AbroadAdvisor.Controllers
         public PartialViewResult StudyAbroad(int id)
         {
             ViewBag.StudentId = id;
-            ViewData.Model = StudyAbroadModel.GetAllForStudent(id);
+            ViewData.Model = StudyAbroadModel.GetAll(id);
             PrepareStudyAbroadDropDowns();
             return PartialView();
         }

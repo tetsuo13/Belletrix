@@ -206,7 +206,7 @@
     <Content Include="Views\Student\View.cshtml" />
     <Content Include="Views\Student\Edit.cshtml" />
     <Content Include="Views\Student\StudyAbroad.cshtml" />
-    <Content Include="Views\Experience\Active.cshtml" />
+    <Content Include="Views\Experience\List.cshtml" />
     <Content Include="Views\Experience\Add.cshtml" />
     <Content Include="Views\Home\Robots.cshtml" />
   </ItemGroup>

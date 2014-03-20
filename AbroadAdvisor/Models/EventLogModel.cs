@@ -51,22 +51,22 @@ namespace Bennett.AbroadAdvisor.Models
                     using (NpgsqlCommand command = connection.CreateCommand())
                     {
                         command.CommandText = @"
-                        SELECT          e.id, e.date, e.modified_by,
-                                        e.student_id, e.user_id, e.type,
-                                        e.action, u.first_name, u.last_name,
-                                        s.first_name AS student_first_name,
-                                        s.last_name AS student_last_name,
-                                        us.first_name AS user_first_name,
-                                        us.last_Name AS user_last_name
-                        FROM            event_log e
-                        INNER JOIN      users u ON
-                                        modified_by = u.id
-                        LEFT OUTER JOIN students s ON
-                                        e.student_id = s.id
-                        LEFT OUTER JOIN users us ON
-                                        e.user_id = us.id
-                        ORDER BY        date DESC
-                        LIMIT           8";
+                            SELECT          e.id, e.date, e.modified_by,
+                                            e.student_id, e.user_id, e.type,
+                                            e.action, u.first_name, u.last_name,
+                                            s.first_name AS student_first_name,
+                                            s.last_name AS student_last_name,
+                                            us.first_name AS user_first_name,
+                                            us.last_Name AS user_last_name
+                            FROM            event_log e
+                            INNER JOIN      users u ON
+                                            modified_by = u.id
+                            LEFT OUTER JOIN students s ON
+                                            e.student_id = s.id
+                            LEFT OUTER JOIN users us ON
+                                            e.user_id = us.id
+                            ORDER BY        date DESC
+                            LIMIT           8";
 
                         connection.Open();
 
