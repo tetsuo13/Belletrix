@@ -24,5 +24,12 @@ namespace Bennett.AbroadAdvisor.Controllers
         {
             return PingModel.Ping();
         }
+
+        [AllowAnonymous]
+        public ActionResult Robots()
+        {
+            Response.ContentType = "text/plain";
+            return View();
+        }
     }
 }

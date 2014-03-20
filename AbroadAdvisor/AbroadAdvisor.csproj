@@ -208,6 +208,7 @@
     <Content Include="Views\Student\StudyAbroad.cshtml" />
     <Content Include="Views\Experience\Active.cshtml" />
     <Content Include="Views\Experience\Add.cshtml" />
+    <Content Include="Views\Home\Robots.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

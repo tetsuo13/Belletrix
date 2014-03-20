@@ -1,5 +1,4 @@
-﻿using System.Security.Policy;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace Bennett.AbroadAdvisor
@@ -10,6 +9,16 @@ namespace Bennett.AbroadAdvisor
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
             routes.LowercaseUrls = true;
+
+            routes.MapRoute(
+                name: "Robots",
+                url: "robots.txt",
+                defaults: new
+                {
+                    controller = "Home",
+                    action = "Robots"
+                }
+            );
 
             routes.MapRoute(
                 name: "Default",
