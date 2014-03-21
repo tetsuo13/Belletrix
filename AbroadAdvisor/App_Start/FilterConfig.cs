@@ -10,7 +10,7 @@ namespace Bennett.AbroadAdvisor
             filters.Add(new HandleErrorAttribute());
 
 #if !DEBUG
-            filters.Add(new RequireHttpsAttribute());
+            filters.Add(new Attributes.RequireHttpsAttribute());
 #endif
         }
     }
