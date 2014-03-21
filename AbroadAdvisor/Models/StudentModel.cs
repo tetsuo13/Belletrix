@@ -304,6 +304,7 @@ namespace Bennett.AbroadAdvisor.Models
                                 student.Citizenship = IntOrDefault(reader, "citizenship");
                                 student.PellGrantRecipient = BoolOrDefault(reader, "pell_grant_recipient");
                                 student.HasPassport = BoolOrDefault(reader, "passport_holder");
+                                student.PhiBetaDeltaMember = BoolOrDefault(reader, "phi_beta_delta_member");
                                 student.CampusEmail = StringOrDefault(reader, "campus_email");
                                 student.AlternateEmail = StringOrDefault(reader, "alternate_email");
                                 student.Created = reader.GetDateTime(reader.GetOrdinal("created"));
@@ -807,6 +808,11 @@ namespace Bennett.AbroadAdvisor.Models
             if (HasPassport.HasValue)
             {
                 AddParameter(sql, "passport_holder", NpgsqlTypes.NpgsqlDbType.Boolean, HasPassport.Value, 0);
+            }
+
+            if (PhiBetaDeltaMember.HasValue)
+            {
+                AddParameter(sql, "phi_beta_delta_member", NpgsqlTypes.NpgsqlDbType.Boolean, PhiBetaDeltaMember.Value, 0);
             }
 
             if (Gpa.HasValue)
