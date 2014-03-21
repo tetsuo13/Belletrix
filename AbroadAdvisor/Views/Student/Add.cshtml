@@ -224,7 +224,7 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-lg-6">
+                            <div class="col-lg-4">
                                 <div class="form-group">
                                     @Html.LabelFor(s => s.PellGrantRecipient)
                                     @Html.DropDownListFor(s => s.PellGrantRecipient, new SelectList(
@@ -238,10 +238,24 @@
                                         Model), "Please Select", new { @class = "form-control" })
                                 </div>
                             </div>
-                            <div class="col-lg-6">
+                            <div class="col-lg-4">
                                 <div class="form-group">
                                     @Html.LabelFor(s => s.HasPassport)
                                     @Html.DropDownListFor(s => s.HasPassport, new SelectList(
+                                        new[]
+                                        {
+                                            new { Value = false, Text = "No" },
+                                            new { Value = true, Text = "Yes" }
+                                        },
+                                        "Value",
+                                        "Text",
+                                        Model), "Please Select", new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    @Html.LabelFor(s => s.PhiBetaDeltaMember)
+                                    @Html.DropDownListFor(s => s.PhiBetaDeltaMember, new SelectList(
                                         new[]
                                         {
                                             new { Value = false, Text = "No" },

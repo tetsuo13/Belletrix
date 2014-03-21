@@ -87,12 +87,15 @@ namespace Bennett.AbroadAdvisor.Models
         [Display(Name = "Enrolled as a")]
         public bool? EnrolledFullTime { get; set; }
 
+        [Display(Name = "Phi Beta Delta?")]
+        public bool? PhiBetaDeltaMember { get; set; }
+
         public int? Citizenship { get; set; }
 
-        [Display(Name = "Are you a Pell Grant Recipient?")]
+        [Display(Name = "Pell Grant?")]
         public bool? PellGrantRecipient { get; set; }
 
-        [Display(Name = "Do you have a passport?")]
+        [Display(Name = "Passport Holder?")]
         public bool? HasPassport { get; set; }
 
         [Range(0.00, 9.99)]
