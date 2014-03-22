@@ -4,6 +4,7 @@ using System.Web.Http;
 
 namespace Bennett.AbroadAdvisor.Controllers
 {
+    [AllowAnonymous]
     public class CacheController : ApiController
     {
         // GET api/cache
