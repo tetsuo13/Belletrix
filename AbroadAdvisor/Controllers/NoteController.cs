@@ -1,6 +1,7 @@
 ﻿using Bennett.AbroadAdvisor.Core;
 using Bennett.AbroadAdvisor.Models;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 
 namespace Bennett.AbroadAdvisor.Controllers
@@ -9,7 +10,7 @@ namespace Bennett.AbroadAdvisor.Controllers
     {
         public ActionResult List(int studentId)
         {
-            List<StudentModel> students = StudentModel.GetStudents(studentId);
+            IList<StudentBaseModel> students = StudentModel.GetStudents(studentId).ToList();
 
             if (students.Count == 0)
             {

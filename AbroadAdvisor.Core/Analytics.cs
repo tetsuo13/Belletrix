@@ -22,7 +22,7 @@ namespace Bennett.AbroadAdvisor.Core
     /// </seealso>
     public class Analytics
     {
-        public static void TrackPageView(HttpRequestBase request, string pageTitle, string username)
+        public static void TrackPageView(HttpRequestBase request, string pageTitle, string username = null)
         {
 #if DEBUG
             return;

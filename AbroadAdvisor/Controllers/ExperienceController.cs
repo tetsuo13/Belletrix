@@ -71,7 +71,7 @@ namespace Bennett.AbroadAdvisor.Controllers
 
         private void PrepareStudent(int studentId)
         {
-            List<StudentModel> student = StudentModel.GetStudents(studentId);
+            IList<StudentBaseModel> student = StudentModel.GetStudents(studentId).ToList();
 
             if (student.Count == 0)
             {

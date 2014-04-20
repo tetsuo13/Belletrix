@@ -1,0 +1,123 @@
+﻿@{
+    Layout = "~/Views/Shared/_PromoLayout.cshtml";
+}
+
+@section headerStyle {
+    <style>
+        /* Everything but the jumbotron gets side spacing for mobile first views */
+        .header,
+        .marketing,
+        .footer {
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+
+        /* Custom page header */
+        .header {
+            border-bottom: 1px solid #e5e5e5;
+        }
+            /* Make the masthead heading the same height as the navigation */
+            .header h3 {
+                padding-bottom: 19px;
+                margin-top: 0;
+                margin-bottom: 0;
+                line-height: 40px;
+            }
+
+        /* Custom page footer */
+        .footer {
+            padding-top: 19px;
+            color: #777;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        /* Customize container */
+        @@media (min-width: 768px) {
+            .container {
+                max-width: 730px;
+            }
+        }
+
+        .container-narrow > hr {
+            margin: 30px 0;
+        }
+
+        /* Main marketing message and sign up button */
+        .jumbotron {
+            text-align: center;
+            border-bottom: 1px solid #e5e5e5;
+            background-color: inherit;
+        }
+
+        /* Supporting marketing content */
+        .marketing {
+            margin: 40px 0;
+        }
+
+            .marketing p + h4 {
+                margin-top: 28px;
+            }
+
+        /* Responsive: Portrait tablets and up */
+        @@media screen and (min-width: 768px) {
+            /* Remove the padding we set earlier */
+            .header,
+            .marketing,
+            .footer {
+                padding-right: 0;
+                padding-left: 0;
+            }
+            /* Space out the masthead */
+            .header {
+                margin-bottom: 30px;
+            }
+            /* Remove the bottom border on the jumbotron for visual effect */
+            .jumbotron {
+                border-bottom: 0;
+            }
+        }
+    </style>
+}
+
+@section Body {
+    <div class="container">
+        <div class="header">
+            @*
+                <ul class="nav nav-pills pull-right">
+                    <li class="active"><a href="#">Home</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            *@
+            <h3 class="text-muted">AbroadAdvisor</h3>
+        </div>
+
+        <div class="jumbotron">
+            @*<h1>Promo</h1>*@
+            <p class="lead">Please enter a promo code to continue.</p>
+
+            @using (Html.BeginForm("Entry", "Promo", FormMethod.Post, new { @class = "form-inline", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="form-group">
+                    @Html.Label("Code", "Code", new { @class = "sr-only" })
+                    @Html.TextBox("Code", "", new { @class = "form-control" })
+                </div>
+
+                <button type="submit" class="btn btn-success">Proceed</button>
+            }
+
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <p class="text-danger"><small>@ViewBag.ErrorMessage</small></p>
+            }
+        </div>
+
+        @*
+            <div class="footer">
+                <p>&copy; @DateTime.Now.Year</p>
+            </div>
+        *@
+    </div>
+}

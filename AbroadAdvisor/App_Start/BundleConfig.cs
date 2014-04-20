@@ -14,6 +14,7 @@ namespace Bennett.AbroadAdvisor.App_Start
                 "~/Scripts/jquery.tablesorter.js",
                 "~/Scripts/tables.js",
                 "~/Scripts/AbroadAdvisor.js",
+                "~/Scripts/AbroadAdvisor.Promo.js",
                 "~/Scripts/AbroadAdvisor.Student.js"));
 
             bundles.Add(new StyleBundle("~/bundles/css").Include(

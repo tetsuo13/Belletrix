@@ -39,7 +39,7 @@ namespace Bennett.AbroadAdvisor.Controllers
 
         public ActionResult View(int id)
         {
-            List<StudentModel> student = StudentModel.GetStudents(id);
+            List<StudentBaseModel> student = StudentModel.GetStudents(id).ToList();
 
             if (student.Count == 0)
             {
@@ -61,7 +61,7 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            List<StudentModel> student = StudentModel.GetStudents(id.Value);
+            List<StudentBaseModel> student = StudentModel.GetStudents(id.Value).ToList();
 
             if (student.Count == 0)
             {
@@ -146,17 +146,15 @@ namespace Bennett.AbroadAdvisor.Controllers
 
         private void PrepareDropDowns()
         {
-            List<object> years = Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 7))
+            IEnumerable<object> years = Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 7))
                 .Reverse()
-                .Select(i => new { Id = i, Name = i.ToString() })
-                .ToList<object>();
+                .Select(i => new { Id = i, Name = i.ToString() });
 
-            List<CountryModel> countries = CountryModel.GetCountries();
+            IEnumerable<CountryModel> countries = CountryModel.GetCountries();
 
             ViewBag.Countries = new SelectList(countries, "Id", "Name");
             ViewBag.Languages = LanguageModel.GetLanguages();
 
-            ViewBag.EnteringYears = new SelectList(Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 2)).Reverse());
             ViewBag.GraduatingYears = new SelectList(years, "Id", "Name");
             ViewBag.GraduatingYearsAsEnumerable = years;
             ViewBag.Classifications = new SelectList(StudentClassificationModel.GetClassifications(), "Id", "Name");
@@ -164,7 +162,7 @@ namespace Bennett.AbroadAdvisor.Controllers
             ViewBag.AvailableMajors = MajorsModel.GetMajors();
             ViewBag.AvailableMinors = MinorsModel.GetMinors();
 
-            List<object> studyYears = new List<object>(years);
+            IList<object> studyYears = new List<object>(years);
             studyYears.Insert(0, new { Id = 1, Name = "Any Year" });
 
             ViewBag.StudyAbroadYears = new SelectList(studyYears, "Id", "Name");

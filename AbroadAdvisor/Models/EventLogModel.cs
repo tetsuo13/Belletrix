@@ -37,7 +37,7 @@ namespace Bennett.AbroadAdvisor.Models
 
         public string RelativeDate { get; set; }
 
-        public static List<EventLogModel> GetEvents()
+        public static IEnumerable<EventLogModel> GetEvents()
         {
             ApplicationCache cacheProvider = new ApplicationCache();
             List<EventLogModel> events = cacheProvider.Get(CacheId, () => new List<EventLogModel>());

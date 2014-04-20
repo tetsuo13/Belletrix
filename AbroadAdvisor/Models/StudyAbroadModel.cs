@@ -130,11 +130,11 @@ namespace Bennett.AbroadAdvisor.Models
                                     study.City = reader.GetString(ord);
                                 }
 
-                                List<StudentModel> student = StudentModel.GetStudents(study.StudentId);
+                                IList<StudentBaseModel> student = StudentModel.GetStudents(study.StudentId).ToList();
 
                                 if (student.Count == 1)
                                 {
-                                    study.Student = student[0];
+                                    study.Student = student[0] as StudentModel;
                                 }
 
                                 studyAbroad.Add(study);

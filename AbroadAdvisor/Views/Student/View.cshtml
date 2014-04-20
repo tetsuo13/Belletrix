@@ -1,7 +1,7 @@
 ﻿@using Bennett.AbroadAdvisor.Core;
 @using Bennett.AbroadAdvisor.Models;
 
-@model StudentModel
+@model StudentBaseModel
 
 @{
     ViewBag.Title = "View";
@@ -150,22 +150,9 @@
                         }
                     </address>
 
-                    <address>
-                        @if (!String.IsNullOrEmpty(Model.StreetAddress))
-                        {
-                            @Model.StreetAddress
-                            if (!String.IsNullOrEmpty(Model.StreetAddress2))
-                            {
-                                <br />
-                                @Model.StreetAddress2
-                            }
-                            <br />
-                            @Model.City@:, @Model.State @Model.PostalCode
-                        }
-                        
+                    <address>                       
                         @if (!String.IsNullOrEmpty(Model.PhoneNumber) || !String.IsNullOrEmpty(Model.CellPhoneNumber))
                         {
-                            <br />
                             if (!String.IsNullOrEmpty(Model.PhoneNumber))
                             {
                                 <abbr title="Phone">P:</abbr>
