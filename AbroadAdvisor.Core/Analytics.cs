@@ -24,9 +24,10 @@ namespace Bennett.AbroadAdvisor.Core
     {
         public static void TrackPageView(HttpRequestBase request, string pageTitle, string username = null)
         {
-#if DEBUG
-            return;
-#endif
+            if (DeploymentEnvironment.IsDevelopment)
+            {
+                return;
+            }
 
             PiwikTracker.URL = "http://analytics.andreinicholson.com";
             PiwikTracker tracker = new PiwikTracker(17);

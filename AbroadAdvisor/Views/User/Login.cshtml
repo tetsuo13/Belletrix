@@ -1,4 +1,5 @@
-﻿@using Bennett.AbroadAdvisor.Models;
+﻿@using Bennett.AbroadAdvisor.Core;
+@using Bennett.AbroadAdvisor.Models;
 
 @model LoginModel
 
@@ -8,13 +9,19 @@
     // http://tidy.eideus.com/
     
     Layout = null;
-    ViewBag.Title = "AbroadAdvisor";
+    string pageTitle = "AbroadAdvisor";
+    bool developmentEnvironment = DeploymentEnvironment.IsDevelopment;
+
+    if (developmentEnvironment)
+    {
+        pageTitle += " (Debug)";
+    }
 }
 
 <!doctype html>
 <html>
 <head>
-    <title>@ViewBag.Title</title>
+    <title>@pageTitle</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     @Styles.Render("~/bundles/css")

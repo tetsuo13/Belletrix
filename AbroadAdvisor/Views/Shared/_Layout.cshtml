@@ -1,9 +1,17 @@
-﻿@using Bennett.AbroadAdvisor.Models;
+﻿@using Bennett.AbroadAdvisor.Core;
+@using Bennett.AbroadAdvisor.Models;
 
 @{
     Layout = null;
     string siteTitle = "AbroadAdvisor";
     string pageTitle = siteTitle;
+    bool developmentEnvironment = DeploymentEnvironment.IsDevelopment;
+    
+    if (developmentEnvironment)
+    {
+        pageTitle += " (Debug)";
+    }
+    
     UserModel user = Session["User"] as UserModel;
 }
 

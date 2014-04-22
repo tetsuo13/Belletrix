@@ -1,5 +1,15 @@
-﻿@{
+﻿@using Bennett.AbroadAdvisor.Core;
+
+@{
     Layout = null;
+    string siteTitle = "AbroadAdvisor Promo";
+    string pageTitle = siteTitle;
+    bool developmentEnvironment = DeploymentEnvironment.IsDevelopment;
+
+    if (developmentEnvironment)
+    {
+        pageTitle += " (Debug)";
+    }
 }
 
 <!doctype html>
@@ -8,7 +18,7 @@
     <meta charset="utf-8" />
     <meta name="robots" content="noindex,nofollow" />
     <meta name="viewport" content="width=device-width" />
-    <title></title>
+    <title>@pageTitle</title>
     @Styles.Render("~/bundles/css")
     @RenderSection("HeaderStyle", false)
 </head>
