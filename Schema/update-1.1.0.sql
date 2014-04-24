@@ -9,6 +9,16 @@ ALTER TABLE students DROP COLUMN classification;
 ALTER TABLE students DROP COLUMN phi_beta_delta_member;
 
 
+CREATE TABLE student_studied_languages (
+student_id      INT NOT NULL,
+language_id     INT NOT NULL,
+
+PRIMARY KEY (student_id, language_id)
+);
+
+COMMENT ON TABLE student_studied_languages IS 'Languages that students have studied or are studying';
+
+
 CREATE TABLE user_promo (
 id              SERIAL,
 description     VARCHAR(256) NOT NULL,
