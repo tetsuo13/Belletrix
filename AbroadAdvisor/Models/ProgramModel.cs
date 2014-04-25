@@ -1,7 +1,6 @@
 ﻿using Bennett.AbroadAdvisor.Core;
 using Npgsql;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Bennett.AbroadAdvisor.Models
 {

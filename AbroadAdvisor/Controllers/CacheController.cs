@@ -22,6 +22,7 @@ namespace Bennett.AbroadAdvisor.Controllers
 
             StudentModel.GetStudents(null);
             StudyAbroadModel.GetAll();
+            PromoModel.GetPromos();
 
             return new string[] { "foo" };
         }

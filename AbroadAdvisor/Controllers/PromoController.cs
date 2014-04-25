@@ -3,7 +3,6 @@ using Bennett.AbroadAdvisor.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Web;
 using System.Web.Mvc;
 
@@ -32,7 +31,7 @@ namespace Bennett.AbroadAdvisor.Controllers
         public ActionResult List()
         {
             Analytics.TrackPageView(Request, "Promo List", (Session["User"] as UserModel).Login);
-            return View(PromoModel.GetPromos());
+            return View(PromoModel.GetPromos(true));
         }
 
         public ActionResult Add()

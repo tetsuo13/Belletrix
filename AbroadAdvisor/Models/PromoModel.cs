@@ -3,8 +3,6 @@ using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Text;
 using System.Linq;
 
 namespace Bennett.AbroadAdvisor.Models
@@ -31,7 +29,9 @@ namespace Bennett.AbroadAdvisor.Models
 
         public bool IsActive { get; set; }
 
-        public static List<PromoModel> GetPromos()
+        public IEnumerable<StudentPromoLog> Logs { get; set; }
+
+        public static IEnumerable<PromoModel> GetPromos(bool withLogs = false)
         {
             ApplicationCache cacheProvider = new ApplicationCache();
             List<PromoModel> promos = cacheProvider.Get(CacheId, () => new List<PromoModel>());
@@ -76,6 +76,11 @@ namespace Bennett.AbroadAdvisor.Models
 
                                 promo.CreatedBy = user;
 
+                                if (withLogs)
+                                {
+                                    promo.Logs = StudentPromoLog.GetLogsForPromo(promo.Id);
+                                }
+
                                 promos.Add(promo);
                             }
 
@@ -90,7 +95,7 @@ namespace Bennett.AbroadAdvisor.Models
 
         public static PromoModel GetPromo(int id)
         {
-            List<PromoModel> promos = GetPromos();
+            IEnumerable<PromoModel> promos = GetPromos();
             PromoModel needle = promos.Where(p => p.Id == id).FirstOrDefault();
 
             if (needle != null)
@@ -103,7 +108,7 @@ namespace Bennett.AbroadAdvisor.Models
 
         public static PromoModel GetPromo(string code)
         {
-            List<PromoModel> promos = GetPromos();
+            IEnumerable<PromoModel> promos = GetPromos();
             code = code.ToLower();
             PromoModel needle = promos.Where(p => p.Code == code).FirstOrDefault();
 

@@ -36,6 +36,7 @@
                     <th>Creator <i class="fa fa-sort"></i></th>
                     <th>Created <i class="fa fa-sort"></i></th>
                     <th>Description <i class="fa fa-sort"></i></th>
+                    <th>Students <i class="fa fa-sort"></i></th>
                     <th>Active <i class="fa fa-sort"></i></th>
                     <th></th>
                 </tr>
@@ -49,14 +50,14 @@
                         <td>@promo.CreatedBy.FirstName @promo.CreatedBy.LastName</td>
                         <td>@DateTimeFilter.UtcToLocal(promo.Created)</td>
                         <td>@promo.Description</td>
+                        <td>@(promo.Logs.Count<StudentPromoLog>().ToString("N0"))</td>
                         <td>
                             @if (promo.IsActive)
                             {
                                 <i class="fa fa-check"></i>
                             }
                         </td>
-                        <td>
-                        </td>
+                        <td></td>
                     </tr>
                 }
             </tbody>
