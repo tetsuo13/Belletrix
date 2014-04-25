@@ -18,6 +18,8 @@ PRIMARY KEY (student_id, language_id)
 
 COMMENT ON TABLE student_studied_languages IS 'Languages that students have studied or are studying';
 
+GRANT ALL PRIVILEGES ON student_studied_languages TO neoanime_abroadadvisor;
+
 
 CREATE TABLE user_promo (
 id              SERIAL,

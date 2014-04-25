@@ -96,13 +96,14 @@
             @*<h1>Promo</h1>*@
             <p class="lead">Please enter a promo code to continue.</p>
 
-            @using (Html.BeginForm("Entry", "Promo", FormMethod.Post, new { @class = "form-inline", role = "form" }))
+            @using (Html.BeginForm("Entry", "Promo", FormMethod.Post,
+                new { @class = "form-inline", role = "form", autocomplete = "off" }))
             {
                 @Html.AntiForgeryToken()
 
                 <div class="form-group">
                     @Html.Label("Code", "Code", new { @class = "sr-only" })
-                    @Html.TextBox("Code", "", new { @class = "form-control" })
+                    @Html.TextBox("Code", "", new { @class = "form-control", autocomplete = "off" })
                 </div>
 
                 <button type="submit" class="btn btn-success">Proceed</button>
