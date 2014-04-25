@@ -366,7 +366,7 @@ namespace Bennett.AbroadAdvisor.Models
 
             if (!filterByGraduatingYears && !filterByMajors && !filterByCountries)
             {
-                return Enumerable.Empty<StudentModel>();
+                return Enumerable.Empty<StudentBaseModel>();
             }
 
             IEnumerable<StudentBaseModel> students = new List<StudentBaseModel>(GetStudents(null)).ToList();
@@ -375,14 +375,16 @@ namespace Bennett.AbroadAdvisor.Models
             {
                 students = students
                     .Where(x => x.GraduatingYear.HasValue)
-                    .Where(x => search.SelectedGraduatingYears.Any(y => y == x.GraduatingYear.Value));
+                    .Where(x => search.SelectedGraduatingYears.Any(y => y == x.GraduatingYear.Value))
+                    .ToList();
             }
 
             if (filterByMajors)
             {
                 students = students
                     .Where(x => x.SelectedMajors.Count<int>() > 0)
-                    .Where(x => x.SelectedMajors.Intersect(search.SelectedMajors).Count<int>() > 0);
+                    .Where(x => x.SelectedMajors.Intersect(search.SelectedMajors).Count<int>() > 0)
+                    .ToList();
             }
 
             if (filterByCountries)
@@ -391,7 +393,8 @@ namespace Bennett.AbroadAdvisor.Models
 
                 students = studyAbroad
                     .Where(x => search.SelectedCountries.Any(y => y == x.CountryId))
-                    .Select(x => x.Student);
+                    .Select(x => x.Student)
+                    .ToList();
 
                 //students = students
                 //    .Where(x => x.StudyAbroadCountry.Count<int>() > 0)
