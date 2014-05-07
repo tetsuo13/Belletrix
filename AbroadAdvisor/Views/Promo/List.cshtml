@@ -43,7 +43,7 @@
             </thead>
 
             <tbody>
-                @foreach (var promo in Model)
+                @foreach (PromoModel promo in Model)
                 {
                     <tr>
                         <td>@Html.ActionLink(promo.Code, "Info", new { id = promo.Id })</td>

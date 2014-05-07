@@ -8,7 +8,7 @@ namespace Bennett.AbroadAdvisor.Models
     /// <summary>
     /// Student model related to promos.
     /// </summary>
-    public class StudentPromoModel : StudentBaseModel
+    public class StudentPromoModel : StudentBaseModel, IStudentModel
     {
         [Display(Name = "Are you a Pell Grant Recipient?")]
         new public bool? PellGrantRecipient { get; set; }
@@ -29,6 +29,10 @@ namespace Bennett.AbroadAdvisor.Models
                 using (NpgsqlTransaction transaction = connection.BeginTransaction())
                 {
                     base.Save(connection, userId);
+
+                    EventLogModel eventLog = new EventLogModel();
+                    eventLog.Student = this;
+                    eventLog.AddStudentEvent(connection, Id, EventLogModel.EventType.AddStudent);
 
                     StudentPromoLog log = new StudentPromoLog();
                     log.Save(connection, Id, promoCode);

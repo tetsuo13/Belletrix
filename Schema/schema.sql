@@ -402,6 +402,7 @@ enrolled_full_time      BOOLEAN,
 citizenship             INTEGER,
 pell_grant_recipient    BOOLEAN,
 passport_holder         BOOLEAN,
+phi_beta_delta_member   BOOLEAN,
 gpa                     DECIMAL(3,2),
 campus_email            VARCHAR(128),
 alternate_email         VARCHAR(128),
@@ -564,7 +565,7 @@ GRANT ALL PRIVILEGES ON student_notes_id_seq TO neoanime_abroadadvisor;
 CREATE TABLE event_log (
 id          SERIAL,
 date        TIMESTAMP NOT NULL,
-modified_by INT NOT NULL,
+modified_by INT,
 student_id  INT,
 user_id     INT,
 type        INT NOT NULL,
@@ -577,6 +578,9 @@ FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 COMMENT ON TABLE event_log IS 'Application event logging table';
+COMMENT ON COLUMN event_log.modified_by IS 'User ID who initiated the event. May be NULL to indicate promos or system events.';
+COMMENT ON COLUMN event_log.student_id IS 'Student ID that was modified';
+COMMENT ON COLUMN event_log.user_id IS 'User ID that was modified';
 
 GRANT ALL PRIVILEGES ON event_log TO neoanime_abroadadvisor;
 GRANT ALL PRIVILEGES ON event_log_id_seq TO neoanime_abroadadvisor;

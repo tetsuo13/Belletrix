@@ -20,7 +20,7 @@ namespace Bennett.AbroadAdvisor.Controllers
         {
             Analytics.TrackPageView(Request, "Student List", (Session["User"] as UserModel).Login);
             PrepareDropDowns();
-            return View(StudentModel.GetStudents(null));
+            return View(StudentModel.GetStudents());
         }
 
         [HttpPost]
@@ -39,9 +39,13 @@ namespace Bennett.AbroadAdvisor.Controllers
 
         public ActionResult View(int id)
         {
-            List<StudentBaseModel> student = StudentModel.GetStudents(id).ToList();
+            StudentModel student;
 
-            if (student.Count == 0)
+            try
+            {
+                student = StudentModel.GetStudent(id);
+            }
+            catch (Exception)
             {
                 return HttpNotFound();
             }
@@ -51,7 +55,7 @@ namespace Bennett.AbroadAdvisor.Controllers
             PrepareDropDowns();
             PrepareStudyAbroadDropDowns();
             Analytics.TrackPageView(Request, "Student", (Session["User"] as UserModel).Login);
-            return View(student[0]);
+            return View(student);
         }
 
         public ActionResult Edit(int? id)
@@ -61,16 +65,20 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            List<StudentBaseModel> student = StudentModel.GetStudents(id.Value).ToList();
+            StudentModel student;
 
-            if (student.Count == 0)
+            try
+            {
+                student = StudentModel.GetStudent(id.Value);
+            }
+            catch (Exception)
             {
                 return HttpNotFound();
             }
 
             PrepareDropDowns();
             Analytics.TrackPageView(Request, "Student Edit", (Session["User"] as UserModel).Login);
-            return View(student[0]);
+            return View(student);
         }
 
         [HttpPost]
@@ -81,7 +89,7 @@ namespace Bennett.AbroadAdvisor.Controllers
 
             if (ModelState.IsValid)
             {
-                model.SaveChanges((Session["User"] as UserModel).Id);
+                model.SaveChanges(Session["User"] as UserModel);
                 return RedirectToAction("List");
             }
 
@@ -105,7 +113,7 @@ namespace Bennett.AbroadAdvisor.Controllers
 
             if (ModelState.IsValid)
             {
-                model.Save((Session["User"] as UserModel).Id);
+                model.Save(Session["User"] as UserModel);
                 return RedirectToAction("List");
             }
 

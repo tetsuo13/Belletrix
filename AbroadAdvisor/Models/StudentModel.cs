@@ -2,6 +2,7 @@
 using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 
@@ -10,13 +11,21 @@ namespace Bennett.AbroadAdvisor.Models
     /// <summary>
     /// Student model related to student entry by staff.
     /// </summary>
-    public class StudentModel : StudentBaseModel
+    public class StudentModel : StudentBaseModel, IStudentModel
     {
-        public void SaveChanges(int userId)
+        [Display(Name = "Phi Beta Delta?")]
+        public bool? PhiBetaDeltaMember { get; set; }
+
+        public void SaveChanges(UserModel user)
         {
-            StringBuilder sql = new StringBuilder(@"UPDATE students SET ");
+            StringBuilder sql = new StringBuilder("UPDATE students SET ");
 
             PrepareColumns(ref sql);
+
+            if (PhiBetaDeltaMember.HasValue)
+            {
+                AddParameter(sql, "phi_beta_delta_member", NpgsqlTypes.NpgsqlDbType.Boolean, PhiBetaDeltaMember, 0);
+            }
 
             foreach (KeyValuePair<string, string> pair in columns)
             {
@@ -54,23 +63,27 @@ namespace Bennett.AbroadAdvisor.Models
                     SaveStudentLanguages(connection, Id, "student_desired_languages", SelectedDesiredLanguages);
                     SaveStudentLanguages(connection, Id, "student_studied_languages", StudiedLanguages);
 
-                    EventLogModel eventLog = new EventLogModel();
-                    eventLog.AddStudentEvent(connection, userId, Id, EventLogModel.EventType.EditStudent);
+                    EventLogModel eventLog = new EventLogModel()
+                    {
+                        Student = this,
+                        ModifiedBy = user
+                    };
+                    eventLog.AddStudentEvent(connection, user.Id, Id, EventLogModel.EventType.EditStudent);
 
                     transaction.Commit();
 
                     ApplicationCache cacheProvider = new ApplicationCache();
-                    IDictionary<int, StudentBaseModel> students = cacheProvider.Get(CacheId, () => new Dictionary<int, StudentBaseModel>());
+                    IDictionary<int, StudentModel> students = cacheProvider.Get(CacheId, () => new Dictionary<int, StudentModel>());
                     students[Id] = this;
                     cacheProvider.Set(CacheId, students);
                 }
             }
         }
 
-        public static IEnumerable<StudentBaseModel> GetStudents(int? id)
+        public static List<StudentModel> GetStudents(int? id = null)
         {
             ApplicationCache cacheProvider = new ApplicationCache();
-            IDictionary<int, StudentBaseModel> students = cacheProvider.Get(CacheId, () => new Dictionary<int, StudentBaseModel>());
+            IDictionary<int, StudentModel> students = cacheProvider.Get(CacheId, () => new Dictionary<int, StudentModel>());
 
             if (students.Count == 0)
             {
@@ -159,19 +172,13 @@ namespace Bennett.AbroadAdvisor.Models
                 cacheProvider.Set(CacheId, students);
             }
 
-            if (id.HasValue)
-            {
-                IList<StudentBaseModel> studentReturn = new List<StudentBaseModel>();
-
-                if (students.ContainsKey(id.Value))
-                {
-                    studentReturn.Add(students[id.Value]);
-                }
-
-                return studentReturn;
-            }
-
             return students.Select(x => x.Value).ToList();
+        }
+
+        public static StudentModel GetStudent(int id)
+        {
+            List<StudentModel> students = GetStudents(id);
+            return students[0];
         }
 
         private static void PopulateStudentLanguages(NpgsqlConnection connection, ref IList<StudentModel> students)
@@ -305,7 +312,7 @@ namespace Bennett.AbroadAdvisor.Models
             }
         }
 
-        public void Save(int userId)
+        public void Save(UserModel user)
         {
             using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
@@ -314,7 +321,14 @@ namespace Bennett.AbroadAdvisor.Models
 
                 using (NpgsqlTransaction transaction = connection.BeginTransaction())
                 {
-                    base.Save(connection, userId);
+                    base.Save(connection, user.Id);
+
+                    EventLogModel eventLog = new EventLogModel()
+                    {
+                        Student = this,
+                        ModifiedBy = user
+                    };
+                    eventLog.AddStudentEvent(connection, user.Id, Id, EventLogModel.EventType.AddStudent);
 
                     transaction.Commit();
                 }
@@ -358,7 +372,7 @@ namespace Bennett.AbroadAdvisor.Models
             }
         }
 
-        public static IEnumerable<StudentBaseModel> Search(StudentSearchModel search)
+        public static IEnumerable<StudentModel> Search(StudentSearchModel search)
         {
             bool filterByGraduatingYears = search.SelectedGraduatingYears != null && search.SelectedGraduatingYears.Count<int>() > 0;
             bool filterByMajors = search.SelectedMajors != null && search.SelectedMajors.Count<int>() > 0;
@@ -366,10 +380,10 @@ namespace Bennett.AbroadAdvisor.Models
 
             if (!filterByGraduatingYears && !filterByMajors && !filterByCountries)
             {
-                return Enumerable.Empty<StudentBaseModel>();
+                return Enumerable.Empty<StudentModel>();
             }
 
-            IEnumerable<StudentBaseModel> students = new List<StudentBaseModel>(GetStudents(null)).ToList();
+            IEnumerable<StudentModel> students = new List<StudentModel>(GetStudents()).ToList();
 
             if (filterByGraduatingYears)
             {

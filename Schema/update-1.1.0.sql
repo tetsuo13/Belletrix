@@ -6,7 +6,6 @@ ALTER TABLE students DROP COLUMN postal_code;
 ALTER TABLE students DROP COLUMN cell_phone_number;
 ALTER TABLE students DROP COLUMN entering_year;
 ALTER TABLE students DROP COLUMN classification;
-ALTER TABLE students DROP COLUMN phi_beta_delta_member;
 
 
 CREATE TABLE student_studied_languages (
@@ -64,3 +63,9 @@ ALTER TABLE student_study_abroad_wishlist ALTER COLUMN country_id DROP NOT NULL;
 ALTER TABLE student_study_abroad_wishlist ALTER COLUMN year DROP NOT NULL;
 ALTER TABLE student_study_abroad_wishlist ALTER COLUMN period DROP NOT NULL;
 CREATE INDEX student_study_abroad_wishlist_idx1 ON student_study_abroad_wishlist (student_id);
+
+
+ALTER TABLE event_log ALTER COLUMN modified_by DROP NOT NULL;
+COMMENT ON COLUMN event_log.modified_by IS 'User ID who initiated the event. May be NULL to indicate promos or system events.';
+COMMENT ON COLUMN event_log.student_id IS 'Student ID that was modified';
+COMMENT ON COLUMN event_log.user_id IS 'User ID that was modified';

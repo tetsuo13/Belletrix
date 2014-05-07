@@ -1,7 +1,6 @@
 ﻿using Bennett.AbroadAdvisor.Core;
 using Bennett.AbroadAdvisor.Models;
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using System.Web.Mvc;
 
 namespace Bennett.AbroadAdvisor.Controllers
@@ -10,15 +9,16 @@ namespace Bennett.AbroadAdvisor.Controllers
     {
         public ActionResult List(int studentId)
         {
-            IList<StudentBaseModel> students = StudentModel.GetStudents(studentId).ToList();
-
-            if (students.Count == 0)
+            try
+            {
+                ViewBag.Student = StudentModel.GetStudent(studentId);
+            }
+            catch (Exception)
             {
                 return HttpNotFound();
             }
 
             Analytics.TrackPageView(Request, "Note List", (Session["User"] as UserModel).Login);
-            ViewBag.Student = students[0];
             return View(NoteModel.GetNotes(studentId));
         }
 

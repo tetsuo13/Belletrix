@@ -354,12 +354,6 @@ namespace Bennett.AbroadAdvisor.Models
                 }
             }
 
-            if (userId.HasValue)
-            {
-                EventLogModel eventLog = new EventLogModel();
-                eventLog.AddStudentEvent(connection, userId.Value, studentId, EventLogModel.EventType.AddStudent);
-            }
-
             ApplicationCache cacheProvider = new ApplicationCache();
             Dictionary<int, StudentBaseModel> students = cacheProvider.Get(CacheId, () => new Dictionary<int, StudentBaseModel>());
             Id = studentId;

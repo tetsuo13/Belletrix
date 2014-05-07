@@ -71,14 +71,14 @@ namespace Bennett.AbroadAdvisor.Controllers
 
         private void PrepareStudent(int studentId)
         {
-            IList<StudentBaseModel> student = StudentModel.GetStudents(studentId).ToList();
-
-            if (student.Count == 0)
+            try
             {
-                throw new Exception();
+                ViewBag.Student = StudentModel.GetStudent(studentId);
             }
-
-            ViewBag.Student = student[0];
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         private void PrepareDropDowns()

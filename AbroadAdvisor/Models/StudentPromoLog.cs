@@ -1,7 +1,7 @@
 ﻿using Bennett.AbroadAdvisor.Core;
 using Npgsql;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Bennett.AbroadAdvisor.Models
 {
@@ -69,8 +69,14 @@ namespace Bennett.AbroadAdvisor.Models
                                 StudentId = reader.GetInt32(reader.GetOrdinal("student_id"))
                             };
 
-                            IList<StudentBaseModel> student = StudentModel.GetStudents(log.StudentId).ToList();
-                            log.Student = student[0];
+                            try
+                            {
+                                log.Student = StudentModel.GetStudent(log.StudentId);
+                            }
+                            catch (Exception)
+                            {
+                                throw;
+                            }
 
                             logs.Add(log);
                         }
