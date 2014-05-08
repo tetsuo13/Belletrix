@@ -1,10 +1,10 @@
-﻿using Npgsql;
+﻿using Bennett.AbroadAdvisor.Core;
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using System.Linq;
-using Bennett.AbroadAdvisor.Core;
+using System.Text;
 
 namespace Bennett.AbroadAdvisor.Models
 {
@@ -44,18 +44,9 @@ namespace Bennett.AbroadAdvisor.Models
         [DataType(DataType.PhoneNumber)]
         public string PhoneNumber { get; set; }
 
-        [StringLength(32)]
-        [Display(Name = "Cell Phone #")]
-        [DataType(DataType.PhoneNumber)]
-        public string CellPhoneNumber { get; set; }
-
         [Range(1900, 3000)]
         [Display(Name = "Graduating Year")]
         public int? GraduatingYear { get; set; }
-
-        [Range(0, 3)]
-        [Display(Name = "Classification")]
-        public int? Classification { get; set; }
 
         [StringLength(32)]
         [Display(Name = "Student ID")]
