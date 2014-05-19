@@ -5,7 +5,6 @@ ALTER TABLE students DROP COLUMN state;
 ALTER TABLE students DROP COLUMN postal_code;
 ALTER TABLE students DROP COLUMN cell_phone_number;
 ALTER TABLE students DROP COLUMN entering_year;
-ALTER TABLE students DROP COLUMN classification;
 
 
 CREATE TABLE student_studied_languages (
