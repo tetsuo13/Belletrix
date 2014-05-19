@@ -99,11 +99,11 @@
                         <td>
                             @if (Request.Browser.CanInitiateVoiceCall)
                             {
-                                <a href="tel:@student.CellPhoneNumber">@(Formatter.PhoneNumber(student.CellPhoneNumber))</a>
+                                <a href="tel:@student.PhoneNumber">@(Formatter.PhoneNumber(student.PhoneNumber))</a>
                             }
                             else
                             {
-                                @(Formatter.PhoneNumber(student.CellPhoneNumber))
+                                @(Formatter.PhoneNumber(student.PhoneNumber))
                             }
                         </td>
                         <td>
