@@ -48,6 +48,10 @@ namespace Bennett.AbroadAdvisor.Models
         [Display(Name = "Graduating Year")]
         public int? GraduatingYear { get; set; }
 
+        [Range(0, 3)]
+        [Display(Name = "Classification")]
+        public int? Classification { get; set; }
+
         [StringLength(32)]
         [Display(Name = "Student ID")]
         public string StudentId { get; set; }
@@ -209,6 +213,11 @@ namespace Bennett.AbroadAdvisor.Models
             if (!String.IsNullOrWhiteSpace(PhoneNumber))
             {
                 AddParameter(sql, "phone_number", NpgsqlTypes.NpgsqlDbType.Varchar, PhoneNumber.Trim(), 32);
+            }
+
+            if (Classification.HasValue)
+            {
+                AddParameter(sql, "classification", NpgsqlTypes.NpgsqlDbType.Integer, Classification.Value, 0);
             }
 
             if (GraduatingYear.HasValue)

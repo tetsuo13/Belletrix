@@ -8,6 +8,10 @@ namespace Bennett.AbroadAdvisor.Models
     /// <summary>
     /// Student model related to promos.
     /// </summary>
+    /// <remarks>
+    /// Some of the fields are copied from the base class just to provide a
+    /// different display name than the base class defines.
+    /// </remarks>
     public class StudentPromoModel : StudentBaseModel, IStudentModel
     {
         [Display(Name = "Are you a Pell Grant Recipient?")]
