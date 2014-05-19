@@ -151,19 +151,16 @@
                     </address>
 
                     <address>                       
-                        @if (!String.IsNullOrEmpty(Model.PhoneNumber) || !String.IsNullOrEmpty(Model.CellPhoneNumber))
+                        @if (!String.IsNullOrEmpty(Model.PhoneNumber))
                         {
-                            if (!String.IsNullOrEmpty(Model.PhoneNumber))
+                            <abbr title="Phone">P:</abbr>
+                            if (Request.Browser.CanInitiateVoiceCall)
                             {
-                                <abbr title="Phone">P:</abbr>
-                                if (Request.Browser.CanInitiateVoiceCall)
-                                {
-                                    <a href="tel:@Model.PhoneNumber">@Formatter.PhoneNumber(Model.PhoneNumber)</a>
-                                }
-                                else
-                                {
-                                    @Formatter.PhoneNumber(Model.PhoneNumber)
-                                }
+                                <a href="tel:@Model.PhoneNumber">@Formatter.PhoneNumber(Model.PhoneNumber)</a>
+                            }
+                            else
+                            {
+                                @Formatter.PhoneNumber(Model.PhoneNumber)
                             }
                         }
                     </address>
