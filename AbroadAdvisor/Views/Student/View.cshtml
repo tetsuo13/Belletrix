@@ -165,22 +165,6 @@
                                     @Formatter.PhoneNumber(Model.PhoneNumber)
                                 }
                             }
-                            if (!string.IsNullOrEmpty(Model.PhoneNumber) && !String.IsNullOrEmpty(Model.CellPhoneNumber))
-                            {
-                                    <br />
-                            }
-                            if (!String.IsNullOrEmpty(Model.CellPhoneNumber))
-                            {
-                                <abbr title="Cell">C:</abbr>
-                                if (Request.Browser.CanInitiateVoiceCall)
-                                {
-                                    <a href="tel:@Model.CellPhoneNumber">@Formatter.PhoneNumber(Model.CellPhoneNumber)</a>
-                                }
-                                else
-                                {
-                                    @Formatter.PhoneNumber(Model.CellPhoneNumber)
-                                }
-                            }
                         }
                     </address>
                 </div>
