@@ -20,7 +20,7 @@ namespace Bennett.AbroadAdvisor.Controllers
         {
             Analytics.TrackPageView(Request, "Student List", (Session["User"] as UserModel).Login);
             PrepareDropDowns();
-            return View(StudentModel.GetStudents(null));
+            return View(StudentModel.GetStudents());
         }
 
         [HttpPost]
@@ -39,9 +39,13 @@ namespace Bennett.AbroadAdvisor.Controllers
 
         public ActionResult View(int id)
         {
-            List<StudentModel> student = StudentModel.GetStudents(id);
+            StudentModel student;
 
-            if (student.Count == 0)
+            try
+            {
+                student = StudentModel.GetStudent(id);
+            }
+            catch (Exception)
             {
                 return HttpNotFound();
             }
@@ -51,7 +55,7 @@ namespace Bennett.AbroadAdvisor.Controllers
             PrepareDropDowns();
             PrepareStudyAbroadDropDowns();
             Analytics.TrackPageView(Request, "Student", (Session["User"] as UserModel).Login);
-            return View(student[0]);
+            return View(student);
         }
 
         public ActionResult Edit(int? id)
@@ -61,16 +65,20 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            List<StudentModel> student = StudentModel.GetStudents(id.Value);
+            StudentModel student;
 
-            if (student.Count == 0)
+            try
+            {
+                student = StudentModel.GetStudent(id.Value);
+            }
+            catch (Exception)
             {
                 return HttpNotFound();
             }
 
             PrepareDropDowns();
             Analytics.TrackPageView(Request, "Student Edit", (Session["User"] as UserModel).Login);
-            return View(student[0]);
+            return View(student);
         }
 
         [HttpPost]
@@ -81,7 +89,7 @@ namespace Bennett.AbroadAdvisor.Controllers
 
             if (ModelState.IsValid)
             {
-                model.SaveChanges((Session["User"] as UserModel).Id);
+                model.SaveChanges(Session["User"] as UserModel);
                 return RedirectToAction("List");
             }
 
@@ -105,7 +113,7 @@ namespace Bennett.AbroadAdvisor.Controllers
 
             if (ModelState.IsValid)
             {
-                model.Save((Session["User"] as UserModel).Id);
+                model.Save(Session["User"] as UserModel);
                 return RedirectToAction("List");
             }
 
@@ -146,17 +154,15 @@ namespace Bennett.AbroadAdvisor.Controllers
 
         private void PrepareDropDowns()
         {
-            List<object> years = Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 7))
+            IEnumerable<object> years = Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 7))
                 .Reverse()
-                .Select(i => new { Id = i, Name = i.ToString() })
-                .ToList<object>();
+                .Select(i => new { Id = i, Name = i.ToString() });
 
-            List<CountryModel> countries = CountryModel.GetCountries();
+            IEnumerable<CountryModel> countries = CountryModel.GetCountries();
 
             ViewBag.Countries = new SelectList(countries, "Id", "Name");
             ViewBag.Languages = LanguageModel.GetLanguages();
 
-            ViewBag.EnteringYears = new SelectList(Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 2)).Reverse());
             ViewBag.GraduatingYears = new SelectList(years, "Id", "Name");
             ViewBag.GraduatingYearsAsEnumerable = years;
             ViewBag.Classifications = new SelectList(StudentClassificationModel.GetClassifications(), "Id", "Name");
@@ -164,7 +170,7 @@ namespace Bennett.AbroadAdvisor.Controllers
             ViewBag.AvailableMajors = MajorsModel.GetMajors();
             ViewBag.AvailableMinors = MinorsModel.GetMinors();
 
-            List<object> studyYears = new List<object>(years);
+            IList<object> studyYears = new List<object>(years);
             studyYears.Insert(0, new { Id = 1, Name = "Any Year" });
 
             ViewBag.StudyAbroadYears = new SelectList(studyYears, "Id", "Name");

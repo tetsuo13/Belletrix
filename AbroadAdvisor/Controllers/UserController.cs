@@ -24,6 +24,8 @@ namespace Bennett.AbroadAdvisor.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login(LoginModel model, string returnUrl)
         {
+            string mainError = "Invalid login credentials";
+
             if (ModelState.IsValid)
             {
                 try
@@ -49,13 +51,14 @@ namespace Bennett.AbroadAdvisor.Controllers
                         return RedirectToAction("Index", "Home");
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    mainError = e.Message;
                 }
             }
 
             Analytics.TrackPageView(Request, "AbroadAdvisor", null);
-            ModelState.AddModelError("", "Invalid login credentials");
+            ModelState.AddModelError("", mainError);
             return View(model);
         }
 

@@ -99,11 +99,11 @@
                         <td>
                             @if (Request.Browser.CanInitiateVoiceCall)
                             {
-                                <a href="tel:@student.CellPhoneNumber">@(Formatter.PhoneNumber(student.CellPhoneNumber))</a>
+                                <a href="tel:@student.PhoneNumber">@(Formatter.PhoneNumber(student.PhoneNumber))</a>
                             }
                             else
                             {
-                                @(Formatter.PhoneNumber(student.CellPhoneNumber))
+                                @(Formatter.PhoneNumber(student.PhoneNumber))
                             }
                         </td>
                         <td>
@@ -126,6 +126,19 @@
             </tbody>
         </table>
     </div>
+
+    @if (Request.HttpMethod == "POST" && Model.Count > 0)
+    {
+        List<string> emailableStudents = Model
+            .Where(s => !String.IsNullOrEmpty(s.CampusEmail))
+            .Select(s => s.FirstName + "%20" + s.LastName + "%20<" + s.CampusEmail + ">")
+            .ToList();
+
+        if (emailableStudents.Count > 0)
+        {
+            <a href="mailto:@String.Join(";", emailableStudents)">Send email to student list</a>
+        }
+    }
 
     @* Student notes modal inserted here by Bootstrap JS. *@
     <div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>

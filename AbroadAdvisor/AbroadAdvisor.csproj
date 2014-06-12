@@ -141,11 +141,14 @@
     <Compile Include="Controllers\ExperienceController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\NoteController.cs" />
+    <Compile Include="Controllers\PromoController.cs" />
     <Compile Include="Controllers\StudentController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\IStudentModel.cs" />
+    <Compile Include="Models\StudentBaseModel.cs" />
     <Compile Include="Models\CountryModel.cs" />
     <Compile Include="Models\EventLogModel.cs" />
     <Compile Include="Models\LanguageModel.cs" />
@@ -157,12 +160,15 @@
     <Compile Include="Models\PingModel.cs" />
     <Compile Include="Models\ProgramModel.cs" />
     <Compile Include="Models\ProgramTypeModel.cs" />
+    <Compile Include="Models\PromoModel.cs" />
     <Compile Include="Models\StudentClassificationModel.cs" />
     <Compile Include="Models\StudentModel.cs" />
+    <Compile Include="Models\StudentPromoModel.cs" />
     <Compile Include="Models\StudentSearchModel.cs" />
     <Compile Include="Models\StudentStudyAbroadWishlistModel.cs" />
     <Compile Include="Models\StudyAbroadModel.cs" />
     <Compile Include="Models\UserModel.cs" />
+    <Compile Include="Models\StudentPromoLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +184,7 @@
     <Content Include="Content\fonts\fontawesome-webfont.svg" />
     <Content Include="Content\css\sb-admin.css" />
     <Content Include="Global.asax" />
+    <Content Include="Scripts\AbroadAdvisor.Promo.js" />
     <Content Include="Scripts\AbroadAdvisor.Student.js" />
     <None Include="Scripts\jquery-2.0.3.intellisense.js" />
     <Content Include="Scripts\AbroadAdvisor.js" />
@@ -211,6 +218,13 @@
     <Content Include="Views\Experience\List.cshtml" />
     <Content Include="Views\Experience\Add.cshtml" />
     <Content Include="Views\Home\Robots.cshtml" />
+    <Content Include="Views\Promo\List.cshtml" />
+    <Content Include="Views\Promo\Add.cshtml" />
+    <Content Include="Views\Promo\Info.cshtml" />
+    <Content Include="Views\Promo\Entry.cshtml" />
+    <Content Include="Views\Promo\Form.cshtml" />
+    <Content Include="Views\Promo\Success.cshtml" />
+    <Content Include="Views\Shared\_PromoLayout.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -41,6 +41,7 @@
     <Compile Include="ApplicationCache.cs" />
     <Compile Include="Connections.cs" />
     <Compile Include="DateTimeFilter.cs" />
+    <Compile Include="DeploymentEnvironment.cs" />
     <Compile Include="Formatter.cs" />
     <Compile Include="ICacheService.cs" />
     <Compile Include="PasswordHash.cs" />

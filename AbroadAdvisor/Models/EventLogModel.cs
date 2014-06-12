@@ -31,13 +31,18 @@ namespace Bennett.AbroadAdvisor.Models
 
         public UserModel ModifiedBy { get; set; }
 
-        public StudentModel Student { get; set; }
+        public StudentBaseModel Student { get; set; }
 
         public UserModel User { get; set; }
 
         public string RelativeDate { get; set; }
 
-        public static List<EventLogModel> GetEvents()
+        public EventLogModel()
+        {
+            EventDate = DateTime.Now;
+        }
+
+        public static IEnumerable<EventLogModel> GetEvents()
         {
             ApplicationCache cacheProvider = new ApplicationCache();
             List<EventLogModel> events = cacheProvider.Get(CacheId, () => new List<EventLogModel>());
@@ -123,7 +128,7 @@ namespace Bennett.AbroadAdvisor.Models
                                     Action = action
                                 };
 
-                                eventLog.RelativeDate = CalculateRelativeDate(eventLog.EventDate.ToUniversalTime());
+                                //eventLog.RelativeDate = CalculateRelativeDate(eventLog.EventDate.ToUniversalTime());
 
                                 events.Add(eventLog);
                             }
@@ -153,7 +158,7 @@ namespace Bennett.AbroadAdvisor.Models
             const int Day = 24 * Hour;
             const int Month = 30 * Day;
 
-            TimeSpan ts = new TimeSpan(DateTime.UtcNow.Ticks - date.Ticks);
+            TimeSpan ts = new TimeSpan(DateTime.UtcNow.Ticks - date.ToUniversalTime().Ticks);
             double delta = Math.Abs(ts.TotalSeconds);
 
             if (delta < 0)
@@ -198,6 +203,11 @@ namespace Bennett.AbroadAdvisor.Models
             return years <= 1 ? "one year ago" : years + " years ago";
         }
 
+        public void AddStudentEvent(NpgsqlConnection connection, int studentId, EventType eventType)
+        {
+            AddStudentEvent(connection, 0, studentId, eventType);
+        }
+
         public void AddStudentEvent(NpgsqlConnection connection, int modifiedBy, int studentId, EventType eventType)
         {
             connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
@@ -215,15 +225,26 @@ namespace Bennett.AbroadAdvisor.Models
                     )";
 
                 command.Parameters.Add("@Date", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
-                command.Parameters.Add("@ModifiedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = modifiedBy;
                 command.Parameters.Add("@Type", NpgsqlTypes.NpgsqlDbType.Integer).Value = (int)eventType;
                 command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+
+                if (modifiedBy == 0)
+                {
+                    command.Parameters.Add("@ModifiedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = DBNull.Value;
+                }
+                else
+                {
+                    command.Parameters.Add("@ModifiedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = modifiedBy;
+                }
 
                 command.ExecuteNonQuery();
 
                 ApplicationCache cacheProvider = new ApplicationCache();
                 List<EventLogModel> events = cacheProvider.Get(CacheId, () => new List<EventLogModel>());
-                events.Add(this);
+                
+                // Make this event the newest.
+                events.Insert(0, this);
+
                 cacheProvider.Set(CacheId, events);
             }
         }

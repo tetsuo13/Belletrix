@@ -1,9 +1,17 @@
-﻿@using Bennett.AbroadAdvisor.Models;
+﻿@using Bennett.AbroadAdvisor.Core;
+@using Bennett.AbroadAdvisor.Models;
 
 @{
     Layout = null;
     string siteTitle = "AbroadAdvisor";
     string pageTitle = siteTitle;
+    bool developmentEnvironment = DeploymentEnvironment.IsDevelopment;
+    
+    if (developmentEnvironment)
+    {
+        pageTitle += " (Debug)";
+    }
+    
     UserModel user = Session["User"] as UserModel;
 }
 
@@ -40,6 +48,7 @@
                     <li @if (ViewBag.ActivePage == "dashboard") { <text>class="active"</text> }><a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i> Dashboard</a></li>
                     <li @if (ViewBag.ActivePage == "students") { <text>class="active"</text> }><a href="@Url.Action("List", "Student")"><i class="fa fa-table"></i> Students</a></li>
                     <li @if (ViewBag.ActivePage == "experiences") { <text>class="active"</text> }><a href="@Url.Action("List", "Experience")"><i class="fa fa-plane"></i> Experiences</a></li>
+                    <li @if (ViewBag.ActivePage == "promos") { <text> class="active" </text>  }><a href="@Url.Action("List", "Promo")"><i class="fa fa-certificate"></i> Promos</a></li>
                     @*<li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-plane"></i> Experience <b class="caret"></b></a>
                         <ul class="dropdown-menu">

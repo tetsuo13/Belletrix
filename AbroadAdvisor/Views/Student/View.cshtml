@@ -150,49 +150,17 @@
                         }
                     </address>
 
-                    <address>
-                        @if (!String.IsNullOrEmpty(Model.StreetAddress))
+                    <address>                       
+                        @if (!String.IsNullOrEmpty(Model.PhoneNumber))
                         {
-                            @Model.StreetAddress
-                            if (!String.IsNullOrEmpty(Model.StreetAddress2))
+                            <abbr title="Phone">P:</abbr>
+                            if (Request.Browser.CanInitiateVoiceCall)
                             {
-                                <br />
-                                @Model.StreetAddress2
+                                <a href="tel:@Model.PhoneNumber">@Formatter.PhoneNumber(Model.PhoneNumber)</a>
                             }
-                            <br />
-                            @Model.City@:, @Model.State @Model.PostalCode
-                        }
-                        
-                        @if (!String.IsNullOrEmpty(Model.PhoneNumber) || !String.IsNullOrEmpty(Model.CellPhoneNumber))
-                        {
-                            <br />
-                            if (!String.IsNullOrEmpty(Model.PhoneNumber))
+                            else
                             {
-                                <abbr title="Phone">P:</abbr>
-                                if (Request.Browser.CanInitiateVoiceCall)
-                                {
-                                    <a href="tel:@Model.PhoneNumber">@Formatter.PhoneNumber(Model.PhoneNumber)</a>
-                                }
-                                else
-                                {
-                                    @Formatter.PhoneNumber(Model.PhoneNumber)
-                                }
-                            }
-                            if (!string.IsNullOrEmpty(Model.PhoneNumber) && !String.IsNullOrEmpty(Model.CellPhoneNumber))
-                            {
-                                    <br />
-                            }
-                            if (!String.IsNullOrEmpty(Model.CellPhoneNumber))
-                            {
-                                <abbr title="Cell">C:</abbr>
-                                if (Request.Browser.CanInitiateVoiceCall)
-                                {
-                                    <a href="tel:@Model.CellPhoneNumber">@Formatter.PhoneNumber(Model.CellPhoneNumber)</a>
-                                }
-                                else
-                                {
-                                    @Formatter.PhoneNumber(Model.CellPhoneNumber)
-                                }
+                                @Formatter.PhoneNumber(Model.PhoneNumber)
                             }
                         }
                     </address>

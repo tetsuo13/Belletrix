@@ -17,13 +17,14 @@
                         {
                             string action = String.Empty;
                             string personName = eventLog.Student.FirstName + " " + eventLog.Student.LastName;
+                            bool modifiedByRealUser = eventLog.ModifiedBy != null;
                             string iconClass = String.Empty;
                             
                             switch (eventLog.Type)
                             {
                                 case (int)EventLogModel.EventType.AddStudent:
                                     action = "added";
-                                    iconClass = "fa fa-user";
+                                    iconClass = modifiedByRealUser ? "fa fa-user" : "fa fa-certificate";
                                     break;
                                     
                                 case (int)EventLogModel.EventType.EditStudent:
@@ -41,10 +42,12 @@
                                     iconClass = "fa fa-comment";
                                     break;
                             }
+
+                            string eventBy = !modifiedByRealUser ? "System" : eventLog.ModifiedBy.FirstName;
                             
                             <a href="#" class="list-group-item">
-                                <span class="badge" title="@eventLog.EventDate.ToString("dddd, MMMM d, yyyy \\a\\t h:mm tt")">@eventLog.RelativeDate</span>
-                                <i class="@iconClass"></i> @eventLog.ModifiedBy.FirstName @action @personName
+                                <span class="badge" title="@eventLog.EventDate.ToString("dddd, MMMM d, yyyy \\a\\t h:mm tt")">@EventLogModel.CalculateRelativeDate(eventLog.EventDate)</span>
+                                <i class="@iconClass"></i> @eventBy @action @personName
                             </a>
                         }
                         @*

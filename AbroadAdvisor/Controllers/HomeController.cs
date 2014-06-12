@@ -18,7 +18,9 @@ namespace Bennett.AbroadAdvisor.Controllers
         /// <summary>
         /// Function that does nothing.
         /// </summary>
+        /// <remarks>Promotions use this too. Keep anonymous.</remarks>
         /// <returns>Some text.</returns>
+        [AllowAnonymous]
         [HttpGet]
         public string Ping()
         {

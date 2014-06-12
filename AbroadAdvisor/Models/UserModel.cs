@@ -141,11 +141,26 @@ namespace Bennett.AbroadAdvisor.Models
 
         public static UserModel GetUser(string username)
         {
-            List<UserModel> users = UserModel.GetUsers(username);
+            IList<UserModel> users = UserModel.GetUsers(username);
             
             if (users.Count == 1)
             {
                 return users[0];
+            }
+
+            throw new Exception("User not found");
+        }
+
+        public static UserModel GetUser(int id)
+        {
+            IEnumerable<UserModel> users = UserModel.GetUsers();
+
+            foreach (UserModel user in users)
+            {
+                if (user.Id == id)
+                {
+                    return user;
+                }
             }
 
             throw new Exception("User not found");

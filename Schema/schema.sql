@@ -395,19 +395,10 @@ initial_meeting         DATE,
 first_name              VARCHAR(64) NOT NULL,
 middle_name             VARCHAR(64),
 last_name               VARCHAR(64) NOT NULL,
-living_on_campus        BOOLEAN,
-street_address          VARCHAR(128),
-street_address2         VARCHAR(128),
-city                    VARCHAR(128),
-state                   VARCHAR(32),
-postal_code             VARCHAR(16),
-phone_number            VARCHAR(32),
-cell_phone_number       VARCHAR(32),
-entering_year           INT,
-graduating_year         INT,
 classification          INT,
 student_id              VARCHAR(32),
-dob                     DATE,
+phone_number            VARCHAR(32),
+living_on_campus        BOOLEAN,
 enrolled_full_time      BOOLEAN,
 citizenship             INTEGER,
 pell_grant_recipient    BOOLEAN,
@@ -416,15 +407,15 @@ phi_beta_delta_member   BOOLEAN,
 gpa                     DECIMAL(3,2),
 campus_email            VARCHAR(128),
 alternate_email         VARCHAR(128),
+graduating_year         INT,
+dob                     DATE,
 
 PRIMARY KEY (id),
 FOREIGN KEY (citizenship) REFERENCES countries (id)
 );
 
 COMMENT ON TABLE students IS 'Student master';
-COMMENT ON COLUMN students.entering_year IS 'Year that student started at the institution';
 COMMENT ON COLUMN students.graduating_year IS 'Year that student will be or has already graduated';
-COMMENT ON COLUMN students.classification IS '0 - 3, for freshmen up to senior';
 
 GRANT ALL PRIVILEGES ON students TO neoanime_abroadadvisor;
 GRANT ALL PRIVILEGES ON students_id_seq TO neoanime_abroadadvisor;
@@ -469,11 +460,10 @@ GRANT ALL PRIVILEGES ON matriculation TO neoanime_abroadadvisor;
 
 CREATE TABLE student_study_abroad_wishlist (
 student_id  INT NOT NULL,
-country_id  INT NOT NULL,
-year        INT NOT NULL,
-period      INT NOT NULL,
+country_id  INT,
+year        INT,
+period      INT,
 
-PRIMARY KEY (student_id, country_id, year, period),
 FOREIGN KEY (student_id) REFERENCES students (id),
 FOREIGN KEY (country_id) REFERENCES countries (id)
 );
@@ -483,6 +473,8 @@ COMMENT ON COLUMN student_study_abroad_wishlist.student_id IS 'Student ID';
 COMMENT ON COLUMN student_study_abroad_wishlist.country_id IS 'Country ID';
 COMMENT ON COLUMN student_study_abroad_wishlist.year IS 'Desired four digit year';
 COMMENT ON COLUMN student_study_abroad_wishlist.period IS 'One of StudentStudyAbroadWishlistModel.PeriodValue';
+
+CREATE INDEX student_study_abroad_wishlist_idx1 ON student_study_abroad_wishlist (student_id);
 
 GRANT ALL PRIVILEGES ON student_study_abroad_wishlist TO neoanime_abroadadvisor;
 
@@ -526,6 +518,30 @@ VALUES
 ('Andrei', 'Nicholson', 'anicholson', 1000, 'og85e2R6TvXl+8SuOqv3EWTc7eWX3aje', 'RzfdfsXpQQTg1E+n3wnLMEZbjJoEkqEf', NOW(), 'contact@andreinicholson.com', TRUE);
 
 
+CREATE TABLE user_promo (
+id              SERIAL,
+description     VARCHAR(256) NOT NULL,
+created_by      INT NOT NULL,
+created         TIMESTAMP NOT NULL,
+code            VARCHAR(32) NOT NULL,
+active          BOOLEAN NOT NULL DEFAULT TRUE,
+
+PRIMARY KEY (id),
+UNIQUE (code),
+FOREIGN KEY (created_by) REFERENCES users (id)
+);
+
+COMMENT ON TABLE user_promo IS 'Promotional users attached to student entries';
+COMMENT ON COLUMN user_promo.description IS 'Helper description';
+COMMENT ON COLUMN user_promo.created_by IS 'User that created the promo';
+COMMENT ON COLUMN user_promo.created IS 'Date and time that the promo was created';
+COMMENT ON COLUMN user_promo.code IS 'Unique promo code used to log enter the public portion of the site for the student entry forms';
+COMMENT ON COLUMN user_promo.active IS 'Whether the promo can still be used';
+
+GRANT ALL PRIVILEGES ON user_promo TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON user_promo_id_seq TO neoanime_abroadadvisor;
+
+
 CREATE TABLE student_notes (
 id          SERIAL,
 student_id  INT NOT NULL,
@@ -550,7 +566,7 @@ GRANT ALL PRIVILEGES ON student_notes_id_seq TO neoanime_abroadadvisor;
 CREATE TABLE event_log (
 id          SERIAL,
 date        TIMESTAMP NOT NULL,
-modified_by INT NOT NULL,
+modified_by INT,
 student_id  INT,
 user_id     INT,
 type        INT NOT NULL,
@@ -563,9 +579,26 @@ FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 COMMENT ON TABLE event_log IS 'Application event logging table';
+COMMENT ON COLUMN event_log.modified_by IS 'User ID who initiated the event. May be NULL to indicate promos or system events.';
+COMMENT ON COLUMN event_log.student_id IS 'Student ID that was modified';
+COMMENT ON COLUMN event_log.user_id IS 'User ID that was modified';
 
 GRANT ALL PRIVILEGES ON event_log TO neoanime_abroadadvisor;
 GRANT ALL PRIVILEGES ON event_log_id_seq TO neoanime_abroadadvisor;
+
+
+CREATE TABLE student_promo_log (
+promo_id    INT NOT NULL,
+student_id  INT NOT NULL,
+
+PRIMARY KEY (promo_id, student_id),
+FOREIGN KEY (promo_id) REFERENCES user_promo (id),
+FOREIGN KEY (student_id) REFERENCES students (id)
+);
+
+COMMENT ON TABLE student_promo_log IS 'Students created through ptomos';
+
+GRANT ALL PRIVILEGES ON student_promo_log TO neoanime_abroadadvisor;
 
 
 CREATE TABLE programs (
@@ -675,3 +708,5 @@ FOREIGN KEY (program_type_id) REFERENCES program_types (id)
 );
 
 GRANT ALL PRIVILEGES ON study_abroad_program_types TO neoanime_abroadadvisor;
+
+

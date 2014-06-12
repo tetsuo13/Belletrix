@@ -44,12 +44,8 @@
 	Student.initStudentAddEdit = function () {
 		/// <summary>Initialize student add/edit page.</summary>
 
-		$('.multiselect').multiselect({
-			numberDisplayed: 1,
-			buttonContainer: '<div class="button-default" />'
-		});
-
-		$('input[type=date], input[type=email]').addClass('form-control');
+	    Bennett.AbroadAdvisor.initMultiselect(1);
+	    Bennett.AbroadAdvisor.handleMvcEditor();
 
 		$('a#studyAbroadDestinations').click(function (e) {
 			e.preventDefault();
@@ -78,12 +74,7 @@
 	    $('.collapse').collapse();
 
 	    setupNoteModal();
-
-	    $('.multiselect').multiselect({
-	        numberDisplayed: 0,
-	        buttonContainer: '<div class="button-default" />',
-	        maxHeight: 300
-	    });
+	    Bennett.AbroadAdvisor.initMultiselect(0, 300);
 	};
 
 	Student.addStudyAbroadRows = function (countries, years, periods) {
@@ -98,10 +89,10 @@
 		/// <param name="periods" type="Array" elementType="Number" optional="true"></param>
 
 		var destinationFieldNames = {
-			'StudyAbroadCountry': countries,
-			'StudyAbroadYear': years,
-			'StudyAbroadPeriod': periods
-		},
+			    'StudyAbroadCountry': countries,
+			    'StudyAbroadYear': years,
+			    'StudyAbroadPeriod': periods
+		    },
             addExistingValues = countries !== undefined && years !== undefined && periods !== undefined,
             i;
 
@@ -141,7 +132,7 @@
 		/// Index to select
 		/// </param>
 
-		var rowId = (Math.random() + 1).toString(36).slice(2),
+	    var rowId = Bennett.AbroadAdvisor.randomString(),
             enclosure,
             anchor;
 
