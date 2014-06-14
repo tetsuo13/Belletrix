@@ -98,7 +98,7 @@ namespace Bennett.AbroadAdvisor.Models
 
                     using (NpgsqlCommand command = connection.CreateCommand())
                     {
-                        StringBuilder sql = new StringBuilder(@"
+                        command.CommandText = @"
                             SELECT              s.id, s.created, s.initial_meeting,
                                                 s.first_name, s.middle_name, s.last_name,
                                                 s.living_on_campus, s.phone_number, s.student_id,
@@ -117,9 +117,8 @@ namespace Bennett.AbroadAdvisor.Models
                                                 s.pell_grant_recipient, s.passport_holder, s.gpa,
                                                 s.campus_email, s.alternate_email, s.graduating_year,
                                                 s.classification
-                            ORDER BY            s.last_name, s.first_name");
+                            ORDER BY            s.last_name, s.first_name";
 
-                        command.CommandText = sql.ToString();
                         connection.Open();
 
                         using (NpgsqlDataReader reader = command.ExecuteReader())
