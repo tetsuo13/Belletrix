@@ -169,7 +169,17 @@ namespace Bennett.AbroadAdvisor.Models
                     students.Add(student.Id, student);
                 }
 
-                cacheProvider.Set(CacheId, students);
+                // Don't accidentally cache the one student requested as a
+                // representation of all available students.
+                if (!id.HasValue)
+                {
+                    cacheProvider.Set(CacheId, students);
+                }
+            }
+
+            if (id.HasValue)
+            {
+                return students.Where(x => x.Value.Id == id.Value).Select(x => x.Value).ToList();
             }
 
             return students.Select(x => x.Value).ToList();
