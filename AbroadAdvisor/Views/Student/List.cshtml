@@ -86,6 +86,21 @@
             <tbody>
                 @foreach (var student in Model)
                 {
+                    string noteTooltip = "Add Notes";
+                    string noteIcon = "fa fa-book";
+                    
+                    if (student.NumberOfNotes > 0)
+                    {
+                        noteTooltip = student.NumberOfNotes.ToString("N0") + " Note";
+                        
+                        if (student.NumberOfNotes > 1)
+                        {
+                            noteTooltip += "s";
+                        }
+                        
+                        noteIcon += " highlight-icon";
+                    }
+                    
                     <tr>
                         <td>
                             <a href="@Url.Action("View", "Student", new { id = student.Id })">@student.LastName, @student.FirstName @student.MiddleName</a>
@@ -112,7 +127,7 @@
                                     <a href="@Url.Action("List", "Note", new { studentId = student.Id })"
                                        data-toggle="modal" data-target="#noteModal"
                                        class="studentlisttooltop studentlistmodel" data-placement="top"
-                                       title="Notes"><i class="fa fa-book"></i></a>
+                                       title="@noteTooltip"><i class="@noteIcon"></i></a>
                                 </li>
                                 <li>
                                     <a href="@Url.Action("Edit", "Student", new { id = student.Id })"

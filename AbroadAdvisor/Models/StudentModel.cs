@@ -16,6 +16,8 @@ namespace Bennett.AbroadAdvisor.Models
         [Display(Name = "Phi Beta Delta?")]
         public bool? PhiBetaDeltaMember { get; set; }
 
+        public int NumberOfNotes { get; set; }
+
         public void SaveChanges(UserModel user)
         {
             StringBuilder sql = new StringBuilder("UPDATE students SET ");
@@ -85,6 +87,7 @@ namespace Bennett.AbroadAdvisor.Models
             ApplicationCache cacheProvider = new ApplicationCache();
             IDictionary<int, StudentModel> students = cacheProvider.Get(CacheId, () => new Dictionary<int, StudentModel>());
 
+            // Select all students by default so they're cached.
             if (students.Count == 0)
             {
                 IList<StudentModel> studentList = new List<StudentModel>();
@@ -96,16 +99,25 @@ namespace Bennett.AbroadAdvisor.Models
                     using (NpgsqlCommand command = connection.CreateCommand())
                     {
                         StringBuilder sql = new StringBuilder(@"
-                            SELECT  *
-                            FROM    students ");
-
-                        if (id.HasValue)
-                        {
-                            sql.Append("WHERE id = @Id ");
-                            command.Parameters.Add("@Id", NpgsqlTypes.NpgsqlDbType.Integer).Value = id.Value;
-                        }
-
-                        sql.Append("ORDER BY last_name, first_name");
+                            SELECT              s.id, s.created, s.initial_meeting,
+                                                s.first_name, s.middle_name, s.last_name,
+                                                s.living_on_campus, s.phone_number, s.student_id,
+                                                s.dob, s.enrolled_full_time, s.citizenship,
+                                                s.pell_grant_recipient, s.passport_holder, s.gpa,
+                                                s.campus_email, s.alternate_email, s.graduating_year,
+                                                s.classification,
+                                                COUNT(n.id) AS num_notes
+                            FROM                students s
+                            LEFT OUTER JOIN     student_notes n ON
+                                                s.id = n.student_id
+                            GROUP BY            s.id, s.created, s.initial_meeting,
+                                                s.first_name, s.middle_name, s.last_name,
+                                                s.living_on_campus, s.phone_number, s.student_id,
+                                                s.dob, s.enrolled_full_time, s.citizenship,
+                                                s.pell_grant_recipient, s.passport_holder, s.gpa,
+                                                s.campus_email, s.alternate_email, s.graduating_year,
+                                                s.classification
+                            ORDER BY            s.last_name, s.first_name");
 
                         command.CommandText = sql.ToString();
                         connection.Open();
@@ -133,6 +145,7 @@ namespace Bennett.AbroadAdvisor.Models
                                 student.CampusEmail = StringOrDefault(reader, "campus_email");
                                 student.AlternateEmail = StringOrDefault(reader, "alternate_email");
                                 student.Created = reader.GetDateTime(reader.GetOrdinal("created"));
+                                student.NumberOfNotes = (int)reader.GetInt64(reader.GetOrdinal("num_notes"));
 
                                 int ord = reader.GetOrdinal("gpa");
                                 if (!reader.IsDBNull(ord))
@@ -169,12 +182,7 @@ namespace Bennett.AbroadAdvisor.Models
                     students.Add(student.Id, student);
                 }
 
-                // Don't accidentally cache the one student requested as a
-                // representation of all available students.
-                if (!id.HasValue)
-                {
-                    cacheProvider.Set(CacheId, students);
-                }
+                cacheProvider.Set(CacheId, students);
             }
 
             if (id.HasValue)
