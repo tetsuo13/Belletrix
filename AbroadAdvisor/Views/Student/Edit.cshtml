@@ -213,21 +213,6 @@
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <div class="form-group">
-                                            @Html.LabelFor(s => s.Classification)
-                                            @Html.DropDownListFor(s => s.Classification, ViewBag.Classifications as SelectList, "Please Select", new { @class = "form-control" })
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <div class="form-group">
-                                            @Html.LabelFor(s => s.GraduatingYear)
-                                            @Html.DropDownListFor(s => s.GraduatingYear, ViewBag.GraduatingYears as SelectList, "Please Select", new { @class = "form-control" })
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        <div class="form-group">
                                             @Html.LabelFor(s => s.SelectedMajors)
                                             @Html.ListBoxFor(s => s.SelectedMajors, new MultiSelectList(ViewBag.AvailableMajors, "Id", "Name"), new { @class = "multiselect", multiple = "multiple" })
                                         </div>
@@ -236,6 +221,21 @@
                                         <div class="form-group">
                                             @Html.LabelFor(s => s.SelectedMinors)
                                             @Html.ListBoxFor(s => s.SelectedMinors, new MultiSelectList(ViewBag.AvailableMinors, "Id", "Name"), new { @class = "multiselect", multiple = "multiple" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(s => s.EnteringYear)
+                                            @Html.DropDownListFor(s => s.EnteringYear, ViewBag.EnteringYears as SelectList, "Please Select", new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(s => s.GraduatingYear)
+                                            @Html.DropDownListFor(s => s.GraduatingYear, ViewBag.GraduatingYears as SelectList, "Please Select", new { @class = "form-control" })
                                         </div>
                                     </div>
                                 </div>
@@ -302,7 +302,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-lg-12">
+                                    <div class="col-lg-6">
                                         <div class="form-group">
                                             @Html.LabelFor(s => s.PhiBetaDeltaMember)
                                             @Html.DropDownListFor(s => s.PhiBetaDeltaMember, new SelectList(
@@ -314,6 +314,12 @@
                                                 "Value",
                                                 "Text",
                                                 Model), "Please Select", new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(s => s.Classification)
+                                            @Html.DropDownListFor(s => s.Classification, ViewBag.Classifications as SelectList, "Please Select", new { @class = "form-control" })
                                         </div>
                                     </div>
                                 </div>

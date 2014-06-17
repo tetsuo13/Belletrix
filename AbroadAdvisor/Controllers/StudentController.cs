@@ -163,6 +163,7 @@ namespace Bennett.AbroadAdvisor.Controllers
             ViewBag.Countries = new SelectList(countries, "Id", "Name");
             ViewBag.Languages = LanguageModel.GetLanguages();
 
+            ViewBag.EnteringYears = new SelectList(Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 2)).Reverse());
             ViewBag.GraduatingYears = new SelectList(years, "Id", "Name");
             ViewBag.GraduatingYearsAsEnumerable = years;
             ViewBag.Classifications = new SelectList(StudentClassificationModel.GetClassifications(), "Id", "Name");

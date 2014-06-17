@@ -62,6 +62,10 @@ namespace Bennett.AbroadAdvisor.Models
         public string PhoneNumber { get; set; }
 
         [Range(1900, 3000)]
+        [Display(Name = "Entering Year")]
+        public int? EnteringYear { get; set; }
+
+        [Range(1900, 3000)]
         [Display(Name = "Graduating Year")]
         public int? GraduatingYear { get; set; }
 
@@ -260,6 +264,11 @@ namespace Bennett.AbroadAdvisor.Models
             if (Classification.HasValue)
             {
                 AddParameter(sql, "classification", NpgsqlTypes.NpgsqlDbType.Integer, Classification.Value, 0);
+            }
+
+            if (EnteringYear.HasValue)
+            {
+                AddParameter(sql, "entering_year", NpgsqlTypes.NpgsqlDbType.Integer, EnteringYear.Value, 0);
             }
 
             if (GraduatingYear.HasValue)

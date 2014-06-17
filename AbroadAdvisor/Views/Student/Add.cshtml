@@ -206,8 +206,8 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    @Html.LabelFor(s => s.Classification)
-                                    @Html.DropDownListFor(s => s.Classification, ViewBag.Classifications as SelectList, "Please Select", new { @class = "form-control" })
+                                    @Html.LabelFor(s => s.EnteringYear)
+                                    @Html.DropDownListFor(s => s.EnteringYear, ViewBag.EnteringYears as SelectList, "Please Select", new { @class = "form-control" })
                                 </div>
                             </div>
                             <div class="col-lg-6">
@@ -280,7 +280,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-lg-12">
+                            <div class="col-lg-6">
                                 <div class="form-group">
                                     @Html.LabelFor(s => s.PhiBetaDeltaMember)
                                     @Html.DropDownListFor(s => s.PhiBetaDeltaMember, new SelectList(
@@ -292,6 +292,12 @@
                                         "Value",
                                         "Text",
                                         Model), "Please Select", new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(s => s.Classification)
+                                    @Html.DropDownListFor(s => s.Classification, ViewBag.Classifications as SelectList, "Please Select", new { @class = "form-control" })
                                 </div>
                             </div>
                         </div>

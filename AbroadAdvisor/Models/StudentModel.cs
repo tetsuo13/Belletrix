@@ -107,6 +107,7 @@ namespace Bennett.AbroadAdvisor.Models
                                                 s.campus_email, s.alternate_email, s.graduating_year,
                                                 s.classification, s.street_address, s.street_address2,
                                                 s.city, s.state, s.postal_code,
+                                                s.entering_year,
                                                 COUNT(n.id) AS num_notes
                             FROM                students s
                             LEFT OUTER JOIN     student_notes n ON
@@ -118,7 +119,8 @@ namespace Bennett.AbroadAdvisor.Models
                                                 s.pell_grant_recipient, s.passport_holder, s.gpa,
                                                 s.campus_email, s.alternate_email, s.graduating_year,
                                                 s.classification, s.street_address, s.street_address2,
-                                                s.city, s.state, s.postal_code
+                                                s.city, s.state, s.postal_code,
+                                                s.entering_year
                             ORDER BY            s.last_name, s.first_name";
 
                         connection.Open();
@@ -142,6 +144,7 @@ namespace Bennett.AbroadAdvisor.Models
                                 student.State = StringOrDefault(reader, "state");
                                 student.PostalCode = StringOrDefault(reader, "postal_code");
                                 student.PhoneNumber = StringOrDefault(reader, "phone_number");
+                                student.EnteringYear = IntOrDefault(reader, "entering_year");
                                 student.GraduatingYear = IntOrDefault(reader, "graduating_year");
                                 student.StudentId = StringOrDefault(reader, "student_id");
                                 student.EnrolledFullTime = BoolOrDefault(reader, "enrolled_full_time");
