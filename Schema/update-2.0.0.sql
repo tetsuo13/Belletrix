@@ -1,13 +1,4 @@
-﻿ALTER TABLE students DROP COLUMN street_address;
-ALTER TABLE students DROP COLUMN street_address2;
-ALTER TABLE students DROP COLUMN city;
-ALTER TABLE students DROP COLUMN state;
-ALTER TABLE students DROP COLUMN postal_code;
-ALTER TABLE students DROP COLUMN cell_phone_number;
-ALTER TABLE students DROP COLUMN entering_year;
-
-
-CREATE TABLE student_studied_languages (
+﻿CREATE TABLE student_studied_languages (
 student_id      INT NOT NULL,
 language_id     INT NOT NULL,
 

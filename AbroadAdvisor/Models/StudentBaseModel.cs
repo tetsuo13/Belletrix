@@ -39,6 +39,23 @@ namespace Bennett.AbroadAdvisor.Models
         [Display(Name = "Living")]
         public bool? LivingOnCampus { get; set; }
 
+        [StringLength(128)]
+        [Display(Name = "Local Address")]
+        public string StreetAddress { get; set; }
+
+        [StringLength(128)]
+        public string StreetAddress2 { get; set; }
+
+        [StringLength(128)]
+        public string City { get; set; }
+
+        [StringLength(32)]
+        public string State { get; set; }
+
+        [StringLength(16)]
+        [DataType(DataType.PostalCode)]
+        public string PostalCode { get; set; }
+
         [StringLength(32)]
         [Display(Name = "Telephone #")]
         [DataType(DataType.PhoneNumber)]
@@ -208,6 +225,31 @@ namespace Bennett.AbroadAdvisor.Models
             if (LivingOnCampus.HasValue)
             {
                 AddParameter(sql, "living_on_campus", NpgsqlTypes.NpgsqlDbType.Boolean, LivingOnCampus, 0);
+            }
+
+            if (!String.IsNullOrEmpty(StreetAddress))
+            {
+                AddParameter(sql, "street_address", NpgsqlTypes.NpgsqlDbType.Varchar, StreetAddress, 128);
+            }
+
+            if (!String.IsNullOrEmpty(StreetAddress2))
+            {
+                AddParameter(sql, "street_address2", NpgsqlTypes.NpgsqlDbType.Varchar, StreetAddress2, 128);
+            }
+
+            if (!String.IsNullOrEmpty(City))
+            {
+                AddParameter(sql, "city", NpgsqlTypes.NpgsqlDbType.Varchar, City, 128);
+            }
+
+            if (!String.IsNullOrEmpty(State))
+            {
+                AddParameter(sql, "state", NpgsqlTypes.NpgsqlDbType.Varchar, State, 32);
+            }
+
+            if (!String.IsNullOrEmpty(PostalCode))
+            {
+                AddParameter(sql, "postal_code", NpgsqlTypes.NpgsqlDbType.Varchar, PostalCode, 16);
             }
 
             if (!String.IsNullOrWhiteSpace(PhoneNumber))

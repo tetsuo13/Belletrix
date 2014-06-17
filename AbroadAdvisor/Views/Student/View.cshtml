@@ -131,7 +131,7 @@
         <div class="col-lg-4">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <address>
+                    <div>
                         @if (Model.Classification.HasValue)
                         {
                             @((ViewBag.Classifications as SelectList).Where(c => c.Value == Model.Classification.Value.ToString()).First().Text)
@@ -148,13 +148,38 @@
                             <br />
                             <a href="mailto:@Model.AlternateEmail">@Model.AlternateEmail</a>
                         }
-                    </address>
+                    </div>
 
-                    <address>                       
-                        @if (!String.IsNullOrEmpty(Model.PhoneNumber))
+                    <br />
+
+                    @if (!String.IsNullOrEmpty(Model.StreetAddress))
+                    {
+                        string address = Model.StreetAddress;
+                            
+                        if (!String.IsNullOrEmpty(Model.StreetAddress2))
                         {
+                            address += ", " + Model.StreetAddress2;
+                        }
+
+                        address += ", " + Model.City + ", " + Model.State + " " + Model.PostalCode;
+                            
+                        <address>
+                            <a href="https://maps.google.com/maps?q=@Url.Encode(address)" target="_blank">@Model.StreetAddress
+                                @if (!String.IsNullOrEmpty(Model.StreetAddress2))
+                                {
+                                    <br />
+                                    @Model.StreetAddress2
+                                }
+                                <br />
+                                @Model.City, @Model.State @Model.PostalCode</a>
+                        </address>
+                    }
+
+                    @if (!String.IsNullOrEmpty(Model.PhoneNumber))
+                    {
+                        <div>
                             <abbr title="Phone">P:</abbr>
-                            if (Request.Browser.CanInitiateVoiceCall)
+                            @if (Request.Browser.CanInitiateVoiceCall)
                             {
                                 <a href="tel:@Model.PhoneNumber">@Formatter.PhoneNumber(Model.PhoneNumber)</a>
                             }
@@ -162,8 +187,8 @@
                             {
                                 @Formatter.PhoneNumber(Model.PhoneNumber)
                             }
-                        }
-                    </address>
+                        </div>
+                    }
                 </div>
                 <div class="panel-footer">
                     <ul class="list-inline" style="margin-bottom: 0">
