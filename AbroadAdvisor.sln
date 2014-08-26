@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{F77BA8
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbroadAdvisor.Core", "AbroadAdvisor.Core\AbroadAdvisor.Core.csproj", "{A0F343D6-B9B3-42B7-8C1D-2826A16280CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piwik.Tracker", "lib\Piwik.Tracker\Piwik.Tracker.csproj", "{C3BB0E94-F45C-4691-81FF-061FC20E3209}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piwik.Tracker", "Piwik.Tracker\Piwik.Tracker.csproj", "{C3BB0E94-F45C-4691-81FF-061FC20E3209}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

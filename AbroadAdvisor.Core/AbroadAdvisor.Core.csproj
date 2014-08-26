@@ -49,7 +49,7 @@
     <Compile Include="Properties\VersionInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\lib\Piwik.Tracker\Piwik.Tracker.csproj">
+    <ProjectReference Include="..\Piwik.Tracker\Piwik.Tracker.csproj">
       <Project>{c3bb0e94-f45c-4691-81ff-061fc20e3209}</Project>
       <Name>Piwik.Tracker</Name>
     </ProjectReference>
