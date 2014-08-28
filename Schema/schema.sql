@@ -395,6 +395,11 @@ initial_meeting         DATE,
 first_name              VARCHAR(64) NOT NULL,
 middle_name             VARCHAR(64),
 last_name               VARCHAR(64) NOT NULL,
+street_address          VARCHAR(128),
+street_address2         VARCHAR(128),
+city                    VARCHAR(128),
+state                   VARCHAR(32),
+postal_code             VARCHAR(16),
 classification          INT,
 student_id              VARCHAR(32),
 phone_number            VARCHAR(32),
@@ -407,6 +412,7 @@ phi_beta_delta_member   BOOLEAN,
 gpa                     DECIMAL(3,2),
 campus_email            VARCHAR(128),
 alternate_email         VARCHAR(128),
+entering_year           INT,
 graduating_year         INT,
 dob                     DATE,
 
@@ -443,6 +449,18 @@ PRIMARY KEY (student_id, language_id)
 COMMENT ON TABLE student_desired_languages IS 'Languages that students would like to study abroad';
 
 GRANT ALL PRIVILEGES ON student_desired_languages TO neoanime_abroadadvisor;
+
+
+CREATE TABLE student_studied_languages (
+student_id      INT NOT NULL,
+language_id     INT NOT NULL,
+
+PRIMARY KEY (student_id, language_id)
+);
+
+COMMENT ON TABLE student_studied_languages IS 'Languages that students have studied or are studying';
+
+GRANT ALL ON TABLE student_studied_languages TO neoanime_abroadadvisor;
 
 
 CREATE TABLE matriculation (
