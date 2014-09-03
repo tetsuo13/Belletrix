@@ -72,7 +72,7 @@ namespace Piwik.Tracker
         private int width;
         private int height;
 
-        public enum ActionType {download, link};
+        public enum ActionType { download, link };
 
         /// <summary>
         /// Builds a PiwikTracker object, used to track visits, pages and Goal conversions
@@ -161,7 +161,7 @@ namespace Piwik.Tracker
         public void setCustomVariable(int id, string name, string value, CustomVar.Scopes scope = CustomVar.Scopes.visit)
         {
             string stringId = Convert.ToString(id);
-            string[] customVar = {name, value};
+            string[] customVar = { name, value };
 
             switch (scope)
             {
@@ -246,7 +246,7 @@ namespace Piwik.Tracker
         /// Sets the Browser language. Used to guess visitor countries when GeoIP is not enabled
         /// </summary>       
         /// <param name="acceptLanguage">For example "fr-fr"</param>    
-        public void setBrowserLanguage( string[] acceptLanguage )
+        public void setBrowserLanguage(string[] acceptLanguage)
         {
             this.acceptLanguage = acceptLanguage;
         }
@@ -284,8 +284,8 @@ namespace Piwik.Tracker
         /// <returns>HTTP Response from the server</returns>
         public HttpWebResponse doTrackGoal(int idGoal, double revenue = Double.MinValue)
         {
-    	    string url = getUrlTrackGoal(idGoal, revenue);
-    	    return sendRequest(url);
+            string url = getUrlTrackGoal(idGoal, revenue);
+            return sendRequest(url);
         }
 
 
@@ -298,8 +298,8 @@ namespace Piwik.Tracker
         public HttpWebResponse doTrackAction(string actionUrl, ActionType actionType)
         {
             // Referrer could be udpated to be the current URL temporarily (to mimic JS behavior)
-    	    string url = getUrlTrackAction(actionUrl, actionType);
-    	    return sendRequest(url); 
+            string url = getUrlTrackAction(actionUrl, actionType);
+            return sendRequest(url);
         }
 
 
@@ -318,10 +318,10 @@ namespace Piwik.Tracker
         /// <param name="quantity">Product quantity. If not specified, will default to 1 in the Reports</param> 
         public void addEcommerceItem(string sku, string name = null, string category = null, double price = Double.MinValue, UInt64 quantity = UInt64.MinValue)
         {
-    	    if(String.IsNullOrEmpty(sku))
-    	    {
-    		    throw new Exception("You must specify a SKU for the Ecommerce item");
-    	    }
+            if (String.IsNullOrEmpty(sku))
+            {
+                throw new Exception("You must specify a SKU for the Ecommerce item");
+            }
 
             string sanitizedName = name;
             if (name == null)
@@ -355,26 +355,26 @@ namespace Piwik.Tracker
 
 
         /// <summary>
-	    /// Tracks a Cart Update (add item, remove item, update item).
-	    /// 
-	    /// On every Cart update, you must call addEcommerceItem() for each item (product) in the cart, 
-	    /// including the items that haven't been updated since the last cart update.
-	    /// Items which were in the previous cart and are not sent in later Cart updates will be deleted from the cart (in the database).
+        /// Tracks a Cart Update (add item, remove item, update item).
+        /// 
+        /// On every Cart update, you must call addEcommerceItem() for each item (product) in the cart, 
+        /// including the items that haven't been updated since the last cart update.
+        /// Items which were in the previous cart and are not sent in later Cart updates will be deleted from the cart (in the database).
         /// </summary>       
         /// <param name="grandTotal">Cart grandTotal (typically the sum of all items' prices)</param> 
         public HttpWebResponse doTrackEcommerceCartUpdate(double grandTotal)
         {
-    	    string url = getUrlTrackEcommerceCartUpdate(grandTotal);
-    	    return sendRequest(url); 
+            string url = getUrlTrackEcommerceCartUpdate(grandTotal);
+            return sendRequest(url);
         }
 
 
         /// <summary>
-	    /// Tracks an Ecommerce order.
-	    /// 
-	    /// If the Ecommerce order contains items (products), you must call first the addEcommerceItem() for each item in the order.
-	    /// All revenues (grandTotal, subTotal, tax, shipping, discount) will be individually summed and reported in Piwik reports.
-	    /// Only the parameters $orderId and $grandTotal are required. 
+        /// Tracks an Ecommerce order.
+        /// 
+        /// If the Ecommerce order contains items (products), you must call first the addEcommerceItem() for each item in the order.
+        /// All revenues (grandTotal, subTotal, tax, shipping, discount) will be individually summed and reported in Piwik reports.
+        /// Only the parameters $orderId and $grandTotal are required. 
         /// </summary>       
         /// <param name="orderId">Unique Order ID. This will be used to count this order only once in the event the order page is reloaded several times. orderId must be unique for each transaction, even on different days, or the transaction will not be recorded by Piwik.</param> 
         /// <param name="grandTotal">Grand Total revenue of the transaction (including tax, shipping, etc.)</param> 
@@ -384,8 +384,8 @@ namespace Piwik.Tracker
         /// <param name="discount">Discounted amount in this order</param> 
         public HttpWebResponse doTrackEcommerceOrder(string orderId, double grandTotal, double subTotal = Double.MinValue, double tax = Double.MinValue, double shipping = Double.MinValue, double discount = Double.MinValue)
         {
-    	    string url = getUrlTrackEcommerceOrder(orderId, grandTotal, subTotal, tax, shipping, discount);
-    	    return sendRequest(url); 
+            string url = getUrlTrackEcommerceOrder(orderId, grandTotal, subTotal, tax, shipping, discount);
+            return sendRequest(url);
         }
 
 
@@ -429,7 +429,7 @@ namespace Piwik.Tracker
         /// </summary>        
         private string getUrlTrackEcommerceCartUpdate(double grandTotal)
         {
-        	return getUrlTrackEcommerce(grandTotal);
+            return getUrlTrackEcommerce(grandTotal);
         }
 
 
@@ -440,17 +440,17 @@ namespace Piwik.Tracker
         /// </summary>  
         public string getUrlTrackEcommerceOrder(string orderId, double grandTotal, double subTotal = Double.MinValue, double tax = Double.MinValue, double shipping = Double.MinValue, double discount = Double.MinValue)
         {
-    	    if(String.IsNullOrEmpty(orderId))
-    	    {
-    		    throw new Exception("You must specifiy an orderId for the Ecommerce order");
-    	    }
+            if (String.IsNullOrEmpty(orderId))
+            {
+                throw new Exception("You must specifiy an orderId for the Ecommerce order");
+            }
 
-    	    string url = getUrlTrackEcommerce(grandTotal, subTotal, tax, shipping, discount);
-    	    url += "&ec_id=" + urlEncode(orderId);
+            string url = getUrlTrackEcommerce(grandTotal, subTotal, tax, shipping, discount);
+            url += "&ec_id=" + urlEncode(orderId);
 
-    	    ecommerceLastOrderTimestamp = forcedDatetime.Equals(DateTimeOffset.MinValue) ? DateTimeOffset.Now : forcedDatetime;
+            ecommerceLastOrderTimestamp = forcedDatetime.Equals(DateTimeOffset.MinValue) ? DateTimeOffset.Now : forcedDatetime;
 
-    	    return url;
+            return url;
         }
 
 
@@ -461,37 +461,37 @@ namespace Piwik.Tracker
         /// </summary>  
         protected string getUrlTrackEcommerce(double grandTotal, double subTotal = Double.MinValue, double tax = Double.MinValue, double shipping = Double.MinValue, double discount = Double.MinValue)
         {
-    	
-    	    string url = getRequest( idSite ) + "&idgoal=0&revenue="  + formatMonetaryValue(grandTotal);
+
+            string url = getRequest(idSite) + "&idgoal=0&revenue=" + formatMonetaryValue(grandTotal);
 
             if (!subTotal.Equals(Double.MinValue))
-    	    {
-    		    url += "&ec_st=" + formatMonetaryValue(subTotal);
-    	    }
+            {
+                url += "&ec_st=" + formatMonetaryValue(subTotal);
+            }
 
             if (!tax.Equals(Double.MinValue))
-    	    {
-    		    url += "&ec_tx=" + formatMonetaryValue(tax);
-    	    }
+            {
+                url += "&ec_tx=" + formatMonetaryValue(tax);
+            }
 
             if (!shipping.Equals(Double.MinValue))
-    	    {
-    		    url += "&ec_sh="  + formatMonetaryValue(shipping);
-    	    }
+            {
+                url += "&ec_sh=" + formatMonetaryValue(shipping);
+            }
 
             if (!discount.Equals(Double.MinValue))
-    	    {
-    		    url += "&ec_dt=" + formatMonetaryValue(discount);
-    	    }
+            {
+                url += "&ec_dt=" + formatMonetaryValue(discount);
+            }
 
-    	    if(ecommerceItems.Count > 0)
-    	    {
-    		    url += "&ec_items=" + urlEncode(new JavaScriptSerializer().Serialize(ecommerceItems.Values));                
-    	    }
+            if (ecommerceItems.Count > 0)
+            {
+                url += "&ec_items=" + urlEncode(new JavaScriptSerializer().Serialize(ecommerceItems.Values));
+            }
 
             ecommerceItems = new Dictionary<string, string[]>();
 
-    	    return url;
+            return url;
         }
 
 
@@ -516,15 +516,16 @@ namespace Piwik.Tracker
         /// <returns>URL to piwik.php with all parameters set to track the goal conversion</returns>
         public string getUrlTrackGoal(int idGoal, double revenue)
         {
-    	    string url = getRequest( idSite );
+            string url = getRequest(idSite);
 
             url += "&idgoal=" + idGoal;
 
-    	    if(!revenue.Equals(Double.MinValue)) {
+            if (!revenue.Equals(Double.MinValue))
+            {
                 url += "&revenue=" + formatMonetaryValue(revenue);
-    	    }
+            }
 
-    	    return url;
+            return url;
         }
 
 
@@ -533,11 +534,11 @@ namespace Piwik.Tracker
         /// <returns>URL to piwik.php with all parameters set to track an action</returns>
         public string getUrlTrackAction(string actionUrl, ActionType actionType)
         {
-    	    string url = getRequest( idSite );
+            string url = getRequest(idSite);
 
-		    url += "&" + actionType.ToString() + "=" + urlEncode(actionUrl) + "&redirect=0";
-		
-    	    return url;
+            url += "&" + actionType.ToString() + "=" + urlEncode(actionUrl) + "&redirect=0";
+
+            return url;
         }
 
 
@@ -564,7 +565,7 @@ namespace Piwik.Tracker
         public void setIp(string ip)
         {
             this.ip = ip;
-        }     
+        }
 
 
         /// <summary>
@@ -579,12 +580,12 @@ namespace Piwik.Tracker
         public void setVisitorId(string visitorId)
         {
 
-        	if(visitorId.Length != LENGTH_VISITOR_ID)
-    	    {
-        		throw new Exception("setVisitorId() expects a " + LENGTH_VISITOR_ID + " characters ID");
-        	}
+            if (visitorId.Length != LENGTH_VISITOR_ID)
+            {
+                throw new Exception("setVisitorId() expects a " + LENGTH_VISITOR_ID + " characters ID");
+            }
 
-    	    this.forcedVisitorId = visitorId;
+            this.forcedVisitorId = visitorId;
         }
 
 
@@ -601,24 +602,24 @@ namespace Piwik.Tracker
         /// <returns>16 hex chars visitor ID string</returns>
         public string getVisitorId()
         {
-    	    if(!String.IsNullOrEmpty(forcedVisitorId))
-    	    {
-    		    return forcedVisitorId;
-    	    }
-    	
-    	    HttpCookie idCookie = getCookieMatchingName("id." + idSite + ".");
+            if (!String.IsNullOrEmpty(forcedVisitorId))
+            {
+                return forcedVisitorId;
+            }
 
-    	    if(idCookie != null)
-    	    {
+            HttpCookie idCookie = getCookieMatchingName("id." + idSite + ".");
+
+            if (idCookie != null)
+            {
                 string cookieVal = idCookie.Value;
-    		    string parsedVisitorId = cookieVal.Substring(0, cookieVal.IndexOf("."));
-    		    if(parsedVisitorId.Length == LENGTH_VISITOR_ID)
-    		    {
-    			    return parsedVisitorId;
-    		    }
-    	    }
+                string parsedVisitorId = cookieVal.Substring(0, cookieVal.IndexOf("."));
+                if (parsedVisitorId.Length == LENGTH_VISITOR_ID)
+                {
+                    return parsedVisitorId;
+                }
+            }
 
-    	    return visitorId;
+            return visitorId;
         }
 
 
@@ -633,58 +634,65 @@ namespace Piwik.Tracker
         {
             HttpCookie refCookie = getCookieMatchingName("ref." + idSite + ".");
 
-            if(refCookie == null) {
+            if (refCookie == null)
+            {
                 return null;
             }
 
             string[] cookieDecoded = new JavaScriptSerializer().Deserialize<string[]>(HttpUtility.UrlDecode(refCookie.Value));
 
-            if(cookieDecoded == null) {
+            if (cookieDecoded == null)
+            {
                 return null;
             }
 
             int arraySize = cookieDecoded.Length;
 
-            if(arraySize == 0) {
+            if (arraySize == 0)
+            {
                 return null;
             }
 
             AttributionInfo attributionInfo = new AttributionInfo();
 
-            if(!String.IsNullOrEmpty(cookieDecoded[0])) {
+            if (!String.IsNullOrEmpty(cookieDecoded[0]))
+            {
                 attributionInfo.campaignName = cookieDecoded[0];
             }
 
-            if(arraySize > 1 && !String.IsNullOrEmpty(cookieDecoded[1])) {
+            if (arraySize > 1 && !String.IsNullOrEmpty(cookieDecoded[1]))
+            {
                 attributionInfo.campaignKeyword = cookieDecoded[1];
             }
 
-            if(arraySize > 2 && !String.IsNullOrEmpty(cookieDecoded[2])) {
+            if (arraySize > 2 && !String.IsNullOrEmpty(cookieDecoded[2]))
+            {
                 attributionInfo.referrerTimestamp = new DateTime(1970, 1, 1, 0, 0, 0).AddSeconds(Convert.ToInt32(cookieDecoded[2]));
             }
 
-            if(arraySize > 3 && !String.IsNullOrEmpty(cookieDecoded[3])) {
+            if (arraySize > 3 && !String.IsNullOrEmpty(cookieDecoded[3]))
+            {
                 attributionInfo.referrerUrl = cookieDecoded[3];
             }
 
-            return attributionInfo;            
+            return attributionInfo;
         }
 
 
         /// <summary>
- 	    /// Some Tracking API functionnality requires express authentication, using either the 
-	    /// Super User token_auth, or a user with 'admin' access to the website.
-	    /// 
-	    /// The following features require access:
-	    /// - force the visitor IP
-	    /// - force the date & time of the tracking requests rather than track for the current datetime
-	    /// - force Piwik to track the requests to a specific VisitorId rather than use the standard visitor matching heuristic
+        /// Some Tracking API functionnality requires express authentication, using either the 
+        /// Super User token_auth, or a user with 'admin' access to the website.
+        /// 
+        /// The following features require access:
+        /// - force the visitor IP
+        /// - force the date & time of the tracking requests rather than track for the current datetime
+        /// - force Piwik to track the requests to a specific VisitorId rather than use the standard visitor matching heuristic
         /// </summary>
         /// <param name="token_auth">32 chars token_auth string</param>
-	    public void setTokenAuth(string token_auth)
-	    {
-    		this.token_auth = token_auth;
-    	}
+        public void setTokenAuth(string token_auth)
+        {
+            this.token_auth = token_auth;
+        }
 
 
         /// <summary>
@@ -702,8 +710,8 @@ namespace Piwik.Tracker
         /// </summary>       
         public void setResolution(int width, int height)
         {
-    	    this.width = width;
-    	    this.height = height;
+            this.width = width;
+            this.height = height;
         }
 
 
@@ -711,7 +719,7 @@ namespace Piwik.Tracker
         /// Sets if the browser supports cookies 
         /// This is reported in "List of plugins" report in Piwik.
         /// </summary>  
-        public void setBrowserHasCookies( bool hasCookies )
+        public void setBrowserHasCookies(bool hasCookies)
         {
             this.hasCookies = hasCookies;
         }
@@ -720,7 +728,7 @@ namespace Piwik.Tracker
         /// <summary>
         /// Will append a custom string at the end of the Tracking request. 
         /// </summary> 
-        public void setDebugStringAppend( string debugString )
+        public void setDebugStringAppend(string debugString)
         {
             this.DEBUG_APPEND_URL = debugString;
         }
@@ -731,16 +739,16 @@ namespace Piwik.Tracker
         /// </summary>       
         public void setPlugins(BrowserPlugins browserPlugins)
         {
-    	    plugins =
+            plugins =
                 "&fla=" + (browserPlugins.flash ? "1" : "0") +
                 "&java=" + (browserPlugins.java ? "1" : "0") +
-                "&dir=" + (browserPlugins.director ? "1" : "0") + 
-    		    "&qt=" + (browserPlugins.quickTime ? "1" : "0") + 
-    		    "&realp=" + (browserPlugins.realPlayer ? "1" : "0") + 
-    		    "&pdf=" + (browserPlugins.pdf ? "1" : "0") + 
-    		    "&wma=" + (browserPlugins.windowsMedia ? "1" : "0") + 
-    		    "&gears=" + (browserPlugins.gears ? "1" : "0") + 
-    		    "&ag=" + (browserPlugins.silverlight ? "1" : "0"); 
+                "&dir=" + (browserPlugins.director ? "1" : "0") +
+                "&qt=" + (browserPlugins.quickTime ? "1" : "0") +
+                "&realp=" + (browserPlugins.realPlayer ? "1" : "0") +
+                "&pdf=" + (browserPlugins.pdf ? "1" : "0") +
+                "&wma=" + (browserPlugins.windowsMedia ? "1" : "0") +
+                "&gears=" + (browserPlugins.gears ? "1" : "0") +
+                "&ag=" + (browserPlugins.silverlight ? "1" : "0");
         }
 
 
@@ -751,18 +759,18 @@ namespace Piwik.Tracker
         /// </summary>      
         public void disableCookieSupport()
         {
-        	cookieSupport = false;
+            cookieSupport = false;
         }
 
 
         private HttpWebResponse sendRequest(string url)
         {
-		    int timeout = 600000; // Allow debug while blocking the request
+            int timeout = 600000; // Allow debug while blocking the request
 
-		    if(!cookieSupport)
-		    {
-			    requestCookie = null;
-		    }
+            if (!cookieSupport)
+            {
+                requestCookie = null;
+            }
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.UserAgent = userAgent;
@@ -772,14 +780,14 @@ namespace Piwik.Tracker
             {
                 request.Headers.Add("Accept-Language", String.Join(", ", acceptLanguage));
             }
-            
-            if(requestCookie != null)
+
+            if (requestCookie != null)
             {
                 request.Headers.Add("Cookie", requestCookie.Name + "=" + requestCookie.Value);
             }
 
-            HttpWebResponse response = (HttpWebResponse) request.GetResponse();
-            CookieCollection cookies = response.Cookies;        
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            CookieCollection cookies = response.Cookies;
 
             // The cookie in the response will be set in the next request
             for (int i = 0; i < cookies.Count; i++)
@@ -791,69 +799,69 @@ namespace Piwik.Tracker
                 }
             }
 
-		    return response;
+            return response;
         }
 
 
-        private string getRequest( int idSite )
+        private string getRequest(int idSite)
         {
-            if(String.IsNullOrEmpty(URL))
+            if (String.IsNullOrEmpty(URL))
             {
-    	        throw new Exception("You must first set the Piwik Tracker URL by calling PiwikTracker.URL = \"http://your-website.org/piwik/\";");
+                throw new Exception("You must first set the Piwik Tracker URL by calling PiwikTracker.URL = \"http://your-website.org/piwik/\";");
             }
 
-            string absoluteURI = URL;      
+            string absoluteURI = URL;
 
-            if(!absoluteURI.Contains("/piwik.php") && !absoluteURI.Contains("/proxy-piwik.php"))
+            if (!absoluteURI.Contains("/piwik.php") && !absoluteURI.Contains("/proxy-piwik.php"))
             {
-    	        absoluteURI += "/piwik.php";
+                absoluteURI += "/piwik.php";
             }
-    	
+
             string url =
                 absoluteURI +
                 "?idsite=" + idSite +
-		        "&rec=1" +
-		        "&apiv=" + VERSION + 
-	            "&r=" + Convert.ToString(new Random().Next()).Substring(2, 6) +
-    	   	 
-    	        // Only allowed for Super User, token_auth required
-		        (!String.IsNullOrEmpty(ip) ? "&cip=" + ip : "") +
-    	        (!String.IsNullOrEmpty(forcedVisitorId) ? "&cid=" + forcedVisitorId : "&_id=" + visitorId) +
+                "&rec=1" +
+                "&apiv=" + VERSION +
+                "&r=" + new Random().Next(0, 1000000).ToString("000000") +
+
+                // Only allowed for Super User, token_auth required
+                (!String.IsNullOrEmpty(ip) ? "&cip=" + ip : "") +
+                (!String.IsNullOrEmpty(forcedVisitorId) ? "&cid=" + forcedVisitorId : "&_id=" + visitorId) +
                 (!forcedDatetime.Equals(DateTimeOffset.MinValue) ? "&cdt=" + formatDateValue(forcedDatetime) : "") +
                 (!String.IsNullOrEmpty(token_auth) ? "&token_auth=" + urlEncode(token_auth) : "") +
-	        
-		        // These parameters are set by the JS, but optional when using API
-	            (!String.IsNullOrEmpty(plugins) ? plugins : "") +
+
+                // These parameters are set by the JS, but optional when using API
+                (!String.IsNullOrEmpty(plugins) ? plugins : "") +
                 (!localTime.Equals(DateTimeOffset.MinValue) ? "&h=" + localTime.Hour + "&m=" + localTime.Minute + "&s=" + localTime.Second : "") +
-	            ((width != 0 && height != 0) ? "&res=" + width + "x" + height : "") +
-	            (hasCookies ? "&cookie=1" : "") +
+                ((width != 0 && height != 0) ? "&res=" + width + "x" + height : "") +
+                (hasCookies ? "&cookie=1" : "") +
                 (!ecommerceLastOrderTimestamp.Equals(DateTimeOffset.MinValue) ? "&_ects=" + formatTimestamp(ecommerceLastOrderTimestamp) : "") +
-	        
-	            // Various important attributes
-	            (!String.IsNullOrEmpty(customData) ? "&data=" + customData : "") +
+
+                // Various important attributes
+                (!String.IsNullOrEmpty(customData) ? "&data=" + customData : "") +
                 (visitorCustomVar.Count() > 0 ? "&_cvar=" + urlEncode(new JavaScriptSerializer().Serialize(visitorCustomVar)) : "") +
                 (pageCustomVar.Count() > 0 ? "&cvar=" + urlEncode(new JavaScriptSerializer().Serialize(pageCustomVar)) : "") +
-	        
-	            // URL parameters
+
+                // URL parameters
                 (!String.IsNullOrEmpty(pageUrl) ? "&url=" + urlEncode(pageUrl) : "") +
                 (!String.IsNullOrEmpty(urlReferrer) ? "&urlref=" + urlEncode(urlReferrer) : "") +
-	        
-	            // Attribution information, so that Goal conversions are attributed to the right referrer or campaign
-	            // Campaign name
+
+                // Attribution information, so that Goal conversions are attributed to the right referrer or campaign
+                // Campaign name
                 ((attributionInfo != null && !String.IsNullOrEmpty(attributionInfo.campaignName)) ? "&_rcn=" + urlEncode(attributionInfo.campaignName) : "") +
-    	        // Campaign keyword
+                // Campaign keyword
                 ((attributionInfo != null && !String.IsNullOrEmpty(attributionInfo.campaignKeyword)) ? "&_rck=" + urlEncode(attributionInfo.campaignKeyword) : "") +
-    	        // Timestamp at which the referrer was set
+                // Timestamp at which the referrer was set
                 ((attributionInfo != null && !attributionInfo.referrerTimestamp.Equals(DateTimeOffset.MinValue)) ? "&_refts=" + formatTimestamp(attributionInfo.referrerTimestamp) : "") +
-    	        // Referrer URL
+                // Referrer URL
                 ((attributionInfo != null && !String.IsNullOrEmpty(attributionInfo.referrerUrl)) ? "&_ref=" + urlEncode(attributionInfo.referrerUrl) : "") +
 
-    	        // DEBUG 
-	            DEBUG_APPEND_URL;
+                // DEBUG 
+                DEBUG_APPEND_URL;
 
             // Reset page level custom variables after this page view
-            pageCustomVar = new Dictionary<string ,string[]>();
-    	
+            pageCustomVar = new Dictionary<string, string[]>();
+
             return url;
         }
 
@@ -873,7 +881,7 @@ namespace Piwik.Tracker
 
         private string formatMonetaryValue(double value)
         {
-            return value.ToString("0.##", new CultureInfo("en-US")); 
+            return value.ToString("0.##", new CultureInfo("en-US"));
         }
 
 
@@ -892,7 +900,7 @@ namespace Piwik.Tracker
             {
                 if (cookies[i].Name.Contains(name))
                 {
-                    return cookies[i];                    
+                    return cookies[i];
                 }
             }
 
@@ -904,5 +912,5 @@ namespace Piwik.Tracker
             return HttpUtility.UrlEncode(value);
         }
 
-    } 
+    }
 }
