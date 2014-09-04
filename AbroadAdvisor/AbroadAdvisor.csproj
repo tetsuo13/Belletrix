@@ -181,11 +181,15 @@
     <Content Include="Content\css\datepicker.css" />
     <Content Include="Content\css\font-awesome.css" />
     <Content Include="Content\css\font-awesome.min.css" />
-    <Content Include="Content\fonts\fontawesome-webfont.svg" />
     <Content Include="Content\css\sb-admin.css" />
+    <Content Include="Content\fonts\fontawesome-webfont.svg" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\AbroadAdvisor.Promo.js" />
     <Content Include="Scripts\AbroadAdvisor.Student.js" />
+    <Content Include="Content\fonts\fontawesome-webfont.woff" />
+    <Content Include="Content\fonts\fontawesome-webfont.ttf" />
+    <Content Include="Content\fonts\fontawesome-webfont.eot" />
+    <Content Include="Content\fonts\FontAwesome.otf" />
     <None Include="Scripts\jquery-2.0.3.intellisense.js" />
     <Content Include="Scripts\AbroadAdvisor.js" />
     <Content Include="Scripts\bootstrap-datepicker.js" />
@@ -240,18 +244,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\User\Login.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Content\fonts\fontawesome-webfont.woff" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Content\fonts\fontawesome-webfont.ttf" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Content\fonts\fontawesome-webfont.eot" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Content\fonts\FontAwesome.otf" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AbroadAdvisor.Core\AbroadAdvisor.Core.csproj">
