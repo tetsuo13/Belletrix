@@ -21,7 +21,6 @@ namespace Bennett.AbroadAdvisor.Controllers
         /// <remarks>Promotions use this too. Keep anonymous.</remarks>
         /// <returns>Some text.</returns>
         [AllowAnonymous]
-        [HttpGet]
         public string Ping()
         {
             return PingModel.Ping();
