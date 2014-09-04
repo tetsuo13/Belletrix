@@ -1,5 +1,6 @@
 ﻿using Piwik.Tracker;
 using System;
+using System.Configuration;
 using System.Web;
 
 namespace Bennett.AbroadAdvisor.Core
@@ -34,11 +35,24 @@ namespace Bennett.AbroadAdvisor.Core
 
             try
             {
-                tracker.setIp(request.ServerVariables["HTTP_X_FORWARDED_FOR"]);
+                string token = ConfigurationManager.AppSettings["AnalyticsAdminToken"];
+
+                if (!String.IsNullOrEmpty(token))
+                {
+                    tracker.setTokenAuth(token);
+
+                    try
+                    {
+                        tracker.setIp(request.ServerVariables["HTTP_X_FORWARDED_FOR"]);
+                    }
+                    catch (Exception)
+                    {
+                        tracker.setIp(request.UserHostAddress);
+                    }
+                }
             }
             catch (Exception)
             {
-                tracker.setIp(request.UserHostAddress);
             }
 
             tracker.setBrowserLanguage(request.UserLanguages);
@@ -56,7 +70,6 @@ namespace Bennett.AbroadAdvisor.Core
                 tracker.setCustomVariable(1, "username", username);
             }
 
-            tracker.setTokenAuth("fdb0ca65560ea3264a5bcc6922ac08ce");
             tracker.doTrackPageView(pageTitle);
         }
     }
