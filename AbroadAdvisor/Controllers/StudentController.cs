@@ -125,9 +125,8 @@ namespace Bennett.AbroadAdvisor.Controllers
         public PartialViewResult StudyAbroad(int id)
         {
             ViewBag.StudentId = id;
-            ViewData.Model = StudyAbroadModel.GetAll(id);
             PrepareStudyAbroadDropDowns();
-            return PartialView();
+            return PartialView(StudyAbroadModel.GetAll(id));
         }
 
         private void CheckStudyAbroadDestinations(ref StudentModel model)
