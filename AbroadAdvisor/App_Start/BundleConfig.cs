@@ -18,7 +18,7 @@ namespace Bennett.AbroadAdvisor.App_Start
                 "~/Scripts/AbroadAdvisor.Student.js"));
 
             bundles.Add(new StyleBundle("~/bundles/css").Include(
-                "~/Content/css/bootstrap.css",
+                "~/Content/bootstrap.css",
                 "~/Content/css/bootstrap-multiselect.css",
                 "~/Content/css/sb-admin.css",
                 "~/Content/css/font-awesome.min.css",

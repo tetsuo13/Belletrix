@@ -2,6 +2,8 @@
 @using Bennett.AbroadAdvisor.Models;
 @using System.Linq;
 
+@model IEnumerable<StudyAbroadModel>
+
 <div class="table-responsive">
     <table class="table table-bordered table-hover table-striped tablesorter">
         <thead>
@@ -19,8 +21,37 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var study in ViewData.Model)
+            @foreach (StudyAbroadModel study in Model)
             {
+                string semesterName;
+
+                switch (study.Semester)
+                {
+                    case (int)StudentStudyAbroadWishlistModel.PeriodValue.Fall:
+                        semesterName = "Fall";
+                        break;
+
+                    case (int)StudentStudyAbroadWishlistModel.PeriodValue.Spring:
+                        semesterName = "Spring";
+                        break;
+
+                    case (int)StudentStudyAbroadWishlistModel.PeriodValue.Summer:
+                        semesterName = "Summer";
+                        break;
+
+                    case (int)StudentStudyAbroadWishlistModel.PeriodValue.Maymester:
+                        semesterName = "Maymester";
+                        break;
+
+                    case (int)StudentStudyAbroadWishlistModel.PeriodValue.AcademicYear:
+                        semesterName = "Academic Year";
+                        break;
+
+                    default:
+                        semesterName = study.Semester.ToString();
+                        break;
+                }
+                
                 CountryModel selectedCountry = (ViewBag.Countries as List<CountryModel>).FirstOrDefault(c => c.Id == study.CountryId);
                 string countryName = String.Empty;
                 
@@ -51,17 +82,17 @@
                 
                 <tr>
                     <td>@study.Year</td>
-                    <td>@study.Semester</td>
+                    <td>@semesterName</td>
                     <td>
-                        @if (study.StartDate != null)
+                        @if (study.StartDate.HasValue)
                         {
-                            @DateTimeFilter.UtcToLocal(study.StartDate).ToShortDateString()
+                            @DateTimeFilter.UtcToLocal(study.StartDate.Value).ToShortDateString()
                         }
                     </td>
                     <td>
-                        @if (study.EndDate != null)
+                        @if (study.EndDate.HasValue)
                         {
-                            @DateTimeFilter.UtcToLocal(study.EndDate).ToShortDateString()
+                            @DateTimeFilter.UtcToLocal(study.EndDate.Value).ToShortDateString()
                         }
                     </td>
                     <td>

@@ -23,7 +23,7 @@ namespace Bennett.AbroadAdvisor.Models
         [Display(Name = "Desired Language Abroad")]
         public new IEnumerable<int> SelectedDesiredLanguages { get; set; }
 
-        public new void Save(int? userId, string promoCode)
+        public void Save(int? userId, string promoCode)
         {
             using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {

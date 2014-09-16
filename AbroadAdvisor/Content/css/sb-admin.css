@@ -8,21 +8,6 @@ For more info and more free Bootstrap 3 HTML themes, visit http://startbootstrap
 
 /* ATTN: This is mobile first CSS - to update 786px and up screen width use the media query near the bottom of the document! */
 
-/* Global Styles */
-
-body {
-  margin-top: 50px;
-}
-
-#wrapper {
-  padding-left: 0;
-}
-
-#page-wrapper {
-  width: 100%;
-  padding: 5px 15px;
-}
-
 /* Nav Messages */
 
 .messages-dropdown .dropdown-menu .message-preview .avatar,
@@ -85,31 +70,6 @@ table.tablesorter thead tr th:hover {
 
 /* Edit Below to Customize Widths > 768px */
 @media (min-width:768px) {
-
-  /* Wrappers */
-
-  #wrapper {
-	padding-left: 225px;
-  }
-
-  #page-wrapper {
-	padding: 15px 25px;
-  }
-
-  /* Side Nav */
-
-  .side-nav {
-	margin-left: -225px;
-	left: 225px;
-	width: 225px;
-	position: fixed;
-	top: 50px;
-	height: 100%;
-	border-radius: 0;
-	border: none;
-	background-color: #222222;
-	overflow-y: auto;
-  }
 
   /* Bootstrap Default Overrides - Customized Dropdowns for the Side Nav */
 
