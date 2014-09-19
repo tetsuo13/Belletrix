@@ -12,9 +12,9 @@
     string pageTitle = "AbroadAdvisor";
     bool developmentEnvironment = DeploymentEnvironment.IsDevelopment;
 
-    if (developmentEnvironment)
+    if (!DeploymentEnvironment.IsProduction)
     {
-        pageTitle += " (Debug)";
+        pageTitle += String.Format(" ({0})", DeploymentEnvironment.Enviroment);
     }
 }
 

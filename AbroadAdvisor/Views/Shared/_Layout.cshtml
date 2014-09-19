@@ -7,9 +7,9 @@
     string pageTitle = siteTitle;
     bool developmentEnvironment = DeploymentEnvironment.IsDevelopment;
     
-    if (developmentEnvironment)
+    if (!DeploymentEnvironment.IsProduction)
     {
-        pageTitle += " (Debug)";
+        pageTitle += String.Format(" ({0})", DeploymentEnvironment.Enviroment);
     }
     
     UserModel user = Session["User"] as UserModel;

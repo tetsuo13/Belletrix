@@ -18,22 +18,22 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piwik.Tracker", "Piwik.Trac
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Staging|Any CPU = Staging|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{72018DEC-CA2F-4AC1-A83B-FFEAB8087989}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{72018DEC-CA2F-4AC1-A83B-FFEAB8087989}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72018DEC-CA2F-4AC1-A83B-FFEAB8087989}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72018DEC-CA2F-4AC1-A83B-FFEAB8087989}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A0F343D6-B9B3-42B7-8C1D-2826A16280CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A0F343D6-B9B3-42B7-8C1D-2826A16280CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72018DEC-CA2F-4AC1-A83B-FFEAB8087989}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{72018DEC-CA2F-4AC1-A83B-FFEAB8087989}.Staging|Any CPU.Build.0 = Staging|Any CPU
 		{A0F343D6-B9B3-42B7-8C1D-2826A16280CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0F343D6-B9B3-42B7-8C1D-2826A16280CB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C3BB0E94-F45C-4691-81FF-061FC20E3209}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C3BB0E94-F45C-4691-81FF-061FC20E3209}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0F343D6-B9B3-42B7-8C1D-2826A16280CB}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{A0F343D6-B9B3-42B7-8C1D-2826A16280CB}.Staging|Any CPU.Build.0 = Staging|Any CPU
 		{C3BB0E94-F45C-4691-81FF-061FC20E3209}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3BB0E94-F45C-4691-81FF-061FC20E3209}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3BB0E94-F45C-4691-81FF-061FC20E3209}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{C3BB0E94-F45C-4691-81FF-061FC20E3209}.Staging|Any CPU.Build.0 = Staging|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
