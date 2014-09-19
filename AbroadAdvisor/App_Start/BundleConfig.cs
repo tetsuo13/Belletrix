@@ -17,13 +17,13 @@ namespace Bennett.AbroadAdvisor.App_Start
                 "~/Scripts/AbroadAdvisor.Promo.js",
                 "~/Scripts/AbroadAdvisor.Student.js"));
 
-            bundles.Add(new StyleBundle("~/bundles/css").Include(
-                "~/Content/bootstrap.css",
-                "~/Content/css/bootstrap-multiselect.css",
-                "~/Content/css/sb-admin.css",
-                "~/Content/css/font-awesome.min.css",
-                "~/Content/css/datepicker.css",
-                "~/Content/css/AbroadAdvisor.css"));
+            bundles.Add(new StyleBundle("~/bundles/css")
+                .Include("~/Content/bootstrap.css")
+                .Include("~/Content/css/bootstrap-multiselect.css")
+                .Include("~/Content/css/sb-admin.css")
+                .Include("~/Content/css/font-awesome.min.css", new CssRewriteUrlTransform())
+                .Include("~/Content/css/datepicker.css")
+                .Include("~/Content/css/AbroadAdvisor.css"));
         }
     }
 }
