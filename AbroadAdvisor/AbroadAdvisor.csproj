@@ -238,9 +238,9 @@
     <Content Include="Views\Promo\Success.cshtml" />
     <Content Include="Views\Shared\_PromoLayout.cshtml" />
     <Content Include="Scripts\jquery-2.1.1.min.map" />
-    <None Include="Web.Staging.config">
+    <Content Include="Web.Staging.config">
       <DependentUpon>Web.config</DependentUpon>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
