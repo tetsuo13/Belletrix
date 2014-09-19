@@ -29,15 +29,7 @@ namespace Bennett.AbroadAdvisor.Core
             }
         }
 
-        /// <summary>
-        /// If the environment seems to be the development one.
-        /// </summary>
-        public static bool IsDevelopment
-        {
-            get
-            {
-                return Enviroment == "Debug";
-            }
-        }
+        public static bool IsDevelopment { get { return Enviroment == "Debug"; } }
+        public static bool IsProduction { get { return Enviroment == "Release"; } }
     }
 }
