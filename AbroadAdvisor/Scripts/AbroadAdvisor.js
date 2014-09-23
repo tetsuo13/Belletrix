@@ -6,6 +6,32 @@
     /// <var type="Number">Number of milliseconds between pinging the server</var>
     var idleKillerInterval = 1000 * 60 * 10;
 
+    AbroadAdvisor.errorMessage = function (message) {
+        /// <summary>Show an error message as a modal dialog.</summary>
+        /// <param name="message" type="String">Error message.</param>
+
+        var setup =
+            '<div class="modal fade">' +
+                '<div class="modal-dialog">' +
+                    '<div class="modal-content">' +
+                        '<div class="modal-header">' +
+                            '<button type="button" class="close" data-dismiss="modal">' +
+                                '<span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>' +
+                            '<h4 class="modal-title">Error</h4>' +
+                        '</div>' +
+                        '<div class="modal-body">' +
+                            message +
+                        '</div>' +
+                        '<div class="modal-footer">' +
+                            '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+
+        $(setup).modal();
+    };
+
     AbroadAdvisor.initPinger = function (pingUrl) {
         /// <summary>
         /// Have the server process something often. This is to avoid the

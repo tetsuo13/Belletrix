@@ -58,6 +58,26 @@ namespace Bennett.AbroadAdvisor.Controllers
             return View(student);
         }
 
+        public ActionResult ViewInline(int id)
+        {
+            StudentModel student;
+
+            try
+            {
+                student = StudentModel.GetStudent(id);
+            }
+            catch (Exception)
+            {
+                return HttpNotFound();
+            }
+
+            ViewBag.StudyAbroad = StudyAbroadModel.GetAll(id);
+            ViewBag.Notes = NoteModel.GetNotes(id);
+            PrepareDropDowns();
+            PrepareStudyAbroadDropDowns();
+            return PartialView("View.NameCheck", student);
+        }
+
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -201,6 +221,11 @@ namespace Bennett.AbroadAdvisor.Controllers
             ViewBag.Semesters = StudentStudyAbroadWishlistModel.GetPeriods();
             ViewBag.Programs = ProgramModel.GetPrograms();
             ViewBag.ProgramTypes = ProgramTypeModel.GetProgramTypes();
+        }
+
+        public PartialViewResult NameCheck(string firstName, string lastName)
+        {
+            return PartialView(StudentModel.SearchByFullName(firstName, lastName));
         }
     }
 }

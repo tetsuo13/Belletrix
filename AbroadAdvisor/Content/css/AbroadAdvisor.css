@@ -60,3 +60,12 @@
 .highlight-icon {
     color: #ff6a00;
 }
+
+.input-validation-error {
+    border: 1px solid #b94a48;
+}
+.field-validation-error,
+.validation-summary-errors {
+    font-weight: bold;
+    color: #b94a48;
+}

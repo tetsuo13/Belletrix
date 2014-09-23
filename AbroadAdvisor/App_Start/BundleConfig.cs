@@ -12,6 +12,8 @@ namespace Bennett.AbroadAdvisor.App_Start
                 "~/Scripts/bootstrap-datepicker.js",
                 "~/Scripts/bootstrap-multiselect.js",
                 "~/Scripts/jquery.tablesorter.js",
+                "~/Scripts/jquery.validate.min.js",
+                "~/Scripts/jquery.validate.unobtrusive.min.js",
                 "~/Scripts/tables.js",
                 "~/Scripts/AbroadAdvisor.js",
                 "~/Scripts/AbroadAdvisor.Promo.js",
