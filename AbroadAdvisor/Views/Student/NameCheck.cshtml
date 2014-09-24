@@ -18,7 +18,7 @@
 
                 @foreach (StudentModel student in Model)
                 {
-                    <a data-toggle="modal" href="/student/viewinline/@student.Id" class="list-group-item" data-target="#dup">
+                    <a data-toggle="modal" href="@Url.Action("ViewInline", new { id = student.Id })" class="list-group-item" data-target="#dup">
                         <h4 class="list-group-item-heading">@student.FirstName @student.LastName</h4>
                         <p class="list-group-item-text">
                             Created @DateTimeFilter.UtcToLocal(student.Created)
