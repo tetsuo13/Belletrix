@@ -6,6 +6,28 @@
     /// <var type="Number">Number of milliseconds between pinging the server</var>
     var idleKillerInterval = 1000 * 60 * 10;
 
+    AbroadAdvisor.singleSubmit = function () {
+        /// <summary>Disable the form submit button after clicking it.</summary>
+
+        $('form').submit(function () {
+            // We're doing to disable all submit buttons unless otherwise
+            // told to.
+            var disableButtons = true;
+
+            // If the jQuery Validate plugin has been activated for this form,
+            // only disable the submit buttons if the form is valid. Otherwise
+            // leave the buttons enabled and allow the user to complete their
+            // corrections.
+            if (typeof $(this).valid === 'function' && !$(this).valid()) {
+                disableButtons = false;
+            }
+
+            if (disableButtons) {
+                $(this).find('button[type="submit"]').prop('disabled', true);
+            }
+        });
+    };
+
     AbroadAdvisor.errorMessage = function (message) {
         /// <summary>Show an error message as a modal dialog.</summary>
         /// <param name="message" type="String">Error message.</param>

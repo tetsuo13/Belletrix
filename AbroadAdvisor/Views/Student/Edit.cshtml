@@ -19,6 +19,7 @@
                 [@String.Join(",", studyAbroadYears)],
                 [@String.Join(",", studyAbroadPeriods)]
             );
+            Bennett.AbroadAdvisor.singleSubmit();
 
             $('a[href="#studyabroadtab"]').on('show.bs.tab', function (e) {
                 $.get('@Url.Action("StudyAbroad", new { id = Model.Id })', function (data) {
