@@ -25,8 +25,8 @@ namespace Bennett.AbroadAdvisor.App_Start
                 .Include("~/Content/css/sb-admin.css")
                 .Include("~/Content/css/font-awesome.min.css", new CssRewriteUrlTransform())
                 .Include("~/Content/css/datepicker.css")
-                .Include("~/Content/css/jquery.dataTables.min.css")
-                .Include("~/Content/css/jquery.dataTables.bootstrap.css")
+                .Include("~/Content/css/jquery.dataTables.min.css", new CssRewriteUrlTransform())
+                .Include("~/Content/css/jquery.dataTables.bootstrap.css", new CssRewriteUrlTransform())
                 .Include("~/Content/css/AbroadAdvisor.css"));
         }
     }
