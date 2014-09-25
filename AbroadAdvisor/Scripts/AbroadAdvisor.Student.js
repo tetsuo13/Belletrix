@@ -152,6 +152,13 @@
 	Student.initStudentList = function () {
 	    /// <summary>Initialize the student list page.</summary>
 
+	    $('#studentlist').dataTable({
+	        columnDefs: [{
+	            targets: -1,
+                orderable: false
+	        }]
+	    });
+
 	    $('a.studentlisttooltop').tooltip();
 	    $('a.studentlistmodal').modal();
 	    $('.collapse').collapse();

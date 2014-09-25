@@ -8,6 +8,16 @@
     ViewBag.Title = "List";
 }
 
+@section FooterScript {
+    <script>
+        $(function () {
+            'use strict';
+
+            $('#experiencelist').dataTable();
+        });
+    </script>
+}
+
 @section Body {
     <div class="row">
         <div class="col-lg-8">
@@ -16,7 +26,7 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table table-bordered table-hover table-striped tablesorter table-condensed">
+        <table id="experiencelist" class="table table-bordered table-hover table-striped tablesorter table-condensed">
             <thead>
                 <tr>
                     <th>Student</th>

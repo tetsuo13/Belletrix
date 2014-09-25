@@ -7,6 +7,16 @@
     ViewBag.Title = "List";
 }
 
+@section FooterScript {
+    <script>
+        $(function () {
+            'use strict';
+
+            $('#promolist').dataTable();
+        });
+    </script>
+}
+
 @section Body {
 
     <div class="row">
@@ -29,16 +39,15 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table table-bordered table-hover table-striped tablesorter table-condensed">
+        <table id="promolist" class="table table-bordered table-hover table-striped tablesorter table-condensed">
             <thead>
                 <tr>
-                    <th>Code <i class="fa fa-sort"></i></th>
-                    <th>Creator <i class="fa fa-sort"></i></th>
-                    <th>Created <i class="fa fa-sort"></i></th>
-                    <th>Description <i class="fa fa-sort"></i></th>
-                    <th>Students <i class="fa fa-sort"></i></th>
-                    <th>Active <i class="fa fa-sort"></i></th>
-                    <th></th>
+                    <th>Code</th>
+                    <th>Creator</th>
+                    <th>Created</th>
+                    <th>Description</th>
+                    <th>Students</th>
+                    <th>Active</th>
                 </tr>
             </thead>
 
@@ -57,7 +66,6 @@
                                 <i class="fa fa-check"></i>
                             }
                         </td>
-                        <td></td>
                     </tr>
                 }
             </tbody>
