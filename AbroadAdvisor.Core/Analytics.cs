@@ -25,7 +25,7 @@ namespace Bennett.AbroadAdvisor.Core
     {
         public static void TrackPageView(HttpRequestBase request, string pageTitle, string username = null)
         {
-            if (DeploymentEnvironment.IsDevelopment)
+            if (!DeploymentEnvironment.IsProduction)
             {
                 return;
             }
