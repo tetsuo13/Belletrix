@@ -664,7 +664,8 @@ VALUES
 ('NYU London', NULL),
 ('Institute for Future Global Leaders UVI', NULL),
 ('Tec de Monterrey', NULL),
-('Global Semesters', NULL);
+('Global Semesters', NULL),
+('Global Linkages', NULL);
 
 
 CREATE TABLE program_types (
