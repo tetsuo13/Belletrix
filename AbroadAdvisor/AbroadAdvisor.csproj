@@ -285,6 +285,14 @@
       <Project>{a0f343d6-b9b3-42b7-8c1d-2826a16280cb}</Project>
       <Name>AbroadAdvisor.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\StackExchange.Exceptional.PostgreSql\StackExchange.Exceptional.PostgreSQL.csproj">
+      <Project>{8dc4bf04-721a-4da4-aeca-f8fb8cf64625}</Project>
+      <Name>StackExchange.Exceptional.PostgreSQL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StackExchange.Exceptional\StackExchange.Exceptional.csproj">
+      <Project>{da84a7a0-8042-4b2b-a000-3579dd419d2a}</Project>
+      <Name>StackExchange.Exceptional</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
