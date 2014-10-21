@@ -1,6 +1,8 @@
 ﻿-- Store all date and times in UTC.
 SET TIME ZONE 0;
 
+CREATE LANGUAGE plpgsql;
+
 CREATE TABLE countries (
 id              SERIAL,
 name            VARCHAR(64) NOT NULL,

@@ -31,6 +31,8 @@ CREATE INDEX IX_Exceptions_ErrorHash_AppName_CreationDate_DelDate ON exceptions 
 GRANT ALL PRIVILEGES ON exceptions TO neoanime_abroadadvisor;
 GRANT ALL PRIVILEGES ON exceptions_id_seq TO neoanime_abroadadvisor;
 
+CREATE LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION delete_student(INT) RETURNS VOID AS $delete_student$
     DECLARE
         p_student_id ALIAS FOR $1;
