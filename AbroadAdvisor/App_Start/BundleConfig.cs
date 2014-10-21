@@ -11,8 +11,10 @@ namespace Bennett.AbroadAdvisor.App_Start
                 "~/Scripts/bootstrap.js",
                 "~/Scripts/bootstrap-datepicker.js",
                 "~/Scripts/bootstrap-multiselect.js",
-                "~/Scripts/jquery.tablesorter.js",
-                "~/Scripts/tables.js",
+                "~/Scripts/jquery.dataTables.min.js",
+                "~/Scripts/jquery.dataTables.bootstrap.js",
+                "~/Scripts/jquery.validate.min.js",
+                "~/Scripts/jquery.validate.unobtrusive.min.js",
                 "~/Scripts/AbroadAdvisor.js",
                 "~/Scripts/AbroadAdvisor.Promo.js",
                 "~/Scripts/AbroadAdvisor.Student.js"));
@@ -23,6 +25,8 @@ namespace Bennett.AbroadAdvisor.App_Start
                 .Include("~/Content/css/sb-admin.css")
                 .Include("~/Content/css/font-awesome.min.css", new CssRewriteUrlTransform())
                 .Include("~/Content/css/datepicker.css")
+                .Include("~/Content/css/jquery.dataTables.min.css", new CssRewriteUrlTransform())
+                .Include("~/Content/css/jquery.dataTables.bootstrap.css", new CssRewriteUrlTransform())
                 .Include("~/Content/css/AbroadAdvisor.css"));
         }
     }

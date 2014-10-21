@@ -1,7 +1,11 @@
 ﻿window.Bennett.AbroadAdvisor = window.Bennett.AbroadAdvisor || {};
 
 (function (Student, $, undefined) {
-	'use strict';
+    'use strict';
+
+    var ajaxUrls = {
+        nameCheck: ''
+    };
 
 	Student.handleNewNote = function (formSelector, noteSelector,
                                       userFirstName, userLastName) {
@@ -41,8 +45,11 @@
 		});
 	};
 
-	Student.initStudentAddEdit = function () {
-		/// <summary>Initialize student add/edit page.</summary>
+	Student.initStudentAddEdit = function (nameCheckUrl) {
+	    /// <summary>Initialize student add/edit page.</summary>
+	    /// <param name="nameCheckUrl" type="String">URL for unique name check.</param>
+
+	    ajaxUrls.nameCheck = nameCheckUrl;
 
 	    Bennett.AbroadAdvisor.initMultiselect(1);
 	    Bennett.AbroadAdvisor.handleMvcEditor();
@@ -51,7 +58,83 @@
 			e.preventDefault();
 			Student.addStudyAbroadRows();
 		})
+
+		prepareForm();
 	};
+
+	function toggleAllFormFields(disabled) {
+	    /// <summary>Enable/disable all form fields.</summary>
+	    /// <param name="disabled" type="Boolean">True to disable all fields.</param>
+
+	    $('#student-form input, #student-form select, #student-form button').attr('disabled', disabled);
+	}
+
+	function prepareForm() {
+	    /// <summary>
+	    /// Disable all fields except first and last name, force the user to
+	    /// enter that information first.
+	    /// </summary>
+
+	    // https://stackoverflow.com/a/1909508
+	    var delay = (function () {
+	        var timer = 0;
+
+	        return function (callback, ms) {
+	            /// <summary>Execute callback function after certain timeframe.</summary>
+	            /// <param name="callback" type="Function">Function to execute.</param>
+	            /// <param name="ms" type="Number">Milliseconds to wait before executing callback.</param>
+
+	            clearTimeout(timer);
+	            timer = setTimeout(callback, ms);
+	        };
+	    })();
+
+	    toggleAllFormFields(true);
+	    $('#FirstName, #LastName').attr('disabled', false);
+
+	    $('#FirstName, #LastName').keyup(function () {
+	        delay(function () {
+	            // Calling the Bootstrap Modal doesn't automatically unfocus
+	            // input fields.
+	            $('#FirstName, #LastName').blur();
+
+	            checkNameUniqueness($('#FirstName').val(), $('#LastName').val())
+	        }, 500);
+	    });
+	}
+
+	function checkNameUniqueness(firstName, lastName) {
+	    if (firstName.length == 0 || lastName.length == 0) {
+	        return;
+	    }
+
+	    $.ajax({
+	        url: ajaxUrls.nameCheck,
+	        data: {
+	            firstName: firstName,
+                lastName: lastName
+	        },
+	        method: 'GET',
+            cache: false,
+	        success: function (result) {
+	            var uniqueNameContainer = $('#unique-name').empty();
+
+	            if (result.trim().length > 0) {
+	                toggleAllFormFields(true);
+	                $('#FirstName, #LastName').attr('disabled', false);
+	                uniqueNameContainer.html(result);
+	            } else {
+	                // No duplicates found. Enable all form fields and move on.
+	                toggleAllFormFields(false);
+	            }
+	        },
+	        error: function (jqXHR, textStatus, errorThrown) {
+	            var message = '<p>An unknown error occurred while checking student name.</p>' +
+                    '<p>' + textStatus + '</p>';
+	            Bennett.AbroadAdvisor.errorMessage(message);
+	        }
+	    })
+	}
 
 	function setupNoteModal() {
 	    // Load cached modal content and then refetch remote content.
@@ -68,6 +151,13 @@
 
 	Student.initStudentList = function () {
 	    /// <summary>Initialize the student list page.</summary>
+
+	    $('#studentlist').dataTable({
+	        columnDefs: [{
+	            targets: -1,
+                orderable: false
+	        }]
+	    });
 
 	    $('a.studentlisttooltop').tooltip();
 	    $('a.studentlistmodal').modal();

@@ -33,58 +33,52 @@ namespace Bennett.AbroadAdvisor.Models
 
         public static IEnumerable<PromoModel> GetPromos(bool withLogs = false)
         {
-            ApplicationCache cacheProvider = new ApplicationCache();
-            List<PromoModel> promos = cacheProvider.Get(CacheId, () => new List<PromoModel>());
+            List<PromoModel> promos = new List<PromoModel>();
 
-            if (promos.Count == 0)
+            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+
+                using (NpgsqlCommand command = connection.CreateCommand())
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+                    command.CommandText = @"
+                        SELECT      p.id AS promo_id, description, created_by, p.created, code, p.active,
+                                    u.first_name, u.last_name
+                        FROM        user_promo p
+                        INNER JOIN  users u ON
+                                    created_by = u.id
+                        ORDER BY    code";
 
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    connection.Open();
+
+                    using (NpgsqlDataReader reader = command.ExecuteReader())
                     {
-                        command.CommandText = @"
-                            SELECT      p.id AS promo_id, description, created_by, p.created, code, p.active,
-                                        u.first_name, u.last_name
-                            FROM        user_promo p
-                            INNER JOIN  users u ON
-                                        created_by = u.id
-                            ORDER BY    code";
-
-                        connection.Open();
-
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        while (reader.Read())
                         {
-                            while (reader.Read())
+                            PromoModel promo = new PromoModel()
                             {
-                                PromoModel promo = new PromoModel()
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("promo_id")),
-                                    Description = reader.GetString(reader.GetOrdinal("description")),
-                                    Created = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("created"))),
-                                    Code = reader.GetString(reader.GetOrdinal("code")),
-                                    IsActive = reader.GetBoolean(reader.GetOrdinal("active"))
-                                };
+                                Id = reader.GetInt32(reader.GetOrdinal("promo_id")),
+                                Description = reader.GetString(reader.GetOrdinal("description")),
+                                Created = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("created"))),
+                                Code = reader.GetString(reader.GetOrdinal("code")),
+                                IsActive = reader.GetBoolean(reader.GetOrdinal("active"))
+                            };
 
-                                UserModel user = new UserModel()
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("created_by")),
-                                    FirstName = reader.GetString(reader.GetOrdinal("first_name")),
-                                    LastName = reader.GetString(reader.GetOrdinal("last_name"))
-                                };
+                            UserModel user = new UserModel()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("created_by")),
+                                FirstName = reader.GetString(reader.GetOrdinal("first_name")),
+                                LastName = reader.GetString(reader.GetOrdinal("last_name"))
+                            };
 
-                                promo.CreatedBy = user;
+                            promo.CreatedBy = user;
 
-                                if (withLogs)
-                                {
-                                    promo.Logs = StudentPromoLog.GetLogsForPromo(promo.Id);
-                                }
-
-                                promos.Add(promo);
+                            if (withLogs)
+                            {
+                                promo.Logs = StudentPromoLog.GetLogsForPromo(promo.Id);
                             }
 
-                            cacheProvider.Set(CacheId, promos);
+                            promos.Add(promo);
                         }
                     }
                 }

@@ -10,6 +10,19 @@ namespace Bennett.AbroadAdvisor
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
             routes.LowercaseUrls = true;
 
+            // StackExchange.Exceptional error log page.
+            routes.MapRoute(
+                name: "Exceptions",
+                url: "errors/{path}/{subPath}",
+                defaults: new
+                {
+                    controller = "Home",
+                    action = "Exceptions",
+                    path = UrlParameter.Optional,
+                    subPath = UrlParameter.Optional
+                }
+            );
+
             routes.MapRoute(
                 name: "Robots",
                 url: "robots.txt",

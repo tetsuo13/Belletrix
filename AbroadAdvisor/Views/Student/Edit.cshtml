@@ -19,10 +19,25 @@
                 [@String.Join(",", studyAbroadYears)],
                 [@String.Join(",", studyAbroadPeriods)]
             );
+            Bennett.AbroadAdvisor.singleSubmit();
 
             $('a[href="#studyabroadtab"]').on('show.bs.tab', function (e) {
-                $.get('@Url.Action("StudyAbroad", new { id = Model.Id })', function (data) {
-                    $('#studyabroadtab').html(data);
+                $.ajax({
+                    url: '@Url.Action("StudyAbroad", new { id = Model.Id })',
+                    method: 'GET',
+                    cache: false,
+                    success: function (data) {
+                        $('#studyabroadtab').html(data);
+
+                        var timer = setInterval(function () {
+                            var studyAbroadTable = $('#studyabroad');
+
+                            if (studyAbroadTable.length) {
+                                studyAbroadTable.dataTable();
+                                clearInterval(timer);
+                            }
+                        });
+                    }
                 });
             });
         });

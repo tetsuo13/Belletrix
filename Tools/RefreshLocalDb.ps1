@@ -3,15 +3,22 @@
 Replace everything in the development DB with what's in production.
 #>
 
-Set-Variable productionDb -option Constant -value "neoanime_abroadadvisor"
-Set-Variable developmentDb -option Constant -value "neoanime_abroadadvisor"
-Set-Variable productionDbHost -option Constant -value "box450.bluehost.com"
-Set-Variable productionDbUser -option Constant -value "neoanime_abroadadvisor"
+$PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
+$webReleaseConfigPath = (Join-Path (Join-Path (Get-Item $PSScriptRoot).parent.FullName "AbroadAdvisor") "Web.Release.config")
+
+$webConfig = New-Object XML
+$webConfig.Load($webReleaseConfigPath)
+
+$dbConnectionString = New-Object System.Data.Common.DbConnectionStringBuilder
+$dbConnectionString.set_ConnectionString($webConfig.configuration.connectionStrings.add.connectionString)
+
+Set-Variable productionDb -option Constant -value $dbConnectionString["Database"]
+Set-Variable developmentDb -option Constant -value $dbConnectionString["Database"]
+Set-Variable productionDbHost -option Constant -value $dbConnectionString["Server"]
+Set-Variable productionDbUser -option Constant -value $dbConnectionString["User Id"]
 Set-Variable productionDbOwner -option Constant -value "neoanime"
 Set-Variable developmentDbHost -option Constant -value "localhost"
-
-# TODO: This should come from grepping Web.Release.config
-Set-Variable dbPassword -option Constant -value "uZtVIgiToZP4RxTPD"
+Set-Variable dbPassword -option Constant -value $dbConnectionString["Password"]
 
 Write-Host
 

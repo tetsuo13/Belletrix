@@ -445,5 +445,14 @@ namespace Bennett.AbroadAdvisor.Models
 
             return students;
         }
+
+        public static IEnumerable<StudentModel> SearchByFullName(string firstName, string lastName)
+        {
+            return GetStudents().Where(x =>
+                {
+                    return String.Equals(x.FirstName, firstName, StringComparison.InvariantCultureIgnoreCase) &&
+                        String.Equals(x.LastName, lastName, StringComparison.InvariantCultureIgnoreCase);
+                });
+        }
     }
 }
