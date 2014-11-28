@@ -196,5 +196,48 @@ namespace Bennett.AbroadAdvisor.Models
 
             return result;
         }
+
+        public static IEnumerable<PromoModel> AsSources()
+        {
+            IList<PromoModel> promos = new List<PromoModel>();
+            const string sql = @"
+                SELECT      id, code, description
+                FROM        user_promo
+                ORDER BY    description";
+
+            try
+            {
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                {
+                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+
+                    using (NpgsqlCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = sql;
+                        connection.Open();
+
+                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                promos.Add(new PromoModel()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                    Code = reader.GetString(reader.GetOrdinal("code")),
+                                    Description = reader.GetString(reader.GetOrdinal("description"))
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
+            }
+
+            return promos;
+        }
     }
 }

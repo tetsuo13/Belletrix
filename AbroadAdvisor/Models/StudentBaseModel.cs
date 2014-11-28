@@ -141,7 +141,7 @@ namespace Bennett.AbroadAdvisor.Models
         public IEnumerable<int> StudyAbroadPeriod { get; set; }
 
         protected IDictionary<string, string> columns;
-        protected IList<NpgsqlParameter> parameters;
+        protected ICollection<NpgsqlParameter> parameters;
 
         protected static string StringOrDefault(NpgsqlDataReader reader, string column)
         {
@@ -343,21 +343,29 @@ namespace Bennett.AbroadAdvisor.Models
         {
             int studentId;
 
-            using (NpgsqlCommand command = connection.CreateCommand())
+            StringBuilder sql = new StringBuilder("INSERT INTO students (");
+
+            try
             {
-                StringBuilder sql = new StringBuilder(@"INSERT INTO students (");
+                using (NpgsqlCommand command = connection.CreateCommand())
+                {
+                    PrepareColumns(ref sql);
 
-                PrepareColumns(ref sql);
+                    sql.Append(String.Join(", ", columns.Select(x => x.Key)));
+                    sql.Append(") VALUES (");
+                    sql.Append(String.Join(", ", columns.Select(x => x.Value)));
+                    sql.Append(") ");
+                    sql.Append("RETURNING id");
 
-                sql.Append(String.Join(", ", columns.Select(x => x.Key)));
-                sql.Append(") VALUES (");
-                sql.Append(String.Join(", ", columns.Select(x => x.Value)));
-                sql.Append(") ");
-                sql.Append("RETURNING id");
-
-                command.CommandText = sql.ToString();
-                command.Parameters.AddRange(parameters.ToArray());
-                studentId = (int)command.ExecuteScalar();
+                    command.CommandText = sql.ToString();
+                    command.Parameters.AddRange(parameters.ToArray());
+                    studentId = (int)command.ExecuteScalar();
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql.ToString();
+                throw e;
             }
 
             if (SelectedMajors != null)

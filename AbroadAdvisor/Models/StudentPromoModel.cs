@@ -38,8 +38,7 @@ namespace Bennett.AbroadAdvisor.Models
                     eventLog.Student = this;
                     eventLog.AddStudentEvent(connection, Id, EventLogModel.EventType.AddStudent);
 
-                    StudentPromoLog log = new StudentPromoLog();
-                    log.Save(connection, Id, promoCode);
+                    StudentPromoLog.Save(connection, Id, promoCode);
 
                     transaction.Commit();
                 }
