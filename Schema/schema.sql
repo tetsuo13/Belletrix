@@ -610,6 +610,7 @@ GRANT ALL PRIVILEGES ON event_log_id_seq TO neoanime_abroadadvisor;
 CREATE TABLE student_promo_log (
 promo_id    INT NOT NULL,
 student_id  INT NOT NULL,
+created     TIMESTAMP NOT NULL,
 
 PRIMARY KEY (student_id),
 FOREIGN KEY (promo_id) REFERENCES user_promo (id),

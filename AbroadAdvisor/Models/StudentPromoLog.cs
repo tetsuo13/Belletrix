@@ -11,17 +11,18 @@ namespace Bennett.AbroadAdvisor.Models
 
         public int PromoId { get; set; }
         public int StudentId { get; set; }
+        public DateTime Created { get; set; }
 
         public static void Save(NpgsqlConnection connection, int studentId, string promoCode)
         {
             const string sql = @"
                 INSERT INTO student_promo_log
                 (
-                    promo_id, student_id
+                    promo_id, student_id, created
                 )
                 VALUES
                 (
-                    (SELECT id FROM user_promo WHERE code = @PromoCode), @StudentId
+                    (SELECT id FROM user_promo WHERE code = @PromoCode), @StudentId, @Created
                 )
                 RETURNING promo_id";
 
@@ -33,6 +34,7 @@ namespace Bennett.AbroadAdvisor.Models
 
                     command.Parameters.Add("@PromoCode", NpgsqlTypes.NpgsqlDbType.Varchar, 32).Value = promoCode.ToLower();
                     command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+                    command.Parameters.Add("@Created", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
 
                     int promoId = Convert.ToInt32(command.ExecuteScalar());
                     CacheOurselves(promoId, studentId);
@@ -50,11 +52,11 @@ namespace Bennett.AbroadAdvisor.Models
             const string sql = @"
                 INSERT INTO student_promo_log
                 (
-                    promo_id, student_id
+                    promo_id, student_id, created
                 )
                 VALUES
                 (
-                    @PromoId, @StudentId
+                    @PromoId, @StudentId, @Created
                 )";
 
             try
@@ -64,6 +66,7 @@ namespace Bennett.AbroadAdvisor.Models
                     command.CommandText = sql;
                     command.Parameters.Add("@PromoId", NpgsqlTypes.NpgsqlDbType.Integer).Value = promoId;
                     command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+                    command.Parameters.Add("@Created", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
                     command.ExecuteNonQuery();
 
                     CacheOurselves(promoId, studentId);
@@ -114,7 +117,7 @@ namespace Bennett.AbroadAdvisor.Models
         {
             ICollection<StudentPromoLog> logs = new List<StudentPromoLog>();
             const string sql = @"
-                SELECT  student_id
+                SELECT  student_id, created
                 FROM    student_promo_log
                 WHERE   promo_id = @PromoId";
 
@@ -137,7 +140,8 @@ namespace Bennett.AbroadAdvisor.Models
                                 StudentPromoLog log = new StudentPromoLog()
                                 {
                                     PromoId = id,
-                                    StudentId = reader.GetInt32(reader.GetOrdinal("student_id"))
+                                    StudentId = reader.GetInt32(reader.GetOrdinal("student_id")),
+                                    Created = reader.GetDateTime(reader.GetOrdinal("created"))
                                 };
 
                                 logs.Add(log);
@@ -215,11 +219,13 @@ namespace Bennett.AbroadAdvisor.Models
                     {
                         sql = @"
                             UPDATE  student_promo_log
-                            SET     promo_id = @PromoId
+                            SET     promo_id = @PromoId,
+                                    created = @Created
                             WHERE   student_id = @StudentId";
 
                         command.CommandText = sql;
                         command.Parameters.Add("@PromoId", NpgsqlTypes.NpgsqlDbType.Numeric).Value = promoId;
+                        command.Parameters.Add("@Created", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
                         command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Numeric).Value = studentId;
                         command.ExecuteNonQuery();
 
