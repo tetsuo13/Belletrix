@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.ComponentModel.DataAnnotations;
 
 namespace Bennett.AbroadAdvisor.Models
 {
@@ -26,7 +24,7 @@ namespace Bennett.AbroadAdvisor.Models
 
         public static IEnumerable<object> GetPeriods()
         {
-            List<object> periods = new List<object>();
+            ICollection<object> periods = new List<object>();
 
             foreach (PeriodValue value in Enum.GetValues(typeof(PeriodValue)))
             {
@@ -37,12 +35,12 @@ namespace Bennett.AbroadAdvisor.Models
                 });
             }
 
-            return periods.AsEnumerable();
+            return periods;
         }
 
         public static IEnumerable<object> GetPeriodsWithCatchAll()
         {
-            List<object> catchAll = new List<object>()
+            IEnumerable<object> catchAll = new List<object>()
             {
                 new { Id = CatchAllValue, Name = "Any Semester" }
             };

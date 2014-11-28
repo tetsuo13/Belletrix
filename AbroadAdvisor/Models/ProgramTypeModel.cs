@@ -1,5 +1,6 @@
 ﻿using Bennett.AbroadAdvisor.Core;
 using Npgsql;
+using System;
 using System.Collections.Generic;
 
 namespace Bennett.AbroadAdvisor.Models
@@ -12,34 +13,42 @@ namespace Bennett.AbroadAdvisor.Models
 
         public static IEnumerable<ProgramTypeModel> GetProgramTypes()
         {
-            List<ProgramTypeModel> programTypes = new List<ProgramTypeModel>();
+            const string sql = @"
+                SELECT      id, name, short_term
+                FROM        program_types
+                ORDER BY    name";
+            ICollection<ProgramTypeModel> programTypes = new List<ProgramTypeModel>();
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+            try
             {
-                connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                 {
-                    command.CommandText = @"
-                        SELECT      id, name, short_term
-                        FROM        program_types
-                        ORDER BY    name";
+                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
 
-                    connection.Open();
-
-                    using (NpgsqlDataReader reader = command.ExecuteReader())
+                    using (NpgsqlCommand command = connection.CreateCommand())
                     {
-                        while (reader.Read())
+                        command.CommandText = sql;
+                        connection.Open();
+
+                        using (NpgsqlDataReader reader = command.ExecuteReader())
                         {
-                            programTypes.Add(new ProgramTypeModel()
+                            while (reader.Read())
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                Name = reader.GetString(reader.GetOrdinal("name")),
-                                ShortTerm = reader.GetBoolean(reader.GetOrdinal("short_term"))
-                            });
+                                programTypes.Add(new ProgramTypeModel()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                    Name = reader.GetString(reader.GetOrdinal("name")),
+                                    ShortTerm = reader.GetBoolean(reader.GetOrdinal("short_term"))
+                                });
+                            }
                         }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
 
             return programTypes;

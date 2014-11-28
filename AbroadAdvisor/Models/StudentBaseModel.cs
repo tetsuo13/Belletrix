@@ -423,47 +423,66 @@ namespace Bennett.AbroadAdvisor.Models
         protected void SaveStudyAbroadDestinations(NpgsqlConnection connection, int studentId,
             IEnumerable<int> countries, IEnumerable<int> years, IEnumerable<int> periods)
         {
-            using (NpgsqlCommand command = connection.CreateCommand())
-            {
-                command.CommandText = @"
-                    DELETE FROM student_study_abroad_wishlist
-                    WHERE student_id = @StudentId";
+            const string sql = @"
+                DELETE FROM student_study_abroad_wishlist
+                WHERE student_id = @StudentId";
 
-                command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
-                command.ExecuteNonQuery();
+            try
+            {
+                using (NpgsqlCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = sql;
+                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
 
             if (countries != null)
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                const string insertSql = @"
+                    INSERT INTO student_study_abroad_wishlist
+                    (
+                        student_id, country_id, year, period
+                    )
+                    VALUES
+                    (
+                        @StudentId, @CountryId, @Year, @Period
+                    )";
+
+                try
                 {
-                    command.CommandText = @"
-                        INSERT INTO student_study_abroad_wishlist
-                        (
-                            student_id, country_id, year, period
-                        )
-                        VALUES
-                        (
-                            @StudentId, @CountryId, @Year, @Period
-                        )";
-
-                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
-                    command.Parameters.Add("@CountryId", NpgsqlTypes.NpgsqlDbType.Integer);
-                    command.Parameters.Add("@Year", NpgsqlTypes.NpgsqlDbType.Integer);
-                    command.Parameters.Add("@Period", NpgsqlTypes.NpgsqlDbType.Integer);
-
-                    command.Prepare();
-
-                    int countriesCount = countries.Cast<int>().Count();
-
-                    for (int i = 0; i < countriesCount; i++)
+                    using (NpgsqlCommand command = connection.CreateCommand())
                     {
-                        command.Parameters[1].Value = countries.ElementAt(i);
-                        command.Parameters[2].Value = years.ElementAt(i);
-                        command.Parameters[3].Value = periods.ElementAt(i);
+                        command.CommandText = insertSql;
 
-                        command.ExecuteNonQuery();
+                        command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+                        command.Parameters.Add("@CountryId", NpgsqlTypes.NpgsqlDbType.Integer);
+                        command.Parameters.Add("@Year", NpgsqlTypes.NpgsqlDbType.Integer);
+                        command.Parameters.Add("@Period", NpgsqlTypes.NpgsqlDbType.Integer);
+
+                        command.Prepare();
+
+                        int countriesCount = countries.Cast<int>().Count();
+
+                        for (int i = 0; i < countriesCount; i++)
+                        {
+                            command.Parameters[1].Value = countries.ElementAt(i);
+                            command.Parameters[2].Value = years.ElementAt(i);
+                            command.Parameters[3].Value = periods.ElementAt(i);
+
+                            command.ExecuteNonQuery();
+                        }
                     }
+                }
+                catch (Exception e)
+                {
+                    e.Data["SQL"] = insertSql;
+                    throw e;
                 }
             }
         }
@@ -471,68 +490,102 @@ namespace Bennett.AbroadAdvisor.Models
         protected void SaveStudentLanguages(NpgsqlConnection connection, int studentId, string tableName,
             IEnumerable<int> languages)
         {
-            using (NpgsqlCommand command = connection.CreateCommand())
-            {
-                command.CommandText = String.Format(@"
-                    DELETE FROM {0}
-                    WHERE student_id = @StudentId",
-                    tableName);
+            string sql = String.Format(@"
+                DELETE FROM {0}
+                WHERE student_id = @StudentId",
+                tableName);
 
-                command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
-                command.ExecuteNonQuery();
+            try
+            {
+                using (NpgsqlCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = sql;
+                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
 
             if (languages != null && languages.Cast<int>().Count() > 0)
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                ICollection<string> values = new List<string>();
+
+                foreach (int languageId in languages)
                 {
-                    IList<string> values = new List<string>();
+                    values.Add(String.Format("({0}, {1})", studentId, languageId));
+                }
 
-                    foreach (int languageId in languages)
+                StringBuilder insertSql = new StringBuilder();
+                insertSql.Append("INSERT INTO ").Append(tableName).Append(" (student_id, language_id) VALUES ");
+                insertSql.Append(String.Join(",", values));
+
+                try
+                {
+                    using (NpgsqlCommand command = connection.CreateCommand())
                     {
-                        values.Add(String.Format("({0}, {1})", studentId, languageId));
+                        command.CommandText = insertSql.ToString();
+                        command.ExecuteNonQuery();
                     }
-
-                    StringBuilder sql = new StringBuilder();
-                    sql.Append("INSERT INTO ").Append(tableName).Append(" (student_id, language_id) VALUES ");
-                    sql.Append(String.Join(",", values));
-
-                    command.CommandText = sql.ToString();
-                    command.ExecuteNonQuery();
+                }
+                catch (Exception e)
+                {
+                    e.Data["SQL"] = insertSql.ToString();
+                    throw e;
                 }
             }
         }
 
         protected void SaveStudentMajors(NpgsqlConnection connection, int studentId, IEnumerable<int> majors, bool isMajor)
         {
-            using (NpgsqlCommand command = connection.CreateCommand())
-            {
-                command.CommandText = @"
-                    DELETE FROM matriculation
-                    WHERE   student_id = @StudentId AND
-                            is_major = @IsMajor";
+            const string sql = @"
+                DELETE FROM matriculation
+                WHERE   student_id = @StudentId AND
+                        is_major = @IsMajor";
 
-                command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
-                command.Parameters.Add("@IsMajor", NpgsqlTypes.NpgsqlDbType.Boolean).Value = isMajor;
-                command.ExecuteNonQuery();
+            try
+            {
+                using (NpgsqlCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = sql;
+                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+                    command.Parameters.Add("@IsMajor", NpgsqlTypes.NpgsqlDbType.Boolean).Value = isMajor;
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
 
             if (majors != null && majors.Cast<int>().Count() > 0)
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                StringBuilder insertSql = new StringBuilder("INSERT INTO matriculation (student_id, major_id, is_major) VALUES ");
+                ICollection<string> values = new List<string>();
+
+                foreach (int majorId in majors)
                 {
-                    StringBuilder sql = new StringBuilder("INSERT INTO matriculation (student_id, major_id, is_major) VALUES ");
-                    IList<string> values = new List<string>();
+                    values.Add(String.Format("({0}, {1}, '{2}')", studentId, majorId, isMajor ? 1 : 0));
+                }
 
-                    foreach (int majorId in majors)
+                insertSql.Append(String.Join(",", values));
+
+                try
+                {
+                    using (NpgsqlCommand command = connection.CreateCommand())
                     {
-                        values.Add(String.Format("({0}, {1}, '{2}')", studentId, majorId, isMajor ? 1 : 0));
+                        command.CommandText = insertSql.ToString();
+                        command.ExecuteNonQuery();
                     }
-
-                    sql.Append(String.Join(",", values));
-
-                    command.CommandText = sql.ToString();
-                    command.ExecuteNonQuery();
+                }
+                catch (Exception e)
+                {
+                    e.Data["SQL"] = insertSql.ToString();
+                    throw e;
                 }
             }
         }

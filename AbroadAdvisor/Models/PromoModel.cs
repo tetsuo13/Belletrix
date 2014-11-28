@@ -33,55 +33,63 @@ namespace Bennett.AbroadAdvisor.Models
 
         public static IEnumerable<PromoModel> GetPromos(bool withLogs = false)
         {
-            List<PromoModel> promos = new List<PromoModel>();
+            const string sql = @"
+                SELECT      p.id AS promo_id, description, created_by, p.created, code, p.active,
+                            u.first_name, u.last_name
+                FROM        user_promo p
+                INNER JOIN  users u ON
+                            created_by = u.id
+                ORDER BY    code";
+            ICollection<PromoModel> promos = new List<PromoModel>();
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+            try
             {
-                connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                 {
-                    command.CommandText = @"
-                        SELECT      p.id AS promo_id, description, created_by, p.created, code, p.active,
-                                    u.first_name, u.last_name
-                        FROM        user_promo p
-                        INNER JOIN  users u ON
-                                    created_by = u.id
-                        ORDER BY    code";
+                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
 
-                    connection.Open();
-
-                    using (NpgsqlDataReader reader = command.ExecuteReader())
+                    using (NpgsqlCommand command = connection.CreateCommand())
                     {
-                        while (reader.Read())
+                        command.CommandText = sql;
+                        connection.Open();
+
+                        using (NpgsqlDataReader reader = command.ExecuteReader())
                         {
-                            PromoModel promo = new PromoModel()
+                            while (reader.Read())
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("promo_id")),
-                                Description = reader.GetString(reader.GetOrdinal("description")),
-                                Created = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("created"))),
-                                Code = reader.GetString(reader.GetOrdinal("code")),
-                                IsActive = reader.GetBoolean(reader.GetOrdinal("active"))
-                            };
+                                PromoModel promo = new PromoModel()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("promo_id")),
+                                    Description = reader.GetString(reader.GetOrdinal("description")),
+                                    Created = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("created"))),
+                                    Code = reader.GetString(reader.GetOrdinal("code")),
+                                    IsActive = reader.GetBoolean(reader.GetOrdinal("active"))
+                                };
 
-                            UserModel user = new UserModel()
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("created_by")),
-                                FirstName = reader.GetString(reader.GetOrdinal("first_name")),
-                                LastName = reader.GetString(reader.GetOrdinal("last_name"))
-                            };
+                                UserModel user = new UserModel()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("created_by")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("first_name")),
+                                    LastName = reader.GetString(reader.GetOrdinal("last_name"))
+                                };
 
-                            promo.CreatedBy = user;
+                                promo.CreatedBy = user;
 
-                            if (withLogs)
-                            {
-                                promo.Logs = StudentPromoLog.GetLogsForPromo(promo.Id);
+                                if (withLogs)
+                                {
+                                    promo.Logs = StudentPromoLog.GetLogsForPromo(promo.Id);
+                                }
+
+                                promos.Add(promo);
                             }
-
-                            promos.Add(promo);
                         }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
 
             return promos;
@@ -90,7 +98,7 @@ namespace Bennett.AbroadAdvisor.Models
         public static PromoModel GetPromo(int id)
         {
             IEnumerable<PromoModel> promos = GetPromos();
-            PromoModel needle = promos.Where(p => p.Id == id).FirstOrDefault();
+            PromoModel needle = promos.FirstOrDefault(p => p.Id == id);
 
             if (needle != null)
             {
@@ -104,7 +112,7 @@ namespace Bennett.AbroadAdvisor.Models
         {
             IEnumerable<PromoModel> promos = GetPromos();
             code = code.ToLower();
-            PromoModel needle = promos.Where(p => p.Code == code).FirstOrDefault();
+            PromoModel needle = promos.FirstOrDefault(p => p.Code == code);
 
             if (needle != null)
             {
@@ -116,51 +124,61 @@ namespace Bennett.AbroadAdvisor.Models
 
         public void Save(int userId)
         {
+            const string sql = @"
+                INSERT INTO user_promo
+                (
+                    description, created_by, created,
+                    code, active
+                )
+                VALUES
+                (
+                    @Description, @CreatedBy, @Created,
+                    @Code, @Active
+                )
+                RETURNING id";
+
             Created = DateTime.Now.ToUniversalTime();
             IsActive = true;
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+            try
             {
-                connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-                connection.Open();
-
-                using (NpgsqlTransaction transaction = connection.BeginTransaction())
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                 {
-                    int promoId;
+                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+                    connection.Open();
 
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (NpgsqlTransaction transaction = connection.BeginTransaction())
                     {
-                        command.CommandText = @"
-                            INSERT INTO user_promo
-                            (
-                                description, created_by, created,
-                                code, active
-                            )
-                            VALUES
-                            (
-                                @Description, @CreatedBy, @Created,
-                                @Code, @Active
-                            )
-                            RETURNING id";
+                        int promoId;
 
-                        command.Parameters.Add("@Description", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = Description;
-                        command.Parameters.Add("@CreatedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = userId;
-                        command.Parameters.Add("@Created", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = Created;
-                        command.Parameters.Add("@Code", NpgsqlTypes.NpgsqlDbType.Varchar, 32).Value = Code.ToLower();
-                        command.Parameters.Add("@Active", NpgsqlTypes.NpgsqlDbType.Boolean).Value = IsActive;
+                        using (NpgsqlCommand command = connection.CreateCommand())
+                        {
+                            command.CommandText = sql;
 
-                        promoId = (int)command.ExecuteScalar();
+                            command.Parameters.Add("@Description", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = Description;
+                            command.Parameters.Add("@CreatedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = userId;
+                            command.Parameters.Add("@Created", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = Created;
+                            command.Parameters.Add("@Code", NpgsqlTypes.NpgsqlDbType.Varchar, 32).Value = Code.ToLower();
+                            command.Parameters.Add("@Active", NpgsqlTypes.NpgsqlDbType.Boolean).Value = IsActive;
+
+                            promoId = (int)command.ExecuteScalar();
+                        }
+
+                        transaction.Commit();
+
+                        ApplicationCache cacheProvider = new ApplicationCache();
+                        List<PromoModel> promos = cacheProvider.Get(CacheId, () => new List<PromoModel>());
+                        Id = promoId;
+                        CreatedBy = UserModel.GetUser(userId);
+                        promos.Add(this);
+                        cacheProvider.Set(CacheId, promos);
                     }
-
-                    transaction.Commit();
-
-                    ApplicationCache cacheProvider = new ApplicationCache();
-                    List<PromoModel> promos = cacheProvider.Get(CacheId, () => new List<PromoModel>());
-                    Id = promoId;
-                    CreatedBy = UserModel.GetUser(userId);
-                    promos.Add(this);
-                    cacheProvider.Set(CacheId, promos);
                 }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
         }
 
@@ -173,25 +191,34 @@ namespace Bennett.AbroadAdvisor.Models
                 return result;
             }
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+            const string sql = @"
+                SELECT  id
+                FROM    user_promo
+                WHERE   LOWER(code) = @Code";
+
+            try
             {
-                connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                 {
-                    command.CommandText = @"
-                        SELECT  id
-                        FROM    user_promo
-                        WHERE   LOWER(code) = @Code";
+                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
 
-                    command.Parameters.Add("@Code", NpgsqlTypes.NpgsqlDbType.Varchar, 32).Value = name.ToLower();
-                    connection.Open();
-
-                    using (NpgsqlDataReader reader = command.ExecuteReader())
+                    using (NpgsqlCommand command = connection.CreateCommand())
                     {
-                        result = !reader.HasRows;
+                        command.CommandText = sql;
+                        command.Parameters.Add("@Code", NpgsqlTypes.NpgsqlDbType.Varchar, 32).Value = name.ToLower();
+                        connection.Open();
+
+                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        {
+                            result = !reader.HasRows;
+                        }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
 
             return result;

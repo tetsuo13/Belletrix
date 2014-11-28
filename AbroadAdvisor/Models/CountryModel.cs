@@ -1,5 +1,6 @@
 ﻿using Bennett.AbroadAdvisor.Core;
 using Npgsql;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -26,37 +27,46 @@ namespace Bennett.AbroadAdvisor.Models
 
             if (countries.Count == 0)
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                const string sql = @"
+                    SELECT      id, name, abbreviation
+                    FROM        countries
+                    WHERE       is_region = FALSE
+                    ORDER BY    CASE abbreviation
+                                    WHEN 'US' THEN 1
+                                    WHEN '' THEN 2
+                                    ELSE 3
+                                END, name";
+
+                try
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                     {
-                        command.CommandText = @"
-                            SELECT      id, name, abbreviation
-                            FROM        countries
-                            WHERE       is_region = FALSE
-                            ORDER BY    CASE abbreviation
-                                            WHEN 'US' THEN 1
-                                            WHEN '' THEN 2
-                                            ELSE 3
-                                        END, name";
+                        connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
 
-                        connection.Open();
-
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (NpgsqlCommand command = connection.CreateCommand())
                         {
-                            while (reader.Read())
+                            command.CommandText = sql;
+                            connection.Open();
+
+                            using (NpgsqlDataReader reader = command.ExecuteReader())
                             {
-                                countries.Add(new CountryModel()
+                                while (reader.Read())
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                    Name = reader.GetString(reader.GetOrdinal("name")),
-                                    Abbreviation = reader.GetString(reader.GetOrdinal("abbreviation"))
-                                });
+                                    countries.Add(new CountryModel()
+                                    {
+                                        Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                        Name = reader.GetString(reader.GetOrdinal("name")),
+                                        Abbreviation = reader.GetString(reader.GetOrdinal("abbreviation"))
+                                    });
+                                }
                             }
                         }
                     }
+                }
+                catch (Exception e)
+                {
+                    e.Data["SQL"] = sql;
+                    throw e;
                 }
 
                 cacheProvider.Set(cacheId, countries);
@@ -73,33 +83,42 @@ namespace Bennett.AbroadAdvisor.Models
 
             if (regions.Count == 0)
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                const string sql = @"
+                    SELECT      id, name, abbreviation
+                    FROM        countries
+                    WHERE       is_region = TRUE
+                    ORDER BY    name";
+
+                try
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                     {
-                        command.CommandText = @"
-                            SELECT      id, name, abbreviation
-                            FROM        countries
-                            WHERE       is_region = TRUE
-                            ORDER BY    name";
+                        connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
 
-                        connection.Open();
-
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (NpgsqlCommand command = connection.CreateCommand())
                         {
-                            while (reader.Read())
+                            command.CommandText = sql;
+                            connection.Open();
+
+                            using (NpgsqlDataReader reader = command.ExecuteReader())
                             {
-                                regions.Add(new CountryModel()
+                                while (reader.Read())
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                    Name = reader.GetString(reader.GetOrdinal("name")),
-                                    Abbreviation = reader.GetString(reader.GetOrdinal("abbreviation"))
-                                });
+                                    regions.Add(new CountryModel()
+                                    {
+                                        Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                        Name = reader.GetString(reader.GetOrdinal("name")),
+                                        Abbreviation = reader.GetString(reader.GetOrdinal("abbreviation"))
+                                    });
+                                }
                             }
                         }
                     }
+                }
+                catch (Exception e)
+                {
+                    e.Data["SQL"] = sql;
+                    throw e;
                 }
 
                 cacheProvider.Set(cacheId, regions);

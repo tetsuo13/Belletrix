@@ -16,7 +16,7 @@ namespace Bennett.AbroadAdvisor.Models
                 new StudentClassificationModel() { Id = 1, Name = "Sophomore" },
                 new StudentClassificationModel() { Id = 2, Name = "Junior" },
                 new StudentClassificationModel() { Id = 3, Name = "Senior" }
-            }.AsEnumerable();
+            };
         }
     }
 }

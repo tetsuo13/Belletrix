@@ -1,5 +1,6 @@
 ﻿using Bennett.AbroadAdvisor.Core;
 using Npgsql;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -16,36 +17,45 @@ namespace Bennett.AbroadAdvisor.Models
         public static List<LanguageModel> GetLanguages()
         {
             ApplicationCache cacheProvider = new ApplicationCache();
-            string cacheId = "Languages";
+            const string cacheId = "Languages";
             List<LanguageModel> languages = cacheProvider.Get(cacheId, () => new List<LanguageModel>());
 
             if (languages.Count == 0)
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                const string sql = @"
+                    SELECT      id, name
+                    FROM        languages
+                    ORDER BY    name";
+
+                try
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                     {
-                        command.CommandText = @"
-                        SELECT      id, name
-                        FROM        languages
-                        ORDER BY    name";
+                        connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
 
-                        connection.Open();
-
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (NpgsqlCommand command = connection.CreateCommand())
                         {
-                            while (reader.Read())
+                            command.CommandText = sql;
+                            connection.Open();
+
+                            using (NpgsqlDataReader reader = command.ExecuteReader())
                             {
-                                languages.Add(new LanguageModel()
+                                while (reader.Read())
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                    Name = reader.GetString(reader.GetOrdinal("name"))
-                                });
+                                    languages.Add(new LanguageModel()
+                                    {
+                                        Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                        Name = reader.GetString(reader.GetOrdinal("name"))
+                                    });
+                                }
                             }
                         }
                     }
+                }
+                catch (Exception e)
+                {
+                    e.Data["SQL"] = sql;
+                    throw e;
                 }
 
                 cacheProvider.Set(cacheId, languages);

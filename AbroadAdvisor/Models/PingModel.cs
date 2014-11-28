@@ -8,25 +8,27 @@ namespace Bennett.AbroadAdvisor.Models
     {
         public static string Ping()
         {
+            const string sql = "SELECT version() AS version";
             string result = String.Empty;
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+            try
             {
-                connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                 {
-                    command.CommandText = "SELECT version() AS version";
-                    connection.Open();
+                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
 
-                    using (NpgsqlDataReader reader = command.ExecuteReader())
+                    using (NpgsqlCommand command = connection.CreateCommand())
                     {
-                        while (reader.Read())
-                        {
-                            result = reader.GetString(reader.GetOrdinal("version"));
-                        }
+                        command.CommandText = sql;
+                        connection.Open();
+                        result = command.ExecuteScalar() as String;
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
 
             return result;

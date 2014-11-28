@@ -3,7 +3,7 @@ using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Security.Cryptography;
+using System.Linq;
 using System.Text;
 
 namespace Bennett.AbroadAdvisor.Models
@@ -57,83 +57,102 @@ namespace Bennett.AbroadAdvisor.Models
 
         public static void UpdateLastLogin(string username)
         {
-            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+            const string sql = @"
+                UPDATE  users
+                SET     last_login = @LastLogin
+                WHERE   login = @Username";
+
+            try
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                 {
-                    command.CommandText = @"
-                        UPDATE  users
-                        SET     last_login = @LastLogin
-                        WHERE   login = @Username";
+                    using (NpgsqlCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = sql;
+                        command.Parameters.Add("@LastLogin", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
+                        command.Parameters.Add("@Username", NpgsqlTypes.NpgsqlDbType.Varchar, 24).Value = username;
 
-                    command.Parameters.Add("@LastLogin", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
-                    command.Parameters.Add("@Username", NpgsqlTypes.NpgsqlDbType.Varchar, 24).Value = username;
-
-                    connection.Open();
-                    command.ExecuteNonQuery();
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
         }
 
-        public static List<UserModel> GetUsers(string username = null)
+        public static IEnumerable<UserModel> GetUsers(string username = null)
         {
-            List<UserModel> users = new List<UserModel>();
+            ICollection<UserModel> users = new List<UserModel>();
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
-            {
-                connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                string sql = @"
+            string sql = @"
                     SELECT  id, first_name, last_name,
                             created, last_login, email,
                             admin, active, login,
                             password_iterations, password_salt, password_hash
                     FROM    users ";
 
-                if (username != null)
+            if (username != null)
+            {
+                sql += "WHERE login = @Username";
+            }
+
+            try
+            {
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                 {
-                    sql += "WHERE login = @Username";
-                }
+                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
 
-                using (NpgsqlCommand command = new NpgsqlCommand(sql, connection))
-                {
-                    if (username != null)
+                    using (NpgsqlCommand command = connection.CreateCommand())
                     {
-                        command.Parameters.Add("@Username", NpgsqlTypes.NpgsqlDbType.Varchar, 24).Value = username;
-                    }
+                        command.CommandText = sql;
 
-                    connection.Open();
-
-                    using (NpgsqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
+                        if (username != null)
                         {
-                            UserModel user = new UserModel()
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                FirstName = reader.GetString(reader.GetOrdinal("first_name")),
-                                LastName = reader.GetString(reader.GetOrdinal("last_name")),
-                                Login = reader.GetString(reader.GetOrdinal("login")),
-                                Created = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("created"))),
-                                Email = reader.GetString(reader.GetOrdinal("email")),
-                                IsAdmin = reader.GetBoolean(reader.GetOrdinal("admin")),
-                                IsActive = reader.GetBoolean(reader.GetOrdinal("active")),
-                                PasswordIterations = reader.GetInt32(reader.GetOrdinal("password_iterations")),
-                                PasswordSalt = reader.GetString(reader.GetOrdinal("password_salt")),
-                                Password = reader.GetString(reader.GetOrdinal("password_hash"))
-                            };
+                            command.Parameters.Add("@Username", NpgsqlTypes.NpgsqlDbType.Varchar, 24).Value = username;
+                        }
 
-                            int ord = reader.GetOrdinal("last_login");
+                        connection.Open();
 
-                            if (!reader.IsDBNull(ord))
+                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
                             {
-                                user.LastLogin = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
+                                UserModel user = new UserModel()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("first_name")),
+                                    LastName = reader.GetString(reader.GetOrdinal("last_name")),
+                                    Login = reader.GetString(reader.GetOrdinal("login")),
+                                    Created = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("created"))),
+                                    Email = reader.GetString(reader.GetOrdinal("email")),
+                                    IsAdmin = reader.GetBoolean(reader.GetOrdinal("admin")),
+                                    IsActive = reader.GetBoolean(reader.GetOrdinal("active")),
+                                    PasswordIterations = reader.GetInt32(reader.GetOrdinal("password_iterations")),
+                                    PasswordSalt = reader.GetString(reader.GetOrdinal("password_salt")),
+                                    Password = reader.GetString(reader.GetOrdinal("password_hash"))
+                                };
+
+                                int ord = reader.GetOrdinal("last_login");
+
+                                if (!reader.IsDBNull(ord))
+                                {
+                                    user.LastLogin = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
+                                }
+
+                                users.Add(user);
                             }
-
-                            users.Add(user);
                         }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
 
             return users;
@@ -141,11 +160,11 @@ namespace Bennett.AbroadAdvisor.Models
 
         public static UserModel GetUser(string username)
         {
-            IList<UserModel> users = UserModel.GetUsers(username);
-            
-            if (users.Count == 1)
+            IEnumerable<UserModel> users = UserModel.GetUsers(username);
+
+            if (users.Any())
             {
-                return users[0];
+                return users.First();
             }
 
             throw new Exception("User not found");
@@ -153,14 +172,11 @@ namespace Bennett.AbroadAdvisor.Models
 
         public static UserModel GetUser(int id)
         {
-            IEnumerable<UserModel> users = UserModel.GetUsers();
+            UserModel user = UserModel.GetUsers().FirstOrDefault(x => x.Id == id);
 
-            foreach (UserModel user in users)
+            if (user != null)
             {
-                if (user.Id == id)
-                {
-                    return user;
-                }
+                return user;
             }
 
             throw new Exception("User not found");
@@ -168,43 +184,108 @@ namespace Bennett.AbroadAdvisor.Models
 
         public void SaveChanges(bool isAdmin)
         {
-            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+            bool updatePassword = !String.IsNullOrEmpty(Password);
+
+            StringBuilder sql = new StringBuilder(@"
+                UPDATE  users
+                SET     first_name = @FirstName,
+                        last_name = @LastName,
+                        email = @Email ");
+
+            if (updatePassword)
             {
-                connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+                sql.Append(", password_iterations = @PasswordIterations ");
+                sql.Append(", password_salt = @PasswordSalt ");
+                sql.Append(", password_hash = @PasswordHash ");
+            }
 
-                bool updatePassword = !String.IsNullOrEmpty(Password);
+            if (isAdmin)
+            {
+                sql.Append(", admin = @Admin");
+                sql.Append(", active = @Active ");
+            }
 
-                StringBuilder sql = new StringBuilder(@"
-                    UPDATE  users
-                    SET     first_name = @FirstName,
-                            last_name = @LastName,
-                            email = @Email ");
+            sql.Append("WHERE id = @Id");
 
-                if (updatePassword)
+            try
+            {
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                 {
-                    sql.Append(", password_iterations = @PasswordIterations ");
-                    sql.Append(", password_salt = @PasswordSalt ");
-                    sql.Append(", password_hash = @PasswordHash ");
-                }
+                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
 
-                if (isAdmin)
-                {
-                    sql.Append(", admin = @Admin");
-                    sql.Append(", active = @Active ");
-                }
-
-                sql.Append("WHERE id = @Id");
-
-                using (NpgsqlCommand command = connection.CreateCommand())
-                {
-                    command.CommandText = sql.ToString();
-                    command.Parameters.Add("@FirstName", NpgsqlTypes.NpgsqlDbType.Varchar, 64).Value = FirstName.Trim();
-                    command.Parameters.Add("@LastName", NpgsqlTypes.NpgsqlDbType.Varchar, 64).Value = LastName.Trim();
-                    command.Parameters.Add("@Email", NpgsqlTypes.NpgsqlDbType.Varchar, 128).Value = Email.Trim();
-                    command.Parameters.Add("@Id", NpgsqlTypes.NpgsqlDbType.Integer).Value = Id;
-
-                    if (updatePassword)
+                    using (NpgsqlCommand command = connection.CreateCommand())
                     {
+                        command.CommandText = sql.ToString();
+                        command.Parameters.Add("@FirstName", NpgsqlTypes.NpgsqlDbType.Varchar, 64).Value = FirstName.Trim();
+                        command.Parameters.Add("@LastName", NpgsqlTypes.NpgsqlDbType.Varchar, 64).Value = LastName.Trim();
+                        command.Parameters.Add("@Email", NpgsqlTypes.NpgsqlDbType.Varchar, 128).Value = Email.Trim();
+                        command.Parameters.Add("@Id", NpgsqlTypes.NpgsqlDbType.Integer).Value = Id;
+
+                        if (updatePassword)
+                        {
+                            string hash = PasswordHash.CreateHash(Password);
+                            string[] split = hash.Split(':');
+
+                            command.Parameters.Add("@PasswordIterations", NpgsqlTypes.NpgsqlDbType.Integer).Value =
+                                split[PasswordHash.ITERATION_INDEX];
+                            command.Parameters.Add("@PasswordSalt", NpgsqlTypes.NpgsqlDbType.Char, 32).Value =
+                                split[PasswordHash.SALT_INDEX];
+                            command.Parameters.Add("@PasswordHash", NpgsqlTypes.NpgsqlDbType.Char, 32).Value =
+                                split[PasswordHash.PBKDF2_INDEX];
+                        }
+
+                        if (isAdmin)
+                        {
+                            command.Parameters.Add("@Admin", NpgsqlTypes.NpgsqlDbType.Boolean).Value = IsAdmin;
+                            command.Parameters.Add("@Active", NpgsqlTypes.NpgsqlDbType.Boolean).Value = IsActive;
+                        }
+
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql.ToString();
+                throw e;
+            }
+        }
+
+        public void Save()
+        {
+            const string sql = @"
+                INSERT INTO users
+                (
+                    first_name, last_name, login,
+                    created, email, admin, active,
+                    password_iterations, password_salt, password_hash
+                )
+                VALUES
+                (
+                    @FirstName, @LastName, @Login,
+                    @Created, @Email, @Admin, @Active,
+                    @PasswordIterations, @PasswordSalt, @PasswordHash
+                )";
+
+            try
+            {
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                {
+                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+
+                    using (NpgsqlCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = sql;
+
+                        command.Parameters.Add("@FirstName", NpgsqlTypes.NpgsqlDbType.Varchar, 64).Value = FirstName.Trim();
+                        command.Parameters.Add("@LastName", NpgsqlTypes.NpgsqlDbType.Varchar, 64).Value = LastName.Trim();
+                        command.Parameters.Add("@Login", NpgsqlTypes.NpgsqlDbType.Varchar, 24).Value = Login.Trim();
+                        command.Parameters.Add("@Created", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
+                        command.Parameters.Add("@Email", NpgsqlTypes.NpgsqlDbType.Varchar, 128).Value = Email.Trim();
+                        command.Parameters.Add("@Admin", NpgsqlTypes.NpgsqlDbType.Boolean).Value = IsAdmin;
+                        command.Parameters.Add("@Active", NpgsqlTypes.NpgsqlDbType.Boolean).Value = IsActive;
+
                         string hash = PasswordHash.CreateHash(Password);
                         string[] split = hash.Split(':');
 
@@ -214,63 +295,16 @@ namespace Bennett.AbroadAdvisor.Models
                             split[PasswordHash.SALT_INDEX];
                         command.Parameters.Add("@PasswordHash", NpgsqlTypes.NpgsqlDbType.Char, 32).Value =
                             split[PasswordHash.PBKDF2_INDEX];
-                    }
 
-                    if (isAdmin)
-                    {
-                        command.Parameters.Add("@Admin", NpgsqlTypes.NpgsqlDbType.Boolean).Value = IsAdmin;
-                        command.Parameters.Add("@Active", NpgsqlTypes.NpgsqlDbType.Boolean).Value = IsActive;
+                        connection.Open();
+                        command.ExecuteNonQuery();
                     }
-
-                    connection.Open();
-                    command.ExecuteNonQuery();
                 }
             }
-        }
-
-        public void Save()
-        {
-            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+            catch (Exception e)
             {
-                connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                using (NpgsqlCommand command = connection.CreateCommand())
-                {
-                    command.CommandText = @"
-                        INSERT INTO users
-                        (
-                            first_name, last_name, login,
-                            created, email, admin, active,
-                            password_iterations, password_salt, password_hash
-                        )
-                        VALUES
-                        (
-                            @FirstName, @LastName, @Login,
-                            @Created, @Email, @Admin, @Active,
-                            @PasswordIterations, @PasswordSalt, @PasswordHash
-                        )";
-
-                    command.Parameters.Add("@FirstName", NpgsqlTypes.NpgsqlDbType.Varchar, 64).Value = FirstName.Trim();
-                    command.Parameters.Add("@LastName", NpgsqlTypes.NpgsqlDbType.Varchar, 64).Value = LastName.Trim();
-                    command.Parameters.Add("@Login", NpgsqlTypes.NpgsqlDbType.Varchar, 24).Value = Login.Trim();
-                    command.Parameters.Add("@Created", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
-                    command.Parameters.Add("@Email", NpgsqlTypes.NpgsqlDbType.Varchar, 128).Value = Email.Trim();
-                    command.Parameters.Add("@Admin", NpgsqlTypes.NpgsqlDbType.Boolean).Value = IsAdmin;
-                    command.Parameters.Add("@Active", NpgsqlTypes.NpgsqlDbType.Boolean).Value = IsActive;
-
-                    string hash = PasswordHash.CreateHash(Password);
-                    string[] split = hash.Split(':');
-
-                    command.Parameters.Add("@PasswordIterations", NpgsqlTypes.NpgsqlDbType.Integer).Value =
-                        split[PasswordHash.ITERATION_INDEX];
-                    command.Parameters.Add("@PasswordSalt", NpgsqlTypes.NpgsqlDbType.Char, 32).Value =
-                        split[PasswordHash.SALT_INDEX];
-                    command.Parameters.Add("@PasswordHash", NpgsqlTypes.NpgsqlDbType.Char, 32).Value =
-                        split[PasswordHash.PBKDF2_INDEX];
-
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
+                e.Data["SQL"] = sql;
+                throw e;
             }
         }
     }
