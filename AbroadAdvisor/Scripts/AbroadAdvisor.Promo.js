@@ -89,6 +89,17 @@
             .appendTo($('div#studyAbroadRowRemovals').parent());
     };
 
+    Promo.initStudentList = function () {
+        /// <summary>Initialize the student list page for a promo.</summary>
+
+        $('#studentlist').dataTable({
+            columnDefs: [{
+                targets: -1,
+                orderable: false
+            }]
+        });
+    };
+
     Promo.init = function (uniqueNameCheckUrl, nameSelector, resultImageSelector) {
         /// <summary>Promotions initialization.</summary>
         /// <param name="uniqueNameCheckUrl" type="String">URL for the name check ajax function.</param>

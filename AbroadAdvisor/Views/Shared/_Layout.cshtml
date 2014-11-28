@@ -61,10 +61,10 @@
             <div class="row">
                 <div class="col-sm-3 col-md-2 sidebar">
                     <ul class="nav nav-sidebar">
-                        <li @if (ViewBag.ActivePage == "dashboard") { <text> class="active" </text>    }><a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-                        <li @if (ViewBag.ActivePage == "students") { <text> class="active" </text>    }><a href="@Url.Action("List", "Student")"><i class="fa fa-table"></i> Students</a></li>
-                        <li @if (ViewBag.ActivePage == "experiences") { <text> class="active" </text>    }><a href="@Url.Action("List", "Experience")"><i class="fa fa-plane"></i> Experiences</a></li>
-                        <li @if (ViewBag.ActivePage == "promos") { <text> class="active" </text>     }><a href="@Url.Action("List", "Promo")"><i class="fa fa-certificate"></i> Promos</a></li>
+                        <li @if (ViewBag.ActivePage == "dashboard") { <text> class="active" </text> }><a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+                        <li @if (ViewBag.ActivePage == "students") { <text> class="active" </text> }><a href="@Url.Action("List", "Student")"><i class="fa fa-table"></i> Students</a></li>
+                        <li @if (ViewBag.ActivePage == "experiences") { <text> class="active" </text> }><a href="@Url.Action("List", "Experience")"><i class="fa fa-plane"></i> Experiences</a></li>
+                        <li @if (ViewBag.ActivePage == "promos") { <text> class="active" </text>  }><a href="@Url.Action("List", "Promo")"><i class="fa fa-certificate"></i> Promos</a></li>
                     </ul>
                 </div>
                 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">

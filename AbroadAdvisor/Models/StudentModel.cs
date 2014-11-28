@@ -224,8 +224,19 @@ namespace Bennett.AbroadAdvisor.Models
 
         public static StudentModel GetStudent(int id)
         {
-            List<StudentModel> students = GetStudents(id);
-            return students[0];
+            IEnumerable<StudentModel> students = GetStudents(id);
+            return students.First();
+        }
+
+        /// <summary>
+        /// All students associated with a specific promo.
+        /// </summary>
+        /// <param name="promoId">Promo ID.</param>
+        /// <returns>Student collection from promo.</returns>
+        public static IEnumerable<StudentModel> FromPromo(int promoId)
+        {
+            IEnumerable<StudentModel> students = GetStudents();
+            return students.Where(x => x.PromoId.HasValue && x.PromoId.Value == promoId);
         }
 
         private static void PopulateStudentLanguages(NpgsqlConnection connection, ref IList<StudentModel> students)

@@ -265,6 +265,7 @@
     <Content Include="Views\Student\NameCheck.cshtml" />
     <Content Include="Views\Student\View.Partial.cshtml" />
     <Content Include="Views\Student\View.NameCheck.cshtml" />
+    <Content Include="Views\Promo\Students.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

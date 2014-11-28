@@ -74,6 +74,22 @@ namespace Bennett.AbroadAdvisor.Controllers
             return View(promo);
         }
 
+        public ActionResult Students(int id)
+        {
+            PromoModel promo = PromoModel.GetPromo(id);
+
+            if (promo == null)
+            {
+                return HttpNotFound();
+            }
+
+            ViewBag.Promo = promo;
+
+            string title = String.Format("Students of {0} promo ({1})", promo.Description, promo.Code);
+            Analytics.TrackPageView(Request, title, (Session["User"] as UserModel).Login);
+            return View(StudentModel.FromPromo(id));
+        }
+
         [AllowAnonymous]
         public ActionResult Entry()
         {
