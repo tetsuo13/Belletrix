@@ -5,7 +5,15 @@ Dump production database to local file.
 
 Import-Module .\ModuleFunctions.psm1
 
-$dbConnection = Get-ConnectionString "Release"
+try
+{
+    $dbConnection = Get-ConnectionString "Release"
+}
+catch
+{
+    Write-Error $_
+    Exit
+}
 
 Set-Variable productionDb -option Constant -value $dbConnection["Database"]
 Set-Variable productionDbHost -option Constant -value $dbConnection["Server"]
