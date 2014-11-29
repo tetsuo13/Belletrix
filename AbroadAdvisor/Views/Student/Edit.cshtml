@@ -137,16 +137,33 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-lg-6">
+                                    <div class="col-lg-12">
                                         <div class="form-group">
                                             @Html.LabelFor(s => s.DateOfBirth)
                                             @Html.EditorFor(s => s.DateOfBirth)
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Lead</h3>
+                            </div>
+
+                            <div class="panel-body">
+                                <div class="row">
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             @Html.LabelFor(s => s.InitialMeeting)
                                             @Html.EditorFor(s => s.InitialMeeting)
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(s => s.PromoId)
+                                            @Html.DropDownListFor(s => s.PromoId, ViewBag.Promos as SelectList, "Please Select", new { @class = "form-control" })
                                         </div>
                                     </div>
                                 </div>

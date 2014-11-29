@@ -18,28 +18,11 @@ namespace Bennett.AbroadAdvisor.Models
 
         public int NumberOfNotes { get; set; }
 
+        [Display(Name = "Promo")]
+        public int? PromoId { get; set; }
+
         public void SaveChanges(UserModel user)
         {
-            StringBuilder sql = new StringBuilder("UPDATE students SET ");
-
-            PrepareColumns(ref sql);
-
-            if (PhiBetaDeltaMember.HasValue)
-            {
-                AddParameter(sql, "phi_beta_delta_member", NpgsqlTypes.NpgsqlDbType.Boolean, PhiBetaDeltaMember, 0);
-            }
-
-            foreach (KeyValuePair<string, string> pair in columns)
-            {
-                sql.Append(String.Format("{0} = {1}, ", pair.Key, pair.Value));
-            }
-
-            // Remove the trailing comma and space.
-            sql.Length -= 2;
-
-            sql.Append(" WHERE id = @Id");
-            parameters.Add(new NpgsqlParameter("@Id", NpgsqlTypes.NpgsqlDbType.Integer) { Value = Id });
-
             using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
             {
                 connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
@@ -47,11 +30,39 @@ namespace Bennett.AbroadAdvisor.Models
 
                 using (NpgsqlTransaction transaction = connection.BeginTransaction())
                 {
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    StringBuilder sql = new StringBuilder("UPDATE students SET ");
+
+                    PrepareColumns(ref sql);
+
+                    if (PhiBetaDeltaMember.HasValue)
                     {
-                        command.CommandText = sql.ToString();
-                        command.Parameters.AddRange(parameters.ToArray());
-                        command.ExecuteNonQuery();
+                        AddParameter(sql, "phi_beta_delta_member", NpgsqlTypes.NpgsqlDbType.Boolean, PhiBetaDeltaMember, 0);
+                    }
+
+                    foreach (KeyValuePair<string, string> pair in columns)
+                    {
+                        sql.Append(String.Format("{0} = {1}, ", pair.Key, pair.Value));
+                    }
+
+                    // Remove the trailing comma and space.
+                    sql.Length -= 2;
+
+                    sql.Append(" WHERE id = @Id");
+                    parameters.Add(new NpgsqlParameter("@Id", NpgsqlTypes.NpgsqlDbType.Integer) { Value = Id });
+
+                    try
+                    {
+                        using (NpgsqlCommand command = connection.CreateCommand())
+                        {
+                            command.CommandText = sql.ToString();
+                            command.Parameters.AddRange(parameters.ToArray());
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.Data["SQL"] = sql;
+                        throw e;
                     }
 
                     // Always call the next two functions. User may be
@@ -64,6 +75,15 @@ namespace Bennett.AbroadAdvisor.Models
                     SaveStudentLanguages(connection, Id, "student_fluent_languages", SelectedLanguages);
                     SaveStudentLanguages(connection, Id, "student_desired_languages", SelectedDesiredLanguages);
                     SaveStudentLanguages(connection, Id, "student_studied_languages", StudiedLanguages);
+
+                    if (!PromoId.HasValue)
+                    {
+                        StudentPromoLog.Delete(connection, Id);
+                    }
+                    else
+                    {
+                        StudentPromoLog.Upsert(connection, Id, PromoId.Value);
+                    }
 
                     EventLogModel eventLog = new EventLogModel()
                     {
@@ -82,7 +102,7 @@ namespace Bennett.AbroadAdvisor.Models
             }
         }
 
-        public static List<StudentModel> GetStudents(int? id = null)
+        public static IEnumerable<StudentModel> GetStudents(int? id = null)
         {
             ApplicationCache cacheProvider = new ApplicationCache();
             IDictionary<int, StudentModel> students = cacheProvider.Get(CacheId, () => new Dictionary<int, StudentModel>());
@@ -90,100 +110,117 @@ namespace Bennett.AbroadAdvisor.Models
             // Select all students by default so they're cached.
             if (students.Count == 0)
             {
+                const string sql = @"
+                    SELECT              s.id, s.created, s.initial_meeting,
+                                        s.first_name, s.middle_name, s.last_name,
+                                        s.living_on_campus, s.phone_number, s.student_id,
+                                        s.dob, s.enrolled_full_time, s.citizenship,
+                                        s.pell_grant_recipient, s.passport_holder, s.gpa,
+                                        s.campus_email, s.alternate_email, s.graduating_year,
+                                        s.classification, s.street_address, s.street_address2,
+                                        s.city, s.state, s.postal_code,
+                                        s.entering_year, promo_id,
+                                        COUNT(n.id) AS num_notes
+                    FROM                students s
+                    LEFT OUTER JOIN     student_notes n ON
+                                        s.id = n.student_id
+                    LEFT OUTER JOIN     student_promo_log p ON
+                                        s.id = p.student_id
+                    GROUP BY            s.id, s.created, s.initial_meeting,
+                                        s.first_name, s.middle_name, s.last_name,
+                                        s.living_on_campus, s.phone_number, s.student_id,
+                                        s.dob, s.enrolled_full_time, s.citizenship,
+                                        s.pell_grant_recipient, s.passport_holder, s.gpa,
+                                        s.campus_email, s.alternate_email, s.graduating_year,
+                                        s.classification, s.street_address, s.street_address2,
+                                        s.city, s.state, s.postal_code,
+                                        s.entering_year, promo_id
+                    ORDER BY            s.last_name, s.first_name";
+
                 IList<StudentModel> studentList = new List<StudentModel>();
 
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                try
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                     {
-                        command.CommandText = @"
-                            SELECT              s.id, s.created, s.initial_meeting,
-                                                s.first_name, s.middle_name, s.last_name,
-                                                s.living_on_campus, s.phone_number, s.student_id,
-                                                s.dob, s.enrolled_full_time, s.citizenship,
-                                                s.pell_grant_recipient, s.passport_holder, s.gpa,
-                                                s.campus_email, s.alternate_email, s.graduating_year,
-                                                s.classification, s.street_address, s.street_address2,
-                                                s.city, s.state, s.postal_code,
-                                                s.entering_year,
-                                                COUNT(n.id) AS num_notes
-                            FROM                students s
-                            LEFT OUTER JOIN     student_notes n ON
-                                                s.id = n.student_id
-                            GROUP BY            s.id, s.created, s.initial_meeting,
-                                                s.first_name, s.middle_name, s.last_name,
-                                                s.living_on_campus, s.phone_number, s.student_id,
-                                                s.dob, s.enrolled_full_time, s.citizenship,
-                                                s.pell_grant_recipient, s.passport_holder, s.gpa,
-                                                s.campus_email, s.alternate_email, s.graduating_year,
-                                                s.classification, s.street_address, s.street_address2,
-                                                s.city, s.state, s.postal_code,
-                                                s.entering_year
-                            ORDER BY            s.last_name, s.first_name";
+                        connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
 
-                        connection.Open();
-
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (NpgsqlCommand command = connection.CreateCommand())
                         {
-                            while (reader.Read())
+                            command.CommandText = sql;
+                            connection.Open();
+
+                            using (NpgsqlDataReader reader = command.ExecuteReader())
                             {
-                                StudentModel student = new StudentModel()
+                                while (reader.Read())
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                    FirstName = reader.GetString(reader.GetOrdinal("first_name")),
-                                    LastName = reader.GetString(reader.GetOrdinal("last_name"))
-                                };
+                                    StudentModel student = new StudentModel()
+                                    {
+                                        Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                        FirstName = reader.GetString(reader.GetOrdinal("first_name")),
+                                        LastName = reader.GetString(reader.GetOrdinal("last_name"))
+                                    };
 
-                                student.MiddleName = StringOrDefault(reader, "middle_name");
-                                student.LivingOnCampus = BoolOrDefault(reader, "living_on_campus");
-                                student.StreetAddress = StringOrDefault(reader, "street_address");
-                                student.StreetAddress2 = StringOrDefault(reader, "street_address2");
-                                student.City = StringOrDefault(reader, "city");
-                                student.State = StringOrDefault(reader, "state");
-                                student.PostalCode = StringOrDefault(reader, "postal_code");
-                                student.PhoneNumber = StringOrDefault(reader, "phone_number");
-                                student.EnteringYear = IntOrDefault(reader, "entering_year");
-                                student.GraduatingYear = IntOrDefault(reader, "graduating_year");
-                                student.StudentId = StringOrDefault(reader, "student_id");
-                                student.EnrolledFullTime = BoolOrDefault(reader, "enrolled_full_time");
-                                student.Citizenship = IntOrDefault(reader, "citizenship");
-                                student.PellGrantRecipient = BoolOrDefault(reader, "pell_grant_recipient");
-                                student.HasPassport = BoolOrDefault(reader, "passport_holder");
-                                student.CampusEmail = StringOrDefault(reader, "campus_email");
-                                student.AlternateEmail = StringOrDefault(reader, "alternate_email");
-                                student.Created = reader.GetDateTime(reader.GetOrdinal("created"));
-                                student.NumberOfNotes = (int)reader.GetInt64(reader.GetOrdinal("num_notes"));
+                                    student.MiddleName = StringOrDefault(reader, "middle_name");
+                                    student.LivingOnCampus = BoolOrDefault(reader, "living_on_campus");
+                                    student.StreetAddress = StringOrDefault(reader, "street_address");
+                                    student.StreetAddress2 = StringOrDefault(reader, "street_address2");
+                                    student.City = StringOrDefault(reader, "city");
+                                    student.State = StringOrDefault(reader, "state");
+                                    student.PostalCode = StringOrDefault(reader, "postal_code");
+                                    student.PhoneNumber = StringOrDefault(reader, "phone_number");
+                                    student.EnteringYear = IntOrDefault(reader, "entering_year");
+                                    student.GraduatingYear = IntOrDefault(reader, "graduating_year");
+                                    student.StudentId = StringOrDefault(reader, "student_id");
+                                    student.EnrolledFullTime = BoolOrDefault(reader, "enrolled_full_time");
+                                    student.Citizenship = IntOrDefault(reader, "citizenship");
+                                    student.PellGrantRecipient = BoolOrDefault(reader, "pell_grant_recipient");
+                                    student.HasPassport = BoolOrDefault(reader, "passport_holder");
+                                    student.CampusEmail = StringOrDefault(reader, "campus_email");
+                                    student.AlternateEmail = StringOrDefault(reader, "alternate_email");
+                                    student.Created = reader.GetDateTime(reader.GetOrdinal("created"));
+                                    student.NumberOfNotes = (int)reader.GetInt64(reader.GetOrdinal("num_notes"));
 
-                                int ord = reader.GetOrdinal("gpa");
-                                if (!reader.IsDBNull(ord))
-                                {
-                                    student.Gpa = Convert.ToDouble(reader["gpa"]);
+                                    int ord = reader.GetOrdinal("gpa");
+                                    if (!reader.IsDBNull(ord))
+                                    {
+                                        student.Gpa = Convert.ToDouble(reader["gpa"]);
+                                    }
+
+                                    ord = reader.GetOrdinal("dob");
+                                    if (!reader.IsDBNull(ord))
+                                    {
+                                        student.DateOfBirth = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
+                                    }
+
+                                    ord = reader.GetOrdinal("initial_meeting");
+                                    if (!reader.IsDBNull(ord))
+                                    {
+                                        student.InitialMeeting = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
+                                    }
+
+                                    ord = reader.GetOrdinal("promo_id");
+                                    if (!reader.IsDBNull(ord))
+                                    {
+                                        student.PromoId = reader.GetInt32(ord);
+                                    }
+
+                                    studentList.Add(student);
                                 }
-
-                                ord = reader.GetOrdinal("dob");
-                                if (!reader.IsDBNull(ord))
-                                {
-                                    student.DateOfBirth = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
-                                }
-
-                                ord = reader.GetOrdinal("initial_meeting");
-                                if (!reader.IsDBNull(ord))
-                                {
-                                    student.InitialMeeting = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
-                                }
-
-                                studentList.Add(student);
                             }
                         }
-                    }
 
-                    PopulateStudentMajorsMinors(connection, ref studentList);
-                    PopulateStudentLanguages(connection, ref studentList);
-                    PopulateDesiredStudentLanguages(connection, ref studentList);
-                    PopulateStudiedLanguages(connection, ref studentList);
-                    PopulateStudyAbroadDestinations(connection, ref studentList);
+                        PopulateStudentMajorsMinors(connection, ref studentList);
+                        PopulateStudentLanguages(connection, ref studentList);
+                        PopulateDesiredStudentLanguages(connection, ref studentList);
+                        PopulateStudiedLanguages(connection, ref studentList);
+                        PopulateStudyAbroadDestinations(connection, ref studentList);
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.Data["SQL"] = sql;
+                    throw e;
                 }
 
                 foreach (StudentModel student in studentList)
@@ -204,138 +241,185 @@ namespace Bennett.AbroadAdvisor.Models
 
         public static StudentModel GetStudent(int id)
         {
-            List<StudentModel> students = GetStudents(id);
-            return students[0];
+            IEnumerable<StudentModel> students = GetStudents(id);
+            return students.First();
+        }
+
+        /// <summary>
+        /// All students associated with a specific promo.
+        /// </summary>
+        /// <param name="promoId">Promo ID.</param>
+        /// <returns>Student collection from promo.</returns>
+        public static IEnumerable<StudentModel> FromPromo(int promoId)
+        {
+            IEnumerable<StudentModel> students = GetStudents();
+            return students.Where(x => x.PromoId.HasValue && x.PromoId.Value == promoId);
         }
 
         private static void PopulateStudentLanguages(NpgsqlConnection connection, ref IList<StudentModel> students)
         {
-            using (NpgsqlCommand command = connection.CreateCommand())
+            const string sql = @"
+                SELECT  language_id
+                FROM    student_fluent_languages
+                WHERE   student_id = @StudentId";
+
+            try
             {
-                command.CommandText = @"
-                    SELECT  language_id
-                    FROM    student_fluent_languages
-                    WHERE   student_id = @StudentId";
-
-                command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer);
-                command.Prepare();
-
-                for (int i = 0; i < students.Count; i++)
+                using (NpgsqlCommand command = connection.CreateCommand())
                 {
-                    List<int> languages = new List<int>();
-                    command.Parameters[0].Value = students[i].Id;
+                    command.CommandText = sql;
+                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer);
+                    command.Prepare();
 
-                    using (NpgsqlDataReader reader = command.ExecuteReader())
+                    for (int i = 0; i < students.Count; i++)
                     {
-                        while (reader.Read())
-                        {
-                            languages.Add(reader.GetInt32(reader.GetOrdinal("language_id")));
-                        }
-                    }
+                        ICollection<int> languages = new List<int>();
+                        command.Parameters[0].Value = students[i].Id;
 
-                    students[i].SelectedLanguages = languages.AsEnumerable();
+                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                languages.Add(reader.GetInt32(reader.GetOrdinal("language_id")));
+                            }
+                        }
+
+                        students[i].SelectedLanguages = languages;
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
         }
 
         private static void PopulateDesiredStudentLanguages(NpgsqlConnection connection, ref IList<StudentModel> students)
         {
-            using (NpgsqlCommand command = connection.CreateCommand())
+            const string sql = @"
+                SELECT  language_id
+                FROM    student_desired_languages
+                WHERE   student_id = @StudentId";
+
+            try
             {
-                command.CommandText = @"
-                    SELECT  language_id
-                    FROM    student_desired_languages
-                    WHERE   student_id = @StudentId";
-
-                command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer);
-                command.Prepare();
-
-                for (int i = 0; i < students.Count; i++)
+                using (NpgsqlCommand command = connection.CreateCommand())
                 {
-                    List<int> languages = new List<int>();
-                    command.Parameters[0].Value = students[i].Id;
+                    command.CommandText = sql;
+                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer);
+                    command.Prepare();
 
-                    using (NpgsqlDataReader reader = command.ExecuteReader())
+                    for (int i = 0; i < students.Count; i++)
                     {
-                        while (reader.Read())
-                        {
-                            languages.Add(reader.GetInt32(reader.GetOrdinal("language_id")));
-                        }
-                    }
+                        ICollection<int> languages = new List<int>();
+                        command.Parameters[0].Value = students[i].Id;
 
-                    students[i].SelectedDesiredLanguages = languages.AsEnumerable();
+                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                languages.Add(reader.GetInt32(reader.GetOrdinal("language_id")));
+                            }
+                        }
+
+                        students[i].SelectedDesiredLanguages = languages;
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
         }
 
         private static void PopulateStudiedLanguages(NpgsqlConnection connection, ref IList<StudentModel> students)
         {
-            using (NpgsqlCommand command = connection.CreateCommand())
+            const string sql = @"
+                SELECT  language_id
+                FROM    student_studied_languages
+                WHERE   student_id = @StudentId";
+
+            try
             {
-                command.CommandText = @"
-                    SELECT  language_id
-                    FROM    student_studied_languages
-                    WHERE   student_id = @StudentId";
-
-                command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer);
-                command.Prepare();
-
-                for (int i = 0; i < students.Count; i++)
+                using (NpgsqlCommand command = connection.CreateCommand())
                 {
-                    IList<int> languages = new List<int>();
-                    command.Parameters[0].Value = students[i].Id;
+                    command.CommandText = sql;
+                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer);
+                    command.Prepare();
 
-                    using (NpgsqlDataReader reader = command.ExecuteReader())
+                    for (int i = 0; i < students.Count; i++)
                     {
-                        while (reader.Read())
-                        {
-                            languages.Add(reader.GetInt32(reader.GetOrdinal("language_id")));
-                        }
-                    }
+                        ICollection<int> languages = new List<int>();
+                        command.Parameters[0].Value = students[i].Id;
 
-                    students[i].StudiedLanguages = languages.AsEnumerable();
+                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                languages.Add(reader.GetInt32(reader.GetOrdinal("language_id")));
+                            }
+                        }
+
+                        students[i].StudiedLanguages = languages;
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
         }
 
         private static void PopulateStudentMajorsMinors(NpgsqlConnection connection, ref IList<StudentModel> students)
         {
-            using (NpgsqlCommand command = connection.CreateCommand())
+            const string sql = @"
+                SELECT  major_id, is_major
+                FROM    matriculation
+                WHERE   student_id = @StudentId";
+
+            try
             {
-                command.CommandText = @"
-                    SELECT  major_id, is_major
-                    FROM    matriculation
-                    WHERE   student_id = @StudentId";
-
-                command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer);
-                command.Prepare();
-
-                for (int i = 0; i < students.Count; i++)
+                using (NpgsqlCommand command = connection.CreateCommand())
                 {
-                    List<int> majors = new List<int>();
-                    List<int> minors = new List<int>();
-                    command.Parameters[0].Value = students[i].Id;
+                    command.CommandText = sql;
+                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer);
+                    command.Prepare();
 
-                    using (NpgsqlDataReader reader = command.ExecuteReader())
+                    for (int i = 0; i < students.Count; i++)
                     {
-                        while (reader.Read())
-                        {
-                            int majorId = reader.GetInt32(reader.GetOrdinal("major_id"));
+                        ICollection<int> majors = new List<int>();
+                        ICollection<int> minors = new List<int>();
+                        command.Parameters[0].Value = students[i].Id;
 
-                            if (reader.GetBoolean(reader.GetOrdinal("is_major")))
+                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
                             {
-                                majors.Add(majorId);
-                            }
-                            else
-                            {
-                                minors.Add(majorId);
+                                int majorId = reader.GetInt32(reader.GetOrdinal("major_id"));
+
+                                if (reader.GetBoolean(reader.GetOrdinal("is_major")))
+                                {
+                                    majors.Add(majorId);
+                                }
+                                else
+                                {
+                                    minors.Add(majorId);
+                                }
                             }
                         }
-                    }
 
-                    students[i].SelectedMajors = majors.AsEnumerable();
-                    students[i].SelectedMinors = minors.AsEnumerable();
+                        students[i].SelectedMajors = majors;
+                        students[i].SelectedMinors = minors;
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
         }
 
@@ -349,6 +433,15 @@ namespace Bennett.AbroadAdvisor.Models
                 using (NpgsqlTransaction transaction = connection.BeginTransaction())
                 {
                     base.Save(connection, user.Id);
+
+                    if (!PromoId.HasValue)
+                    {
+                        StudentPromoLog.Delete(connection, Id);
+                    }
+                    else
+                    {
+                        StudentPromoLog.Upsert(connection, Id, PromoId.Value);
+                    }
 
                     EventLogModel eventLog = new EventLogModel()
                     {
@@ -364,38 +457,47 @@ namespace Bennett.AbroadAdvisor.Models
 
         private static void PopulateStudyAbroadDestinations(NpgsqlConnection connection, ref IList<StudentModel> students)
         {
-            using (NpgsqlCommand command = connection.CreateCommand())
+            const string sql = @"
+                SELECT  country_id, year, period
+                FROM    student_study_abroad_wishlist
+                WHERE   student_id = @StudentId";
+
+            try
             {
-                command.CommandText = @"
-                    SELECT  country_id, year, period
-                    FROM    student_study_abroad_wishlist
-                    WHERE   student_id = @StudentId";
-
-                command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer);
-                command.Prepare();
-
-                for (int i = 0; i < students.Count; i++)
+                using (NpgsqlCommand command = connection.CreateCommand())
                 {
-                    IList<int> countries = new List<int>();
-                    IList<int> years = new List<int>();
-                    IList<int> periods = new List<int>();
+                    command.CommandText = sql;
+                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer);
+                    command.Prepare();
 
-                    command.Parameters[0].Value = students[i].Id;
-
-                    using (NpgsqlDataReader reader = command.ExecuteReader())
+                    for (int i = 0; i < students.Count; i++)
                     {
-                        while (reader.Read())
-                        {
-                            countries.Add(reader.GetInt32(reader.GetOrdinal("country_id")));
-                            years.Add(reader.GetInt32(reader.GetOrdinal("year")));
-                            periods.Add(reader.GetInt32(reader.GetOrdinal("period")));
-                        }
-                    }
+                        ICollection<int> countries = new List<int>();
+                        ICollection<int> years = new List<int>();
+                        ICollection<int> periods = new List<int>();
 
-                    students[i].StudyAbroadCountry = countries.AsEnumerable();
-                    students[i].StudyAbroadYear = years.AsEnumerable();
-                    students[i].StudyAbroadPeriod = periods.AsEnumerable();
+                        command.Parameters[0].Value = students[i].Id;
+
+                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                countries.Add(reader.GetInt32(reader.GetOrdinal("country_id")));
+                                years.Add(reader.GetInt32(reader.GetOrdinal("year")));
+                                periods.Add(reader.GetInt32(reader.GetOrdinal("period")));
+                            }
+                        }
+
+                        students[i].StudyAbroadCountry = countries;
+                        students[i].StudyAbroadYear = years;
+                        students[i].StudyAbroadPeriod = periods;
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
         }
 
@@ -410,22 +512,20 @@ namespace Bennett.AbroadAdvisor.Models
                 return Enumerable.Empty<StudentModel>();
             }
 
-            IEnumerable<StudentModel> students = new List<StudentModel>(GetStudents()).ToList();
+            IEnumerable<StudentModel> students = new List<StudentModel>(GetStudents());
 
             if (filterByGraduatingYears)
             {
                 students = students
                     .Where(x => x.GraduatingYear.HasValue)
-                    .Where(x => search.SelectedGraduatingYears.Any(y => y == x.GraduatingYear.Value))
-                    .ToList();
+                    .Where(x => search.SelectedGraduatingYears.Any(y => y == x.GraduatingYear.Value));
             }
 
             if (filterByMajors)
             {
                 students = students
                     .Where(x => x.SelectedMajors.Count<int>() > 0)
-                    .Where(x => x.SelectedMajors.Intersect(search.SelectedMajors).Count<int>() > 0)
-                    .ToList();
+                    .Where(x => x.SelectedMajors.Intersect(search.SelectedMajors).Count<int>() > 0);
             }
 
             if (filterByCountries)
@@ -434,13 +534,11 @@ namespace Bennett.AbroadAdvisor.Models
 
                 students = studyAbroad
                     .Where(x => search.SelectedCountries.Any(y => y == x.CountryId))
-                    .Select(x => x.Student)
-                    .ToList();
+                    .Select(x => x.Student);
 
                 //students = students
                 //    .Where(x => x.StudyAbroadCountry.Count<int>() > 0)
-                //    .Where(x => x.StudyAbroadCountry.Intersect(search.SelectedCountries).Count<int>() > 0)
-                //    .ToList();
+                //    .Where(x => x.StudyAbroadCountry.Intersect(search.SelectedCountries).Count<int>() > 0);
             }
 
             return students;

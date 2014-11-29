@@ -49,93 +49,102 @@ namespace Bennett.AbroadAdvisor.Models
 
             if (events.Count == 0)
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                const string sql = @"
+                    SELECT          e.id, e.date, e.modified_by,
+                                    e.student_id, e.user_id, e.type,
+                                    e.action, u.first_name, u.last_name,
+                                    s.first_name AS student_first_name,
+                                    s.last_name AS student_last_name,
+                                    us.first_name AS user_first_name,
+                                    us.last_Name AS user_last_name
+                    FROM            event_log e
+                    INNER JOIN      users u ON
+                                    modified_by = u.id
+                    LEFT OUTER JOIN students s ON
+                                    e.student_id = s.id
+                    LEFT OUTER JOIN users us ON
+                                    e.user_id = us.id
+                    ORDER BY        date DESC
+                    LIMIT           8";
+
+                try
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                     {
-                        command.CommandText = @"
-                            SELECT          e.id, e.date, e.modified_by,
-                                            e.student_id, e.user_id, e.type,
-                                            e.action, u.first_name, u.last_name,
-                                            s.first_name AS student_first_name,
-                                            s.last_name AS student_last_name,
-                                            us.first_name AS user_first_name,
-                                            us.last_Name AS user_last_name
-                            FROM            event_log e
-                            INNER JOIN      users u ON
-                                            modified_by = u.id
-                            LEFT OUTER JOIN students s ON
-                                            e.student_id = s.id
-                            LEFT OUTER JOIN users us ON
-                                            e.user_id = us.id
-                            ORDER BY        date DESC
-                            LIMIT           8";
+                        connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
 
-                        connection.Open();
-
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (NpgsqlCommand command = connection.CreateCommand())
                         {
-                            while (reader.Read())
+                            command.CommandText = sql;
+                            connection.Open();
+
+                            using (NpgsqlDataReader reader = command.ExecuteReader())
                             {
-                                UserModel modifiedBy = new UserModel()
+                                while (reader.Read())
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("modified_by")),
-                                    FirstName = reader.GetString(reader.GetOrdinal("first_name")),
-                                    LastName = reader.GetString(reader.GetOrdinal("last_name"))
-                                };
-
-                                int ord = reader.GetOrdinal("action");
-                                string action = null;
-                                if (!reader.IsDBNull(ord))
-                                {
-                                    action = reader.GetString(ord);
-                                }
-
-                                StudentModel student = null;
-                                ord = reader.GetOrdinal("student_id");
-                                if (!reader.IsDBNull(ord))
-                                {
-                                    student = new StudentModel()
+                                    UserModel modifiedBy = new UserModel()
                                     {
-                                        Id = reader.GetInt32(ord),
-                                        FirstName = reader.GetString(reader.GetOrdinal("student_first_name")),
-                                        LastName = reader.GetString(reader.GetOrdinal("student_last_name"))
+                                        Id = reader.GetInt32(reader.GetOrdinal("modified_by")),
+                                        FirstName = reader.GetString(reader.GetOrdinal("first_name")),
+                                        LastName = reader.GetString(reader.GetOrdinal("last_name"))
                                     };
-                                }
 
-                                UserModel user = null;
-                                ord = reader.GetOrdinal("user_id");
-                                if (!reader.IsDBNull(ord))
-                                {
-                                    user = new UserModel()
+                                    int ord = reader.GetOrdinal("action");
+                                    string action = null;
+                                    if (!reader.IsDBNull(ord))
                                     {
-                                        Id = reader.GetInt32(ord),
-                                        FirstName = reader.GetString(reader.GetOrdinal("user_first_name")),
-                                        LastName = reader.GetString(reader.GetOrdinal("user_last_name"))
+                                        action = reader.GetString(ord);
+                                    }
+
+                                    StudentModel student = null;
+                                    ord = reader.GetOrdinal("student_id");
+                                    if (!reader.IsDBNull(ord))
+                                    {
+                                        student = new StudentModel()
+                                        {
+                                            Id = reader.GetInt32(ord),
+                                            FirstName = reader.GetString(reader.GetOrdinal("student_first_name")),
+                                            LastName = reader.GetString(reader.GetOrdinal("student_last_name"))
+                                        };
+                                    }
+
+                                    UserModel user = null;
+                                    ord = reader.GetOrdinal("user_id");
+                                    if (!reader.IsDBNull(ord))
+                                    {
+                                        user = new UserModel()
+                                        {
+                                            Id = reader.GetInt32(ord),
+                                            FirstName = reader.GetString(reader.GetOrdinal("user_first_name")),
+                                            LastName = reader.GetString(reader.GetOrdinal("user_last_name"))
+                                        };
+                                    }
+
+                                    EventLogModel eventLog = new EventLogModel()
+                                    {
+                                        Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                        EventDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("date"))),
+                                        ModifiedBy = modifiedBy,
+                                        Student = student,
+                                        User = user,
+                                        Type = reader.GetInt32(reader.GetOrdinal("type")),
+                                        Action = action
                                     };
+
+                                    //eventLog.RelativeDate = CalculateRelativeDate(eventLog.EventDate.ToUniversalTime());
+
+                                    events.Add(eventLog);
                                 }
 
-                                EventLogModel eventLog = new EventLogModel()
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                    EventDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("date"))),
-                                    ModifiedBy = modifiedBy,
-                                    Student = student,
-                                    User = user,
-                                    Type = reader.GetInt32(reader.GetOrdinal("type")),
-                                    Action = action
-                                };
-
-                                //eventLog.RelativeDate = CalculateRelativeDate(eventLog.EventDate.ToUniversalTime());
-
-                                events.Add(eventLog);
+                                cacheProvider.Set(CacheId, events);
                             }
-
-                            cacheProvider.Set(CacheId, events);
                         }
                     }
+                }
+                catch (Exception e)
+                {
+                    e.Data["SQL"] = sql;
+                    throw e;
                 }
             }
 
@@ -210,42 +219,52 @@ namespace Bennett.AbroadAdvisor.Models
 
         public void AddStudentEvent(NpgsqlConnection connection, int modifiedBy, int studentId, EventType eventType)
         {
+            const string sql = @"
+                INSERT INTO event_log
+                (
+                    date, modified_by, student_id, type
+                )
+                VALUES
+                (
+                    @Date, @ModifiedBy, @StudentId, @Type
+                )";
+
             connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
 
-            using (NpgsqlCommand command = connection.CreateCommand())
+            try
             {
-                command.CommandText = @"
-                    INSERT INTO event_log
-                    (
-                        date, modified_by, student_id, type
-                    )
-                    VALUES
-                    (
-                        @Date, @ModifiedBy, @StudentId, @Type
-                    )";
-
-                command.Parameters.Add("@Date", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
-                command.Parameters.Add("@Type", NpgsqlTypes.NpgsqlDbType.Integer).Value = (int)eventType;
-                command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
-
-                if (modifiedBy == 0)
+                using (NpgsqlCommand command = connection.CreateCommand())
                 {
-                    command.Parameters.Add("@ModifiedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = DBNull.Value;
+                    command.CommandText = sql;
+
+                    command.Parameters.Add("@Date", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
+                    command.Parameters.Add("@Type", NpgsqlTypes.NpgsqlDbType.Integer).Value = (int)eventType;
+                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+
+                    if (modifiedBy == 0)
+                    {
+                        command.Parameters.Add("@ModifiedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = DBNull.Value;
+                    }
+                    else
+                    {
+                        command.Parameters.Add("@ModifiedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = modifiedBy;
+                    }
+
+                    command.ExecuteNonQuery();
+
+                    ApplicationCache cacheProvider = new ApplicationCache();
+                    List<EventLogModel> events = cacheProvider.Get(CacheId, () => new List<EventLogModel>());
+
+                    // Make this event the newest.
+                    events.Insert(0, this);
+
+                    cacheProvider.Set(CacheId, events);
                 }
-                else
-                {
-                    command.Parameters.Add("@ModifiedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = modifiedBy;
-                }
-
-                command.ExecuteNonQuery();
-
-                ApplicationCache cacheProvider = new ApplicationCache();
-                List<EventLogModel> events = cacheProvider.Get(CacheId, () => new List<EventLogModel>());
-                
-                // Make this event the newest.
-                events.Insert(0, this);
-
-                cacheProvider.Set(CacheId, events);
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
         }
     }

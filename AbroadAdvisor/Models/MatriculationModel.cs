@@ -1,5 +1,6 @@
 ﻿using Bennett.AbroadAdvisor.Core;
 using Npgsql;
+using System;
 using System.Collections.Generic;
 
 namespace Bennett.AbroadAdvisor.Models
@@ -10,37 +11,45 @@ namespace Bennett.AbroadAdvisor.Models
         public int MajorId { get; set; }
         public bool IsMajor { get; set; }
 
-        public static List<MatriculationModel> GetDeclarations(int studentId)
+        public static IEnumerable<MatriculationModel> GetDeclarations(int studentId)
         {
-            List<MatriculationModel> declarations = new List<MatriculationModel>();
+            const string sql = @"
+                SELECT  major_id, is_major
+                FROM    matriculation
+                WHERE   student_id = @StudentId";
+            ICollection<MatriculationModel> declarations = new List<MatriculationModel>();
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+            try
             {
-                connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                 {
-                    command.CommandText = @"
-                        SELECT  major_id, is_major
-                        FROM    matriculation
-                        WHERE   student_id = @StudentId";
+                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
 
-                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
-                    connection.Open();
-
-                    using (NpgsqlDataReader reader = command.ExecuteReader())
+                    using (NpgsqlCommand command = connection.CreateCommand())
                     {
-                        while (reader.Read())
+                        command.CommandText = sql;
+                        command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+                        connection.Open();
+
+                        using (NpgsqlDataReader reader = command.ExecuteReader())
                         {
-                            declarations.Add(new MatriculationModel()
+                            while (reader.Read())
                             {
-                                StudentId = studentId,
-                                MajorId = reader.GetInt32(reader.GetOrdinal("major_id")),
-                                IsMajor = reader.GetBoolean(reader.GetOrdinal("is_major"))
-                            });
+                                declarations.Add(new MatriculationModel()
+                                {
+                                    StudentId = studentId,
+                                    MajorId = reader.GetInt32(reader.GetOrdinal("major_id")),
+                                    IsMajor = reader.GetBoolean(reader.GetOrdinal("is_major"))
+                                });
+                            }
                         }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
 
             return declarations;

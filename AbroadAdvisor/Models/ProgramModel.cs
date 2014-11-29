@@ -1,5 +1,6 @@
 ﻿using Bennett.AbroadAdvisor.Core;
 using Npgsql;
+using System;
 using System.Collections.Generic;
 
 namespace Bennett.AbroadAdvisor.Models
@@ -13,47 +14,56 @@ namespace Bennett.AbroadAdvisor.Models
         public static IEnumerable<ProgramModel> GetPrograms()
         {
             ApplicationCache cacheProvider = new ApplicationCache();
-            string cacheId = "Programs";
+            const string cacheId = "Programs";
             List<ProgramModel> programs = cacheProvider.Get(cacheId, () => new List<ProgramModel>());
 
             if (programs.Count == 0)
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                const string sql = @"
+                    SELECT      id, name, abbreviation
+                    FROM        programs
+                    ORDER BY    name";
+
+                try
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                     {
-                        command.CommandText = @"
-                            SELECT      id, name, abbreviation
-                            FROM        programs
-                            ORDER BY    name";
+                        connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
 
-                        connection.Open();
-
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (NpgsqlCommand command = connection.CreateCommand())
                         {
-                            while (reader.Read())
+                            command.CommandText = sql;
+                            connection.Open();
+
+                            using (NpgsqlDataReader reader = command.ExecuteReader())
                             {
-                                ProgramModel program = new ProgramModel()
+                                while (reader.Read())
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                    Name = reader.GetString(reader.GetOrdinal("name"))
-                                };
+                                    ProgramModel program = new ProgramModel()
+                                    {
+                                        Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                        Name = reader.GetString(reader.GetOrdinal("name"))
+                                    };
 
-                                int ord = reader.GetOrdinal("abbreviation");
+                                    int ord = reader.GetOrdinal("abbreviation");
 
-                                if (!reader.IsDBNull(ord))
-                                {
-                                    program.Abbreviation = reader.GetString(ord);
+                                    if (!reader.IsDBNull(ord))
+                                    {
+                                        program.Abbreviation = reader.GetString(ord);
+                                    }
+
+                                    programs.Add(program);
                                 }
 
-                                programs.Add(program);
+                                cacheProvider.Set(cacheId, programs);
                             }
-
-                            cacheProvider.Set(cacheId, programs);
                         }
                     }
+                }
+                catch (Exception e)
+                {
+                    e.Data["SQL"] = sql;
+                    throw e;
                 }
             }
 

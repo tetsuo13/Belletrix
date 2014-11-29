@@ -1,5 +1,6 @@
 ﻿using Bennett.AbroadAdvisor.Core;
 using Npgsql;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -17,42 +18,51 @@ namespace Bennett.AbroadAdvisor.Models
         public static IEnumerable<MinorsModel> GetMinors()
         {
             ApplicationCache cacheProvider = new ApplicationCache();
-            string cacheId = "Minors";
+            const string cacheId = "Minors";
             List<MinorsModel> minors = cacheProvider.Get(cacheId, () => new List<MinorsModel>());
 
             if (minors.Count == 0)
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                const string sql = @"
+                    SELECT      id, name
+                    FROM        minors
+                    ORDER BY    name";
+
+                try
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                     {
-                        command.CommandText = @"
-                            SELECT      id, name
-                            FROM        minors
-                            ORDER BY    name";
+                        connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
 
-                        connection.Open();
-
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (NpgsqlCommand command = connection.CreateCommand())
                         {
-                            while (reader.Read())
+                            command.CommandText = sql;
+                            connection.Open();
+
+                            using (NpgsqlDataReader reader = command.ExecuteReader())
                             {
-                                minors.Add(new MinorsModel()
+                                while (reader.Read())
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                    Name = reader.GetString(reader.GetOrdinal("name"))
-                                });
+                                    minors.Add(new MinorsModel()
+                                    {
+                                        Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                        Name = reader.GetString(reader.GetOrdinal("name"))
+                                    });
+                                }
                             }
                         }
                     }
+                }
+                catch (Exception e)
+                {
+                    e.Data["SQL"] = sql;
+                    throw e;
                 }
 
                 cacheProvider.Set(cacheId, minors);
             }
 
-            return minors.AsEnumerable();
+            return minors;
         }
     }
 }

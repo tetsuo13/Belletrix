@@ -610,13 +610,16 @@ GRANT ALL PRIVILEGES ON event_log_id_seq TO neoanime_abroadadvisor;
 CREATE TABLE student_promo_log (
 promo_id    INT NOT NULL,
 student_id  INT NOT NULL,
+created     TIMESTAMP NOT NULL,
 
-PRIMARY KEY (promo_id, student_id),
+PRIMARY KEY (student_id),
 FOREIGN KEY (promo_id) REFERENCES user_promo (id),
 FOREIGN KEY (student_id) REFERENCES students (id)
 );
 
 COMMENT ON TABLE student_promo_log IS 'Students created through ptomos';
+
+CREATE INDEX student_promo_log_idx1 ON student_promo_log (promo_id);
 
 GRANT ALL PRIVILEGES ON student_promo_log TO neoanime_abroadadvisor;
 

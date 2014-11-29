@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Web.Mvc;
 using System.Web.Security;
+using System.Linq;
 
 namespace Bennett.AbroadAdvisor.Controllers
 {
@@ -141,16 +142,16 @@ namespace Bennett.AbroadAdvisor.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            List<UserModel> user = UserModel.GetUsers(username);
+            UserModel user = UserModel.GetUsers(username).FirstOrDefault();
 
-            if (user.Count == 0)
+            if (user == null)
             {
                 return HttpNotFound();
             }
 
             Analytics.TrackPageView(Request, "Edit User", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Edit";
-            return View("Profile", user[0]);
+            return View("Profile", user);
         }
 
         /// <summary>

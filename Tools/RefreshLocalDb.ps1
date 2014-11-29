@@ -3,22 +3,25 @@
 Replace everything in the development DB with what's in production.
 #>
 
-$PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
-$webReleaseConfigPath = (Join-Path (Join-Path (Get-Item $PSScriptRoot).parent.FullName "AbroadAdvisor") "Web.Release.config")
+Import-Module .\ModuleFunctions.psm1
 
-$webConfig = New-Object XML
-$webConfig.Load($webReleaseConfigPath)
+try
+{
+    $dbConnection = Get-ConnectionString "Release"
+}
+catch
+{
+    Write-Error $_
+    Exit
+}
 
-$dbConnectionString = New-Object System.Data.Common.DbConnectionStringBuilder
-$dbConnectionString.set_ConnectionString($webConfig.configuration.connectionStrings.add.connectionString)
-
-Set-Variable productionDb -option Constant -value $dbConnectionString["Database"]
-Set-Variable developmentDb -option Constant -value $dbConnectionString["Database"]
-Set-Variable productionDbHost -option Constant -value $dbConnectionString["Server"]
-Set-Variable productionDbUser -option Constant -value $dbConnectionString["User Id"]
+Set-Variable productionDb -option Constant -value $dbConnection["Database"]
+Set-Variable developmentDb -option Constant -value $dbConnection["Database"]
+Set-Variable productionDbHost -option Constant -value $dbConnection["Server"]
+Set-Variable productionDbUser -option Constant -value $dbConnection["User Id"]
 Set-Variable productionDbOwner -option Constant -value "neoanime"
 Set-Variable developmentDbHost -option Constant -value "localhost"
-Set-Variable dbPassword -option Constant -value $dbConnectionString["Password"]
+Set-Variable dbPassword -option Constant -value $dbConnection["Password"]
 
 Write-Host
 
@@ -86,6 +89,7 @@ Write-Host
 --dbname=$developmentDb `
 --file=$dump
 
+Remove-Item End:\PGPASSWORD
 Remove-Item $dump
 Remove-Item $purgeDev
 
