@@ -13,7 +13,7 @@ namespace Bennett.AbroadAdvisor
             AreaRegistration.RegisterAllAreas();
 
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-            WebApiConfig.Register(GlobalConfiguration.Configuration);
+            GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             GlobalConfiguration.Configuration.Filters.Add(new System.Web.Http.AuthorizeAttribute());
