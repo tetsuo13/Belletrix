@@ -294,16 +294,18 @@ VALUES
 ('Early Childhood'),
 ('Education'),
 ('English'),
+('Entrepreneurial Studies'),
 ('Interdisciplinary Studies'),
 ('International Business'),
 ('Journalism and Media Studies'),
+('Music Education'),
 ('Political Science'),
 ('Psychology'),
 ('Social Work'),
 ('Special Education'),
 ('Theater'),
-('Women''s Studies'),
-('Undecided & Entrepreneurial Studies');
+('Undecided'),
+('Women''s Studies');
 
 
 CREATE TABLE minors (
@@ -332,19 +334,20 @@ VALUES
 ('Early Childhood'),
 ('Education'),
 ('English'),
+('Entrepreneurial Studies'),
+('Global Studies'),
 ('Interdisciplinary Studies'),
 ('International Business'),
 ('Journalism and Media Studies'),
+('Music Education'),
 ('Political Science'),
 ('Psychology'),
 ('Social Work'),
+('Spanish'),
 ('Special Education'),
 ('Theater'),
-('Women''s Studies'),
-('Undecided & Entrepreneurial Studies'),
-('Entrepreneurial Studies'),
-('Global Studies'),
-('Spanish');
+('Undecided'),
+('Women''s Studies');
 
 
 CREATE TABLE languages (
