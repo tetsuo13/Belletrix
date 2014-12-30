@@ -10,6 +10,9 @@ namespace Bennett.AbroadAdvisor
     {
         protected void Application_Start()
         {
+            // Disable the X-AspNetMvc-Version header.
+            MvcHandler.DisableMvcResponseHeader = true;
+
             AreaRegistration.RegisterAllAreas();
 
             BundleConfig.RegisterBundles(BundleTable.Bundles);
