@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Andrei Nicholson")]
 [assembly: AssemblyProduct("Bennett.AbroadAdvisor.Core")]
-[assembly: AssemblyCopyright("Copyright © Andrei Nicholson 2014")]
+[assembly: AssemblyCopyright("Copyright © Andrei Nicholson 2014-2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
