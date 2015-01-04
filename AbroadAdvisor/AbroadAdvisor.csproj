@@ -221,13 +221,14 @@
     <Content Include="Scripts\AbroadAdvisor.js" />
     <Content Include="Scripts\bootstrap-datepicker.js" />
     <Content Include="Scripts\bootstrap-multiselect.js" />
-    <None Include="Scripts\jquery-2.1.1-vsdoc.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <None Include="Scripts\jquery-2.1.3.intellisense.js" />
+    <Content Include="Scripts\jquery-2.1.3.js" />
+    <Content Include="Scripts\jquery-2.1.3.min.js" />
     <Content Include="Scripts\jquery.dataTables.bootstrap.js" />
-    <Content Include="Scripts\jquery-2.1.1.js" />
-    <Content Include="Scripts\jquery-2.1.1.min.js" />
     <Content Include="Scripts\jquery.dataTables.min.js" />
+    <Content Include="Scripts\jquery-2.1.3.min.map" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
@@ -260,7 +261,6 @@
     <Content Include="Views\Promo\Form.cshtml" />
     <Content Include="Views\Promo\Success.cshtml" />
     <Content Include="Views\Shared\_PromoLayout.cshtml" />
-    <Content Include="Scripts\jquery-2.1.1.min.map" />
     <Content Include="Web.Staging.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
