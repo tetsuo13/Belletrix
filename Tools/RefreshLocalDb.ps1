@@ -89,7 +89,7 @@ Write-Host
 --dbname=$developmentDb `
 --file=$dump
 
-Remove-Item End:\PGPASSWORD
+Remove-Item Env:\PGPASSWORD
 Remove-Item $dump
 Remove-Item $purgeDev
 
