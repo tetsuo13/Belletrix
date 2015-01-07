@@ -55,10 +55,15 @@ namespace Bennett.AbroadAdvisor.Core
             {
             }
 
-            tracker.setBrowserLanguage(request.UserLanguages);
+            if (request.UserLanguages != null)
+            {
+                tracker.setBrowserLanguage(request.UserLanguages[0]);
+            }
+
             tracker.setUrl(request.Url.Scheme + "://" + request.Url.Host + request.Url.PathAndQuery);
             tracker.setBrowserHasCookies(request.Cookies.Count > 0);
             tracker.setUserAgent(request.UserAgent);
+            tracker.setRequestTimeout(600000);
 
             if (request.UrlReferrer != null)
             {
