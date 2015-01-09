@@ -26,6 +26,7 @@ namespace Bennett.AbroadAdvisor.Controllers
             StudentModel.GetStudents();
             StudyAbroadModel.GetAll();
             PromoModel.GetPromos(true);
+            StudentPromoLog.Get();
 
             TimeSpan span = DateTime.Now - startDate;
 

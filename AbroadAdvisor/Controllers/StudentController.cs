@@ -213,10 +213,7 @@ namespace Bennett.AbroadAdvisor.Controllers
                 }));
 
             ViewBag.StudyAbroadPlaces = places;
-
-            IEnumerable<object> promos = PromoModel.AsSources()
-                .Select(x => new { Id = x.Id, Description = String.Format("{0} ({1})", x.Description, x.Code) });
-            ViewBag.Promos = new SelectList(promos, "Id", "Description");
+            ViewBag.Promos = PromoModel.AsSources();
         }
 
         private void PrepareStudyAbroadDropDowns()

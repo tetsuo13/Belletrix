@@ -18,8 +18,11 @@ namespace Bennett.AbroadAdvisor.Models
 
         public int NumberOfNotes { get; set; }
 
+        /// <summary>
+        /// Set of promos that the student may be associated with.
+        /// </summary>
         [Display(Name = "Promo")]
-        public int? PromoId { get; set; }
+        public IEnumerable<int> PromoIds { get; set; }
 
         public void SaveChanges(UserModel user)
         {
@@ -76,14 +79,7 @@ namespace Bennett.AbroadAdvisor.Models
                     SaveStudentLanguages(connection, Id, "student_desired_languages", SelectedDesiredLanguages);
                     SaveStudentLanguages(connection, Id, "student_studied_languages", StudiedLanguages);
 
-                    if (!PromoId.HasValue)
-                    {
-                        StudentPromoLog.Delete(connection, Id);
-                    }
-                    else
-                    {
-                        StudentPromoLog.Upsert(connection, Id, PromoId.Value);
-                    }
+                    StudentPromoLog.Save(connection, Id, PromoIds);
 
                     EventLogModel eventLog = new EventLogModel()
                     {
@@ -119,13 +115,11 @@ namespace Bennett.AbroadAdvisor.Models
                                         s.campus_email, s.alternate_email, s.graduating_year,
                                         s.classification, s.street_address, s.street_address2,
                                         s.city, s.state, s.postal_code,
-                                        s.entering_year, promo_id,
+                                        s.entering_year,
                                         COUNT(n.id) AS num_notes
                     FROM                students s
                     LEFT OUTER JOIN     student_notes n ON
                                         s.id = n.student_id
-                    LEFT OUTER JOIN     student_promo_log p ON
-                                        s.id = p.student_id
                     GROUP BY            s.id, s.created, s.initial_meeting,
                                         s.first_name, s.middle_name, s.last_name,
                                         s.living_on_campus, s.phone_number, s.student_id,
@@ -134,7 +128,7 @@ namespace Bennett.AbroadAdvisor.Models
                                         s.campus_email, s.alternate_email, s.graduating_year,
                                         s.classification, s.street_address, s.street_address2,
                                         s.city, s.state, s.postal_code,
-                                        s.entering_year, promo_id
+                                        s.entering_year
                     ORDER BY            s.last_name, s.first_name";
 
                 IList<StudentModel> studentList = new List<StudentModel>();
@@ -199,11 +193,7 @@ namespace Bennett.AbroadAdvisor.Models
                                         student.InitialMeeting = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
                                     }
 
-                                    ord = reader.GetOrdinal("promo_id");
-                                    if (!reader.IsDBNull(ord))
-                                    {
-                                        student.PromoId = reader.GetInt32(ord);
-                                    }
+                                    student.PromoIds = StudentPromoLog.GetPromoIdsForStudent(student.Id);
 
                                     studentList.Add(student);
                                 }
@@ -253,7 +243,7 @@ namespace Bennett.AbroadAdvisor.Models
         public static IEnumerable<StudentModel> FromPromo(int promoId)
         {
             IEnumerable<StudentModel> students = GetStudents();
-            return students.Where(x => x.PromoId.HasValue && x.PromoId.Value == promoId);
+            return students.Where(x => x.PromoIds != null && x.PromoIds.Any(y => y == promoId));
         }
 
         private static void PopulateStudentLanguages(NpgsqlConnection connection, ref IList<StudentModel> students)
@@ -434,14 +424,7 @@ namespace Bennett.AbroadAdvisor.Models
                 {
                     base.Save(connection, user.Id);
 
-                    if (!PromoId.HasValue)
-                    {
-                        StudentPromoLog.Delete(connection, Id);
-                    }
-                    else
-                    {
-                        StudentPromoLog.Upsert(connection, Id, PromoId.Value);
-                    }
+                    StudentPromoLog.Save(connection, Id, PromoIds);
 
                     EventLogModel eventLog = new EventLogModel()
                     {
