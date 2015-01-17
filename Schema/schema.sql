@@ -615,14 +615,15 @@ promo_id    INT NOT NULL,
 student_id  INT NOT NULL,
 created     TIMESTAMP NOT NULL,
 
-PRIMARY KEY (student_id),
+PRIMARY KEY (promo_id, student_id),
 FOREIGN KEY (promo_id) REFERENCES user_promo (id),
 FOREIGN KEY (student_id) REFERENCES students (id)
 );
 
-COMMENT ON TABLE student_promo_log IS 'Students created through ptomos';
+COMMENT ON TABLE student_promo_log IS 'Students associated with promos';
 
 CREATE INDEX student_promo_log_idx1 ON student_promo_log (promo_id);
+CREATE INDEX student_promo_log_idx2 ON student_promo_log (student_id);
 
 GRANT ALL PRIVILEGES ON student_promo_log TO neoanime_abroadadvisor;
 

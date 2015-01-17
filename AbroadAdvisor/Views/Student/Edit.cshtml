@@ -162,8 +162,8 @@
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="form-group">
-                                            @Html.LabelFor(s => s.PromoId)
-                                            @Html.DropDownListFor(s => s.PromoId, ViewBag.Promos as SelectList, "Please Select", new { @class = "form-control" })
+                                            @Html.LabelFor(s => s.PromoIds)
+                                            @Html.ListBoxFor(s => s.PromoIds, new MultiSelectList(ViewBag.Promos, "Id", "Description"), new { @class = "multiselect", multiple = "multiple" })
                                         </div>
                                     </div>
                                 </div>

@@ -212,9 +212,12 @@ namespace Bennett.AbroadAdvisor.Models
             columns = new Dictionary<string, string>();
             parameters = new List<NpgsqlParameter>();
 
+            FirstName = CapitalizeFirstLetter(FirstName);
+            LastName = CapitalizeFirstLetter(LastName);
+
             AddParameter(sql, "created", NpgsqlTypes.NpgsqlDbType.Timestamp, DateTime.Now.ToUniversalTime(), 0);
-            AddParameter(sql, "first_name", NpgsqlTypes.NpgsqlDbType.Varchar, CapitalizeFirstLetter(FirstName), 64);
-            AddParameter(sql, "last_name", NpgsqlTypes.NpgsqlDbType.Varchar, CapitalizeFirstLetter(LastName), 64);
+            AddParameter(sql, "first_name", NpgsqlTypes.NpgsqlDbType.Varchar, FirstName, 64);
+            AddParameter(sql, "last_name", NpgsqlTypes.NpgsqlDbType.Varchar, LastName, 64);
 
             if (InitialMeeting.HasValue)
             {
@@ -223,7 +226,8 @@ namespace Bennett.AbroadAdvisor.Models
 
             if (!String.IsNullOrWhiteSpace(MiddleName))
             {
-                AddParameter(sql, "middle_name", NpgsqlTypes.NpgsqlDbType.Varchar, CapitalizeFirstLetter(MiddleName), 64);
+                MiddleName = CapitalizeFirstLetter(MiddleName);
+                AddParameter(sql, "middle_name", NpgsqlTypes.NpgsqlDbType.Varchar, MiddleName, 64);
             }
 
             if (LivingOnCampus.HasValue)
