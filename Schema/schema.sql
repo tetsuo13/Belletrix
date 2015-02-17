@@ -289,6 +289,7 @@ VALUES
 ('Business'),
 ('Business Administration'),
 ('Business Management'),
+('Chemical Engineering'),
 ('Chemistry'),
 ('Computer Science'),
 ('Early Childhood'),
