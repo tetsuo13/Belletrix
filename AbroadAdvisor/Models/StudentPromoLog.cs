@@ -67,7 +67,7 @@ namespace Bennett.AbroadAdvisor.Models
         {
             Delete(connection, studentId);
 
-            if (promoIds.Any())
+            if (promoIds != null && promoIds.Any())
             {
                 ApplicationCache cacheProvider = new ApplicationCache();
                 ICollection<StudentPromoLog> logs = cacheProvider.Get(CacheId, () => new List<StudentPromoLog>());
