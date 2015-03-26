@@ -206,6 +206,7 @@
     </Content>
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
+    <Content Include="Icon.png" />
     <Content Include="Scripts\AbroadAdvisor.Promo.js" />
     <Content Include="Scripts\AbroadAdvisor.Student.js" />
     <Content Include="Content\fonts\fontawesome-webfont.woff2" />
