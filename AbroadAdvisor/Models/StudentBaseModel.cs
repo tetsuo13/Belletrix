@@ -397,25 +397,8 @@ namespace Bennett.AbroadAdvisor.Models
                 SaveStudentLanguages(connection, studentId, "student_studied_languages", StudiedLanguages);
             }
 
-            // Student promo won't use this.
-            if (StudyAbroadCountry != null)
-            {
-                int countriesCount = StudyAbroadCountry.Cast<int>().Count();
-
-                if (countriesCount > 0 &&
-                    countriesCount == StudyAbroadYear.Cast<int>().Count() &&
-                    countriesCount == StudyAbroadPeriod.Cast<int>().Count())
-                {
-                    // The default if the user doesn't selecting anything
-                    // at all is that all three enumerables will have a
-                    // single element of value zero.
-                    if (StudyAbroadCountry.ElementAt(0) > 0 && StudyAbroadYear.ElementAt(0) > 0)
-                    {
-                        SaveStudyAbroadDestinations(connection, studentId, StudyAbroadCountry, StudyAbroadYear,
-                            StudyAbroadPeriod);
-                    }
-                }
-            }
+            SaveStudyAbroadDestinations(connection, studentId, StudyAbroadCountry, StudyAbroadYear,
+                StudyAbroadPeriod);
 
             ApplicationCache cacheProvider = new ApplicationCache();
             Dictionary<int, StudentBaseModel> students = cacheProvider.Get(CacheId, () => new Dictionary<int, StudentBaseModel>());
@@ -446,48 +429,64 @@ namespace Bennett.AbroadAdvisor.Models
                 throw e;
             }
 
-            if (countries != null)
+            if (countries == null || years == null || periods == null)
             {
-                const string insertSql = @"
-                    INSERT INTO student_study_abroad_wishlist
-                    (
-                        student_id, country_id, year, period
-                    )
-                    VALUES
-                    (
-                        @StudentId, @CountryId, @Year, @Period
-                    )";
+                return;
+            }
 
-                try
+            int countriesCount = countries.Count();
+
+            // Each collection should have the same number of elements.
+            if (countriesCount == 0 || countriesCount != years.Count() || countriesCount != periods.Count())
+            {
+                return;
+            }
+
+            // The default if the user doesn't selecting anything at all is
+            // that all three enumerables will have a single element of value
+            // zero.
+            if (countries.ElementAt(0) == 0 || years.ElementAt(0) == 0)
+            {
+                return;
+            }
+
+            const string insertSql = @"
+                INSERT INTO student_study_abroad_wishlist
+                (
+                    student_id, country_id, year, period
+                )
+                VALUES
+                (
+                    @StudentId, @CountryId, @Year, @Period
+                )";
+
+            try
+            {
+                using (NpgsqlCommand command = connection.CreateCommand())
                 {
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    command.CommandText = insertSql;
+
+                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+                    command.Parameters.Add("@CountryId", NpgsqlTypes.NpgsqlDbType.Integer);
+                    command.Parameters.Add("@Year", NpgsqlTypes.NpgsqlDbType.Integer);
+                    command.Parameters.Add("@Period", NpgsqlTypes.NpgsqlDbType.Integer);
+
+                    command.Prepare();
+
+                    for (int i = 0; i < countriesCount; i++)
                     {
-                        command.CommandText = insertSql;
+                        command.Parameters[1].Value = countries.ElementAt(i);
+                        command.Parameters[2].Value = years.ElementAt(i);
+                        command.Parameters[3].Value = periods.ElementAt(i);
 
-                        command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
-                        command.Parameters.Add("@CountryId", NpgsqlTypes.NpgsqlDbType.Integer);
-                        command.Parameters.Add("@Year", NpgsqlTypes.NpgsqlDbType.Integer);
-                        command.Parameters.Add("@Period", NpgsqlTypes.NpgsqlDbType.Integer);
-
-                        command.Prepare();
-
-                        int countriesCount = countries.Cast<int>().Count();
-
-                        for (int i = 0; i < countriesCount; i++)
-                        {
-                            command.Parameters[1].Value = countries.ElementAt(i);
-                            command.Parameters[2].Value = years.ElementAt(i);
-                            command.Parameters[3].Value = periods.ElementAt(i);
-
-                            command.ExecuteNonQuery();
-                        }
+                        command.ExecuteNonQuery();
                     }
                 }
-                catch (Exception e)
-                {
-                    e.Data["SQL"] = insertSql;
-                    throw e;
-                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = insertSql;
+                throw e;
             }
         }
 
