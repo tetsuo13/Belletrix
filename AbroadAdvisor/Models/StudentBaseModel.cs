@@ -445,7 +445,7 @@ namespace Bennett.AbroadAdvisor.Models
             // The default if the user doesn't selecting anything at all is
             // that all three enumerables will have a single element of value
             // zero.
-            if (countries.ElementAt(0) == 0 || years.ElementAt(0) == 0)
+            if (countries.ElementAt(0) == 0 && years.ElementAt(0) == 0 && periods.ElementAt(0) == 0)
             {
                 return;
             }

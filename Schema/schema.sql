@@ -490,8 +490,7 @@ country_id  INT,
 year        INT,
 period      INT,
 
-FOREIGN KEY (student_id) REFERENCES students (id),
-FOREIGN KEY (country_id) REFERENCES countries (id)
+FOREIGN KEY (student_id) REFERENCES students (id)
 );
 
 COMMENT ON TABLE student_study_abroad_wishlist IS 'Location and semesters that students wish to study abroad to';

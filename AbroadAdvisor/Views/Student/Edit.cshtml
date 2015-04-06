@@ -4,10 +4,6 @@
 
 @{
     ViewBag.Title = "Edit";
-
-    IEnumerable<int> studyAbroadCountries = Model.StudyAbroadCountry;
-    IEnumerable<int> studyAbroadYears = Model.StudyAbroadYear;
-    IEnumerable<int> studyAbroadPeriods = Model.StudyAbroadPeriod;
 }
 
 @section FooterScript {
@@ -15,9 +11,9 @@
         $(function () {
             Bennett.AbroadAdvisor.Student.initStudentAddEdit();
             Bennett.AbroadAdvisor.Student.addStudyAbroadRows(
-                [@String.Join(",", studyAbroadCountries)],
-                [@String.Join(",", studyAbroadYears)],
-                [@String.Join(",", studyAbroadPeriods)]
+                [@String.Join(",", Model.StudyAbroadCountry)],
+                [@String.Join(",", Model.StudyAbroadYear)],
+                [@String.Join(",", Model.StudyAbroadPeriod)]
             );
             Bennett.AbroadAdvisor.singleSubmit();
 

@@ -6,11 +6,21 @@ namespace Bennett.AbroadAdvisor.Models
 {
     public class StudentStudyAbroadWishlistModel
     {
-        public const int CatchAllValue = 99;
+        /// <summary>
+        /// Value used to represent the "Please Select" option for the year
+        /// select list.
+        /// </summary>
+        public const int CatchAllYearValue = 1;
+
+        /// <summary>
+        /// Value used to represent the "Please Select" option for the period
+        /// select list.
+        /// </summary>
+        public const int CatchAllPeriodValue = 99;
 
         public enum PeriodValue
         {
-            Fall,
+            Fall = 1,
             Spring,
             Summer,
             Maymester,
@@ -42,7 +52,7 @@ namespace Bennett.AbroadAdvisor.Models
         {
             IEnumerable<object> catchAll = new List<object>()
             {
-                new { Id = CatchAllValue, Name = "Any Semester" }
+                new { Id = CatchAllPeriodValue, Name = "Any Semester" }
             };
 
             IEnumerable<object> periods = catchAll;

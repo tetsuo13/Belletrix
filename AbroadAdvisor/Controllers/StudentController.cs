@@ -105,8 +105,6 @@ namespace Bennett.AbroadAdvisor.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(StudentModel model)
         {
-            CheckStudyAbroadDestinations(ref model);
-
             if (ModelState.IsValid)
             {
                 model.SaveChanges(Session["User"] as UserModel);
@@ -149,28 +147,6 @@ namespace Bennett.AbroadAdvisor.Controllers
             return PartialView(StudyAbroadModel.GetAll(id));
         }
 
-        private void CheckStudyAbroadDestinations(ref StudentModel model)
-        {
-            if (model.StudyAbroadCountry != null &&
-                model.StudyAbroadCountry.Cast<int>().Count() == 1 &&
-                model.StudyAbroadCountry.ElementAt(0) == 0)
-            {
-                model.StudyAbroadCountry = Enumerable.Empty<int>();
-            }
-
-            if (model.StudyAbroadYear != null &&
-                model.StudyAbroadYear.Cast<int>().Count() == 1 &&
-                model.StudyAbroadYear.ElementAt(0) == 0)
-            {
-                model.StudyAbroadYear = Enumerable.Empty<int>();
-            }
-
-            if (model.StudyAbroadCountry == null)
-            {
-                model.StudyAbroadPeriod = Enumerable.Empty<int>();
-            }
-        }
-
         private void PrepareDropDowns()
         {
             IEnumerable<object> years = Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 7))
@@ -191,7 +167,7 @@ namespace Bennett.AbroadAdvisor.Controllers
             ViewBag.AvailableMinors = MinorsModel.GetMinors();
 
             IList<object> studyYears = new List<object>(years);
-            studyYears.Insert(0, new { Id = 1, Name = "Any Year" });
+            studyYears.Insert(0, new { Id = StudentStudyAbroadWishlistModel.CatchAllYearValue, Name = "Any Year" });
 
             ViewBag.StudyAbroadYears = new SelectList(studyYears, "Id", "Name");
             ViewBag.StudyAbroadSemesters = StudentStudyAbroadWishlistModel.GetPeriodsWithCatchAll();
