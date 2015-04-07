@@ -197,7 +197,11 @@
         if (addExistingValues) {
             // Populate the first row.
             $.each(destinationFieldNames, function (idName, values) {
-                $('select#' + idName).val(values[0]);
+                // Select the "Please Select" option in cases of a zero. This
+                // is an invalid value.
+                var optionSelector = values[0] == '' ? 'option:first' : 'option[value=' + values[0] + ']';
+
+                $('select#' + idName + ' ' + optionSelector).attr('selected', 'selected');
             });
 
             // Now add every additional row that's needed.
@@ -234,8 +238,11 @@
             var firstSelect = $('select#' + idName),
                 newSelect = firstSelect.clone().removeAttr('id');
 
+            // Get rid of the selected value cloned over.
+            $('option', newSelect).removeAttr('selected');
+
             if (selIndex !== undefined) {
-                newSelect.val(values[selIndex]);
+                $('option[value=' + values[selIndex] + ']', newSelect).attr('selected', 'selected');
             }
 
             $('<div class="form-group reducePadding" />')
