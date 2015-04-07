@@ -127,8 +127,6 @@ namespace Bennett.AbroadAdvisor.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Add(StudentModel model)
         {
-            CheckStudyAbroadDestinations(ref model);
-
             if (ModelState.IsValid)
             {
                 model.Save(Session["User"] as UserModel);
