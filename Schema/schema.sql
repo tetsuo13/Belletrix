@@ -13,8 +13,8 @@ PRIMARY KEY (id),
 UNIQUE (name, abbreviation, is_region)
 );
 
-GRANT ALL PRIVILEGES ON countries TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON countries_id_seq TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON countries TO "neoanime_belletrix-prod";
+GRANT ALL PRIVILEGES ON countries_id_seq TO "neoanime_belletrix-prod";
 
 COMMENT ON TABLE countries IS 'Countries in ISO 3166-1 and regions';
 
@@ -278,8 +278,8 @@ UNIQUE (name)
 
 COMMENT ON TABLE majors IS 'Available majors';
 
-GRANT ALL PRIVILEGES ON majors TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON majors_id_seq TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON majors TO "neoanime_belletrix-prod";
+GRANT ALL PRIVILEGES ON majors_id_seq TO "neoanime_belletrix-prod";
 
 INSERT INTO majors
 (name)
@@ -320,8 +320,8 @@ UNIQUE (name)
 
 COMMENT ON TABLE minors IS 'Available minors';
 
-GRANT ALL PRIVILEGES ON minors TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON minors_id_seq TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON minors TO "neoanime_belletrix-prod";
+GRANT ALL PRIVILEGES ON minors_id_seq TO "neoanime_belletrix-prod";
 
 INSERT INTO minors
 (name)
@@ -361,8 +361,8 @@ PRIMARY KEY (id),
 UNIQUE (name)
 );
 
-GRANT ALL PRIVILEGES ON languages TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON languages_id_seq TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON languages TO "neoanime_belletrix-prod";
+GRANT ALL PRIVILEGES ON languages_id_seq TO "neoanime_belletrix-prod";
 
 INSERT INTO languages
 (name)
@@ -431,8 +431,8 @@ FOREIGN KEY (citizenship) REFERENCES countries (id)
 COMMENT ON TABLE students IS 'Student master';
 COMMENT ON COLUMN students.graduating_year IS 'Year that student will be or has already graduated';
 
-GRANT ALL PRIVILEGES ON students TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON students_id_seq TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON students TO "neoanime_belletrix-prod";
+GRANT ALL PRIVILEGES ON students_id_seq TO "neoanime_belletrix-prod";
 
 
 CREATE TABLE student_fluent_languages (
@@ -444,7 +444,7 @@ PRIMARY KEY (student_id, language_id)
 
 COMMENT ON TABLE student_fluent_languages IS 'Languages that students declare fluency';
 
-GRANT ALL PRIVILEGES ON student_fluent_languages TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON student_fluent_languages TO "neoanime_belletrix-prod";
 
 
 CREATE TABLE student_desired_languages (
@@ -456,7 +456,7 @@ PRIMARY KEY (student_id, language_id)
 
 COMMENT ON TABLE student_desired_languages IS 'Languages that students would like to study abroad';
 
-GRANT ALL PRIVILEGES ON student_desired_languages TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON student_desired_languages TO "neoanime_belletrix-prod";
 
 
 CREATE TABLE student_studied_languages (
@@ -468,7 +468,7 @@ PRIMARY KEY (student_id, language_id)
 
 COMMENT ON TABLE student_studied_languages IS 'Languages that students have studied or are studying';
 
-GRANT ALL ON TABLE student_studied_languages TO neoanime_abroadadvisor;
+GRANT ALL ON TABLE student_studied_languages TO "neoanime_belletrix-prod";
 
 
 CREATE TABLE matriculation (
@@ -481,7 +481,7 @@ PRIMARY KEY (student_id, major_id, is_major)
 
 COMMENT ON TABLE matriculation IS 'Student major/minor cross reference';
 
-GRANT ALL PRIVILEGES ON matriculation TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON matriculation TO "neoanime_belletrix-prod";
 
 
 CREATE TABLE student_study_abroad_wishlist (
@@ -501,7 +501,7 @@ COMMENT ON COLUMN student_study_abroad_wishlist.period IS 'One of StudentStudyAb
 
 CREATE INDEX student_study_abroad_wishlist_idx1 ON student_study_abroad_wishlist (student_id);
 
-GRANT ALL PRIVILEGES ON student_study_abroad_wishlist TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON student_study_abroad_wishlist TO "neoanime_belletrix-prod";
 
 
 CREATE TABLE users (
@@ -533,8 +533,8 @@ COMMENT ON COLUMN users.email IS 'Email address for user';
 COMMENT ON COLUMN users.admin IS 'Administrator access?';
 COMMENT ON COLUMN users.active IS 'Active status dictates whether the user can even log in';
 
-GRANT ALL PRIVILEGES ON users TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON users_id_seq TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON users TO "neoanime_belletrix-prod";
+GRANT ALL PRIVILEGES ON users_id_seq TO "neoanime_belletrix-prod";
 
 -- Password is the same as the login.
 INSERT INTO users
@@ -563,8 +563,8 @@ COMMENT ON COLUMN user_promo.created IS 'Date and time that the promo was create
 COMMENT ON COLUMN user_promo.code IS 'Unique promo code used to log enter the public portion of the site for the student entry forms';
 COMMENT ON COLUMN user_promo.active IS 'Whether the promo can still be used';
 
-GRANT ALL PRIVILEGES ON user_promo TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON user_promo_id_seq TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON user_promo TO "neoanime_belletrix-prod";
+GRANT ALL PRIVILEGES ON user_promo_id_seq TO "neoanime_belletrix-prod";
 
 
 CREATE TABLE student_notes (
@@ -584,8 +584,8 @@ COMMENT ON COLUMN student_notes.student_id IS 'Student ID for note';
 COMMENT ON COLUMN student_notes.created_by IS 'User ID who created the note';
 COMMENT ON COLUMN student_notes.entry_date IS 'Date that the note was created';
 
-GRANT ALL PRIVILEGES ON student_notes TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON student_notes_id_seq TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON student_notes TO "neoanime_belletrix-prod";
+GRANT ALL PRIVILEGES ON student_notes_id_seq TO "neoanime_belletrix-prod";
 
 
 CREATE TABLE event_log (
@@ -608,8 +608,8 @@ COMMENT ON COLUMN event_log.modified_by IS 'User ID who initiated the event. May
 COMMENT ON COLUMN event_log.student_id IS 'Student ID that was modified';
 COMMENT ON COLUMN event_log.user_id IS 'User ID that was modified';
 
-GRANT ALL PRIVILEGES ON event_log TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON event_log_id_seq TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON event_log TO "neoanime_belletrix-prod";
+GRANT ALL PRIVILEGES ON event_log_id_seq TO "neoanime_belletrix-prod";
 
 
 CREATE TABLE student_promo_log (
@@ -627,7 +627,7 @@ COMMENT ON TABLE student_promo_log IS 'Students associated with promos';
 CREATE INDEX student_promo_log_idx1 ON student_promo_log (promo_id);
 CREATE INDEX student_promo_log_idx2 ON student_promo_log (student_id);
 
-GRANT ALL PRIVILEGES ON student_promo_log TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON student_promo_log TO "neoanime_belletrix-prod";
 
 
 CREATE TABLE programs (
@@ -639,8 +639,8 @@ PRIMARY KEY (id),
 UNIQUE(name, abbreviation)
 );
 
-GRANT ALL PRIVILEGES ON programs TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON programs_id_seq TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON programs TO "neoanime_belletrix-prod";
+GRANT ALL PRIVILEGES ON programs_id_seq TO "neoanime_belletrix-prod";
 
 INSERT INTO programs
 (name, abbreviation)
@@ -688,8 +688,8 @@ PRIMARY KEY (id),
 UNIQUE (name)
 );
 
-GRANT ALL PRIVILEGES ON program_types TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON program_types_id_seq TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON program_types TO "neoanime_belletrix-prod";
+GRANT ALL PRIVILEGES ON program_types_id_seq TO "neoanime_belletrix-prod";
 
 INSERT INTO program_types
 (name, short_term)
@@ -725,8 +725,8 @@ FOREIGN KEY (country_id) REFERENCES countries (id),
 FOREIGN KEY (program_id) REFERENCES programs (id)
 );
 
-GRANT ALL PRIVILEGES ON study_abroad TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON study_abroad_id_seq TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON study_abroad TO "neoanime_belletrix-prod";
+GRANT ALL PRIVILEGES ON study_abroad_id_seq TO "neoanime_belletrix-prod";
 
 
 CREATE TABLE study_abroad_program_types (
@@ -737,7 +737,7 @@ PRIMARY KEY (study_abroad_id, program_type_id),
 FOREIGN KEY (program_type_id) REFERENCES program_types (id)
 );
 
-GRANT ALL PRIVILEGES ON study_abroad_program_types TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON study_abroad_program_types TO "neoanime_belletrix-prod";
 
 
 CREATE TABLE exceptions (
@@ -770,8 +770,8 @@ COMMENT ON TABLE exceptions IS 'SQL store for StackExchange.Exceptional error ha
 CREATE INDEX IX_Exceptions_GUID_ApplicationName_DeletionDate_CreationDate ON exceptions (GUID, ApplicationName, DeletionDate, CreationDate DESC);
 CREATE INDEX IX_Exceptions_ErrorHash_AppName_CreationDate_DelDate ON exceptions (ErrorHash, ApplicationName, CreationDate DESC, DeletionDate);
 
-GRANT ALL PRIVILEGES ON exceptions TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON exceptions_id_seq TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON exceptions TO "neoanime_belletrix-prod";
+GRANT ALL PRIVILEGES ON exceptions_id_seq TO "neoanime_belletrix-prod";
 
 
 CREATE OR REPLACE FUNCTION delete_student(INT) RETURNS VOID AS $delete_student$
