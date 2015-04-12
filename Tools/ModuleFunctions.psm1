@@ -1,6 +1,4 @@
-﻿function Get-ConnectionString()
-{
-<#
+﻿<#
 .SYNOPSIS
 Returns a dictionary for the database connection details for a given build.
 
@@ -8,19 +6,11 @@ Returns a dictionary for the database connection details for a given build.
 Uses the current working directory to go to the parent and into the MVC root
 directory. From there it loads the "Web.$build.config" XML file into a
 dictionary.
-
-.PARAMETER build
-Standard ASP.NET build -- Debug, Release, etc.
 #>
-
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory=$True)]
-        [string]$build
-    )
-
+function Get-ConnectionString()
+{
     $PSScriptRoot = Split-Path $script:MyInvocation.MyCommand.Path
-    $webConfigPath = (Join-Path (Join-Path (Get-Item $PSScriptRoot).parent.FullName "AbroadAdvisor") "Web.$build.config")
+    $webConfigPath = (Join-Path (Join-Path (Get-Item $PSScriptRoot).parent.FullName "Belletrix") "Web.Release.config")
 
     $webConfig = New-Object XML
     $webConfig.Load($webConfigPath)
@@ -29,4 +19,49 @@ Standard ASP.NET build -- Debug, Release, etc.
     $dbConnectionString.set_ConnectionString($webConfig.configuration.connectionStrings.add.connectionString)
 
     return $dbConnectionString
+}
+
+function Get-PostgresBinaryPath()
+{
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory=$True)]
+        [string]$binary
+    )
+
+    $binaryPath = Get-ChildItem (Join-Path ${env:ProgramFiles(x86)} "PostgreSQL") -Recurse -Filter $binary
+
+    if ($binaryPath -eq $null)
+    {
+        Throw "Could not find PostgreSQL binary $binaryPath"
+    }
+
+    return $binaryPath
+}
+
+<#
+.SYNOPSIS
+Returns the path to the PostgreSQL interactive terminal (psql)
+#>
+function Get-PostgresInteractiveTerminalPath()
+{
+    return Get-PostgresBinaryPath "psql.exe"
+}
+
+<#
+.SYNOPSIS
+Returns the path to pg_dump
+#>
+function Get-PostgresDumpPath()
+{
+    return Get-PostgresBinaryPath "pg_dump.exe"
+}
+
+<#
+.SYNOPSIS
+Returns the path to the PostgreSQL create DB command
+#>
+function Get-PostgresCreateDbPath()
+{
+    return Get-PostgresBinaryPath "createdb.exe"
 }

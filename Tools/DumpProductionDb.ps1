@@ -7,7 +7,7 @@ Import-Module .\ModuleFunctions.psm1
 
 try
 {
-    $dbConnection = Get-ConnectionString "Release"
+    $dbConnection = Get-ConnectionString
 }
 catch
 {
@@ -22,16 +22,9 @@ Set-Variable dbPassword -option Constant -value $dbConnection["Password"]
 
 Write-Host
 
-$pgDump = Get-ChildItem (Join-Path ${env:ProgramFiles(x86)} "PostgreSQL") -Recurse -Filter pg_dump.exe
+$pgDump = Get-PostgresDumpPath
 
-if ($pgDump -eq $null)
-{
-    Write-Host "Could not find PostgreSQL Dump"
-    Exit
-}
-
-$dump = "{0}-{1}{2:00}{3:00}_{4:00}{5:00}{6:00}.sql.gz" `
-    -f $productionDb, (Get-Date).Year, (Get-Date).Month, (Get-Date).Day, (Get-Date).Hour, (Get-Date).Minute, (Get-Date).Second
+$dump = "{0}-{1}.sql.gz" -f $productionDb, (Get-Date -Format "yyyyMMdd-HHmmss")
 
 # Set the Postgres password in a session environment variable so all pg
 # commands don't prompt for a password.
