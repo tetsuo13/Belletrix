@@ -1,13 +1,17 @@
 ﻿<#
 .SYNOPSIS
 Replace everything in the development DB with what's in production.
+
+.DESCRIPTION
+It's expected that both production and development databases share the same
+password.
 #>
 
 Import-Module .\ModuleFunctions.psm1
 
 try
 {
-    $dbConnection = Get-ConnectionString "Release"
+    $dbConnection = Get-ConnectionString
 }
 catch
 {
@@ -16,30 +20,20 @@ catch
 }
 
 Set-Variable productionDb -option Constant -value $dbConnection["Database"]
-Set-Variable developmentDb -option Constant -value $dbConnection["Database"]
+Set-Variable developmentDb -option Constant -value $productionDb
+
 Set-Variable productionDbHost -option Constant -value $dbConnection["Server"]
-Set-Variable productionDbUser -option Constant -value $dbConnection["User Id"]
-Set-Variable productionDbOwner -option Constant -value "neoanime"
 Set-Variable developmentDbHost -option Constant -value "localhost"
+
+Set-Variable productionDbUser -option Constant -value $dbConnection["User Id"]
+Set-Variable developmentDbUser -option Constant -value $productionDbUser
+
 Set-Variable dbPassword -option Constant -value $dbConnection["Password"]
 
 Write-Host
 
-$pgDump = Get-ChildItem (Join-Path ${env:ProgramFiles(x86)} "PostgreSQL") -Recurse -Filter pg_dump.exe
-
-if ($pgDump -eq $null)
-{
-    Write-Host "Could not find PostgreSQL Dump"
-    Exit
-}
-
-$psql = Get-ChildItem (Join-Path ${env:ProgramFiles(x86)} "PostgreSQL") -Recurse -Filter psql.exe
-
-if ($psql -eq $null)
-{
-    Write-Host "Could not find PostgreSQL shell"
-    Exit
-}
+$pgDump = Get-PostgresDumpPath
+$psql = Get-PostgresInteractiveTerminalPath
 
 # Set the Postgres password in a session environment variable so all pg
 # commands don't prompt for a password.
@@ -52,6 +46,11 @@ Write-Host "Exporting $productionDb@$productionDbHost..." -foregroundcolor Yello
 Write-Host
 
 & $pgDump.FullName --host=$productionDbHost --username=$productionDbUser --file=$dump $productionDb
+
+if ($? -eq $False)
+{
+    Throw "Could not dump production database"
+}
 
 # Wipe out everything in the development database.
 Write-Host "Purging everything in $developmentDb..." -foregroundcolor Yellow
@@ -67,6 +66,11 @@ $purgeDev = [IO.Path]::GetTempFileName()
 --tuples-only `
 --command="SELECT 'DROP TABLE \""' || tablename || '\"" CASCADE;' FROM pg_tables WHERE schemaname = 'public';" | Out-File $purgeDev
 
+if ($? -eq $False)
+{
+    Throw "Could not generate SQL queries to drop tables in development database"
+}
+
 # Avoid the "invalid byte sequence for encoding "UTF8": 0xff" error from
 # attempting to read a file that has the Byte Order Mark (BOM). Write the
 # contents in UTF8 without the BOM to make psql happy.
@@ -74,9 +78,14 @@ $purgeDev = [IO.Path]::GetTempFileName()
 
 & $psql.FullName `
 --host=$developmentDbHost `
---username=$productionDbOwner `
+--username=$developmentDbUser `
 --dbname=$developmentDb `
 --file=$purgeDev
+
+if ($? -eq $False)
+{
+    Throw "Could not drop all tables in development database '$developmentDb'"
+}
 
 # Import the production database dump.
 Write-Host
@@ -85,7 +94,7 @@ Write-Host
 
 & $psql.FullName `
 --host=$developmentDbHost `
---username=$productionDbOwner `
+--username=$developmentDbUser `
 --dbname=$developmentDb `
 --file=$dump
 
