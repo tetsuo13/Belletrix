@@ -8,7 +8,7 @@ using StackExchange.Exceptional;
 using StackExchange.Exceptional.Dapper;
 using StackExchange.Exceptional.Extensions;
 using StackExchange.Exceptional.Stores;
-using Bennett.AbroadAdvisor.Core;
+using Belletrix.Core;
 
 namespace StackExchange.Exceptional.PostgreSql
 {

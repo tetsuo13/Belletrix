@@ -1,0 +1,85 @@
+﻿@using Belletrix.Core;
+@using Belletrix.Models;
+
+@{
+    Layout = null;
+    string siteTitle = "Belletrix";
+    string pageTitle = siteTitle;
+    bool developmentEnvironment = DeploymentEnvironment.IsDevelopment;
+    
+    if (!DeploymentEnvironment.IsProduction)
+    {
+        pageTitle += String.Format(" ({0})", DeploymentEnvironment.Enviroment);
+    }
+    
+    UserModel user = Session["User"] as UserModel;
+}
+
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="robots" content="noindex,nofollow" />
+        <meta name="viewport" content="width=device-width" />
+        <title>@pageTitle</title>
+        @Styles.Render("~/bundles/css")
+        @RenderSection("HeaderStyle", false)
+    </head>
+    <body>
+
+        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    @Html.ActionLink(siteTitle, "Index", "Home", null, new { @class = "navbar-brand" })
+                </div>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right navbar-user">
+                        <li class="dropdown user-dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="fa fa-user"></i>
+                                @user.FirstName @user.LastName
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="@Url.Action("Profile", "User")"><i class="fa fa-user"></i> Profile</a></li>
+                                <li class="divider"></li>
+                                <li><a href="@Url.Action("Logoff", "User")"><i class="fa fa-power-off"></i> Log Out</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-3 col-md-2 sidebar">
+                    <ul class="nav nav-sidebar">
+                        <li @if (ViewBag.ActivePage == "dashboard") { <text> class="active" </text> }><a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+                        <li @if (ViewBag.ActivePage == "students") { <text> class="active" </text> }><a href="@Url.Action("List", "Student")"><i class="fa fa-table"></i> Students</a></li>
+                        <li @if (ViewBag.ActivePage == "experiences") { <text> class="active" </text> }><a href="@Url.Action("List", "Experience")"><i class="fa fa-plane"></i> Experiences</a></li>
+                        <li @if (ViewBag.ActivePage == "promos") { <text> class="active" </text>  }><a href="@Url.Action("List", "Promo")"><i class="fa fa-certificate"></i> Promos</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                    @RenderSection("Body", true)
+                </div>
+            </div>
+        </div>
+
+        @Scripts.Render("~/bundles/js")
+        @RenderSection("FooterScript", false)
+
+        <script>
+            $(function () {
+                Belletrix.initPinger('@Url.Action("Ping", "Home")');
+            });
+        </script>
+    </body>
+</html>

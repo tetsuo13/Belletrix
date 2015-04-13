@@ -1,0 +1,141 @@
+﻿@using Belletrix.Models;
+
+@model UserModel
+
+@{
+    bool addingUser = Model == null || Model.Id == default(int);
+    string submitButtonText = addingUser ? "Add Profile" : "Update Profile";
+    ViewBag.Title = "Settings";
+}
+
+@section FooterScript {
+    <script>
+        $(function () {
+            Belletrix.singleSubmit();
+        });
+    </script>
+}
+
+@section Body {
+    <div class="row">
+        <div class="col-lg-8">
+            <h1>Profile</h1>
+        </div>
+        @if (addingUser || Model.IsAdmin)
+        {
+            <div class="col-lg-4 text-right">
+                <a href="@Url.Action("List", "User")"><i class="fa fa-plus-circle"></i> User List</a>
+                <a href="@Url.Action("Add", "User")"><i class="fa fa-plus-circle"></i> Add User</a>
+            </div>
+        }
+    </div>
+
+    @using (Html.BeginForm(ViewBag.Action as String, "User", FormMethod.Post, new { role = "form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary()
+        
+        if (!addingUser)
+        {
+            @Html.HiddenFor(s => s.Id)
+        }
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            @Html.TextBoxFor(s => s.FirstName, new { @class = "form-control", placeholder = "First" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            @Html.TextBoxFor(s => s.LastName, new { @class = "form-control", placeholder = "Last" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(s => s.Email)
+                    @Html.TextBoxFor(s => s.Email, new { @class = "form-control" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(s => s.Password)
+                    @Html.PasswordFor(s => s.Password, new { @class = "form-control" })
+                    <p class="help-block">Only if you want to change your current password.</p>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(s => s.ConfirmPassword)
+                    @Html.PasswordFor(s => s.ConfirmPassword, new { @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="form-group">
+                    @Html.LabelFor(s => s.Login)
+
+                    @if (addingUser)
+                    {
+                        @Html.TextBoxFor(s => s.Login, new { @class = "form-control" })
+                    }
+                    else
+                    {
+                        @Html.TextBoxFor(s => s.Login, new { @class = "form-control", @readonly = "readonly" })
+                    }
+                </div>
+
+                @if (!addingUser)
+                {
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                @Html.LabelFor(s => s.Created)
+                                <p class="form-control-static">@Model.Created</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                @Html.LabelFor(s => s.LastLogin)
+                                <p class="form-control-static">@Model.LastLogin</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (addingUser || Model.IsAdmin)
+                {
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                @Html.LabelFor(s => s.IsAdmin)
+                                <label class="checkbox-inline">
+                                    @Html.CheckBoxFor(s => s.IsAdmin)
+                                </label>
+                                <p class="help-block">
+                                    Administrative access provides adding/editing users and other core functions.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                @Html.LabelFor(s => s.IsActive)
+                                <label class="checkbox-inline">
+                                    @Html.CheckBoxFor(s => s.IsActive)
+                                </label>
+                                <p class="help-block">
+                                    Setting a user as active allows them to log in.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-default">@submitButtonText</button>
+    }
+}
