@@ -54,6 +54,7 @@ namespace Belletrix.Controllers
                 catch (Exception e)
                 {
                     mainError = e.Message;
+                    MvcApplication.LogException(e);
                 }
             }
 
