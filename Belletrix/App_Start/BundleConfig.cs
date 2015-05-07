@@ -15,9 +15,9 @@ namespace Belletrix.App_Start
                 "~/Scripts/jquery.dataTables.bootstrap.js",
                 "~/Scripts/jquery.validate.min.js",
                 "~/Scripts/jquery.validate.unobtrusive.min.js",
-                "~/Scripts/Belletrix.js",
-                "~/Scripts/Belletrix.Promo.js",
-                "~/Scripts/Belletrix.Student.js"));
+                "~/Scripts/App/Common.js",
+                "~/Scripts/App/Promo.js",
+                "~/Scripts/App/Student.js"));
 
             bundles.Add(new StyleBundle("~/bundles/css")
                 .Include("~/Content/bootstrap.css")

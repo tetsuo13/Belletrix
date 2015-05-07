@@ -15,7 +15,7 @@
                 [@String.Join(",", Model.StudyAbroadYear)],
                 [@String.Join(",", Model.StudyAbroadPeriod)]
             );
-            Belletrix.singleSubmit();
+            Belletrix.Common.singleSubmit();
 
             $('a[href="#studyabroadtab"]').on('show.bs.tab', function (e) {
                 $.ajax({
