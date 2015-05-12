@@ -5,7 +5,7 @@
 'use strict';
 
 module Belletrix {
-    class Promo {
+    export class Promo {
         /**
         * Pass name along to ajax request to check for uniqueness.
         *
@@ -24,8 +24,10 @@ module Belletrix {
 
             $.ajax({
                 url: uniqueNameCheckUrl,
-                data: { name: $(nameSelector).val() },
-                success: function (data) {
+                data: {
+                    name: $(nameSelector).val()
+                },
+                success: function (data: string) {
                     var submitButton: JQuery = $('button[type="submit"]');
 
                     switch (data) {
@@ -56,7 +58,7 @@ module Belletrix {
             Common.initMultiselect(0, 300);
             Common.handleMvcEditor();
 
-            $('a#studyAbroadDestinations').click(function (e) {
+            $('a#studyAbroadDestinations').click((e: JQueryEventObject) => {
                 e.preventDefault();
                 this.addStudyAbroadRows();
             })
@@ -125,15 +127,14 @@ module Belletrix {
             // trigger many times before the user would be finished.
             $(nameSelector)
                 .data('timeout', null)
-                .keyup(function (event) {
-                var element = $(this);
+                .keyup(() => {
+                    var element: JQuery = $(this);
 
-                clearTimeout(element.data('timeout'));
+                    clearTimeout(element.data('timeout'));
 
-                element.data('timeout', setTimeout(function () {
-                    this.checkNameForUniqueness(uniqueNameCheckUrl, nameSelector, resultImageSelector);
-                }, 500));
-            });
+                    element.data('timeout',
+                        setTimeout(() => this.checkNameForUniqueness(uniqueNameCheckUrl, nameSelector, resultImageSelector), 500));
+                });
         }
     }
 }

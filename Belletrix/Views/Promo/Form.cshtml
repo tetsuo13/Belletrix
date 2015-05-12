@@ -17,7 +17,8 @@
 @section FooterScript {
     <script>
         $(function () {
-            Belletrix.Promo.initForm('@Url.Action("Ping", "Home")');
+            var promo = new Belletrix.Promo();
+            promo.initForm('@Url.Action("Ping", "Home")');
             Belletrix.Common.singleSubmit();
         });
     </script>

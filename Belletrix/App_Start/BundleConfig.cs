@@ -17,6 +17,7 @@ namespace Belletrix.App_Start
                 "~/Scripts/jquery.validate.unobtrusive.min.js",
                 "~/Scripts/App/Common.js",
                 "~/Scripts/App/Promo.js",
+                "~/Scripts/App/StudentNote.js",
                 "~/Scripts/App/Student.js"));
 
             bundles.Add(new StyleBundle("~/bundles/css")

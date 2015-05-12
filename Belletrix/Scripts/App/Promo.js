@@ -21,7 +21,9 @@ var Belletrix;
             feedbackImage.removeClass('fa-check').show().addClass('fa-spinner fa-spin');
             $.ajax({
                 url: uniqueNameCheckUrl,
-                data: { name: $(nameSelector).val() },
+                data: {
+                    name: $(nameSelector).val()
+                },
                 success: function (data) {
                     var submitButton = $('button[type="submit"]');
                     switch (data) {
@@ -46,12 +48,13 @@ var Belletrix;
         * @param pingerUrl
         */
         Promo.prototype.initForm = function (pingerUrl) {
+            var _this = this;
             Belletrix.Common.initPinger(pingerUrl);
             Belletrix.Common.initMultiselect(0, 300);
             Belletrix.Common.handleMvcEditor();
             $('a#studyAbroadDestinations').click(function (e) {
                 e.preventDefault();
-                this.addStudyAbroadRows();
+                _this.addStudyAbroadRows();
             });
         };
         /**
@@ -90,19 +93,19 @@ var Belletrix;
         * @param resultImageSelector Selector for inline image for results.
         */
         Promo.prototype.init = function (uniqueNameCheckUrl, nameSelector, resultImageSelector) {
+            var _this = this;
             $(resultImageSelector).hide();
             // Add a delay when checking the name to give the user a chance to
             // complete their typing. Otherwise, a straight "onkeyup" event would
             // trigger many times before the user would be finished.
-            $(nameSelector).data('timeout', null).keyup(function (event) {
-                var element = $(this);
+            $(nameSelector).data('timeout', null).keyup(function () {
+                var element = $(_this);
                 clearTimeout(element.data('timeout'));
-                element.data('timeout', setTimeout(function () {
-                    this.checkNameForUniqueness(uniqueNameCheckUrl, nameSelector, resultImageSelector);
-                }, 500));
+                element.data('timeout', setTimeout(function () { return _this.checkNameForUniqueness(uniqueNameCheckUrl, nameSelector, resultImageSelector); }, 500));
             });
         };
         return Promo;
     })();
+    Belletrix.Promo = Promo;
 })(Belletrix || (Belletrix = {}));
 //# sourceMappingURL=Promo.js.map

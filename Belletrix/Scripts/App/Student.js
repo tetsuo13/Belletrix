@@ -10,33 +10,19 @@ var Belletrix;
                 nameCheck: ''
             };
         }
-        Student.prototype.handleNewNote = function (formSelector, noteSelector, userFirstName, userLastName) {
-            $(formSelector).submit(function (event) {
-                var noteElement = $(noteSelector), noteValue = noteElement.val();
-                event.preventDefault();
-                $.post($(this).attr('action'), $(formSelector).serialize(), function () {
-                    var anchor = $('<a href="#" class="list-group-item"></a>'), listGroup = $('<div class="list-group"></div>'), paraNote = $('<p class="list-group-item-text"></p>');
-                    paraNote.text(noteValue);
-                    anchor.append('<h4 class="list-group-item-heading">' + userFirstName + ' ' + userLastName + '</h4>');
-                    anchor.append(paraNote);
-                    listGroup.append(anchor);
-                    listGroup.hide().insertAfter('div.modal-body div.panel-default').fadeIn(750);
-                    noteElement.val('');
-                });
-            });
-        };
         /**
         * Initialize student add/edit page.
         *
         * @param nameCheckUrl URL for unique name check.
         */
         Student.prototype.initStudentAddEdit = function (nameCheckUrl) {
+            var _this = this;
             this.ajaxUrls.nameCheck = nameCheckUrl;
             Belletrix.Common.initMultiselect(1);
             Belletrix.Common.handleMvcEditor();
             $('a#studyAbroadDestinations').click(function (e) {
                 e.preventDefault();
-                this.addStudyAbroadRows();
+                _this.addStudyAbroadRows();
             });
             this.prepareForm();
         };
@@ -59,6 +45,7 @@ var Belletrix;
         * enter that information first.
         */
         Student.prototype.prepareForm = function () {
+            var _this = this;
             // https://stackoverflow.com/a/1909508
             var delay = (function () {
                 var timer = 0;
@@ -73,9 +60,7 @@ var Belletrix;
             this.toggleAllFormFields(true);
             $('#FirstName, #LastName').removeAttr('disabled');
             $('#FirstName, #LastName').keyup(function () {
-                delay(function () {
-                    this.checkNameUniqueness($('#FirstName').val(), $('#LastName').val());
-                }, 500);
+                delay(function () { return _this.checkNameUniqueness($('#FirstName').val(), $('#LastName').val()); }, 500);
             });
         };
         /**
@@ -87,6 +72,7 @@ var Belletrix;
         * @param lastName Student's last name.
         */
         Student.prototype.checkNameUniqueness = function (firstName, lastName) {
+            var _this = this;
             if (firstName.length == 0 || lastName.length == 0) {
                 return;
             }
@@ -101,13 +87,13 @@ var Belletrix;
                 success: function (result) {
                     var uniqueNameContainer = $('#unique-name').empty();
                     if (result.trim().length > 0) {
-                        this.toggleAllFormFields(true);
+                        _this.toggleAllFormFields(true);
                         $('#FirstName, #LastName').removeAttr('disabled');
                         uniqueNameContainer.html(result);
                     }
                     else {
                         // No duplicates found. Enable all form fields and move on.
-                        this.toggleAllFormFields(false);
+                        _this.toggleAllFormFields(false);
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -116,22 +102,18 @@ var Belletrix;
                 }
             });
         };
-        Student.prototype.setupNoteModal = function () {
-            // Load cached modal content and then refetch remote content.
-            $(document.body).on('hidden.bs.modal', function () {
-                $('#noteModal').removeData('bs.modal');
-            });
-        };
         /**
         * Initialize the student view page.
         */
         Student.prototype.initStudentView = function () {
-            this.setupNoteModal();
+            var note = new Belletrix.StudentNote();
+            note.initModal();
         };
         /**
         * Initialize the student list page.
         */
         Student.prototype.initStudentList = function () {
+            var note;
             $('#studentlist').DataTable({
                 columnDefs: [{
                     targets: -1,
@@ -141,7 +123,8 @@ var Belletrix;
             $('a.studentlisttooltop').tooltip();
             $('a.studentlistmodal').modal();
             $('.collapse').collapse();
-            this.setupNoteModal();
+            note = new Belletrix.StudentNote();
+            note.initModal();
             Belletrix.Common.initMultiselect(0, 300);
         };
         /**
@@ -215,5 +198,6 @@ var Belletrix;
         };
         return Student;
     })();
+    Belletrix.Student = Student;
 })(Belletrix || (Belletrix = {}));
 //# sourceMappingURL=Student.js.map

@@ -9,8 +9,9 @@
 @section FooterScript {
     <script>
         $(function () {
-            Belletrix.Student.initStudentAddEdit('@Url.Action("NameCheck")');
-            Belletrix.Student.addStudyAbroadRows([], [], []);
+            var student = new Belletrix.Student();
+            student.initStudentAddEdit('@Url.Action("NameCheck")');
+            student.addStudyAbroadRows([], [], []);
             Belletrix.Common.singleSubmit();
         });
     </script>

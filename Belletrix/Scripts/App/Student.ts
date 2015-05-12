@@ -5,43 +5,10 @@
 'use strict';
 
 module Belletrix {
-    class Student {
+    export class Student {
         private ajaxUrls: any = {
             nameCheck: ''
         };
-
-        public handleNewNote(formSelector: string, noteSelector: string, userFirstName: string,
-            userLastName: string): void {
-
-            $(formSelector).submit(function (event) {
-                var noteElement: JQuery = $(noteSelector),
-                    noteValue: string = noteElement.val();
-
-                event.preventDefault();
-
-                $.post($(this).attr('action'),
-                    $(formSelector).serialize(),
-                    function () {
-                        var anchor: JQuery = $('<a href="#" class="list-group-item"></a>'),
-                            listGroup: JQuery = $('<div class="list-group"></div>'),
-                            paraNote: JQuery = $('<p class="list-group-item-text"></p>');
-
-                        paraNote.text(noteValue);
-
-                        anchor.append('<h4 class="list-group-item-heading">' + userFirstName + ' ' + userLastName + '</h4>');
-                        anchor.append(paraNote);
-
-                        listGroup.append(anchor);
-                        listGroup
-                            .hide()
-                            .insertAfter('div.modal-body div.panel-default')
-                            .fadeIn(750);
-
-                        noteElement.val('');
-                    }
-                    );
-            });
-        }
 
         /**
         * Initialize student add/edit page.
@@ -54,7 +21,7 @@ module Belletrix {
             Common.initMultiselect(1);
             Common.handleMvcEditor();
 
-            $('a#studyAbroadDestinations').click(function (e) {
+            $('a#studyAbroadDestinations').click((e: JQueryEventObject) => {
                 e.preventDefault();
                 this.addStudyAbroadRows();
             })
@@ -99,10 +66,8 @@ module Belletrix {
             this.toggleAllFormFields(true);
             $('#FirstName, #LastName').removeAttr('disabled');
 
-            $('#FirstName, #LastName').keyup(function () {
-                delay(function () {
-                    this.checkNameUniqueness($('#FirstName').val(), $('#LastName').val())
-                }, 500);
+            $('#FirstName, #LastName').keyup(() => {
+                delay(() => this.checkNameUniqueness($('#FirstName').val(), $('#LastName').val()), 500);
             });
         }
 
@@ -127,7 +92,7 @@ module Belletrix {
                 },
                 method: 'GET',
                 cache: false,
-                success: function (result) {
+                success: (result) => {
                     var uniqueNameContainer: JQuery = $('#unique-name').empty();
 
                     if (result.trim().length > 0) {
@@ -147,24 +112,20 @@ module Belletrix {
             });
         }
 
-        private setupNoteModal(): void {
-            // Load cached modal content and then refetch remote content.
-            $(document.body).on('hidden.bs.modal', function () {
-                $('#noteModal').removeData('bs.modal');
-            });
-        }
-
         /**
         * Initialize the student view page.
         */
         public initStudentView(): void {
-            this.setupNoteModal();
+            var note = new StudentNote();
+            note.initModal();
         }
 
         /**
         * Initialize the student list page.
         */
         public initStudentList(): void {
+            var note;
+
             $('#studentlist').DataTable({
                 columnDefs: [{
                     targets: -1,
@@ -176,7 +137,8 @@ module Belletrix {
             $('a.studentlistmodal').modal();
             $('.collapse').collapse();
 
-            this.setupNoteModal();
+            note = new StudentNote();
+            note.initModal();
             Common.initMultiselect(0, 300);
         }
 

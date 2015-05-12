@@ -304,6 +304,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\App\Common.ts" />
+    <TypeScriptCompile Include="Scripts\App\StudentNote.ts" />
     <TypeScriptCompile Include="Scripts\App\Promo.ts" />
     <TypeScriptCompile Include="Scripts\App\Student.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap.datepicker\bootstrap.datepicker-tests.ts" />
