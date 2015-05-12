@@ -1,7 +1,7 @@
 ﻿@using Belletrix.Core;
 @using Belletrix.Models;
 
-@model IList<StudentModel>
+@model IEnumerable<StudentModel>
 
 @{
     ViewBag.Title = "List";
@@ -10,7 +10,8 @@
 @section FooterScript {
     <script>
         $(function () {
-            Belletrix.Student.initStudentList();
+            var student = new Belletrix.Student();
+            student.initStudentList();
         });
     </script>
 }
@@ -18,7 +19,7 @@
 @section Body {
     <div class="row">
         <div class="col-lg-8">
-            <h1>Students <small>@Model.Count.ToString("N0") total</small></h1>
+            <h1>Students <small>@Model.Count().ToString("N0") total</small></h1>
         </div>
         <div class="col-lg-4 text-right">
             <a href="@Url.Action("Add", "Student")"><i class="fa fa-plus-circle"></i> Add Student</a>
@@ -84,7 +85,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var student in Model)
+                @foreach (StudentModel student in Model)
                 {
                     string noteTooltip = "Add Notes";
                     string noteIcon = "fa fa-book";
@@ -142,14 +143,13 @@
         </table>
     </div>
 
-    @if (Request.HttpMethod == "POST" && Model.Count > 0)
+    @if (Request.HttpMethod == "POST" && Model.Count() > 0)
     {
-        List<string> emailableStudents = Model
+        IEnumerable<string> emailableStudents = Model
             .Where(s => !String.IsNullOrEmpty(s.CampusEmail))
-            .Select(s => s.FirstName + "%20" + s.LastName + "%20<" + s.CampusEmail + ">")
-            .ToList();
+            .Select(s => s.FirstName + "%20" + s.LastName + "%20<" + s.CampusEmail + ">");
 
-        if (emailableStudents.Count > 0)
+        if (emailableStudents != null && emailableStudents.Any())
         {
             <a href="mailto:@String.Join(";", emailableStudents)">Send email to student list</a>
         }

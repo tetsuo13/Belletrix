@@ -30,7 +30,7 @@
         </div>
     </div>
 
-    @foreach (var note in Model)
+    @foreach (NoteModel note in Model)
     {
         <div class="list-group">
             <a href="#" class="list-group-item">
@@ -56,7 +56,8 @@
             $('#newnote').submit();
         });
 
-        Belletrix.Student.handleNewNote('#newnote', 'textarea#Note', '@user.FirstName', '@user.LastName');
-        Belletrix.singleSubmit();
+        var note = new Belletrix.StudentNote();
+        note.handleNewNote('#newnote', 'textarea#Note', '@user.FirstName', '@user.LastName');
+        Belletrix.Common.singleSubmit();
     });
 </script>
