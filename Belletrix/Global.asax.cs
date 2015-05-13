@@ -32,6 +32,10 @@ namespace Belletrix
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             GlobalConfiguration.Configuration.Filters.Add(new System.Web.Http.AuthorizeAttribute());
+
+            // Remove Web Form (ASPX) view engine, only Razor.
+            ViewEngines.Engines.Clear();
+            ViewEngines.Engines.Add(new RazorViewEngine());
         }
     }
 }
