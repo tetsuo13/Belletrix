@@ -1,17 +1,8 @@
-﻿@using Belletrix.Core;
-@using Belletrix.Models;
+﻿@using Belletrix.Models;
 
 @{
     Layout = null;
-    string siteTitle = "Belletrix";
-    string pageTitle = siteTitle;
-    bool developmentEnvironment = DeploymentEnvironment.IsDevelopment;
-    
-    if (!DeploymentEnvironment.IsProduction)
-    {
-        pageTitle += String.Format(" ({0})", DeploymentEnvironment.Enviroment);
-    }
-    
+    const string siteTitle = "Belletrix";
     UserModel user = Session["User"] as UserModel;
 }
 
@@ -21,7 +12,7 @@
         <meta charset="utf-8" />
         <meta name="robots" content="noindex,nofollow" />
         <meta name="viewport" content="width=device-width" />
-        <title>@pageTitle</title>
+        <title>@siteTitle</title>
         @Styles.Render("~/bundles/css")
         @RenderSection("HeaderStyle", false)
     </head>

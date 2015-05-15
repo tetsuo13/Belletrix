@@ -25,7 +25,9 @@ namespace Belletrix.Core
     {
         public static void TrackPageView(HttpRequestBase request, string pageTitle, string username = null)
         {
-            if (!DeploymentEnvironment.IsProduction)
+            DebuggingService debugging = new DebuggingService();
+
+            if (!debugging.RunningInDebugMode())
             {
                 return;
             }

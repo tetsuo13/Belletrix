@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using Belletrix.Core;
+using System.Web.Mvc;
 
 namespace Belletrix
 {
@@ -8,9 +9,10 @@ namespace Belletrix
         {
             filters.Add(new HandleErrorAttribute());
 
-#if !DEBUG
-            filters.Add(new Attributes.RequireHttpsAttribute());
-#endif
+            if (new DebuggingService().RunningInDebugMode())
+            {
+                filters.Add(new Attributes.RequireHttpsAttribute());
+            }
         }
     }
 }
