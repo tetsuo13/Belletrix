@@ -3,6 +3,9 @@
 @model UserModel
 
 @{
+    HtmlHelper.ClientValidationEnabled = true;
+    HtmlHelper.UnobtrusiveJavaScriptEnabled = true;
+    
     bool addingUser = Model == null || Model.Id == default(int);
     string submitButtonText = addingUser ? "Add Profile" : "Update Profile";
     ViewBag.Title = "Settings";
@@ -100,7 +103,12 @@
                         <div class="col-lg-4">
                             <div class="form-group">
                                 @Html.LabelFor(s => s.LastLogin)
-                                <p class="form-control-static">@Model.LastLogin</p>
+                                <p class="form-control-static">
+                                    @if (Model.LastLogin != default(DateTime))
+                                    {
+                                        @Model.LastLogin
+                                    }
+                                </p>
                             </div>
                         </div>
                     </div>

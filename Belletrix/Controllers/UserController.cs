@@ -124,6 +124,16 @@ namespace Belletrix.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
+            if (model != null &&
+                (String.IsNullOrEmpty(model.Password) || String.IsNullOrEmpty(model.ConfirmPassword)))
+            {
+                ModelState.AddModelError("Password", "Please supply and confirm a password");
+            }
+            else if (model != null && model.Password != model.ConfirmPassword)
+            {
+                ModelState.AddModelError("Password", "Passwords do not match");
+            }
+
             if (ModelState.IsValid)
             {
                 model.Save();
@@ -132,7 +142,7 @@ namespace Belletrix.Controllers
 
             Analytics.TrackPageView(Request, "Add User", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Add";
-            return View("Add", model);
+            return View("Profile", model);
         }
 
         public ActionResult Edit(string username)
