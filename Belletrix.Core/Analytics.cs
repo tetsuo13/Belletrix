@@ -25,9 +25,7 @@ namespace Belletrix.Core
     {
         public static void TrackPageView(HttpRequestBase request, string pageTitle, string username = null)
         {
-            DebuggingService debugging = new DebuggingService();
-
-            if (!debugging.RunningInDebugMode())
+            if (new DebuggingService().RunningInDebugMode())
             {
                 return;
             }
