@@ -1,0 +1,26 @@
+﻿@{
+    Layout = null;
+    const string pageTitle = "An Error Occured - Belletrix";
+}
+
+<!doctype html>
+<html>
+    <head>
+        <title>@pageTitle</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        @Styles.Render("~/bundles/css")
+    </head>
+    <body>
+        <div class="container">
+            <div class="page-header">
+                <h1>Oh Dear!</h1>
+            </div>
+            <p class="lead">
+                There was an error in the page you just tried to submit. To
+                work around it, please login into Belletrix and try again.
+            </p>
+            <p>Start over at the @Html.ActionLink("login page", "Login", "User").</p>
+        </div>
+    </body>
+</html>

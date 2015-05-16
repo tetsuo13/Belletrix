@@ -141,6 +141,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="Attributes\RequireHttpsAttribute.cs" />
     <Compile Include="Controllers\CacheController.cs" />
+    <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\ExperienceController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\NoteController.cs" />
@@ -269,6 +270,7 @@
     <Content Include="Views\Student\View.NameCheck.cshtml" />
     <Content Include="Views\Promo\Students.cshtml" />
     <Content Include="Scripts\typings\jquery.dataTables\jquery.dataTables-tests.ts.tscparams" />
+    <Content Include="Views\Error\AntiForgery.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
