@@ -1,15 +1,5 @@
-﻿@using Belletrix.Core;
-
-@{
+﻿@{
     Layout = null;
-    string siteTitle = "Belletrix Promo";
-    string pageTitle = siteTitle;
-    bool developmentEnvironment = DeploymentEnvironment.IsDevelopment;
-
-    if (!DeploymentEnvironment.IsProduction)
-    {
-        pageTitle += String.Format(" ({0})", DeploymentEnvironment.Enviroment);
-    }
 }
 
 <!doctype html>
@@ -18,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="robots" content="noindex,nofollow" />
     <meta name="viewport" content="width=device-width" />
-    <title>@pageTitle</title>
+    <title>Belletrix Promo</title>
     @Styles.Render("~/bundles/css")
     @RenderSection("HeaderStyle", false)
 </head>
@@ -29,7 +19,7 @@
 
     <script>
         $(function () {
-            Belletrix.initPinger('@Url.Action("Ping", "Home")');
+            Belletrix.Common.initPinger('@Url.Action("Ping", "Home")');
         });
     </script>
 </body>

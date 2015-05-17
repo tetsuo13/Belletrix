@@ -9,13 +9,18 @@
 @section FooterScript {
     <script>
         $(function () {
-            Belletrix.Student.initStudentAddEdit();
-            Belletrix.Student.addStudyAbroadRows(
+            'use strict';
+
+            var student = new Belletrix.Student();
+
+            student.initStudentAddEdit();
+            student.addStudyAbroadRows(
                 [@String.Join(",", Model.StudyAbroadCountry)],
                 [@String.Join(",", Model.StudyAbroadYear)],
                 [@String.Join(",", Model.StudyAbroadPeriod)]
             );
-            Belletrix.singleSubmit();
+
+            Belletrix.Common.singleSubmit();
 
             $('a[href="#studyabroadtab"]').on('show.bs.tab', function (e) {
                 $.ajax({

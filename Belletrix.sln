@@ -5,16 +5,7 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Belletrix", "Belletrix\Belletrix.csproj", "{72018DEC-CA2F-4AC1-A83B-FFEAB8087989}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{F77BA8A1-917D-415A-BE06-2F8F0D7CAAD4}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Belletrix.Core", "Belletrix.Core\Belletrix.Core.csproj", "{A0F343D6-B9B3-42B7-8C1D-2826A16280CB}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piwik.Tracker", "Piwik.Tracker\Piwik.Tracker.csproj", "{C3BB0E94-F45C-4691-81FF-061FC20E3209}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackExchange.Exceptional", "StackExchange.Exceptional\StackExchange.Exceptional.csproj", "{DA84A7A0-8042-4B2B-A000-3579DD419D2A}"
 EndProject
@@ -34,10 +25,6 @@ Global
 		{A0F343D6-B9B3-42B7-8C1D-2826A16280CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0F343D6-B9B3-42B7-8C1D-2826A16280CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0F343D6-B9B3-42B7-8C1D-2826A16280CB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C3BB0E94-F45C-4691-81FF-061FC20E3209}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C3BB0E94-F45C-4691-81FF-061FC20E3209}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C3BB0E94-F45C-4691-81FF-061FC20E3209}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C3BB0E94-F45C-4691-81FF-061FC20E3209}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DA84A7A0-8042-4B2B-A000-3579DD419D2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DA84A7A0-8042-4B2B-A000-3579DD419D2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA84A7A0-8042-4B2B-A000-3579DD419D2A}.Release|Any CPU.ActiveCfg = Release|Any CPU

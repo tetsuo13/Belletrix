@@ -10,7 +10,6 @@ namespace Belletrix.Models
 {
     public class UserModel
     {
-        [Key]
         [Required]
         public int Id { get; set; }
 
@@ -40,6 +39,7 @@ namespace Belletrix.Models
         [Required]
         public DateTime Created { get; set; }
 
+        [Display(Name = "Last Login")]
         public DateTime LastLogin { get; set; }
 
         [Required]
@@ -304,7 +304,7 @@ namespace Belletrix.Models
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
-                throw e;
+                throw;
             }
         }
     }

@@ -43,7 +43,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var study in Model)
+                @foreach (StudyAbroadModel study in Model)
                 {
                     string semesterName = study.Semester.ToString();
 
@@ -86,15 +86,20 @@
                         programName = selectedProgram.Name;
                     }
 
-                    List<string> programTypes = new List<string>();
+                    ICollection<string> programTypes = null;
 
-                    foreach (int type in study.ProgramTypes)
+                    if (study.ProgramTypes != null)
                     {
-                        ProgramTypeModel programType = (ViewBag.ProgramTypes as List<ProgramTypeModel>).FirstOrDefault(p => p.Id == type);
+                        programTypes = new List<string>();
 
-                        if (programType != null)
+                        foreach (int type in study.ProgramTypes)
                         {
-                            programTypes.Add(programType.Name);
+                            ProgramTypeModel programType = (ViewBag.ProgramTypes as List<ProgramTypeModel>).FirstOrDefault(p => p.Id == type);
+
+                            if (programType != null)
+                            {
+                                programTypes.Add(programType.Name);
+                            }
                         }
                     }
 
@@ -136,7 +141,12 @@
                             }
                         </td>
                         <td>@programName</td>
-                        <td>@String.Join(", ", programTypes)</td>
+                        <td>
+                            @if (programTypes != null && programTypes.Count > 0)
+                            {
+                                @String.Join(", ", programTypes)
+                            }
+                        </td>
                     </tr>
                 }
             </tbody>

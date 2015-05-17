@@ -20,6 +20,19 @@ namespace Belletrix
             ErrorStore.LogException(e, HttpContext.Current);
         }
 
+        private void Application_Error(object sender, EventArgs e)
+        {
+            Exception ex = Server.GetLastError();
+
+            if (ex is HttpAntiForgeryException)
+            {
+                Response.Clear();
+                LogException(ex);
+                Server.ClearError();
+                Response.Redirect("/error/antiforgery", true);
+            }
+        }
+
         protected void Application_Start()
         {
             // Disable the X-AspNetMvc-Version header.
@@ -32,6 +45,10 @@ namespace Belletrix
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             GlobalConfiguration.Configuration.Filters.Add(new System.Web.Http.AuthorizeAttribute());
+
+            // Remove Web Form (ASPX) view engine, only Razor.
+            ViewEngines.Engines.Clear();
+            ViewEngines.Engines.Add(new RazorViewEngine());
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿@using Belletrix.Core;
-@using Belletrix.Models;
+﻿@using Belletrix.Models;
 
 @model StudentModel
 
@@ -10,7 +9,8 @@
 @section FooterScript {
     <script>
         $(function () {
-            Belletrix.Student.initStudentView();
+            var student = new Belletrix.Student();
+            student.initStudentView();
         });
     </script>
 }

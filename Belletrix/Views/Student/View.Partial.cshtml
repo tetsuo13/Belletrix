@@ -8,7 +8,7 @@
         <div class="panel panel-default">
             <div class="panel-heading">Study Abroad Experiences</div>
             <div class="panel-body">
-                @if ((ViewBag.StudyAbroad as IEnumerable<StudyAbroadModel>).Count<StudyAbroadModel>() > 0)
+                @if ((ViewBag.StudyAbroad as IEnumerable<StudyAbroadModel>).Count() > 0)
                 {
                     foreach (StudyAbroadModel studyAbroad in ViewBag.StudyAbroad)
                     {
@@ -37,11 +37,16 @@
                                 break;
                         }
 
-                        List<string> programTypes = new List<string>();
+                        ICollection<string> programTypes = null;
 
-                        foreach (int programType in studyAbroad.ProgramTypes)
+                        if (studyAbroad.ProgramTypes != null)
                         {
-                            programTypes.Add((ViewBag.Programs as IEnumerable<ProgramModel>).Where(p => p.Id == programType).First().Name);
+                            programTypes = new List<string>();
+
+                            foreach (int programType in studyAbroad.ProgramTypes)
+                            {
+                                programTypes.Add((ViewBag.Programs as IEnumerable<ProgramModel>).Where(p => p.Id == programType).First().Name);
+                            }
                         }
 
                         <div class="row">
@@ -52,7 +57,7 @@
                                     @if (!String.IsNullOrEmpty(studyAbroad.City))
                                     {
                                         @studyAbroad.City@:,
-                                        }
+                                    }
                                     @((ViewBag.Countries as List<CountryModel>).Where(c => c.Id == studyAbroad.CountryId).First().Name)
                                 </strong>
 
@@ -83,7 +88,7 @@
                                 </div>
 
                                 <div>
-                                    @if (programTypes.Count > 0)
+                                    @if (programTypes != null && programTypes.Count > 0)
                                     {
                                         @String.Join(", ", programTypes)
                                     }
