@@ -222,6 +222,10 @@
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
     <None Include="Scripts\jquery-2.0.3.intellisense.js" />
+    <Content Include="Scripts\Belletrix.js" />
+    <Content Include="Scripts\Belletrix.Promo.js" />
+    <Content Include="Scripts\Belletrix.Student.js" />
+    <Content Include="Scripts\Belletrix.Student.Note.js" />
     <Content Include="Scripts\bootstrap-datepicker.js" />
     <Content Include="Scripts\bootstrap-multiselect.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -269,7 +273,6 @@
     <Content Include="Views\Student\View.Partial.cshtml" />
     <Content Include="Views\Student\View.NameCheck.cshtml" />
     <Content Include="Views\Promo\Students.cshtml" />
-    <Content Include="Scripts\typings\jquery.dataTables\jquery.dataTables-tests.ts.tscparams" />
     <Content Include="Views\Error\AntiForgery.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -303,20 +306,6 @@
       <Project>{da84a7a0-8042-4b2b-a000-3579dd419d2a}</Project>
       <Name>StackExchange.Exceptional</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptCompile Include="Scripts\App\Common.ts" />
-    <TypeScriptCompile Include="Scripts\App\StudentNote.ts" />
-    <TypeScriptCompile Include="Scripts\App\Promo.ts" />
-    <TypeScriptCompile Include="Scripts\App\Student.ts" />
-    <TypeScriptCompile Include="Scripts\typings\bootstrap.datepicker\bootstrap.datepicker-tests.ts" />
-    <TypeScriptCompile Include="Scripts\typings\bootstrap.datepicker\bootstrap.datepicker.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\bootstrap.multiselect\bootstrap.multiselect.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\bootstrap\bootstrap.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jquery.dataTables\jquery.dataTables-tests.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jquery.dataTables\jquery.dataTables.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jquery.validation\jquery.validation.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

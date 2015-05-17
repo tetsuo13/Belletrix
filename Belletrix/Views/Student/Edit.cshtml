@@ -11,16 +11,14 @@
         $(function () {
             'use strict';
 
-            var student = new Belletrix.Student();
-
-            student.initStudentAddEdit();
-            student.addStudyAbroadRows(
+            Belletrix.Student.initStudentAddEdit();
+            Belletrix.Student.addStudyAbroadRows(
                 [@String.Join(",", Model.StudyAbroadCountry)],
                 [@String.Join(",", Model.StudyAbroadYear)],
                 [@String.Join(",", Model.StudyAbroadPeriod)]
             );
 
-            Belletrix.Common.singleSubmit();
+            Belletrix.singleSubmit();
 
             $('a[href="#studyabroadtab"]').on('show.bs.tab', function (e) {
                 $.ajax({
