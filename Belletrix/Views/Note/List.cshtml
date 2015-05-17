@@ -56,8 +56,7 @@
             $('#newnote').submit();
         });
 
-        var note = new Belletrix.StudentNote();
-        note.handleNewNote('#newnote', 'textarea#Note', '@user.FirstName', '@user.LastName');
-        Belletrix.Common.singleSubmit();
+        Belletrix.Student.handleNewNote('#newnote', 'textarea#Note', '@user.FirstName', '@user.LastName');
+        Belletrix.singleSubmit();
     });
 </script>
