@@ -7,44 +7,6 @@
         nameCheck: ''
     };
 
-    Student.handleNewNote = function (formSelector, noteSelector,
-                                      userFirstName, userLastName) {
-        /// <summary></summary>
-        /// <param name="formSelector" type="String"></param>
-        /// <param name="noteSelector" type="String"></param>
-        /// <param name="userFirstName" type="String"></param>
-        /// <param name="userLastName" type="String"></param>
-
-        $(formSelector).submit(function (event) {
-            var noteElement = $(noteSelector),
-                noteValue = noteElement.val();
-
-            event.preventDefault();
-
-            $.post($(this).attr('action'),
-                $(formSelector).serialize(),
-                function () {
-                    var anchor = $('<a href="#" class="list-group-item"></a>'),
-                        listGroup = $('<div class="list-group"></div>'),
-                        paraNote = $('<p class="list-group-item-text"></p>');
-
-                    paraNote.text(noteValue);
-
-                    anchor.append('<h4 class="list-group-item-heading">' + userFirstName + ' ' + userLastName + '</h4>');
-                    anchor.append(paraNote);
-
-                    listGroup.append(anchor);
-                    listGroup
-                        .hide()
-                        .insertAfter('div.modal-body div.panel-default')
-                        .fadeIn(750);
-
-                    noteElement.val('');
-                }
-            );
-        });
-    };
-
     Student.initStudentAddEdit = function (nameCheckUrl) {
         /// <summary>Initialize student add/edit page.</summary>
         /// <param name="nameCheckUrl" type="String">URL for unique name check.</param>
@@ -140,19 +102,6 @@
         })
     }
 
-    function setupNoteModal() {
-        // Load cached modal content and then refetch remote content.
-        $(document.body).on('hidden.bs.modal', function () {
-            $('#noteModal').removeData('bs.modal');
-        });
-    }
-
-    Student.initStudentView = function () {
-        /// <summary>Initialize the student view page.</summary>
-
-        setupNoteModal();
-    };
-
     Student.initStudentList = function () {
         /// <summary>Initialize the student list page.</summary>
 
@@ -167,7 +116,7 @@
         $('a.studentlistmodal').modal();
         $('.collapse').collapse();
 
-        setupNoteModal();
+        Belletrix.Student.Note.initModal();
         Belletrix.initMultiselect(0, 300);
     };
 

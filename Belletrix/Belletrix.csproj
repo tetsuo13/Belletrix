@@ -225,6 +225,7 @@
     <Content Include="Scripts\Belletrix.js" />
     <Content Include="Scripts\Belletrix.Promo.js" />
     <Content Include="Scripts\Belletrix.Student.js" />
+    <Content Include="Scripts\Belletrix.Student.Note.js" />
     <Content Include="Scripts\bootstrap-datepicker.js" />
     <Content Include="Scripts\bootstrap-multiselect.js" />
     <Content Include="Scripts\bootstrap.js" />
