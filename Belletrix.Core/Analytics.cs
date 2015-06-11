@@ -1,6 +1,7 @@
 ﻿using Piwik.Tracker;
 using System;
 using System.Configuration;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace Belletrix.Core
@@ -22,13 +23,19 @@ namespace Belletrix.Core
     /// </seealso>
     public class Analytics
     {
-        public static void TrackPageView(HttpRequestBase request, string pageTitle, string username = null)
+        public static Task TrackPageView(HttpRequestBase request, string pageTitle, string username = null)
         {
             if (new DebuggingService().RunningInDebugMode())
             {
-                return;
+                // no-op
+                return Task.FromResult<object>(null);
             }
 
+            return Task.Run(() => SendRequest(request, pageTitle, username));
+        }
+
+        private static void SendRequest(HttpRequestBase request, string pageTitle, string username)
+        {
             try
             {
                 PiwikTracker.URL = "http://analytics.andreinicholson.com";
