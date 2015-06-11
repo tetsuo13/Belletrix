@@ -58,7 +58,7 @@ namespace Belletrix.Models
                 FROM        activity_log
                 ORDER BY    created_by DESC";
 
-            ICollection<ActivityLogListViewModel> activities = null;
+            ICollection<ActivityLogListViewModel> activities = new List<ActivityLogListViewModel>();
 
             try
             {
@@ -73,45 +73,40 @@ namespace Belletrix.Models
 
                         using (NpgsqlDataReader reader = command.ExecuteReader())
                         {
-                            if (reader.HasRows)
+                            while (reader.Read())
                             {
-                                activities = new List<ActivityLogListViewModel>();
-
-                                while (reader.Read())
+                                ActivityLogListViewModel activity = new ActivityLogListViewModel()
                                 {
-                                    ActivityLogListViewModel activity = new ActivityLogListViewModel()
-                                    {
-                                        Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                        Title = reader.GetString(reader.GetOrdinal("title")),
-                                        Title2 = reader.GetText("title2"),
-                                        Title3 = reader.GetText("title3"),
-                                        StartDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("start_date"))),
-                                        Types = reader["types"] as int[],
-                                        Organizers = reader.GetText("organizers")
-                                    };
+                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                    Title = reader.GetString(reader.GetOrdinal("title")),
+                                    Title2 = reader.GetText("title2"),
+                                    Title3 = reader.GetText("title3"),
+                                    StartDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("start_date"))),
+                                    Types = reader["types"] as int[],
+                                    Organizers = reader.GetText("organizers")
+                                };
 
-                                    //ActivityLogModel activity = new ActivityLogModel()
-                                    //{
-                                    //    Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                    //    Created = reader.GetDateTime(reader.GetOrdinal("created")),
-                                    //    CreatedBy = reader.GetInt32(reader.GetOrdinal("created_by")),
-                                    //    Title = reader.GetString(reader.GetOrdinal("title")),
-                                    //    Title2 = reader.GetText("title2"),
-                                    //    Title3 = reader.GetText("title3"),
-                                    //    Organizers = reader.GetText("organizers"),
-                                    //    Location = reader.GetText("location"),
-                                    //    StartDate = reader.GetDateTime(reader.GetOrdinal("start_date")),
-                                    //    EndDate = reader.GetDateTime(reader.GetOrdinal("end_date")),
-                                    //    OnCampus = reader.GetBoolean(reader.GetOrdinal("on_campus")),
-                                    //    WebSite = reader.GetText("web_site"),
-                                    //    Notes = reader.GetText("notes")
-                                    //};
+                                //ActivityLogModel activity = new ActivityLogModel()
+                                //{
+                                //    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                //    Created = reader.GetDateTime(reader.GetOrdinal("created")),
+                                //    CreatedBy = reader.GetInt32(reader.GetOrdinal("created_by")),
+                                //    Title = reader.GetString(reader.GetOrdinal("title")),
+                                //    Title2 = reader.GetText("title2"),
+                                //    Title3 = reader.GetText("title3"),
+                                //    Organizers = reader.GetText("organizers"),
+                                //    Location = reader.GetText("location"),
+                                //    StartDate = reader.GetDateTime(reader.GetOrdinal("start_date")),
+                                //    EndDate = reader.GetDateTime(reader.GetOrdinal("end_date")),
+                                //    OnCampus = reader.GetBoolean(reader.GetOrdinal("on_campus")),
+                                //    WebSite = reader.GetText("web_site"),
+                                //    Notes = reader.GetText("notes")
+                                //};
 
-                                    //int[] types = reader["types"] as int[];
-                                    //activity.Types = (ActivityType[])(object)types;
+                                //int[] types = reader["types"] as int[];
+                                //activity.Types = (ActivityType[])(object)types;
 
-                                    activities.Add(activity);
-                                }
+                                activities.Add(activity);
                             }
                         }
                     }
