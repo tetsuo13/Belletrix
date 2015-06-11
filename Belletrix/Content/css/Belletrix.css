@@ -41,6 +41,10 @@
         color: #fff;
         background-color: #080808;
     }
+    .nav-sidebar .fa {
+        font-size: 150% !important;
+        margin-right: 5px;
+    }
 
 .main {
     padding: 20px;

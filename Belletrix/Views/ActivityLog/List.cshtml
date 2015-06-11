@@ -1,0 +1,102 @@
+﻿@using Belletrix.Models;
+@using System.Collections;
+@using System.Linq;
+
+@model IEnumerable<ActivityLogListViewModel>
+
+@{
+    ViewBag.Title = "List";
+}
+
+@helper DisplayTypeLabels(IEnumerable<int> types)
+{
+    if (types.Contains((int)ActivityLogModel.ActivityType.Conference))
+    {
+        <span class="label label-default">Conference</span>
+    }
+    if (types.Contains((int)ActivityLogModel.ActivityType.Institute))
+    {
+        <span class="label label-primary">Institute</span>
+    }
+    if (types.Contains((int)ActivityLogModel.ActivityType.Summit))
+    {
+        <span class="label label-success">Summit</span>
+    }
+    if (types.Contains((int)ActivityLogModel.ActivityType.Grant))
+    {
+        <span class="label label-info">Grant</span>
+    }
+    if (types.Contains((int)ActivityLogModel.ActivityType.Community))
+    {
+        <span class="label label-warning">Community</span>
+    }
+    if (types.Contains((int)ActivityLogModel.ActivityType.Student))
+    {
+        <span class="label label-danger">Student</span>
+    }
+    if (types.Contains((int)ActivityLogModel.ActivityType.SiteVisit))
+    {
+        <span class="label label-default">SiteVisit</span>
+    }
+}
+
+@section FooterScript {
+    <script>
+        $(function () {
+            'use strict';
+            //$('#experiencelist').dataTable();
+        });
+    </script>
+}
+
+@section Body {
+    <div class="row">
+        <div class="col-lg-8">
+            <h1>Students Abroad <small>@Model.Count.ToString("N0") total</small></h1>
+        </div>
+    </div>
+
+    <br />
+
+    <div class="table-responsive">
+        <table id="activitylist" class="table table-bordered table-hover table-striped tablesorter table-condensed">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(x => x.Title)</th>
+                    <th>@Html.DisplayNameFor(x => x.Organizers)</th>
+                    <th>@Html.DisplayNameFor(x => x.StartDate)</th>
+                    <th>@Html.DisplayNameFor(x => x.Types)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (ActivityLogListViewModel activity in Model)
+                {
+                    <tr>
+                        <td>
+                            @activity.Title
+                            @if (!String.IsNullOrEmpty(activity.Title2))
+                            {
+                                <br /><small>@activity.Title2</small>
+                                @if (!String.IsNullOrEmpty(activity.Title3))
+                                {
+                                    <br /><small>@activity.Title3</small>
+                                }
+                            }
+                        </td>
+                        <td>@activity.Organizers</td>
+                        <td>@activity.StartDate.ToShortDateString()</td>
+                        <td>@DisplayTypeLabels(activity.Types)</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="@Url.Action("Edit", "ActivityLog", new { id = activity.Id })"
+                                   class="btn btn-xs btn-info" data-placement="top"
+                                   title="Edit"><i class="fa fa-pencil"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

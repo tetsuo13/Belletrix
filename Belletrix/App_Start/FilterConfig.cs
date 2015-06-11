@@ -9,7 +9,7 @@ namespace Belletrix
         {
             filters.Add(new HandleErrorAttribute());
 
-            if (new DebuggingService().RunningInDebugMode())
+            if (!new DebuggingService().RunningInDebugMode())
             {
                 filters.Add(new Attributes.RequireHttpsAttribute());
             }

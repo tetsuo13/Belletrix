@@ -138,6 +138,7 @@
     </Compile>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="Attributes\RequireHttpsAttribute.cs" />
+    <Compile Include="Controllers\ActivityLogController.cs" />
     <Compile Include="Controllers\CacheController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\ExperienceController.cs" />
@@ -149,6 +150,11 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\ActivityLogModel.cs" />
+    <Compile Include="Models\ActivityLogParticipantModel.cs" />
+    <Compile Include="Models\ActivityLogPersonModel.cs" />
+    <Compile Include="Models\ActivityLogPersonViewModel.cs" />
+    <Compile Include="Models\ActivityLogListViewModel.cs" />
     <Compile Include="Models\IStudentModel.cs" />
     <Compile Include="Models\StudentBaseModel.cs" />
     <Compile Include="Models\CountryModel.cs" />
@@ -272,6 +278,7 @@
     <Content Include="Views\Student\View.NameCheck.cshtml" />
     <Content Include="Views\Promo\Students.cshtml" />
     <Content Include="Views\Error\AntiForgery.cshtml" />
+    <Content Include="Views\ActivityLog\List.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

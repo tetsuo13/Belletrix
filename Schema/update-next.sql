@@ -1,74 +1,61 @@
-CREATE TABLE location (
-id              SERIAL,
-country_id      INT NOT NULL,
-address         VARCHAR(128),
-address2        VARCHAR(128),
-locality        VARCHAR(128),
-region          VARCHAR(128),
-postal_code     VARCHAR(32),
-
-PRIMARY KEY (id),
-FOREIGN KEY (country_id) REFERENCES countries (id)
-);
-
-COMMENT ON TABLE location IS 'Address information for a general location type';
-COMMENT ON COLUMN location.locality IS 'The locality. For example, Greensboro';
-COMMENT ON COLUMN location.region IS 'The region. For example, North Carolina';
-
-GRANT ALL PRIVILEGES ON location TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON location_id_seq TO neoanime_abroadadvisor;
-
-
-CREATE TABLE event_log_person (
+CREATE TABLE activity_log_person (
 id              SERIAL,
 full_name       VARCHAR(128) NOT NULL,
 description     VARCHAR(256),
 phone           VARCHAR(32),
-email           VARCHAR(128)
+email           VARCHAR(128),
+
+PRIMARY KEY (id),
+UNIQUE (full_name)
 );
 
+COMMENT ON TABLE activity_log_person IS 'Generic person associated with an event';
 
-CREATE TABLE event_log (
+GRANT ALL PRIVILEGES ON activity_log_person TO "neoanime_belletrix-prod";
+GRANT ALL PRIVILEGES ON activity_log_person_id_seq TO "neoanime_belletrix-prod";
+
+
+CREATE TABLE activity_log (
 id              SERIAL,
+created         TIMESTAMP NOT NULL,
+created_by      INT NOT NULL,
 title           VARCHAR(256) NOT NULL,
 title2          VARCHAR(256),
 title3          VARCHAR(256),
-location_id     INT NOT NULL,
+organizers      VARCHAR(256),
+location        VARCHAR(512),
+types           INT[] NOT NULL,
 start_date      TIMESTAMP NOT NULL,
-end_date        TIMESTAMP,
+end_date        TIMESTAMP NOT NULL,
 on_campus       BOOLEAN NOT NULL,
 web_site        VARCHAR(2048),
 notes           VARCHAR(4096),
 
 PRIMARY KEY (id),
-FOREIGN KEY (location_id) REFERENCES location (id)
+UNIQUE (title),
+FOREIGN KEY (created_by) REFERENCES users (id)
 );
 
-COMMENT ON TABLE events IS 'CGS event log';
-COMMENT ON COLUMN events.start_date IS 'Starting date and time of event';
-COMMENT ON COLUMN events.end_date IS 'Ending date and time if the event was a range of days or NULL if it was a one-time event';
-COMMENT ON COLUMN events.tags IS 'Comma-delimited list of event tags';
+COMMENT ON TABLE activity_log IS 'Event log';
+COMMENT ON COLUMN activity_log.types IS 'Conference, community event, etc. values derived from code';
+COMMENT ON COLUMN activity_log.start_date IS 'Starting date and time of event';
+COMMENT ON COLUMN activity_log.end_date IS 'Ending date and time of event';
 
-GRANT ALL PRIVILEGES ON events TO neoanime_abroadadvisor;
-GRANT ALL PRIVILEGES ON events_id_seq TO neoanime_abroadadvisor;
+GRANT ALL PRIVILEGES ON activity_log TO "neoanime_belletrix-prod";
+GRANT ALL PRIVILEGES ON activity_log_id_seq TO "neoanime_belletrix-prod";
 
 
-CREATE TABLE event_log_types (
-event_id        INT NOT NULL,
-type_name       VARCHAR(256) NOT NULL,
+CREATE TABLE activity_log_participant (
+event_id            INT NOT NULL,
+person_id           INT NOT NULL,
+participant_type    INT NOT NULL,
 
-PRIMARY KEY (event_id, type_name),
-FOREIGN KEY (event_id) REFERENCES event_log (id)
+PRIMARY KEY (event_id, person_id),
+FOREIGN KEY (event_id) REFERENCES activity_log (id),
+FOREIGN KEY (person_id) REFERENCES activity_log_person (id)
 );
 
+COMMENT ON TABLE activity_log_participant IS 'Association between people and events and their type of participation';
+COMMENT ON COLUMN activity_log_participant.participant_type IS 'Denotes attendee or contact, value derived from code';
 
-CREATE TABLE event_log_attendees (
-event_id        INT NOT NULL,
-person_id       INT NOT NULL,
-);
-
-
-CREATE TABLE event_log_contacts (
-event_id        INT NOT NULL,
-person_id       INT NOT NULL,
-);
+GRANT ALL PRIVILEGES ON activity_log_participant TO "neoanime_belletrix-prod";
