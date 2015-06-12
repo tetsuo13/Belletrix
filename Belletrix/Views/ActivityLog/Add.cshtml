@@ -1,0 +1,44 @@
+﻿@using Belletrix.Entity.ViewModel;
+
+@model ActivityLogCreateViewModel
+
+@{
+    ViewBag.Title = "Create";
+    HtmlHelper.ClientValidationEnabled = true;
+    HtmlHelper.UnobtrusiveJavaScriptEnabled = true;
+}
+
+@section FooterScript {
+    <script>
+        $(function () {
+            return;
+            Belletrix.Student.initStudentAddEdit('@Url.Action("NameCheck")');
+            Belletrix.Student.addStudyAbroadRows([], [], []);
+            Belletrix.singleSubmit();
+        });
+    </script>
+}
+
+@section Body {
+    <div class="row">
+        <div class="col-lg-12">
+            <h1>@ViewBag.Title Student</h1>
+        </div>
+    </div>
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { role = "form", id = "student-form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary()
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Personal Information</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

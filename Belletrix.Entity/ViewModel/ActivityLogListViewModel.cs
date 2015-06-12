@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
-namespace Belletrix.Models
+namespace Belletrix.Entity.ViewModel
 {
     public class ActivityLogListViewModel
     {

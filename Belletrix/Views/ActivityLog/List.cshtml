@@ -1,6 +1,5 @@
-﻿@using Belletrix.Models;
-@using System.Collections;
-@using System.Linq;
+﻿@using Belletrix.Entity.Enum;
+@using Belletrix.Entity.ViewModel;
 
 @model IEnumerable<ActivityLogListViewModel>
 
@@ -10,33 +9,33 @@
 
 @helper DisplayTypeLabels(IEnumerable<int> types)
 {
-    if (types.Contains((int)ActivityLogModel.ActivityType.Conference))
+    if (types.Contains((int)ActivityLogTypes.Conference))
     {
-        <span class="label label-default">@ActivityLogModel.ActivityType.Conference</span>
+        <span class="label label-default">@ActivityLogTypes.Conference</span>
     }
-    if (types.Contains((int)ActivityLogModel.ActivityType.Institute))
+    if (types.Contains((int)ActivityLogTypes.Institute))
     {
-        <span class="label label-primary">@ActivityLogModel.ActivityType.Institute</span>
+        <span class="label label-primary">@ActivityLogTypes.Institute</span>
     }
-    if (types.Contains((int)ActivityLogModel.ActivityType.Summit))
+    if (types.Contains((int)ActivityLogTypes.Summit))
     {
-        <span class="label label-success">@ActivityLogModel.ActivityType.Summit</span>
+        <span class="label label-success">@ActivityLogTypes.Summit</span>
     }
-    if (types.Contains((int)ActivityLogModel.ActivityType.Grant))
+    if (types.Contains((int)ActivityLogTypes.Grant))
     {
-        <span class="label label-info">@ActivityLogModel.ActivityType.Grant</span>
+        <span class="label label-info">@ActivityLogTypes.Grant</span>
     }
-    if (types.Contains((int)ActivityLogModel.ActivityType.Community))
+    if (types.Contains((int)ActivityLogTypes.Community))
     {
-        <span class="label label-warning">@ActivityLogModel.ActivityType.Community</span>
+        <span class="label label-warning">@ActivityLogTypes.Community</span>
     }
-    if (types.Contains((int)ActivityLogModel.ActivityType.Student))
+    if (types.Contains((int)ActivityLogTypes.Student))
     {
-        <span class="label label-danger">@ActivityLogModel.ActivityType.Student</span>
+        <span class="label label-danger">@ActivityLogTypes.Student</span>
     }
-    if (types.Contains((int)ActivityLogModel.ActivityType.SiteVisit))
+    if (types.Contains((int)ActivityLogTypes.SiteVisit))
     {
-        <span class="label label-default">@ActivityLogModel.ActivityType.SiteVisit</span>
+        <span class="label label-default">@ActivityLogTypes.SiteVisit</span>
     }
 }
 
@@ -55,7 +54,7 @@
             <h1>Activities Logged <small>@Model.Count().ToString("N0") total</small></h1>
         </div>
         <div class="col-lg-4 text-right">
-            <a href="@Url.Action("Add", "ActivityLog")"><i class="fa fa-plus-circle"></i> Add Activity</a>
+            <a href="@Url.Action("Create", "ActivityLog")"><i class="fa fa-plus-circle"></i> Add Activity</a>
         </div>
     </div>
 

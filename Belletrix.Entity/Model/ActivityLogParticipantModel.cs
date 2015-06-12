@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Belletrix.Models
+namespace Belletrix.Entity.Model
 {
     public class ActivityLogParticipantModel
     {

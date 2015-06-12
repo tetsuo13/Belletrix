@@ -1,54 +1,17 @@
 ﻿using Belletrix.Core;
+using Belletrix.Entity.ViewModel;
 using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Belletrix.Models
+namespace Belletrix.DAL
 {
-    public class ActivityLogModel
+    public class ActivityLogRepository
     {
-        public int Id { get; set; }
-
-        public DateTime Created { get; set; }
-
-        public int CreatedBy { get; set; }
-
-        public string Title { get; set; }
-
-        public string Title2 { get; set; }
-
-        public string Title3 { get; set; }
-
-        public string Organizers { get; set; }
-
-        public string Location { get; set; }
-
-        public enum ActivityType
-        {
-            Conference,
-            Institute,
-            Summit,
-            Grant,
-            Community,
-            Student,
-            SiteVisit
-        }
-
-        public ActivityType[] Types { get; set; }
-
-        public DateTime StartDate { get; set; }
-
-        public DateTime EndDate { get; set; }
-
-        public bool OnCampus { get; set; }
-
-        public string WebSite { get; set; }
-
-        public string Notes { get; set; }
-
-        public static IEnumerable<ActivityLogListViewModel> GetActivityLogs()
+        public IEnumerable<ActivityLogListViewModel> GetActivityLogs()
         {
             const string sql = @"
                 SELECT      id, title, title2, title3,

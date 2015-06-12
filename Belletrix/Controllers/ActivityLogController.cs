@@ -1,4 +1,6 @@
 ﻿using Belletrix.Core;
+using Belletrix.Domain;
+using Belletrix.Entity.ViewModel;
 using Belletrix.Models;
 using System.Web.Mvc;
 
@@ -15,7 +17,20 @@ namespace Belletrix.Controllers
         public ActionResult List()
         {
             Analytics.TrackPageView(Request, "Activity Log List", (Session["User"] as UserModel).Login);
-            return View(ActivityLogModel.GetActivityLogs());
+            ActivityLogService service = new ActivityLogService();
+            return View(service.GetActivityLogs());
+        }
+
+        public ActionResult Add()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Add(ActivityLogCreateViewModel model)
+        {
+            return View(model);
         }
     }
 }

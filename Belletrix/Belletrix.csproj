@@ -139,6 +139,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="Attributes\RequireHttpsAttribute.cs" />
     <Compile Include="Controllers\ActivityLogController.cs" />
+    <Compile Include="Controllers\Api\ActivityLogController.cs" />
     <Compile Include="Controllers\CacheController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\ExperienceController.cs" />
@@ -150,11 +151,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\ActivityLogModel.cs" />
-    <Compile Include="Models\ActivityLogParticipantModel.cs" />
-    <Compile Include="Models\ActivityLogPersonModel.cs" />
-    <Compile Include="Models\ActivityLogPersonViewModel.cs" />
-    <Compile Include="Models\ActivityLogListViewModel.cs" />
     <Compile Include="Models\IStudentModel.cs" />
     <Compile Include="Models\StudentBaseModel.cs" />
     <Compile Include="Models\CountryModel.cs" />
@@ -279,6 +275,7 @@
     <Content Include="Views\Promo\Students.cshtml" />
     <Content Include="Views\Error\AntiForgery.cshtml" />
     <Content Include="Views\ActivityLog\List.cshtml" />
+    <Content Include="Views\ActivityLog\Add.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -302,6 +299,14 @@
     <ProjectReference Include="..\Belletrix.Core\Belletrix.Core.csproj">
       <Project>{a0f343d6-b9b3-42b7-8c1d-2826a16280cb}</Project>
       <Name>Belletrix.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Belletrix.Domain\Belletrix.Domain.csproj">
+      <Project>{261fe036-e1ee-4944-b8ed-25b79f3ac065}</Project>
+      <Name>Belletrix.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Belletrix.Entity\Belletrix.Entity.csproj">
+      <Project>{8c8cc40a-af9f-4c3c-be73-501963c92281}</Project>
+      <Name>Belletrix.Entity</Name>
     </ProjectReference>
     <ProjectReference Include="..\StackExchange.Exceptional.PostgreSql\StackExchange.Exceptional.PostgreSQL.csproj">
       <Project>{8dc4bf04-721a-4da4-aeca-f8fb8cf64625}</Project>
