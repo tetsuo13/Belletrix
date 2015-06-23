@@ -38,48 +38,49 @@
         </div>
     </div>
 
-    <div class="table-responsive">
-        <table id="promolist" class="table table-bordered table-hover table-striped tablesorter table-condensed">
-            <thead>
-                <tr>
-                    <th>Code</th>
-                    <th>Creator</th>
-                    <th>Created</th>
-                    <th>Description</th>
-                    <th>Students</th>
-                    <th>Active</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @foreach (PromoModel promo in Model)
-                {
-                    int students = promo.Logs.Count();
-
+    <div class="row">
+        <div class="col-lg-12">
+            <table id="promolist" class="table table-bordered table-hover table-striped tablesorter table-condensed">
+                <thead>
                     <tr>
-                        <td>@Html.ActionLink(promo.Code, "Info", new { id = promo.Id })</td>
-                        <td>@promo.CreatedBy.FirstName @promo.CreatedBy.LastName</td>
-                        <td>@DateTimeFilter.UtcToLocal(promo.Created)</td>
-                        <td>@promo.Description</td>
-                        <td>
-                            @if (students > 0)
-                            {
-                                @Html.ActionLink(students.ToString("N0"), "Students", new { id = promo.Id })
-                            }
-                            else
-                            {
-                                @students
-                            }
-                        </td>
-                        <td>
-                            @if (promo.IsActive)
-                            {
-                                <i class="fa fa-check"></i>
-                            }
-                        </td>
+                        <th>Code</th>
+                        <th>Creator</th>
+                        <th>Created</th>
+                        <th>Description</th>
+                        <th>Students</th>
+                        <th>Active</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (PromoModel promo in Model)
+                    {
+                        int students = promo.Logs.Count();
+
+                        <tr>
+                            <td>@Html.ActionLink(promo.Code, "Info", new { id = promo.Id })</td>
+                            <td>@promo.CreatedBy.FirstName @promo.CreatedBy.LastName</td>
+                            <td>@DateTimeFilter.UtcToLocal(promo.Created)</td>
+                            <td>@promo.Description</td>
+                            <td>
+                                @if (students > 0)
+                                {
+                                    @Html.ActionLink(students.ToString("N0"), "Students", new { id = promo.Id })
+                                }
+                                else
+                                {
+                                    @students
+                                }
+                            </td>
+                            <td>
+                                @if (promo.IsActive)
+                                {
+                                    <i class="fa fa-check"></i>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 }

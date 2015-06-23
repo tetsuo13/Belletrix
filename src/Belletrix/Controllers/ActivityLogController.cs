@@ -9,9 +9,11 @@ namespace Belletrix.Controllers
     [Authorize]
     public class ActivityLogController : Controller
     {
+        public static string ActivePageName = "activitylog";
+
         public ActivityLogController()
         {
-            ViewBag.ActivePage = "activitylog";
+            ViewBag.ActivePage = ActivePageName;
         }
 
         public ActionResult List()

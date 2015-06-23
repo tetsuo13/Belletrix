@@ -11,9 +11,11 @@ namespace Belletrix.Controllers
     [Authorize]
     public class PromoController : Controller
     {
+        public static string ActivePageName = "promos";
+
         public PromoController()
         {
-            ViewBag.ActivePage = "promos";
+            ViewBag.ActivePage = ActivePageName;
         }
 
         private void TrackPageView(string pageTitle)

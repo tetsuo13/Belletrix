@@ -11,9 +11,11 @@ namespace Belletrix.Controllers
     [Authorize]
     public class StudentController : Controller
     {
+        public static string ActivePageName = "students";
+
         public StudentController()
         {
-            ViewBag.ActivePage = "students";
+            ViewBag.ActivePage = ActivePageName;
         }
 
         public ActionResult List()

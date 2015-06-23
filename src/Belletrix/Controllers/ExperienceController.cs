@@ -9,9 +9,11 @@ namespace Belletrix.Controllers
     [Authorize]
     public class ExperienceController : Controller
     {
+        public static string ActivePageName = "experiences";
+
         public ExperienceController()
         {
-            ViewBag.ActivePage = "experiences";
+            ViewBag.ActivePage = ActivePageName;
         }
 
         public ActionResult List()

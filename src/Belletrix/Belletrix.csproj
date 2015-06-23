@@ -190,7 +190,6 @@
     <Content Include="Content\css\jquery.dataTables.bootstrap.css" />
     <Content Include="Content\css\datepicker.css" />
     <Content Include="Content\css\jquery.dataTables.min.css" />
-    <Content Include="Content\css\sb-admin.css" />
     <Content Include="Content\fonts\fontawesome-webfont.svg" />
     <Content Include="Content\images\back_disabled.png" />
     <Content Include="Content\images\back_enabled.png" />

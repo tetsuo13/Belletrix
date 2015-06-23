@@ -8,10 +8,12 @@ namespace Belletrix.Controllers
     [Authorize]
     public class HomeController : Controller
     {
+        public static string ActivePageName = "dashboard";
+
         public ActionResult Index()
         {
             Analytics.TrackPageView(Request, "Dashboard", (Session["User"] as UserModel).Login);
-            ViewBag.ActivePage = "dashboard";
+            ViewBag.ActivePage = ActivePageName;
             ViewBag.RecentActivity = EventLogModel.GetEvents();
             return View();
         }

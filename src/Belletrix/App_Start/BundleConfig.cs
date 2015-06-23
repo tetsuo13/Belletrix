@@ -23,7 +23,6 @@ namespace Belletrix.App_Start
             bundles.Add(new StyleBundle("~/bundles/css")
                 .Include("~/Content/bootstrap.css")
                 .Include("~/Content/css/bootstrap-multiselect.css")
-                .Include("~/Content/css/sb-admin.css")
                 .Include("~/Content/css/font-awesome.min.css", new CssRewriteUrlTransform())
                 .Include("~/Content/css/datepicker.css")
                 .Include("~/Content/css/jquery.dataTables.min.css", new CssRewriteUrlTransform())

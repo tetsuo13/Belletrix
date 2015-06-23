@@ -50,55 +50,58 @@
 
 @section Body {
     <div class="row">
-        <div class="col-lg-8">
-            <h1>Activities Logged <small>@Model.Count().ToString("N0") total</small></h1>
-        </div>
-        <div class="col-lg-4 text-right">
-            <a href="@Url.Action("Add", "ActivityLog")"><i class="fa fa-plus-circle"></i> Add Activity</a>
+        <div class="col-lg-12">
+            <h1 class="page-header">
+                Activities Logged
+                <small>@Model.Count().ToString("N0") total</small>
+                <small><span class="pull-right small"><a href="@Url.Action("Add", "ActivityLog")"><i class="fa fa-plus-circle"></i> Add Activity</a></span></small>
+            </h1>
         </div>
     </div>
 
     <br />
 
-    <div class="table-responsive">
-        <table id="activitylist" class="table table-bordered table-hover table-striped tablesorter table-condensed">
-            <thead>
-                <tr>
-                    <th>@Html.DisplayNameFor(x => x.Title)</th>
-                    <th>@Html.DisplayNameFor(x => x.Organizers)</th>
-                    <th>@Html.DisplayNameFor(x => x.StartDate)</th>
-                    <th>@Html.DisplayNameFor(x => x.Types)</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (ActivityLogListViewModel activity in Model)
-                {
+    <div class="row">
+        <div class="col-lg-12">
+            <table id="activitylist" class="table table-bordered table-hover table-striped tablesorter table-condensed">
+                <thead>
                     <tr>
-                        <td>
-                            @activity.Title
-                            @if (!String.IsNullOrEmpty(activity.Title2))
-                            {
-                                <br /><small>@activity.Title2</small>
-                                if (!String.IsNullOrEmpty(activity.Title3))
-                                {
-                                    <br /><small>@activity.Title3</small>
-                                }
-                            }
-                        </td>
-                        <td>@activity.Organizers</td>
-                        <td>@activity.StartDate.ToShortDateString()</td>
-                        <td>@DisplayTypeLabels(activity.Types)</td>
-                        <td>
-                            <div class="btn-group">
-                                <a href="@Url.Action("Edit", "ActivityLog", new { id = activity.Id })"
-                                   class="btn btn-xs btn-info" data-placement="top"
-                                   title="Edit"><i class="fa fa-pencil"></i></a>
-                            </div>
-                        </td>
+                        <th>@Html.DisplayNameFor(x => x.Title)</th>
+                        <th>@Html.DisplayNameFor(x => x.Organizers)</th>
+                        <th>@Html.DisplayNameFor(x => x.StartDate)</th>
+                        <th>@Html.DisplayNameFor(x => x.Types)</th>
+                        <th></th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (ActivityLogListViewModel activity in Model)
+                    {
+                        <tr>
+                            <td>
+                                @activity.Title
+                                @if (!String.IsNullOrEmpty(activity.Title2))
+                                {
+                                    <br /><small>@activity.Title2</small>
+                                    if (!String.IsNullOrEmpty(activity.Title3))
+                                    {
+                                        <br /><small>@activity.Title3</small>
+                                    }
+                                }
+                            </td>
+                            <td>@activity.Organizers</td>
+                            <td>@activity.StartDate.ToShortDateString()</td>
+                            <td>@DisplayTypeLabels(activity.Types)</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="@Url.Action("Edit", "ActivityLog", new { id = activity.Id })"
+                                       class="btn btn-xs btn-info" data-placement="top"
+                                       title="Edit"><i class="fa fa-pencil"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 }
