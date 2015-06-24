@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Belletrix.Entity.ViewModel
 {
@@ -41,5 +42,9 @@ namespace Belletrix.Entity.ViewModel
 
         [MaxLength(4096)]
         public string Notes { get; set; }
+
+        [Required(ErrorMessage = "Please select at least one type")]
+        [MinLength(1)]
+        public int[] Types { get; set; }
     }
 }
