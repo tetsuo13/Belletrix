@@ -1,10 +1,7 @@
 ﻿using Belletrix.DAL;
+using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Belletrix.Domain
 {
@@ -17,9 +14,34 @@ namespace Belletrix.Domain
             repository = new ActivityLogRepository();
         }
 
-        public IEnumerable<ActivityLogListViewModel> GetActivityLogs()
+        public IEnumerable<ActivityLogModel> GetActivityLogs()
         {
-            return repository.GetActivityLogs();
+            return repository.GetAll();
+        }
+
+        public ActivityLogModel FindByid(int id)
+        {
+            return repository.GetActivityLogById(id);
+        }
+
+        public void Create(ActivityLogCreateViewModel createModel, int userId)
+        {
+            ActivityLogModel model = new ActivityLogModel()
+            {
+                CreatedBy = userId,
+                Title = createModel.Title,
+                Title2 = createModel.Title2,
+                Title3 = createModel.Title3,
+                Organizers = createModel.Organizers,
+                Location = createModel.Location,
+                StartDate = createModel.StartDate,
+                EndDate = createModel.EndDate,
+                OnCampus = createModel.OnCampus,
+                WebSite = createModel.WebSite,
+                Notes = createModel.Notes
+            };
+
+            repository.Create(model, userId);
         }
     }
 }

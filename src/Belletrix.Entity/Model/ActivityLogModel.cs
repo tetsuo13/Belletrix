@@ -1,5 +1,5 @@
-﻿using Belletrix.Entity.Enum;
-using System;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Belletrix.Entity.Model
 {
@@ -21,7 +21,7 @@ namespace Belletrix.Entity.Model
 
         public string Location { get; set; }
 
-        public ActivityLogTypes[] Types { get; set; }
+        public IEnumerable<int> Types { get; set; }
 
         public DateTime StartDate { get; set; }
 
@@ -32,6 +32,5 @@ namespace Belletrix.Entity.Model
         public string WebSite { get; set; }
 
         public string Notes { get; set; }
-
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Belletrix.Entity.ViewModel
@@ -25,26 +26,27 @@ namespace Belletrix.Entity.ViewModel
         [Required]
         [Display(Name = "Starting Date")]
         [DataType(DataType.Date)]
-        public string StartDate { get; set; }
+        public DateTime StartDate { get; set; }
 
         [Required]
         [Display(Name = "Ending Date")]
         [DataType(DataType.Date)]
-        public string EndDate { get; set; }
+        public DateTime EndDate { get; set; }
 
         [Required]
         [Display(Name = "On Campus?")]
         public bool OnCampus { get; set; }
 
         [MaxLength(2048)]
+        [Display(Name = "Web Site")]
         [DataType(DataType.Url)]
         public string WebSite { get; set; }
 
         [MaxLength(4096)]
+        [DataType(DataType.MultilineText)]
         public string Notes { get; set; }
 
-        [Required(ErrorMessage = "Please select at least one type")]
-        [MinLength(1)]
-        public int[] Types { get; set; }
+        //[Required(ErrorMessage = "Please select at least one type")]
+        //public List<ActivityLogTypesViewModel> Types { get; set; }
     }
 }

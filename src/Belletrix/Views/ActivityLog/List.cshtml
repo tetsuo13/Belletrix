@@ -1,7 +1,7 @@
 ﻿@using Belletrix.Entity.Enum;
-@using Belletrix.Entity.ViewModel;
+@using Belletrix.Entity.Model;
 
-@model IEnumerable<ActivityLogListViewModel>
+@model IEnumerable<ActivityLogModel>
 
 @{
     ViewBag.Title = "List";
@@ -43,7 +43,15 @@
     <script>
         $(function () {
             'use strict';
-            $('#activitylist').dataTable();
+            $('#activitylist').dataTable({
+                columns: [
+                    null,
+                    null,
+                    null,
+                    null,
+                    { orderable: false }
+                ]
+            });
         });
     </script>
 }
@@ -70,30 +78,31 @@
             <table id="activitylist" class="table table-bordered table-hover table-striped tablesorter table-condensed">
                 <thead>
                     <tr>
-                        <th>@Html.DisplayNameFor(x => x.Title)</th>
-                        <th>@Html.DisplayNameFor(x => x.Organizers)</th>
-                        <th>@Html.DisplayNameFor(x => x.StartDate)</th>
-                        <th>@Html.DisplayNameFor(x => x.Types)</th>
+                        <th>Title</th>
+                        <th>Organizers</th>
+                        <th>Dates</th>
+                        <th>Types</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (ActivityLogListViewModel activity in Model)
+                    @foreach (ActivityLogModel activity in Model)
                     {
                         <tr>
+                            <td>@Html.ActionLink(activity.Title, "View", new { id = activity.Id })</td>
+                            <td>@activity.Organizers</td>
                             <td>
-                                @activity.Title
-                                @if (!String.IsNullOrEmpty(activity.Title2))
+                                @if (activity.StartDate.Date == activity.EndDate.Date)
                                 {
-                                    <br /><small>@activity.Title2</small>
-                                    if (!String.IsNullOrEmpty(activity.Title3))
-                                    {
-                                        <br /><small>@activity.Title3</small>
-                                    }
+                                    @activity.StartDate.ToShortDateString()
+                                }
+                                else
+                                {
+                                    @activity.StartDate.ToShortDateString()
+                                    @:-
+                                    @activity.EndDate.ToShortDateString()
                                 }
                             </td>
-                            <td>@activity.Organizers</td>
-                            <td>@activity.StartDate.ToShortDateString()</td>
                             <td>@DisplayTypeLabels(activity.Types)</td>
                             <td>
                                 <div class="btn-group">

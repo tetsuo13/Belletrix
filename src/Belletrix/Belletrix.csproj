@@ -221,6 +221,7 @@
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
     <None Include="Scripts\jquery-2.0.3.intellisense.js" />
+    <Content Include="Scripts\Belletrix.ActivityLog.js" />
     <Content Include="Scripts\Belletrix.js" />
     <Content Include="Scripts\Belletrix.Promo.js" />
     <Content Include="Scripts\Belletrix.Student.js" />
@@ -275,6 +276,7 @@
     <Content Include="Views\Error\AntiForgery.cshtml" />
     <Content Include="Views\ActivityLog\List.cshtml" />
     <Content Include="Views\ActivityLog\Add.cshtml" />
+    <Content Include="Views\ActivityLog\View.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -16,6 +16,7 @@ namespace Belletrix.App_Start
                 "~/Scripts/jquery.validate.min.js",
                 "~/Scripts/jquery.validate.unobtrusive.min.js",
                 "~/Scripts/Belletrix.js",
+                "~/Scripts/Belletrix.ActivityLog.js",
                 "~/Scripts/Belletrix.Promo.js",
                 "~/Scripts/Belletrix.Student.js",
                 "~/Scripts/Belletrix.Student.Note.js"));

@@ -39,12 +39,12 @@
     </Compile>
     <Compile Include="Enum\ActivityLogTypes.cs" />
     <Compile Include="ViewModel\ActivityLogCreateViewModel.cs" />
-    <Compile Include="ViewModel\ActivityLogListViewModel.cs" />
     <Compile Include="Model\ActivityLogModel.cs" />
     <Compile Include="Model\ActivityLogParticipantModel.cs" />
     <Compile Include="Model\ActivityLogPersonModel.cs" />
     <Compile Include="ViewModel\ActivityLogPersonViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModel\ActivityLogTypesViewModel.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

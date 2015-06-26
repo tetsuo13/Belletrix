@@ -12,10 +12,7 @@
 @section FooterScript {
     <script>
         $(function () {
-            return;
-            Belletrix.Student.initStudentAddEdit('@Url.Action("NameCheck")');
-            Belletrix.Student.addStudyAbroadRows([], [], []);
-            Belletrix.singleSubmit();
+            Belletrix.ActivityLog.init();
         });
     </script>
 }
@@ -66,10 +63,16 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="form-group" data-toggle="buttons">
+                                    @*
                                     <label class="btn btn-default btn-xs">
+                                        @Html.HiddenFor(x => x.Types[(int)ActivityLogTypes.Conference].Id)
+                                        @Html.Hidden()
+                                        @Html.CheckBoxFor(x => x.Types[(int)ActivityLogTypes.Conference].IsChecked)
                                         <input name="Types" type="checkbox" autocomplete="off" value="@((int)ActivityLogTypes.Conference)"> @ActivityLogTypes.Conference
                                     </label>
                                     <label class="btn btn-default btn-xs">
+                                        @Html.HiddenFor(x => x.Types[(int)ActivityLogTypes.Institute].Id)
+                                        @Html.CheckBoxFor(x => x.Types[(int)ActivityLogTypes.Institute].IsChecked)
                                         <input name="Types" type="checkbox" autocomplete="off" value="@((int)ActivityLogTypes.Institute)"> @ActivityLogTypes.Institute
                                     </label>
                                     <label class="btn btn-default btn-xs">
@@ -88,14 +91,13 @@
                                         <input name="Types" type="checkbox" autocomplete="off" value="@((int)ActivityLogTypes.SiteVisit)"> @ActivityLogTypes.SiteVisit
                                     </label>
                                     @Html.ValidationMessageFor(x => x.Types)
+                                    *@
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-lg-12">
                                 <div class="form-group">
-                                    @Html.LabelFor(x => x.Location)
-                                    @Html.TextBoxFor(x => x.Location, new { @class = "form-control" })
+                                    @Html.LabelFor(x => x.WebSite)
+                                    @Html.TextBoxFor(x => x.WebSite, new { @class = "form-control" })
                                     @Html.ValidationMessageFor(x => x.Location)
                                 </div>
                             </div>
@@ -107,10 +109,72 @@
             <div class="col-lg-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
+                        <h3 class="panel-title">Logistics</h3>
+                    </div>
+
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-9">
+                                <div class="form-group">
+                                    @Html.LabelFor(x => x.Location)
+                                    @Html.TextBoxFor(x => x.Location, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.Location)
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group has-error">
+                                    @Html.LabelFor(x => x.OnCampus)
+                                    @Html.DropDownListFor(x => x.OnCampus, new SelectList(
+                                        new[]
+                                        {
+                                            new { Value = false, Text = "No" },
+                                            new { Value = true, Text = "Yes" }
+                                        },
+                                        "Value",
+                                        "Text",
+                                        Model), "Please Select", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.OnCampus)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 has-error">
+                                @Html.LabelFor(s => s.StartDate)
+                                @Html.EditorFor(s => s.StartDate)
+                                @Html.ValidationMessageFor(x => x.StartDate)
+                            </div>
+                            <div class="col-lg-6 has-error">
+                                @Html.LabelFor(s => s.EndDate)
+                                @Html.EditorFor(s => s.EndDate)
+                                @Html.ValidationMessageFor(x => x.EndDate)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
                         <h3 class="panel-title">Participants</h3>
                     </div>
 
                     <div class="panel-body">
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Notes</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(x => x.Notes)
+                                    @Html.TextAreaFor(x => x.Notes, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.Notes)
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
