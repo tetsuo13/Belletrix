@@ -3,6 +3,8 @@ using Belletrix.Entity.Model;
 using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Threading.Tasks;
 
 //int[] types = reader["types"] as int[];
 //activity.Types = (ActivityType[])(object)types;
@@ -11,7 +13,7 @@ namespace Belletrix.DAL
 {
     public class ActivityLogRepository
     {
-        public ActivityLogModel GetActivityLogById(int id)
+        public async Task<ActivityLogModel> GetActivityLogById(int id)
         {
             const string sql = @"
                 SELECT      id, title, title2, title3,
@@ -33,13 +35,13 @@ namespace Belletrix.DAL
                     {
                         command.CommandText = sql;
                         command.Parameters.Add("@Id", NpgsqlTypes.NpgsqlDbType.Numeric).Value = id;
-                        connection.Open();
+                        await connection.OpenAsync();
 
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (var reader = await command.ExecuteReaderAsync())
                         {
-                            while (reader.Read())
+                            while (await reader.ReadAsync())
                             {
-                                activity = ProcessRow(reader);
+                                activity = await ProcessRow(reader);
                             }
                         }
                     }
@@ -54,28 +56,29 @@ namespace Belletrix.DAL
             return activity;
         }
 
-        private ActivityLogModel ProcessRow(NpgsqlDataReader reader)
+        private async Task<ActivityLogModel> ProcessRow(DbDataReader reader)
         {
             return new ActivityLogModel()
             {
-                Id = reader.GetInt32(reader.GetOrdinal("id")),
-                Created = reader.GetDateTime(reader.GetOrdinal("created")),
-                CreatedBy = reader.GetInt32(reader.GetOrdinal("created_by")),
-                Title = reader.GetString(reader.GetOrdinal("title")),
-                Title2 = reader.GetText("title2"),
-                Title3 = reader.GetText("title3"),
-                Location = reader.GetText("location"),
+                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("id")),
+                Created = await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("created")),
+                CreatedBy = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("created_by")),
+                Title = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("title")),
+                Title2 = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("title2")),
+                Title3 = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("title3")),
+                Location = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("location")),
                 StartDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("start_date"))),
                 EndDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("end_date"))),
-                Types = reader["types"] as int[],
-                Organizers = reader.GetText("organizers"),
-                OnCampus = reader.GetBoolean(reader.GetOrdinal("on_campus")),
-                WebSite = reader.GetText("web_site"),
-                Notes = reader.GetText("notes")
+                //Types = reader["types"] as int[],
+                Types = new int[0],
+                Organizers = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("organizers")),
+                OnCampus = await reader.GetFieldValueAsync<bool>(reader.GetOrdinal("on_campus")),
+                WebSite = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("web_site")),
+                Notes = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("notes"))
             };
         }
 
-        public IEnumerable<ActivityLogModel> GetAll()
+        public async Task<IEnumerable<ActivityLogModel>> GetAll()
         {
             const string sql = @"
                 SELECT      id, title, title2, title3,
@@ -96,13 +99,13 @@ namespace Belletrix.DAL
                     using (NpgsqlCommand command = connection.CreateCommand())
                     {
                         command.CommandText = sql;
-                        connection.Open();
+                        await connection.OpenAsync();
 
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (DbDataReader reader = await command.ExecuteReaderAsync())
                         {
-                            while (reader.Read())
+                            while (await reader.ReadAsync())
                             {
-                                activities.Add(ProcessRow(reader));
+                                activities.Add(await ProcessRow(reader));
                             }
                         }
                     }
@@ -117,7 +120,7 @@ namespace Belletrix.DAL
             return activities;
         }
 
-        public void Create(ActivityLogModel model, int userId)
+        public async Task Create(ActivityLogModel model, int userId)
         {
             const string sql = @"
                 INSERT INTO activity_log
@@ -158,8 +161,8 @@ namespace Belletrix.DAL
                         command.Parameters.Add("@Created", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
                         command.Parameters.Add("@CreatedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = userId;
 
-                        connection.Open();
-                        command.ExecuteNonQuery();
+                        await connection.OpenAsync();
+                        await command.ExecuteNonQueryAsync();
                     }
                 }
             }

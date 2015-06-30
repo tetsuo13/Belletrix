@@ -2,6 +2,7 @@
 using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Belletrix.Domain
 {
@@ -14,17 +15,17 @@ namespace Belletrix.Domain
             repository = new ActivityLogRepository();
         }
 
-        public IEnumerable<ActivityLogModel> GetActivityLogs()
+        public async Task<IEnumerable<ActivityLogModel>> GetActivityLogs()
         {
-            return repository.GetAll();
+            return await repository.GetAll();
         }
 
-        public ActivityLogModel FindByid(int id)
+        public async Task<ActivityLogModel> FindByid(int id)
         {
-            return repository.GetActivityLogById(id);
+            return await repository.GetActivityLogById(id);
         }
 
-        public void Create(ActivityLogCreateViewModel createModel, int userId)
+        public async Task Create(ActivityLogCreateViewModel createModel, int userId)
         {
             ActivityLogModel model = new ActivityLogModel()
             {
@@ -41,7 +42,7 @@ namespace Belletrix.Domain
                 Notes = createModel.Notes
             };
 
-            repository.Create(model, userId);
+            await repository.Create(model, userId);
         }
     }
 }
