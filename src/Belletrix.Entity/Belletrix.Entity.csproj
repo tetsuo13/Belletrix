@@ -45,6 +45,7 @@
     <Compile Include="ViewModel\ActivityLogPersonViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModel\ActivityLogTypesViewModel.cs" />
+    <Compile Include="ViewModel\ActivityLogEditViewModel.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

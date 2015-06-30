@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Belletrix.Entity.Model;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -48,5 +49,22 @@ namespace Belletrix.Entity.ViewModel
 
         //[Required(ErrorMessage = "Please select at least one type")]
         //public List<ActivityLogTypesViewModel> Types { get; set; }
+
+        public static explicit operator ActivityLogCreateViewModel(ActivityLogModel a)
+        {
+            return new ActivityLogCreateViewModel()
+            {
+                Title = a.Title,
+                Title2 = a.Title2,
+                Title3 = a.Title3,
+                Organizers = a.Organizers,
+                Location = a.Location,
+                StartDate = a.StartDate,
+                EndDate = a.EndDate,
+                OnCampus = a.OnCampus,
+                WebSite = a.WebSite,
+                Notes = a.Notes
+            };
+        }
     }
 }

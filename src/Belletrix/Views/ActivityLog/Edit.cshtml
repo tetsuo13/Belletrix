@@ -1,10 +1,10 @@
 ﻿@using Belletrix.Entity.Enum;
 @using Belletrix.Entity.ViewModel;
 
-@model ActivityLogCreateViewModel
+@model ActivityLogEditViewModel
 
 @{
-    ViewBag.Title = "Create";
+    ViewBag.Title = "Edit";
     HtmlHelper.ClientValidationEnabled = true;
     HtmlHelper.UnobtrusiveJavaScriptEnabled = true;
 }
@@ -20,20 +20,22 @@
 @section Body {
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Add Activity</h1>
+            <h1 class="page-header">Edit Activity</h1>
         </div>
     </div>
 
     @using (Html.BeginForm())
     {
         @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.Id)
         @Html.ValidationSummary()
 
         @Html.Partial("EditFieldsPartial")
 
         <div class="row">
             <div class="col-lg-12">
-                <button type="submit" class="btn btn-default">Add Activity</button>
+                <button type="submit" class="btn btn-default">Save Changes</button>
+                @Html.ActionLink("Cancel", "List")
             </div>
         </div>
     }

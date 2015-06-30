@@ -27,22 +27,16 @@ namespace Belletrix.Domain
 
         public async Task Create(ActivityLogCreateViewModel createModel, int userId)
         {
-            ActivityLogModel model = new ActivityLogModel()
-            {
-                CreatedBy = userId,
-                Title = createModel.Title,
-                Title2 = createModel.Title2,
-                Title3 = createModel.Title3,
-                Organizers = createModel.Organizers,
-                Location = createModel.Location,
-                StartDate = createModel.StartDate,
-                EndDate = createModel.EndDate,
-                OnCampus = createModel.OnCampus,
-                WebSite = createModel.WebSite,
-                Notes = createModel.Notes
-            };
+            ActivityLogModel model = (ActivityLogModel)createModel;
+            model.CreatedBy = userId;
 
             await repository.Create(model, userId);
+        }
+
+        public async Task Save(ActivityLogEditViewModel saveModel)
+        {
+            ActivityLogModel model = (ActivityLogModel)saveModel;
+            await repository.Save(model);
         }
     }
 }

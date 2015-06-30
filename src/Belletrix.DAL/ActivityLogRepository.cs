@@ -172,5 +172,56 @@ namespace Belletrix.DAL
                 throw e;
             }
         }
+
+        public async Task Save(ActivityLogModel model)
+        {
+            const string sql = @"
+                UPDATE  activity_log
+                SET     title = @Title,
+                        title2 = @Title2,
+                        title3 = @Title3,
+                        organizers = @Organizers,
+                        location = @Location,
+                        types = '{}',
+                        start_date = @StartDate,
+                        end_date = @EndDate,
+                        on_campus = @OnCampus,
+                        web_site = @WebSite,
+                        notes = @Notes
+                WHERE   id = @Id";
+
+            try
+            {
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                {
+                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+
+                    using (NpgsqlCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = sql;
+
+                        command.Parameters.Add("@Title", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = model.Title;
+                        command.Parameters.Add("@Title2", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Title2) ? (object)model.Title2 : DBNull.Value;
+                        command.Parameters.Add("@Title3", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Title3) ? (object)model.Title3 : DBNull.Value;
+                        command.Parameters.Add("@Organizers", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Organizers) ? (object)model.Organizers : DBNull.Value;
+                        command.Parameters.Add("@Location", NpgsqlTypes.NpgsqlDbType.Varchar, 512).Value = !String.IsNullOrEmpty(model.Location) ? (object)model.Location : DBNull.Value;
+                        command.Parameters.Add("@StartDate", NpgsqlTypes.NpgsqlDbType.Date).Value = model.StartDate.ToUniversalTime();
+                        command.Parameters.Add("@EndDate", NpgsqlTypes.NpgsqlDbType.Date).Value = model.EndDate.ToUniversalTime();
+                        command.Parameters.Add("@OnCampus", NpgsqlTypes.NpgsqlDbType.Boolean).Value = model.OnCampus;
+                        command.Parameters.Add("@WebSite", NpgsqlTypes.NpgsqlDbType.Varchar, 2048).Value = !String.IsNullOrEmpty(model.WebSite) ? (object)model.WebSite : DBNull.Value;
+                        command.Parameters.Add("@Notes", NpgsqlTypes.NpgsqlDbType.Varchar, 4096).Value = !String.IsNullOrEmpty(model.Notes) ? (object)model.Notes : DBNull.Value;
+                        command.Parameters.Add("@Id", NpgsqlTypes.NpgsqlDbType.Integer).Value = model.Id;
+
+                        await connection.OpenAsync();
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = e;
+                throw e;
+            }
+        }
     }
 }

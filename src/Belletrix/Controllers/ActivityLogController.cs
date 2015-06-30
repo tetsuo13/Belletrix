@@ -68,5 +68,44 @@ namespace Belletrix.Controllers
 
             return View(model);
         }
+
+        public async Task<ActionResult> Edit(int id)
+        {
+            var service = new ActivityLogService();
+            var activity = await service.FindByid(id);
+
+            if (activity == null)
+            {
+                await Analytics.TrackPageView(Request, "Activity Log Error", (Session["User"] as UserModel).Login);
+                return HttpNotFound();
+            }
+
+            await Analytics.TrackPageView(Request, "Activity Log Edit", (Session["User"] as UserModel).Login);
+
+            return View((ActivityLogEditViewModel)activity);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Edit(ActivityLogEditViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var service = new ActivityLogService();
+                    await service.Save(model);
+                    return RedirectToAction("List");
+                }
+                catch (Exception e)
+                {
+                    MvcApplication.LogException(e);
+                    ModelState.AddModelError("Title",
+                        "There was an error saving. It has been logged for later review.");
+                }
+            }
+
+            return View(model);
+        }
     }
 }
