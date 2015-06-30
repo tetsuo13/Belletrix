@@ -1,6 +1,7 @@
 ﻿using Belletrix.Core;
 using Belletrix.Models;
 using StackExchange.Exceptional;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace Belletrix.Controllers
@@ -10,11 +11,11 @@ namespace Belletrix.Controllers
     {
         public static string ActivePageName = "dashboard";
 
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            Analytics.TrackPageView(Request, "Dashboard", (Session["User"] as UserModel).Login);
+            await Analytics.TrackPageView(Request, "Dashboard", (Session["User"] as UserModel).Login);
             ViewBag.ActivePage = ActivePageName;
-            ViewBag.RecentActivity = EventLogModel.GetEvents();
+            ViewBag.RecentActivity = await EventLogModel.GetEvents();
             return View();
         }
 

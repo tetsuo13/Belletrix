@@ -2,6 +2,8 @@
 using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Threading.Tasks;
 
 namespace Belletrix.Models
 {
@@ -42,7 +44,7 @@ namespace Belletrix.Models
             EventDate = DateTime.Now;
         }
 
-        public static IEnumerable<EventLogModel> GetEvents()
+        public static async Task<IEnumerable<EventLogModel>> GetEvents()
         {
             ApplicationCache cacheProvider = new ApplicationCache();
             List<EventLogModel> events = cacheProvider.Get(CacheId, () => new List<EventLogModel>());
@@ -76,24 +78,24 @@ namespace Belletrix.Models
                         using (NpgsqlCommand command = connection.CreateCommand())
                         {
                             command.CommandText = sql;
-                            connection.Open();
+                            await connection.OpenAsync();
 
-                            using (NpgsqlDataReader reader = command.ExecuteReader())
+                            using (DbDataReader reader = await command.ExecuteReaderAsync())
                             {
-                                while (reader.Read())
+                                while (await reader.ReadAsync())
                                 {
                                     UserModel modifiedBy = new UserModel()
                                     {
-                                        Id = reader.GetInt32(reader.GetOrdinal("modified_by")),
-                                        FirstName = reader.GetString(reader.GetOrdinal("first_name")),
-                                        LastName = reader.GetString(reader.GetOrdinal("last_name"))
+                                        Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("modified_by")),
+                                        FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("first_name")),
+                                        LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("last_name"))
                                     };
 
                                     int ord = reader.GetOrdinal("action");
                                     string action = null;
                                     if (!reader.IsDBNull(ord))
                                     {
-                                        action = reader.GetString(ord);
+                                        action = await reader.GetFieldValueAsync<string>(ord);
                                     }
 
                                     StudentModel student = null;
@@ -102,9 +104,9 @@ namespace Belletrix.Models
                                     {
                                         student = new StudentModel()
                                         {
-                                            Id = reader.GetInt32(ord),
-                                            FirstName = reader.GetString(reader.GetOrdinal("student_first_name")),
-                                            LastName = reader.GetString(reader.GetOrdinal("student_last_name"))
+                                            Id = await reader.GetFieldValueAsync<int>(ord),
+                                            FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("student_first_name")),
+                                            LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("student_last_name"))
                                         };
                                     }
 
@@ -114,20 +116,20 @@ namespace Belletrix.Models
                                     {
                                         user = new UserModel()
                                         {
-                                            Id = reader.GetInt32(ord),
-                                            FirstName = reader.GetString(reader.GetOrdinal("user_first_name")),
-                                            LastName = reader.GetString(reader.GetOrdinal("user_last_name"))
+                                            Id = await reader.GetFieldValueAsync<int>(ord),
+                                            FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("user_first_name")),
+                                            LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("user_last_name"))
                                         };
                                     }
 
                                     EventLogModel eventLog = new EventLogModel()
                                     {
-                                        Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                        EventDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("date"))),
+                                        Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("id")),
+                                        EventDate = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("date"))),
                                         ModifiedBy = modifiedBy,
                                         Student = student,
                                         User = user,
-                                        Type = reader.GetInt32(reader.GetOrdinal("type")),
+                                        Type = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("type")),
                                         Action = action
                                     };
 
