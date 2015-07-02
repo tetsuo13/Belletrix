@@ -1,14 +1,19 @@
-﻿
+﻿using System.ComponentModel.DataAnnotations;
+
 namespace Belletrix.Entity.Enum
 {
     public enum ActivityLogTypes
     {
-        Conference,
+        Conference = 1,
         Institute,
         Summit,
         Grant,
         Community,
         Student,
-        SiteVisit
+
+        [Display(Name="Site Visit")]
+        SiteVisit,
+
+        Meeting
     }
 }

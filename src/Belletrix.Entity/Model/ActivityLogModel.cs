@@ -1,6 +1,8 @@
-﻿using Belletrix.Entity.ViewModel;
+﻿using Belletrix.Entity.Enum;
+using Belletrix.Entity.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Belletrix.Entity.Model
 {
@@ -22,7 +24,7 @@ namespace Belletrix.Entity.Model
 
         public string Location { get; set; }
 
-        public IEnumerable<int> Types { get; set; }
+        public ActivityLogTypes[] Types { get; set; }
 
         public DateTime StartDate { get; set; }
 

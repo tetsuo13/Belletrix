@@ -1,18 +1,19 @@
-﻿using Npgsql;
+﻿using System.Data.Common;
+using System.Threading.Tasks;
 
 namespace Belletrix.Core
 {
     public static class ExtensionMethods
     {
-        public static string GetText(this NpgsqlDataReader reader, string columnName)
+        public static async Task<string> GetText(this DbDataReader reader, string columnName)
         {
             int ord = reader.GetOrdinal(columnName);
 
-            if (reader.IsDBNull(ord))
+            if (await reader.IsDBNullAsync(ord))
             {
                 return null;
             }
-            return reader.GetString(ord);
+            return await reader.GetFieldValueAsync<string>(ord);
         }
     }
 }

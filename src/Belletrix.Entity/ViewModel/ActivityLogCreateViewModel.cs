@@ -1,5 +1,7 @@
-﻿using Belletrix.Entity.Model;
+﻿using Belletrix.Entity.Enum;
+using Belletrix.Entity.Model;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -47,8 +49,8 @@ namespace Belletrix.Entity.ViewModel
         [DataType(DataType.MultilineText)]
         public string Notes { get; set; }
 
-        //[Required(ErrorMessage = "Please select at least one type")]
-        //public List<ActivityLogTypesViewModel> Types { get; set; }
+        [Required(ErrorMessage = "Please select at least one type")]
+        public IEnumerable<int> Types { get; set; }
 
         public static explicit operator ActivityLogCreateViewModel(ActivityLogModel a)
         {

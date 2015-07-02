@@ -1,5 +1,6 @@
 ﻿using Belletrix.Entity.Model;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Belletrix.Entity.ViewModel
 {
@@ -22,7 +23,8 @@ namespace Belletrix.Entity.ViewModel
                 EndDate = a.EndDate,
                 OnCampus = a.OnCampus,
                 WebSite = a.WebSite,
-                Notes = a.Notes
+                Notes = a.Notes,
+                Types = a.Types.Cast<int>()
             };
         }
     }

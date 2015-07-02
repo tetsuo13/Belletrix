@@ -1,13 +1,11 @@
 ﻿using Belletrix.Core;
+using Belletrix.Entity.Enum;
 using Belletrix.Entity.Model;
 using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading.Tasks;
-
-//int[] types = reader["types"] as int[];
-//activity.Types = (ActivityType[])(object)types;
 
 namespace Belletrix.DAL
 {
@@ -63,18 +61,17 @@ namespace Belletrix.DAL
                 Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("id")),
                 Created = await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("created")),
                 CreatedBy = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("created_by")),
-                Title = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("title")),
-                Title2 = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("title2")),
-                Title3 = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("title3")),
-                Location = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("location")),
+                Title = await reader.GetText("title"),
+                Title2 = await reader.GetText("title2"),
+                Title3 = await reader.GetText("title3"),
+                Location = await reader.GetText("location"),
                 StartDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("start_date"))),
                 EndDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("end_date"))),
-                //Types = reader["types"] as int[],
-                Types = new int[0],
-                Organizers = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("organizers")),
+                Types = await reader.GetFieldValueAsync<ActivityLogTypes[]>(reader.GetOrdinal("types")),
+                Organizers = await reader.GetText("organizers"),
                 OnCampus = await reader.GetFieldValueAsync<bool>(reader.GetOrdinal("on_campus")),
-                WebSite = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("web_site")),
-                Notes = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("notes"))
+                WebSite = await reader.GetText("web_site"),
+                Notes = await reader.GetText("notes")
             };
         }
 
@@ -133,7 +130,7 @@ namespace Belletrix.DAL
                 VALUES
                 (
                     @Title, @Title2, @Title3, @Organizers,
-                    @Location, '{}', @StartDate, @EndDate,
+                    @Location, @Types, @StartDate, @EndDate,
                     @OnCampus, @WebSite, @Notes, @Created,
                     @CreatedBy
                 )";
@@ -153,6 +150,7 @@ namespace Belletrix.DAL
                         command.Parameters.Add("@Title3", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Title3) ? (object)model.Title3 : DBNull.Value;
                         command.Parameters.Add("@Organizers", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Organizers) ? (object)model.Organizers : DBNull.Value;
                         command.Parameters.Add("@Location", NpgsqlTypes.NpgsqlDbType.Varchar, 512).Value = !String.IsNullOrEmpty(model.Location) ? (object)model.Location : DBNull.Value;
+                        command.Parameters.Add("@Types", NpgsqlTypes.NpgsqlDbType.Array | NpgsqlTypes.NpgsqlDbType.Integer).Value = model.Types;
                         command.Parameters.Add("@StartDate", NpgsqlTypes.NpgsqlDbType.Date).Value = model.StartDate.ToUniversalTime();
                         command.Parameters.Add("@EndDate", NpgsqlTypes.NpgsqlDbType.Date).Value = model.EndDate.ToUniversalTime();
                         command.Parameters.Add("@OnCampus", NpgsqlTypes.NpgsqlDbType.Boolean).Value = model.OnCampus;

@@ -5,38 +5,16 @@
 
 @{
     ViewBag.Title = "List";
-}
 
-@helper DisplayTypeLabels(IEnumerable<int> types)
-{
-    if (types.Contains((int)ActivityLogTypes.Conference))
+    IReadOnlyDictionary<int, string> labels = new Dictionary<int, string>()
     {
-        <span class="label label-default">@ActivityLogTypes.Conference</span>
-    }
-    if (types.Contains((int)ActivityLogTypes.Institute))
-    {
-        <span class="label label-primary">@ActivityLogTypes.Institute</span>
-    }
-    if (types.Contains((int)ActivityLogTypes.Summit))
-    {
-        <span class="label label-success">@ActivityLogTypes.Summit</span>
-    }
-    if (types.Contains((int)ActivityLogTypes.Grant))
-    {
-        <span class="label label-info">@ActivityLogTypes.Grant</span>
-    }
-    if (types.Contains((int)ActivityLogTypes.Community))
-    {
-        <span class="label label-warning">@ActivityLogTypes.Community</span>
-    }
-    if (types.Contains((int)ActivityLogTypes.Student))
-    {
-        <span class="label label-danger">@ActivityLogTypes.Student</span>
-    }
-    if (types.Contains((int)ActivityLogTypes.SiteVisit))
-    {
-        <span class="label label-default">@ActivityLogTypes.SiteVisit</span>
-    }
+        { 1, "label-default" },
+        { 2, "label-primary" },
+        { 3, "label-success" },
+        { 4, "label-info" },
+        { 5, "label-warning" },
+        { 6, "label-danger" }
+    };
 }
 
 @section FooterScript {
@@ -103,7 +81,14 @@
                                     @activity.EndDate.ToShortDateString()
                                 }
                             </td>
-                            <td>@DisplayTypeLabels(activity.Types)</td>
+                            <td>
+                                @foreach (ActivityLogTypes type in activity.Types)
+                                {
+                                    int i = (int)type % labels.Count;
+                                    string labelClassName = labels.ContainsKey(i) ? labels[i] : labels[0];
+                                    <span class="label @labelClassName">@type</span>
+                                }
+                            </td>
                             <td>
                                 <div class="btn-group">
                                     <a href="@Url.Action("Edit", "ActivityLog", new { id = activity.Id })"
