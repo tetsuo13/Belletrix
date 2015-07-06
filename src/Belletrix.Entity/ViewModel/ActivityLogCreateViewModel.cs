@@ -1,7 +1,5 @@
-﻿using Belletrix.Entity.Enum;
-using Belletrix.Entity.Model;
+﻿using Belletrix.Entity.Model;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 

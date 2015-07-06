@@ -1,9 +1,7 @@
 ﻿using Belletrix.DAL;
-using Belletrix.Entity.Enum;
 using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Belletrix.Domain
@@ -31,7 +29,6 @@ namespace Belletrix.Domain
         {
             ActivityLogModel model = (ActivityLogModel)createModel;
             model.CreatedBy = userId;
-            model.Types = createModel.Types.Cast<ActivityLogTypes>().ToArray();
 
             await repository.Create(model, userId);
         }

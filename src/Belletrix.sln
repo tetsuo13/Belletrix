@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Belletrix.DAL", "Belletrix.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Belletrix.Domain", "Belletrix.Domain\Belletrix.Domain.csproj", "{261FE036-E1EE-4944-B8ED-25B79F3AC065}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Belletrix.Domain.Tests", "Belletrix.Domain.Tests\Belletrix.Domain.Tests.csproj", "{05E23292-604D-4D32-A7FD-F8A59FE3D71E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{261FE036-E1EE-4944-B8ED-25B79F3AC065}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{261FE036-E1EE-4944-B8ED-25B79F3AC065}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{261FE036-E1EE-4944-B8ED-25B79F3AC065}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05E23292-604D-4D32-A7FD-F8A59FE3D71E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05E23292-604D-4D32-A7FD-F8A59FE3D71E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05E23292-604D-4D32-A7FD-F8A59FE3D71E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05E23292-604D-4D32-A7FD-F8A59FE3D71E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

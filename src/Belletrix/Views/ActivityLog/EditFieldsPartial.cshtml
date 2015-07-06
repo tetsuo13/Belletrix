@@ -38,38 +38,8 @@
                     <div class="col-lg-12">
                         <div class="form-group">
                             @Html.LabelFor(x => x.Types)
-                            @*Html.EnumDropDownListFor(x => x.Types, new { @class = "form-control", multiple = "multiple" })*@
-                            @Html.DropDownListFor(x => x.Types, EnumHelper.GetSelectList(typeof(ActivityLogTypes)), null, new { @class = "form-control multiselect", multiple = "multiple" })
+                            @Html.ListBoxFor(x => x.Types, (MultiSelectList)ViewBag.TypesSelect, new { @class = "form-control multiselect", multiple = "multiple" })
                             @Html.ValidationMessageFor(x => x.Types)
-                            @*
-                                <label class="btn btn-default btn-xs">
-                                    @Html.HiddenFor(x => x.Types[(int)ActivityLogTypes.Conference].Id)
-                                    @Html.Hidden()
-                                    @Html.CheckBoxFor(x => x.Types[(int)ActivityLogTypes.Conference].IsChecked)
-                                    <input name="Types" type="checkbox" autocomplete="off" value="@((int)ActivityLogTypes.Conference)"> @ActivityLogTypes.Conference
-                                </label>
-                                <label class="btn btn-default btn-xs">
-                                    @Html.HiddenFor(x => x.Types[(int)ActivityLogTypes.Institute].Id)
-                                    @Html.CheckBoxFor(x => x.Types[(int)ActivityLogTypes.Institute].IsChecked)
-                                    <input name="Types" type="checkbox" autocomplete="off" value="@((int)ActivityLogTypes.Institute)"> @ActivityLogTypes.Institute
-                                </label>
-                                <label class="btn btn-default btn-xs">
-                                    <input name="Types" type="checkbox" autocomplete="off" value="@((int)ActivityLogTypes.Summit)"> @ActivityLogTypes.Summit
-                                </label>
-                                <label class="btn btn-default btn-xs">
-                                    <input name="Types" type="checkbox" autocomplete="off" value="@((int)ActivityLogTypes.Grant)"> @ActivityLogTypes.Grant
-                                </label>
-                                <label class="btn btn-default btn-xs">
-                                    <input name="Types" type="checkbox" autocomplete="off" value="@((int)ActivityLogTypes.Community)"> @ActivityLogTypes.Community
-                                </label>
-                                <label class="btn btn-default btn-xs">
-                                    <input name="Types" type="checkbox" autocomplete="off" value="@((int)ActivityLogTypes.Student)"> @ActivityLogTypes.Student
-                                </label>
-                                <label class="btn btn-default btn-xs">
-                                    <input name="Types" type="checkbox" autocomplete="off" value="@((int)ActivityLogTypes.SiteVisit)"> @ActivityLogTypes.SiteVisit
-                                </label>
-                                @Html.ValidationMessageFor(x => x.Types)
-                            *@
                         </div>
                     </div>
                     <div class="col-lg-12">

@@ -1,7 +1,6 @@
 ﻿using Belletrix.Entity.Enum;
 using Belletrix.Entity.ViewModel;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Belletrix.Entity.Model
@@ -38,7 +37,7 @@ namespace Belletrix.Entity.Model
 
         public static explicit operator ActivityLogModel(ActivityLogCreateViewModel a)
         {
-            return new ActivityLogModel()
+            ActivityLogModel model = new ActivityLogModel()
             {
                 Title = a.Title,
                 Title2 = a.Title2,
@@ -49,13 +48,21 @@ namespace Belletrix.Entity.Model
                 EndDate = a.EndDate,
                 OnCampus = a.OnCampus,
                 WebSite = a.WebSite,
-                Notes = a.Notes
+                Notes = a.Notes,
+                Types = a.Types.Cast<ActivityLogTypes>().ToArray()
             };
+
+            if (a.Types != null)
+            {
+                model.Types = a.Types.Cast<ActivityLogTypes>().ToArray();
+            }
+
+            return model;
         }
 
         public static explicit operator ActivityLogModel(ActivityLogEditViewModel a)
         {
-            return new ActivityLogModel()
+            ActivityLogModel model = new ActivityLogModel()
             {
                 Id = a.Id,
                 Title = a.Title,
@@ -69,6 +76,13 @@ namespace Belletrix.Entity.Model
                 WebSite = a.WebSite,
                 Notes = a.Notes
             };
+
+            if (a.Types != null)
+            {
+                model.Types = a.Types.Cast<ActivityLogTypes>().ToArray();
+            }
+
+            return model;
         }
     }
 }

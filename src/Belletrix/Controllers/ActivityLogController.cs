@@ -1,8 +1,11 @@
 ﻿using Belletrix.Core;
 using Belletrix.Domain;
+using Belletrix.Entity.Enum;
 using Belletrix.Entity.ViewModel;
 using Belletrix.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
@@ -46,6 +49,19 @@ namespace Belletrix.Controllers
             return View();
         }
 
+        private void PrepareViewBag(ActivityLogCreateViewModel model)
+        {
+            IEnumerable<SelectListItem> types = from ActivityLogTypes a
+                                                in Enum.GetValues(typeof(ActivityLogTypes))
+                                                select new SelectListItem
+                                                {
+                                                    Value = ((int)a).ToString(),
+                                                    Text = a.ToString()
+                                                };
+
+            ViewBag.TypesSelect = new MultiSelectList(types, "Value", "Text", model.Types);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Add(ActivityLogCreateViewModel model)
@@ -82,7 +98,10 @@ namespace Belletrix.Controllers
 
             await Analytics.TrackPageView(Request, "Activity Log Edit", (Session["User"] as UserModel).Login);
 
-            return View((ActivityLogEditViewModel)activity);
+            ActivityLogEditViewModel model = (ActivityLogEditViewModel)activity;
+            PrepareViewBag(model);
+
+            return View(model);
         }
 
         [HttpPost]
@@ -104,6 +123,8 @@ namespace Belletrix.Controllers
                         "There was an error saving. It has been logged for later review.");
                 }
             }
+
+            PrepareViewBag(model);
 
             return View(model);
         }
