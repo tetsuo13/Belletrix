@@ -44,11 +44,6 @@ namespace Belletrix.Controllers
             return View(await service.GetActivityLogs());
         }
 
-        public ActionResult Add()
-        {
-            return View();
-        }
-
         private void PrepareViewBag(ActivityLogCreateViewModel model)
         {
             IEnumerable<SelectListItem> types = from ActivityLogTypes a
@@ -60,6 +55,12 @@ namespace Belletrix.Controllers
                                                 };
 
             ViewBag.TypesSelect = new MultiSelectList(types, "Value", "Text", model.Types);
+        }
+
+        public ActionResult Add()
+        {
+            PrepareViewBag(new ActivityLogCreateViewModel());
+            return View();
         }
 
         [HttpPost]
@@ -81,6 +82,8 @@ namespace Belletrix.Controllers
                         "There was an error saving. It has been logged for later review.");
                 }
             }
+
+            PrepareViewBag(model);
 
             return View(model);
         }
