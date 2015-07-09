@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using Belletrix.Entity.Enum;
 
 namespace Belletrix.Entity.Model
 {
@@ -11,12 +8,6 @@ namespace Belletrix.Entity.Model
 
         public ActivityLogPersonModel Person { get; set; }
 
-        public enum Types
-        {
-            Attendee,
-            Contact
-        }
-
-        public Types Type { get; set; }
+        public ActivityLogParticipantTypes Type { get; set; }
     }
 }

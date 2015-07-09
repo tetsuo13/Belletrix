@@ -279,6 +279,7 @@
     <Content Include="Views\ActivityLog\View.cshtml" />
     <Content Include="Views\ActivityLog\Edit.cshtml" />
     <Content Include="Views\ActivityLog\EditFieldsPartial.cshtml" />
+    <Content Include="Views\ActivityLog\AddPersonPartial.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

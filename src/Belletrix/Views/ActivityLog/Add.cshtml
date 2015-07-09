@@ -1,5 +1,4 @@
-﻿@using Belletrix.Entity.Enum;
-@using Belletrix.Entity.ViewModel;
+﻿@using Belletrix.Entity.ViewModel;
 
 @model ActivityLogCreateViewModel
 
@@ -12,7 +11,7 @@
 @section FooterScript {
     <script>
         $(function () {
-            Belletrix.ActivityLog.init();
+            Belletrix.ActivityLog.init('@Url.Action("AddPerson", new { guid = Request.Params["guid"] })');
         });
     </script>
 }
@@ -27,8 +26,6 @@
     @using (Html.BeginForm())
     {
         @Html.AntiForgeryToken()
-        @Html.ValidationSummary()
-
         @Html.Partial("EditFieldsPartial")
 
         <div class="row">
@@ -37,4 +34,11 @@
             </div>
         </div>
     }
+
+    <div class="modal fade" id="personModal" tabindex="-1" role="dialog" aria-labelledby="personModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
 }

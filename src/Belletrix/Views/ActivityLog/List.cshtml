@@ -42,7 +42,7 @@
                 <small>@Model.Count().ToString("N0") total</small>
                 <small>
                     <span class="pull-right small">
-                        <a href="@Url.Action("Add", "ActivityLog")"><i class="fa fa-plus-circle fa-fw"></i> Add Activity</a>
+                        <a href="@Url.Action("Add", "ActivityLog", new { guid = Guid.NewGuid() })"><i class="fa fa-plus-circle fa-fw"></i> Add Activity</a>
                     </span>
                 </small>
             </h1>
@@ -91,7 +91,7 @@
                             </td>
                             <td>
                                 <div class="btn-group">
-                                    <a href="@Url.Action("Edit", "ActivityLog", new { id = activity.Id })"
+                                    <a href="@Url.Action("Edit", "ActivityLog", new { id = activity.Id, guid = Guid.NewGuid() })"
                                        class="btn btn-xs btn-info" data-placement="top"
                                        title="Edit"><i class="fa fa-pencil fa-fw"></i></a>
                                 </div>

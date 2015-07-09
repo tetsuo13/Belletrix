@@ -33,6 +33,19 @@ namespace Belletrix.Domain
             await repository.Create(model, userId);
         }
 
+        public async Task CreatePerson(ActivityLogPersonCreateViewModel createModel)
+        {
+            ActivityLogPersonModel model = new ActivityLogPersonModel()
+            {
+                FullName = createModel.FullName,
+                Email = createModel.Email,
+                Description = createModel.Description,
+                PhoneNumber = createModel.PhoneNumber
+            };
+
+            await repository.CreatePerson(model);
+        }
+
         public async Task Save(ActivityLogEditViewModel saveModel)
         {
             ActivityLogModel model = (ActivityLogModel)saveModel;

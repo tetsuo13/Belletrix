@@ -222,5 +222,44 @@ namespace Belletrix.DAL
                 throw e;
             }
         }
+
+        public async Task CreatePerson(ActivityLogPersonModel model)
+        {
+            const string sql = @"
+                INSERT INTO activity_log_person
+                (
+                    full_name, description, phone, email
+                )
+                VALUES
+                (
+                    @FullName, @Description, @Phone, @Email
+                )";
+
+            try
+            {
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                {
+                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+
+                    using (NpgsqlCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = sql;
+
+                        command.Parameters.Add("@FullName", NpgsqlTypes.NpgsqlDbType.Varchar, 128).Value = model.FullName;
+                        command.Parameters.Add("@Description", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Description) ? (object)model.Description : DBNull.Value;
+                        command.Parameters.Add("@Phone", NpgsqlTypes.NpgsqlDbType.Varchar, 32).Value = !String.IsNullOrEmpty(model.PhoneNumber) ? (object)model.PhoneNumber : DBNull.Value;
+                        command.Parameters.Add("@Email", NpgsqlTypes.NpgsqlDbType.Varchar, 128).Value = !String.IsNullOrEmpty(model.Email) ? (object)model.Email : DBNull.Value;
+
+                        await connection.OpenAsync();
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = e;
+                throw e;
+            }
+        }
     }
 }

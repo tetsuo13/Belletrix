@@ -131,5 +131,15 @@ namespace Belletrix.Controllers
 
             return View(model);
         }
+
+        public async Task<PartialViewResult> AddPerson(Guid guid)
+        {
+            ActivityLogPersonCreateViewModel model = new ActivityLogPersonCreateViewModel()
+            {
+                SessionId = guid
+            };
+
+            return PartialView("AddPersonPartial", model);
+        }
     }
 }

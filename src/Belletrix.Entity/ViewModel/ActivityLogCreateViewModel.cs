@@ -40,7 +40,7 @@ namespace Belletrix.Entity.ViewModel
 
         [MaxLength(2048)]
         [Display(Name = "Web Site")]
-        [DataType(DataType.Url)]
+        [Url]
         public string WebSite { get; set; }
 
         [MaxLength(4096)]
