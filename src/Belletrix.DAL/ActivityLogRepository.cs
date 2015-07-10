@@ -223,17 +223,22 @@ namespace Belletrix.DAL
             }
         }
 
-        public async Task CreatePerson(ActivityLogPersonModel model)
+        public async Task<int> CreatePerson(ActivityLogPersonModel model)
         {
             const string sql = @"
                 INSERT INTO activity_log_person
                 (
-                    full_name, description, phone, email
+                    id, full_name, description,
+                    phone, email, session_id
                 )
                 VALUES
                 (
-                    @FullName, @Description, @Phone, @Email
-                )";
+                    DEFAULT, @FullName, @Description,
+                    @Phone, @Email, @SessionId
+                )
+                RETURNING id";
+
+            int id;
 
             try
             {
@@ -249,9 +254,10 @@ namespace Belletrix.DAL
                         command.Parameters.Add("@Description", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Description) ? (object)model.Description : DBNull.Value;
                         command.Parameters.Add("@Phone", NpgsqlTypes.NpgsqlDbType.Varchar, 32).Value = !String.IsNullOrEmpty(model.PhoneNumber) ? (object)model.PhoneNumber : DBNull.Value;
                         command.Parameters.Add("@Email", NpgsqlTypes.NpgsqlDbType.Varchar, 128).Value = !String.IsNullOrEmpty(model.Email) ? (object)model.Email : DBNull.Value;
+                        command.Parameters.Add("@SessionId", NpgsqlTypes.NpgsqlDbType.Uuid).Value = model.SessionId;
 
                         await connection.OpenAsync();
-                        await command.ExecuteNonQueryAsync();
+                        id = (int)await command.ExecuteScalarAsync();
                     }
                 }
             }
@@ -260,6 +266,8 @@ namespace Belletrix.DAL
                 e.Data["SQL"] = e;
                 throw e;
             }
+
+            return id;
         }
     }
 }

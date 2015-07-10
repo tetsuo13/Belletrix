@@ -141,5 +141,48 @@ namespace Belletrix.Controllers
 
             return PartialView("AddPersonPartial", model);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> AddPerson(ActivityLogPersonCreateViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var service = new ActivityLogService();
+                    int id = await service.CreatePerson(model);
+                    //int id = new Random().Next();
+
+                    Session["ActivityLog"] = new Dictionary<Guid, List<int>>();
+                    (Session["ActivityLog"] as Dictionary<Guid, List<int>>)[model.SessionId] = new List<int>();
+                    (Session["ActivityLog"] as Dictionary<Guid, List<int>>)[model.SessionId].Add(id);
+
+                    return Json(new
+                    {
+                        Success = true,
+                        Message = String.Empty,
+                        Id = id
+                    });
+                }
+                catch (Exception e)
+                {
+                    MvcApplication.LogException(e);
+                    return Json(new
+                    {
+                        Success = false,
+                        Message = "There was an error saving. It has been logged for later review.",
+                        Id = 0
+                    });
+                }
+            }
+
+            return Json(new
+            {
+                Success = false,
+                Message = "Invalid form",
+                Id = 0
+            });
+        }
     }
 }

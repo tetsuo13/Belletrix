@@ -16,5 +16,7 @@ namespace Belletrix.Entity.Model
         public string PhoneNumber { get; set; }
 
         public string Email { get; set; }
+
+        public Guid SessionId { get; set; }
     }
 }

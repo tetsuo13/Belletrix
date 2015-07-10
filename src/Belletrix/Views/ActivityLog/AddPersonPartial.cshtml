@@ -7,8 +7,9 @@
     HtmlHelper.UnobtrusiveJavaScriptEnabled = true;
 }
 
-@using (Html.BeginRouteForm("DefaultApi", new { controller = "ActivityLog", httproute = "true" }))
+@using (Html.BeginForm("AddPerson", "ActivityLog"))
 {
+    @Html.AntiForgeryToken()
     @Html.HiddenFor(x => x.SessionId)
 
     <div class="modal-header">
