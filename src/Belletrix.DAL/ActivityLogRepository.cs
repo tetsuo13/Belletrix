@@ -1,17 +1,28 @@
 ﻿using Belletrix.Core;
 using Belletrix.Entity.Enum;
+using System.Linq;
 using Belletrix.Entity.Model;
 using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Threading.Tasks;
 
 namespace Belletrix.DAL
 {
-    public class ActivityLogRepository
+    public class ActivityLogRepository : IActivityLogRepository
     {
-        public async Task<ActivityLogModel> GetActivityLogById(int id)
+        private readonly NpgsqlConnection DbContext;
+        private readonly IUnitOfWork UnitOfWork;
+
+        public ActivityLogRepository(IUnitOfWork unitOfWork)
+        {
+            UnitOfWork = unitOfWork;
+            DbContext = unitOfWork.DbContext;
+        }
+
+        public async Task<ActivityLogModel> GetActivityById(int id)
         {
             const string sql = @"
                 SELECT      id, title, title2, title3,
@@ -25,22 +36,16 @@ namespace Belletrix.DAL
 
             try
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                using (NpgsqlCommand command = DbContext.CreateCommand())
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+                    command.CommandText = sql;
+                    command.Parameters.Add("@Id", NpgsqlTypes.NpgsqlDbType.Numeric).Value = id;
 
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (var reader = await command.ExecuteReaderAsync())
                     {
-                        command.CommandText = sql;
-                        command.Parameters.Add("@Id", NpgsqlTypes.NpgsqlDbType.Numeric).Value = id;
-                        await connection.OpenAsync();
-
-                        using (var reader = await command.ExecuteReaderAsync())
+                        while (await reader.ReadAsync())
                         {
-                            while (await reader.ReadAsync())
-                            {
-                                activity = await ProcessRow(reader);
-                            }
+                            activity = await ProcessRow(reader);
                         }
                     }
                 }
@@ -75,7 +80,7 @@ namespace Belletrix.DAL
             };
         }
 
-        public async Task<IEnumerable<ActivityLogModel>> GetAll()
+        public async Task<IEnumerable<ActivityLogModel>> GetAllActivities()
         {
             const string sql = @"
                 SELECT      id, title, title2, title3,
@@ -89,21 +94,15 @@ namespace Belletrix.DAL
 
             try
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                using (NpgsqlCommand command = DbContext.CreateCommand())
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+                    command.CommandText = sql;
 
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (DbDataReader reader = await command.ExecuteReaderAsync())
                     {
-                        command.CommandText = sql;
-                        await connection.OpenAsync();
-
-                        using (DbDataReader reader = await command.ExecuteReaderAsync())
+                        while (await reader.ReadAsync())
                         {
-                            while (await reader.ReadAsync())
-                            {
-                                activities.Add(await ProcessRow(reader));
-                            }
+                            activities.Add(await ProcessRow(reader));
                         }
                     }
                 }
@@ -117,7 +116,7 @@ namespace Belletrix.DAL
             return activities;
         }
 
-        public async Task Create(ActivityLogModel model, int userId)
+        public async Task<int> InsertActivity(ActivityLogModel model, int userId)
         {
             const string sql = @"
                 INSERT INTO activity_log
@@ -133,35 +132,32 @@ namespace Belletrix.DAL
                     @Location, @Types, @StartDate, @EndDate,
                     @OnCampus, @WebSite, @Notes, @Created,
                     @CreatedBy
-                )";
+                )
+                RETURNING id";
+
+            int id;
 
             try
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                using (NpgsqlCommand command = DbContext.CreateCommand())
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+                    command.CommandText = sql;
 
-                    using (NpgsqlCommand command = connection.CreateCommand())
-                    {
-                        command.CommandText = sql;
+                    command.Parameters.Add("@Title", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = model.Title;
+                    command.Parameters.Add("@Title2", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Title2) ? (object)model.Title2 : DBNull.Value;
+                    command.Parameters.Add("@Title3", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Title3) ? (object)model.Title3 : DBNull.Value;
+                    command.Parameters.Add("@Organizers", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Organizers) ? (object)model.Organizers : DBNull.Value;
+                    command.Parameters.Add("@Location", NpgsqlTypes.NpgsqlDbType.Varchar, 512).Value = !String.IsNullOrEmpty(model.Location) ? (object)model.Location : DBNull.Value;
+                    command.Parameters.Add("@Types", NpgsqlTypes.NpgsqlDbType.Array | NpgsqlTypes.NpgsqlDbType.Integer).Value = model.Types;
+                    command.Parameters.Add("@StartDate", NpgsqlTypes.NpgsqlDbType.Date).Value = model.StartDate.ToUniversalTime();
+                    command.Parameters.Add("@EndDate", NpgsqlTypes.NpgsqlDbType.Date).Value = model.EndDate.ToUniversalTime();
+                    command.Parameters.Add("@OnCampus", NpgsqlTypes.NpgsqlDbType.Boolean).Value = model.OnCampus;
+                    command.Parameters.Add("@WebSite", NpgsqlTypes.NpgsqlDbType.Varchar, 2048).Value = !String.IsNullOrEmpty(model.WebSite) ? (object)model.WebSite : DBNull.Value;
+                    command.Parameters.Add("@Notes", NpgsqlTypes.NpgsqlDbType.Varchar, 4096).Value = !String.IsNullOrEmpty(model.Notes) ? (object)model.Notes : DBNull.Value;
+                    command.Parameters.Add("@Created", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
+                    command.Parameters.Add("@CreatedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = userId;
 
-                        command.Parameters.Add("@Title", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = model.Title;
-                        command.Parameters.Add("@Title2", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Title2) ? (object)model.Title2 : DBNull.Value;
-                        command.Parameters.Add("@Title3", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Title3) ? (object)model.Title3 : DBNull.Value;
-                        command.Parameters.Add("@Organizers", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Organizers) ? (object)model.Organizers : DBNull.Value;
-                        command.Parameters.Add("@Location", NpgsqlTypes.NpgsqlDbType.Varchar, 512).Value = !String.IsNullOrEmpty(model.Location) ? (object)model.Location : DBNull.Value;
-                        command.Parameters.Add("@Types", NpgsqlTypes.NpgsqlDbType.Array | NpgsqlTypes.NpgsqlDbType.Integer).Value = model.Types;
-                        command.Parameters.Add("@StartDate", NpgsqlTypes.NpgsqlDbType.Date).Value = model.StartDate.ToUniversalTime();
-                        command.Parameters.Add("@EndDate", NpgsqlTypes.NpgsqlDbType.Date).Value = model.EndDate.ToUniversalTime();
-                        command.Parameters.Add("@OnCampus", NpgsqlTypes.NpgsqlDbType.Boolean).Value = model.OnCampus;
-                        command.Parameters.Add("@WebSite", NpgsqlTypes.NpgsqlDbType.Varchar, 2048).Value = !String.IsNullOrEmpty(model.WebSite) ? (object)model.WebSite : DBNull.Value;
-                        command.Parameters.Add("@Notes", NpgsqlTypes.NpgsqlDbType.Varchar, 4096).Value = !String.IsNullOrEmpty(model.Notes) ? (object)model.Notes : DBNull.Value;
-                        command.Parameters.Add("@Created", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
-                        command.Parameters.Add("@CreatedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = userId;
-
-                        await connection.OpenAsync();
-                        await command.ExecuteNonQueryAsync();
-                    }
+                    id = (int)await command.ExecuteScalarAsync();
                 }
             }
             catch (Exception e)
@@ -169,9 +165,11 @@ namespace Belletrix.DAL
                 e.Data["SQL"] = e;
                 throw e;
             }
+
+            return id;
         }
 
-        public async Task Save(ActivityLogModel model)
+        public async Task UpdateActivity(ActivityLogModel model)
         {
             const string sql = @"
                 UPDATE  activity_log
@@ -190,30 +188,24 @@ namespace Belletrix.DAL
 
             try
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                using (NpgsqlCommand command = DbContext.CreateCommand())
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+                    command.CommandText = sql;
 
-                    using (NpgsqlCommand command = connection.CreateCommand())
-                    {
-                        command.CommandText = sql;
+                    command.Parameters.Add("@Title", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = model.Title;
+                    command.Parameters.Add("@Title2", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Title2) ? (object)model.Title2 : DBNull.Value;
+                    command.Parameters.Add("@Title3", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Title3) ? (object)model.Title3 : DBNull.Value;
+                    command.Parameters.Add("@Organizers", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Organizers) ? (object)model.Organizers : DBNull.Value;
+                    command.Parameters.Add("@Location", NpgsqlTypes.NpgsqlDbType.Varchar, 512).Value = !String.IsNullOrEmpty(model.Location) ? (object)model.Location : DBNull.Value;
+                    command.Parameters.Add("@Types", NpgsqlTypes.NpgsqlDbType.Array | NpgsqlTypes.NpgsqlDbType.Integer).Value = model.Types;
+                    command.Parameters.Add("@StartDate", NpgsqlTypes.NpgsqlDbType.Date).Value = model.StartDate.ToUniversalTime();
+                    command.Parameters.Add("@EndDate", NpgsqlTypes.NpgsqlDbType.Date).Value = model.EndDate.ToUniversalTime();
+                    command.Parameters.Add("@OnCampus", NpgsqlTypes.NpgsqlDbType.Boolean).Value = model.OnCampus;
+                    command.Parameters.Add("@WebSite", NpgsqlTypes.NpgsqlDbType.Varchar, 2048).Value = !String.IsNullOrEmpty(model.WebSite) ? (object)model.WebSite : DBNull.Value;
+                    command.Parameters.Add("@Notes", NpgsqlTypes.NpgsqlDbType.Varchar, 4096).Value = !String.IsNullOrEmpty(model.Notes) ? (object)model.Notes : DBNull.Value;
+                    command.Parameters.Add("@Id", NpgsqlTypes.NpgsqlDbType.Integer).Value = model.Id;
 
-                        command.Parameters.Add("@Title", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = model.Title;
-                        command.Parameters.Add("@Title2", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Title2) ? (object)model.Title2 : DBNull.Value;
-                        command.Parameters.Add("@Title3", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Title3) ? (object)model.Title3 : DBNull.Value;
-                        command.Parameters.Add("@Organizers", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Organizers) ? (object)model.Organizers : DBNull.Value;
-                        command.Parameters.Add("@Location", NpgsqlTypes.NpgsqlDbType.Varchar, 512).Value = !String.IsNullOrEmpty(model.Location) ? (object)model.Location : DBNull.Value;
-                        command.Parameters.Add("@Types", NpgsqlTypes.NpgsqlDbType.Array | NpgsqlTypes.NpgsqlDbType.Integer).Value = model.Types;
-                        command.Parameters.Add("@StartDate", NpgsqlTypes.NpgsqlDbType.Date).Value = model.StartDate.ToUniversalTime();
-                        command.Parameters.Add("@EndDate", NpgsqlTypes.NpgsqlDbType.Date).Value = model.EndDate.ToUniversalTime();
-                        command.Parameters.Add("@OnCampus", NpgsqlTypes.NpgsqlDbType.Boolean).Value = model.OnCampus;
-                        command.Parameters.Add("@WebSite", NpgsqlTypes.NpgsqlDbType.Varchar, 2048).Value = !String.IsNullOrEmpty(model.WebSite) ? (object)model.WebSite : DBNull.Value;
-                        command.Parameters.Add("@Notes", NpgsqlTypes.NpgsqlDbType.Varchar, 4096).Value = !String.IsNullOrEmpty(model.Notes) ? (object)model.Notes : DBNull.Value;
-                        command.Parameters.Add("@Id", NpgsqlTypes.NpgsqlDbType.Integer).Value = model.Id;
-
-                        await connection.OpenAsync();
-                        await command.ExecuteNonQueryAsync();
-                    }
+                    await command.ExecuteNonQueryAsync();
                 }
             }
             catch (Exception e)
@@ -223,51 +215,9 @@ namespace Belletrix.DAL
             }
         }
 
-        public async Task<int> CreatePerson(ActivityLogPersonModel model)
+        public async Task SaveChanges()
         {
-            const string sql = @"
-                INSERT INTO activity_log_person
-                (
-                    id, full_name, description,
-                    phone, email, session_id
-                )
-                VALUES
-                (
-                    DEFAULT, @FullName, @Description,
-                    @Phone, @Email, @SessionId
-                )
-                RETURNING id";
-
-            int id;
-
-            try
-            {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
-                {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                    using (NpgsqlCommand command = connection.CreateCommand())
-                    {
-                        command.CommandText = sql;
-
-                        command.Parameters.Add("@FullName", NpgsqlTypes.NpgsqlDbType.Varchar, 128).Value = model.FullName;
-                        command.Parameters.Add("@Description", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Description) ? (object)model.Description : DBNull.Value;
-                        command.Parameters.Add("@Phone", NpgsqlTypes.NpgsqlDbType.Varchar, 32).Value = !String.IsNullOrEmpty(model.PhoneNumber) ? (object)model.PhoneNumber : DBNull.Value;
-                        command.Parameters.Add("@Email", NpgsqlTypes.NpgsqlDbType.Varchar, 128).Value = !String.IsNullOrEmpty(model.Email) ? (object)model.Email : DBNull.Value;
-                        command.Parameters.Add("@SessionId", NpgsqlTypes.NpgsqlDbType.Uuid).Value = model.SessionId;
-
-                        await connection.OpenAsync();
-                        id = (int)await command.ExecuteScalarAsync();
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                e.Data["SQL"] = e;
-                throw e;
-            }
-
-            return id;
+            UnitOfWork.SaveChanges();
         }
     }
 }

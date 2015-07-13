@@ -49,6 +49,8 @@ namespace Belletrix
             // Remove Web Form (ASPX) view engine, only Razor.
             ViewEngines.Engines.Clear();
             ViewEngines.Engines.Add(new RazorViewEngine());
+
+            UnityConfig.ConfigureIocUnityContainer();
         }
     }
 }

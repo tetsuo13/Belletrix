@@ -11,7 +11,7 @@
 @section FooterScript {
     <script>
         $(function () {
-            Belletrix.ActivityLog.init('@Url.Action("AddPerson", new { guid = Request.Params["guid"] })');
+            Belletrix.ActivityLog.init('@Url.Action("AddPerson", "ActivityLogPerson", new { guid = Request.Params["guid"] })');
         });
     </script>
 }

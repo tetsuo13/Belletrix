@@ -49,6 +49,15 @@
       <HintPath>..\packages\DropDownList.Optgroup.MVC.1.0.0\lib\net40\DropDownList_Optgroup.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Practices.Unity">
+      <HintPath>..\packages\Unity.3.5.1404.0\lib\net45\Microsoft.Practices.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Configuration">
+      <HintPath>..\packages\Unity.3.5.1404.0\lib\net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.RegistrationByConvention">
+      <HintPath>..\packages\Unity.3.5.1404.0\lib\net45\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
+    </Reference>
     <Reference Include="Mono.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Npgsql.2.2.5\lib\net45\Mono.Security.dll</HintPath>
@@ -137,9 +146,10 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="Attributes\RequireHttpsAttribute.cs" />
     <Compile Include="Controllers\ActivityLogController.cs" />
-    <Compile Include="Controllers\Api\ActivityLogController.cs" />
+    <Compile Include="Controllers\ActivityLogPersonController.cs" />
     <Compile Include="Controllers\CacheController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\ExperienceController.cs" />
@@ -151,6 +161,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Infrastructure\BelletrixDependencyResolver.cs" />
     <Compile Include="Models\IStudentModel.cs" />
     <Compile Include="Models\StudentBaseModel.cs" />
     <Compile Include="Models\CountryModel.cs" />
@@ -279,13 +290,14 @@
     <Content Include="Views\ActivityLog\View.cshtml" />
     <Content Include="Views\ActivityLog\Edit.cshtml" />
     <Content Include="Views\ActivityLog\EditFieldsPartial.cshtml" />
-    <Content Include="Views\ActivityLog\AddPersonPartial.cshtml" />
+    <Content Include="Views\ActivityLogPerson\AddPerson.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Controllers\Api\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -303,6 +315,10 @@
     <ProjectReference Include="..\Belletrix.Core\Belletrix.Core.csproj">
       <Project>{a0f343d6-b9b3-42b7-8c1d-2826a16280cb}</Project>
       <Name>Belletrix.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Belletrix.DAL\Belletrix.DAL.csproj">
+      <Project>{5019f75e-e5e3-4e72-9704-8744edb57880}</Project>
+      <Name>Belletrix.DAL</Name>
     </ProjectReference>
     <ProjectReference Include="..\Belletrix.Domain\Belletrix.Domain.csproj">
       <Project>{261fe036-e1ee-4944-b8ed-25b79f3ac065}</Project>

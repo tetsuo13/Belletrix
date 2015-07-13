@@ -50,6 +50,8 @@ namespace Belletrix.Entity.ViewModel
         [Required(ErrorMessage = "Please select at least one type")]
         public IEnumerable<int> Types { get; set; }
 
+        public Guid SessionId { get; set; }
+
         public static explicit operator ActivityLogCreateViewModel(ActivityLogModel a)
         {
             return new ActivityLogCreateViewModel()

@@ -24,5 +24,8 @@ namespace Belletrix.Entity.ViewModel
         [MaxLength(128)]
         [EmailAddress]
         public string Email { get; set; }
+
+        [Required(ErrorMessage = "Please select a type")]
+        public int Type { get; set; }
     }
 }

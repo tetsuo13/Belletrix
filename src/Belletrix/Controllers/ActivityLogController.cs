@@ -1,6 +1,7 @@
 ﻿using Belletrix.Core;
 using Belletrix.Domain;
 using Belletrix.Entity.Enum;
+using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
 using Belletrix.Models;
 using System;
@@ -16,15 +17,17 @@ namespace Belletrix.Controllers
     {
         public static string ActivePageName = "activitylog";
 
-        public ActivityLogController()
+        private IActivityService activityService;
+
+        public ActivityLogController(IActivityService service)
         {
+            this.activityService = service;
             ViewBag.ActivePage = ActivePageName;
         }
 
         public async Task<ActionResult> View(int id)
         {
-            var service = new ActivityLogService();
-            var activity = await service.FindByid(id);
+            var activity = await activityService.FindByid(id);
 
             if (activity == null)
             {
@@ -40,8 +43,8 @@ namespace Belletrix.Controllers
         public async Task<ActionResult> List()
         {
             await Analytics.TrackPageView(Request, "Activity Log List", (Session["User"] as UserModel).Login);
-            var service = new ActivityLogService();
-            return View(await service.GetActivityLogs());
+            var logs = await activityService.GetActivityLogs();
+            return View(logs);
         }
 
         private void PrepareViewBag(ActivityLogCreateViewModel model)
@@ -71,8 +74,19 @@ namespace Belletrix.Controllers
             {
                 try
                 {
-                    var service = new ActivityLogService();
-                    await service.Create(model, (Session["User"] as UserModel).Id);
+                    int activityId = await activityService.InsertActivity(model, (Session["User"] as UserModel).Id);
+
+                    if (activityService.ContainsAssociatedPeople(Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>,
+                        model.SessionId))
+                    {
+                        await activityService.AssociatePeopleWithActivity(activityId,
+                            model.SessionId,
+                            (Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>)[model.SessionId]);
+                        (Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>).Remove(model.SessionId);
+                    }
+
+                    await activityService.SaveChanges();
+
                     return RedirectToAction("List");
                 }
                 catch (Exception e)
@@ -90,8 +104,7 @@ namespace Belletrix.Controllers
 
         public async Task<ActionResult> Edit(int id)
         {
-            var service = new ActivityLogService();
-            var activity = await service.FindByid(id);
+            var activity = await activityService.FindByid(id);
 
             if (activity == null)
             {
@@ -115,8 +128,9 @@ namespace Belletrix.Controllers
             {
                 try
                 {
-                    var service = new ActivityLogService();
-                    await service.Save(model);
+                    await activityService.UpdateActivity(model);
+                    await activityService.SaveChanges();
+
                     return RedirectToAction("List");
                 }
                 catch (Exception e)
@@ -130,59 +144,6 @@ namespace Belletrix.Controllers
             PrepareViewBag(model);
 
             return View(model);
-        }
-
-        public async Task<PartialViewResult> AddPerson(Guid guid)
-        {
-            ActivityLogPersonCreateViewModel model = new ActivityLogPersonCreateViewModel()
-            {
-                SessionId = guid
-            };
-
-            return PartialView("AddPersonPartial", model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<JsonResult> AddPerson(ActivityLogPersonCreateViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    var service = new ActivityLogService();
-                    int id = await service.CreatePerson(model);
-                    //int id = new Random().Next();
-
-                    Session["ActivityLog"] = new Dictionary<Guid, List<int>>();
-                    (Session["ActivityLog"] as Dictionary<Guid, List<int>>)[model.SessionId] = new List<int>();
-                    (Session["ActivityLog"] as Dictionary<Guid, List<int>>)[model.SessionId].Add(id);
-
-                    return Json(new
-                    {
-                        Success = true,
-                        Message = String.Empty,
-                        Id = id
-                    });
-                }
-                catch (Exception e)
-                {
-                    MvcApplication.LogException(e);
-                    return Json(new
-                    {
-                        Success = false,
-                        Message = "There was an error saving. It has been logged for later review.",
-                        Id = 0
-                    });
-                }
-            }
-
-            return Json(new
-            {
-                Success = false,
-                Message = "Invalid form",
-                Id = 0
-            });
         }
     }
 }
