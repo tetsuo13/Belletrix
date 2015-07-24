@@ -4,15 +4,23 @@
 
 @{
     ViewBag.Title = "Create";
+    
     HtmlHelper.ClientValidationEnabled = true;
     HtmlHelper.UnobtrusiveJavaScriptEnabled = true;
+
+    Guid sessionId = Guid.Parse(Request.Params["guid"]);
 }
 
 @section FooterScript {
     <script>
-        $(function () {
-            Belletrix.ActivityLog.init('@Url.Action("AddPerson", "ActivityLogPerson", new { guid = Request.Params["guid"] })');
-        });
+    $(function () {
+        'use strict';
+
+        Belletrix.ActivityLog.init(
+            '@Url.Action("AddPerson", "ActivityLogPerson", new { guid = sessionId })',
+            '@Url.Action("AddPersonId", "ActivityLogPerson")',
+            '@sessionId');
+    });
     </script>
 }
 

@@ -23,7 +23,7 @@ namespace Belletrix.Controllers
             ViewBag.ActivePage = ActivePageName;
         }
 
-        public PartialViewResult AddPerson(Guid guid)
+        public async Task<PartialViewResult> AddPerson(Guid guid)
         {
             IEnumerable<SelectListItem> types = from ActivityLogParticipantTypes t
                                                 in Enum.GetValues(typeof(ActivityLogParticipantTypes))
@@ -34,6 +34,18 @@ namespace Belletrix.Controllers
                                                 };
 
             ViewBag.TypesSelect = new SelectList(types, "Value", "Text");
+
+            IEnumerable<ActivityLogPersonModel> availablePeople = await Service.FindAllPeople();
+            IEnumerable<ActivityLogParticipantModel> participantsInSession = ParticipantsInSession(guid);
+
+            // Remove people from the available list who've already been added
+            // in this session.
+            if (participantsInSession != null && participantsInSession.Any())
+            {
+                availablePeople = availablePeople.Where(x => !participantsInSession.Any(y => y.Person.Id == x.Id));
+            }
+
+            ViewBag.PeopleSelect = new SelectList(availablePeople, "Id", "FullName");
 
             ActivityLogPersonCreateViewModel model = new ActivityLogPersonCreateViewModel()
             {
@@ -68,43 +80,88 @@ namespace Belletrix.Controllers
                         Type = (ActivityLogParticipantTypes)model.Type
                     };
 
-                    if (Session[ActivityLogService.SessionName] == null)
-                    {
-                        Session[ActivityLogService.SessionName] = new Dictionary<Guid, List<ActivityLogParticipantModel>>();
-                    }
-
-                    if (!(Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>).ContainsKey(model.SessionId))
-                    {
-                        (Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>)[model.SessionId] = new List<ActivityLogParticipantModel>();
-                    }
-
-                    (Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>)[model.SessionId].Add(participant);
+                    AddParticipantToSession(model.SessionId, participant);
 
                     return Json(new
-                    {
-                        Success = true,
-                        Message = String.Empty,
-                        Id = id
-                    });
+                        {
+                            Success = true,
+                            Message = String.Empty,
+                            Id = id
+                        });
                 }
                 catch (Exception e)
                 {
                     MvcApplication.LogException(e);
                     return Json(new
-                    {
-                        Success = false,
-                        Message = "There was an error saving. It has been logged for later review.",
-                        Id = 0
-                    });
+                        {
+                            Success = false,
+                            Message = "There was an error saving. It has been logged for later review.",
+                            Id = 0
+                        });
                 }
             }
 
             return Json(new
+                {
+                    Success = false,
+                    Message = "Invalid form",
+                    Id = 0
+                });
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> AddPersonId(int id, int type, Guid sessionid)
+        {
+            ActivityLogPersonModel person = await Service.FindPersonById(id);
+
+            if (person == null)
             {
-                Success = false,
-                Message = "Invalid form",
-                Id = 0
-            });
+                return Json(new
+                    {
+                        Success = false,
+                        Message = "Person not found"
+                    });
+            }
+
+            ActivityLogParticipantModel participant = new ActivityLogParticipantModel()
+            {
+                Person = person,
+                Type = (ActivityLogParticipantTypes)type
+            };
+
+            AddParticipantToSession(sessionid, participant);
+
+            return Json(new
+                {
+                    Success = true,
+                    Message = String.Empty
+                });
+        }
+
+        private void AddParticipantToSession(Guid sessionId, ActivityLogParticipantModel participant)
+        {
+            if (Session[ActivityLogService.SessionName] == null)
+            {
+                Session[ActivityLogService.SessionName] = new Dictionary<Guid, List<ActivityLogParticipantModel>>();
+            }
+
+            if (!(Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>).ContainsKey(sessionId))
+            {
+                (Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>)[sessionId] = new List<ActivityLogParticipantModel>();
+            }
+
+            (Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>)[sessionId].Add(participant);
+        }
+
+        private IEnumerable<ActivityLogParticipantModel> ParticipantsInSession(Guid sessionId)
+        {
+            if (Session[ActivityLogService.SessionName] != null &&
+                (Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>).ContainsKey(sessionId))
+            {
+                return (Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>)[sessionId];
+            }
+
+            return null;
         }
     }
 }

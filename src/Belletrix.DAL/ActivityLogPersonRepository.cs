@@ -1,10 +1,11 @@
-﻿using Belletrix.Entity.Model;
+﻿using Belletrix.Core;
+using Belletrix.Entity.Model;
 using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Belletrix.DAL
@@ -128,9 +129,55 @@ namespace Belletrix.DAL
             }
         }
 
+        public async Task<IEnumerable<ActivityLogPersonModel>> FindAllPeople()
+        {
+            const string sql = @"
+                SELECT      id, full_name, description, phone, email
+                FROM        activity_log_person
+                ORDER BY    full_name";
+
+            ICollection<ActivityLogPersonModel> people = new List<ActivityLogPersonModel>();
+
+            try
+            {
+                using (NpgsqlCommand command = DbContext.CreateCommand())
+                {
+                    command.CommandText = sql;
+
+                    using (DbDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            people.Add(new ActivityLogPersonModel()
+                                {
+                                    Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("id")),
+                                    FullName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("full_name")),
+                                    Description = await reader.GetText("description"),
+                                    PhoneNumber = await reader.GetText("phone"),
+                                    Email = await reader.GetText("email")
+                                });
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = e;
+                throw e;
+            }
+
+            return people;
+        }
+
         public async Task SaveChanges()
         {
             UnitOfWork.SaveChanges();
+        }
+
+        public async Task<ActivityLogPersonModel> FindPersonById(int id)
+        {
+            IEnumerable<ActivityLogPersonModel> people = await FindAllPeople();
+            return people.FirstOrDefault(x => x.Id == id);
         }
     }
 }

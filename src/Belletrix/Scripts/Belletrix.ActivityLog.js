@@ -8,11 +8,82 @@
     /// </var>
     var participantsPanelSelector = '#participants-panel',
 
-        participantModalSelector = '#personModal .modal-content';
+        participantModalSelector = '#personModal .modal-content',
+
+        /// <var>Selectors for the existing person "form."</var>
+        existingPersonSelectors = {
+            /// <field type="String">Person selectlist.</field>
+            PersonSelectList: '#existingpersonselect',
+
+            /// <field type="String">Type selectlist.</field>
+            TypeSelectList: '#existingpersontype',
+
+            /// <field type="String">Submit button to "form."</field>
+            SubmitButton: '#existingpersonsubmit'
+        };
+
+    function bindExistingParticipantForm(modalDialog, addPersonIdUrl, sessionId) {
+        /// <summary>
+        /// Handle selecting existing person. When the existing person and
+        /// their participation type is selected, the submit button should:
+        /// initiate an ajax request to save the selection to the current
+        /// activity, add the person and type to the activity form, and
+        /// finally close the modal dialog.
+        /// </summary>
+        /// <param name="modalDialog" type="Object">Modal dialog.</param>
+        /// <param name="addPersonIdUrl" type="String">URL to submit existing select person to.</param>
+        /// <param name="sessionId" type="Guid">Current activity session ID.</param>
+
+        var personSelect = $(existingPersonSelectors.PersonSelectList),
+            typeSelect = $(existingPersonSelectors.TypeSelectList),
+            submitButton = $(existingPersonSelectors.SubmitButton);
+
+        // The modal dialog will only show the existing people fields if there
+        // are existing people to begin with.
+        if (personSelect.length) {
+            submitButton.click(function (event) {
+                event.preventDefault();
+
+                $.ajax({
+                    url: addPersonIdUrl,
+                    type: 'POST',
+                    data: {
+                        id: personSelect.val(),
+                        type: typeSelect.val(),
+                        sessionId: sessionId
+                    },
+                    success: function (result) {
+                        if (!result.hasOwnProperty('Success') ||
+                            !result.hasOwnProperty('Message')) {
+                            Belletrix.errorMessage('Unexpected result. Try again?\n' + result);
+
+                        } else if (result.Success === true) {
+                            addParticipantRow($('option:selected', personSelect).text(), personSelect.val());
+                            $(participantModalSelector).modal('hide');
+
+                        } else {
+                            // Show server-side error message under the full name
+                            // field.
+
+                            var validator = modalDialogForm.validate();
+                            validator.showErrors({
+                                "FullName": result.Message
+                            })
+                        }
+                    }
+                });
+            });
+        }
+    }
 
     function bindParticipantForm(modalDialog) {
-        /// <summary></summary>
-        /// <param name="modalDialog" type="Object"></param>
+        /// <summary>
+        /// Add jQuery Validator to the new person form. The form should
+        /// perform client-side validation and, if successful, submit the data
+        /// via ajax, add the person and type to the activity form, and
+        /// finally close the modal dialog.
+        /// </summary>
+        /// <param name="modalDialog" type="Object">Modal dialog.</param>
 
         var modalDialogForm = $('form', modalDialog);
 
@@ -52,7 +123,7 @@
     }
 
     function deleteParticipant(id) {
-        // TODO: Call WebAPI to delete this person.
+        // TODO: Call ajax to delete this person from session.
 
         console.log('removing ' + id);
         $('#participant-' + id).fadeOut(300, function () {
@@ -91,9 +162,11 @@
         row.insertBefore($('.last-row', participantsPanelSelector));
     }
 
-    ActivityLog.init = function (addPersonUrl) {
+    ActivityLog.init = function (addPersonUrl, addPersonIdUrl, sessionId) {
         /// <summary></summary>
         /// <param name="addPersonUrl" type="String"></param>
+        /// <param name="addPersonIdUrl" type="String">URL to submit existing select person to.</param>
+        /// <param name="sessionId" type="Guid">Current activity session ID.</param>
 
         Belletrix.handleMvcEditor();
         $('#StartDate, #EndDate').datepicker();
@@ -111,6 +184,7 @@
                 });
 
                 bindParticipantForm(this);
+                bindExistingParticipantForm(this, addPersonIdUrl, sessionId);
             });
         });
     };

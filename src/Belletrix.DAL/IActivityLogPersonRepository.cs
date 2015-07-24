@@ -1,8 +1,6 @@
 ﻿using Belletrix.Entity.Model;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Belletrix.DAL
@@ -13,6 +11,8 @@ namespace Belletrix.DAL
         Task ClearSessionIdFromPeople(IEnumerable<ActivityLogPersonModel> people);
         Task AssociatePeopleWithActivity(int activityId, Guid sessionId,
             IEnumerable<ActivityLogParticipantModel> people);
+        Task<IEnumerable<ActivityLogPersonModel>> FindAllPeople();
         Task SaveChanges();
+        Task<ActivityLogPersonModel> FindPersonById(int id);
     }
 }

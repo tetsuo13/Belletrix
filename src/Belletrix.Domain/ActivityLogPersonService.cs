@@ -1,21 +1,18 @@
 ﻿using Belletrix.DAL;
 using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Belletrix.Domain
 {
     public class ActivityLogPersonService : IActivityLogPersonService
     {
-        private IActivityLogPersonRepository repository;
+        private readonly IActivityLogPersonRepository Repository;
 
         public ActivityLogPersonService(IActivityLogPersonRepository repository)
         {
-            this.repository = repository;
+            Repository = repository;
         }
 
         public async Task<int> CreatePerson(ActivityLogPersonCreateViewModel createModel)
@@ -29,12 +26,33 @@ namespace Belletrix.Domain
                 SessionId = createModel.SessionId
             };
 
-            return await repository.CreatePerson(model);
+            return await Repository.CreatePerson(model);
+        }
+
+        // TODO: Should this be only people who don't have a temporary session ID value?
+        // A session value means this person is in the process of being added
+        // to a new activity log.
+        public async Task<IEnumerable<ActivityLogPersonModel>> FindAllPeople()
+        {
+            return await Repository.FindAllPeople();
         }
 
         public async Task SaveChanges()
         {
-            await repository.SaveChanges();
+            await Repository.SaveChanges();
+        }
+
+        /// <summary>
+        /// Find an existing person by their unique ID.
+        /// </summary>
+        /// <param name="id">Unique ID.</param>
+        /// <returns>
+        /// Person detail or <see typename="null"/> if no person is found by
+        /// that ID.
+        /// </returns>
+        public async Task<ActivityLogPersonModel> FindPersonById(int id)
+        {
+            return await Repository.FindPersonById(id);
         }
     }
 }
