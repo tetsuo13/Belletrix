@@ -55,7 +55,7 @@ namespace Belletrix.DAL
             }
             catch (Exception e)
             {
-                e.Data["SQL"] = e;
+                e.Data["SQL"] = sql;
                 throw e;
             }
 
@@ -100,7 +100,7 @@ namespace Belletrix.DAL
             }
             catch (Exception e)
             {
-                e.Data["SQL"] = e;
+                e.Data["SQL"] = sql;
                 throw e;
             }
         }
@@ -124,7 +124,7 @@ namespace Belletrix.DAL
             }
             catch (Exception e)
             {
-                e.Data["SQL"] = e;
+                e.Data["SQL"] = sql;
                 throw e;
             }
         }
@@ -162,7 +162,7 @@ namespace Belletrix.DAL
             }
             catch (Exception e)
             {
-                e.Data["SQL"] = e;
+                e.Data["SQL"] = sql;
                 throw e;
             }
 
