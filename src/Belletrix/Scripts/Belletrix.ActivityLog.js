@@ -6,12 +6,12 @@
     /// <var type="String">
     /// Selector for panel that contains each each participant line item.
     /// </var>
-    var participantsPanelSelector = '#participants-panel',
+    var _participantsPanelSelector = '#participants-panel',
 
-        participantModalSelector = '#personModal .modal-content',
+        _participantModalSelector = '#personModal .modal-content',
 
         /// <var>Selectors for the existing person "form."</var>
-        existingPersonSelectors = {
+        _existingPersonSelectors = {
             /// <field type="String">Person selectlist.</field>
             PersonSelectList: '#existingpersonselect',
 
@@ -20,9 +20,15 @@
 
             /// <field type="String">Submit button to "form."</field>
             SubmitButton: '#existingpersonsubmit'
-        };
+        },
 
-    function bindExistingParticipantForm(modalDialog, addPersonIdUrl, sessionId) {
+        /// <var type="String">URL to call to remove existing participant from session.</var>
+        _removeExistingPersonIdUrl = '',
+
+        /// <var type="Guid">Current session ID.</var>
+        _sessionId = '';
+
+    function bindExistingParticipantForm(modalDialog, addPersonIdUrl) {
         /// <summary>
         /// Handle selecting existing person. When the existing person and
         /// their participation type is selected, the submit button should:
@@ -32,11 +38,10 @@
         /// </summary>
         /// <param name="modalDialog" type="Object">Modal dialog.</param>
         /// <param name="addPersonIdUrl" type="String">URL to submit existing select person to.</param>
-        /// <param name="sessionId" type="Guid">Current activity session ID.</param>
 
-        var personSelect = $(existingPersonSelectors.PersonSelectList),
-            typeSelect = $(existingPersonSelectors.TypeSelectList),
-            submitButton = $(existingPersonSelectors.SubmitButton);
+        var personSelect = $(_existingPersonSelectors.PersonSelectList),
+            typeSelect = $(_existingPersonSelectors.TypeSelectList),
+            submitButton = $(_existingPersonSelectors.SubmitButton);
 
         // The modal dialog will only show the existing people fields if there
         // are existing people to begin with.
@@ -50,7 +55,7 @@
                     data: {
                         id: personSelect.val(),
                         type: typeSelect.val(),
-                        sessionId: sessionId
+                        sessionId: _sessionId
                     },
                     success: function (result) {
                         if (!result.hasOwnProperty('Success') ||
@@ -59,7 +64,7 @@
 
                         } else if (result.Success === true) {
                             addParticipantRow($('option:selected', personSelect).text(), personSelect.val());
-                            $(participantModalSelector).modal('hide');
+                            $(_participantModalSelector).modal('hide');
 
                         } else {
                             // Show server-side error message under the full name
@@ -104,7 +109,7 @@
 
                     } else if (result.Success === true) {
                         addParticipantRow($('#FullName', modalDialogForm).val(), result.Id);
-                        $(participantModalSelector).modal('hide');
+                        $(_participantModalSelector).modal('hide');
 
                     } else {
                         // Show server-side error message under the full name
@@ -123,11 +128,30 @@
     }
 
     function deleteParticipant(id) {
-        // TODO: Call ajax to delete this person from session.
+        /// <summary>Remove participant from session.</summary>
+        /// <param name="id" type="Number">Participant ID.</param>
 
-        console.log('removing ' + id);
-        $('#participant-' + id).fadeOut(300, function () {
-            $(this).remove();
+        $.ajax({
+            url: _removeExistingPersonIdUrl,
+            type: 'DELETE',
+            data: {
+                id: id,
+                sessionId: _sessionId
+            },
+            success: function (result) {
+                if (!result.hasOwnProperty('Success') ||
+                    !result.hasOwnProperty('Message')) {
+                    Belletrix.errorMessage('Unexpected result. Try again?\n' + result);
+
+                } else if (result.Success === true) {
+                    $('#participant-' + id).fadeOut(300, function () {
+                        $(this).remove();
+                    });
+
+                } else {
+                    Belletrix.errorMessage(result.Message);
+                }
+            }
         });
     }
 
@@ -159,14 +183,18 @@
             .append(actionColumn)
             .appendTo(row);
 
-        row.insertBefore($('.last-row', participantsPanelSelector));
+        row.insertBefore($('.last-row', _participantsPanelSelector));
     }
 
-    ActivityLog.init = function (addPersonUrl, addPersonIdUrl, sessionId) {
+    ActivityLog.init = function (addPersonUrl, addPersonIdUrl, removePersonIdUrl, sessionId) {
         /// <summary></summary>
         /// <param name="addPersonUrl" type="String"></param>
         /// <param name="addPersonIdUrl" type="String">URL to submit existing select person to.</param>
+        /// <param name="removePersonIdUrl" type="String">URL to remove existing select person from session.</param>
         /// <param name="sessionId" type="Guid">Current activity session ID.</param>
+
+        _removeExistingPersonIdUrl = removePersonIdUrl;
+        _sessionId = sessionId;
 
         Belletrix.handleMvcEditor();
         $('#StartDate, #EndDate').datepicker();
@@ -178,13 +206,13 @@
         });
 
         $('#addPersonButton').click(function () {
-            $(participantModalSelector).load(addPersonUrl, function () {
+            $(_participantModalSelector).load(addPersonUrl, function () {
                 $(this).modal({
                     show: true
                 });
 
                 bindParticipantForm(this);
-                bindExistingParticipantForm(this, addPersonIdUrl, sessionId);
+                bindExistingParticipantForm(this, addPersonIdUrl);
             });
         });
     };

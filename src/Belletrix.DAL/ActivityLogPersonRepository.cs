@@ -110,7 +110,8 @@ namespace Belletrix.DAL
             const string sql = @"
                 UPDATE  activity_log_person
                 SET     session_id = NULL
-                WHERE   id IN (@PeopleIds)";
+                WHERE   id = ANY(@PeopleIds) AND
+                        session_id IS NOT NULL";
 
             try
             {

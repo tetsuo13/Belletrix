@@ -109,6 +109,34 @@ namespace Belletrix.Controllers
                 });
         }
 
+        [HttpDelete]
+        public async Task<JsonResult> RemovePersonId(int id, Guid sessionId)
+        {
+            ActivityLogPersonModel person = await Service.FindPersonById(id);
+
+            if (person == null)
+            {
+                return Json(new
+                {
+                    Success = false,
+                    Message = "Person not found"
+                });
+            }
+
+            ActivityLogParticipantModel participant = new ActivityLogParticipantModel()
+            {
+                Person = person
+            };
+
+            RemoveParticipantFromSession(sessionId, participant);
+
+            return Json(new
+            {
+                Success = true,
+                Message = String.Empty
+            });
+        }
+
         [HttpPost]
         public async Task<JsonResult> AddPersonId(int id, int type, Guid sessionid)
         {
@@ -136,6 +164,15 @@ namespace Belletrix.Controllers
                     Success = true,
                     Message = String.Empty
                 });
+        }
+
+        private void RemoveParticipantFromSession(Guid sessionId, ActivityLogParticipantModel participant)
+        {
+            List<ActivityLogParticipantModel> participants = (Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>)[sessionId];
+
+            int index = participants.FindIndex(x => x.Person.Id == participant.Person.Id);
+
+            participants.RemoveAt(index);
         }
 
         private void AddParticipantToSession(Guid sessionId, ActivityLogParticipantModel participant)
