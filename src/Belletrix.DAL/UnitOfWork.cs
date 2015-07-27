@@ -72,6 +72,7 @@ namespace Belletrix.DAL
 
                 if (context != null)
                 {
+                    context.Close();
                     context.Dispose();
                     context = null;
                 }
