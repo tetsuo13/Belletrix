@@ -1,6 +1,5 @@
 CREATE TABLE activity_log_person (
     id              SERIAL,
-    session_id      UUID,
     full_name       VARCHAR(128) NOT NULL,
     description     VARCHAR(256),
     phone           VARCHAR(32),
@@ -10,8 +9,12 @@ CREATE TABLE activity_log_person (
     UNIQUE (full_name)
 );
 
-COMMENT ON TABLE activity_log_person IS 'Generic person associated with an event';
-COMMENT ON COLUMN activity_log_person.session_id IS 'Temporary identifier to link user entering a new activity log with a person';
+COMMENT ON TABLE activity_log_person IS 'Generic person associated with one or more events';
+COMMENT ON COLUMN activity_log_person.id IS 'Unique identifier';
+COMMENT ON COLUMN activity_log_person.full_name IS 'Person''s full name -- this can be as simple or complex as needed';
+COMMENT ON COLUMN activity_log_person.description IS 'Generic description to help remember the person later';
+COMMENT ON COLUMN activity_log_person.phone IS 'Contact phone number';
+COMMENT ON COLUMN activity_log_person.email IS 'Contact email address';
 
 GRANT ALL PRIVILEGES ON activity_log_person TO "neoanime_belletrix-prod";
 GRANT ALL PRIVILEGES ON activity_log_person_id_seq TO "neoanime_belletrix-prod";
@@ -58,6 +61,8 @@ CREATE TABLE activity_log_participant (
 );
 
 COMMENT ON TABLE activity_log_participant IS 'Association between people and events and their type of participation';
-COMMENT ON COLUMN activity_log_participant.participant_type IS 'Denotes attendee or contact, value derived from code';
+COMMENT ON COLUMN activity_log_participant.event_id IS 'Existing activity log event ID';
+COMMENT ON COLUMN activity_log_participant.person_id IS 'Existing person ID';
+COMMENT ON COLUMN activity_log_participant.participant_type IS 'Denotes attendee or contact (value derived from Belletrix.Entity.Enum.ActivityLogParticipantTypes)';
 
 GRANT ALL PRIVILEGES ON activity_log_participant TO "neoanime_belletrix-prod";

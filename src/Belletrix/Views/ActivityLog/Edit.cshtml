@@ -4,16 +4,32 @@
 
 @{
     ViewBag.Title = "Edit";
+    
     HtmlHelper.ClientValidationEnabled = true;
     HtmlHelper.UnobtrusiveJavaScriptEnabled = true;
+
+    Guid sessionId = Guid.Parse(Request.Params["guid"]);
 }
 
 @section FooterScript {
     <script>
-        $(function () {
-            Belletrix.ActivityLog.init();
-        });
-    </script>
+    $(function () {
+        'use strict';
+
+        Belletrix.ActivityLog.init(
+            '@Url.Action("AddPerson", "ActivityLogPerson", new { guid = sessionId })',
+            '@Url.Action("AddPersonId", "ActivityLogPerson")',
+            '@Url.Action("RemovePersonId", "ActivityLogPerson")',
+            '@sessionId');
+
+        Belletrix.ActivityLog.initSession(
+            '@Url.Action("StartSession", "ActivityLogPerson", new { guid = sessionId })',
+            '@Html.Raw(Url.Action("PopuplateSession", "ActivityLogPerson", new { guid = sessionId, activityId = Model.Id }))');
+
+        Belletrix.ActivityLog.initExistingParticipants(
+            '@Url.Action("participantsInSession", "ActivityLogPerson", new { guid = sessionId })');
+    });
+</script>
 }
 
 @section Body {
@@ -27,6 +43,7 @@
     {
         @Html.AntiForgeryToken()
         @Html.HiddenFor(x => x.Id)
+        @Html.Hidden("SessionId", sessionId)
         @Html.ValidationSummary()
 
         @Html.Partial("EditFieldsPartial")

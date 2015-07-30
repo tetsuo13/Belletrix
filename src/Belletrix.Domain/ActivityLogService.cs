@@ -11,12 +11,6 @@ namespace Belletrix.Domain
 {
     public class ActivityLogService : IActivityLogService
     {
-        /// <summary>
-        /// Session key associated with Activity Log. Used to store active
-        /// participants while creating/editing an activity.
-        /// </summary>
-        public const string SessionName = "ActivityLog";
-
         private IActivityLogRepository repository;
 
         public ActivityLogService(IActivityLogRepository repository)

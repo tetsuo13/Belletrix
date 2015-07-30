@@ -14,6 +14,6 @@ namespace Belletrix.Entity.Model
 
         public string Email { get; set; }
 
-        public Guid SessionId { get; set; }
+        public Guid? SessionId { get; set; }
     }
 }

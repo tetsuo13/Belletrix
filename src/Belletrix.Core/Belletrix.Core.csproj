@@ -60,6 +60,7 @@
     <Compile Include="Analytics.cs" />
     <Compile Include="ApplicationCache.cs" />
     <Compile Include="Connections.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="DateTimeFilter.cs" />
     <Compile Include="DebuggingService.cs" />
     <Compile Include="ExtensionMethods.cs" />

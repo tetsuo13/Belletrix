@@ -20,7 +20,6 @@ namespace Belletrix.Domain
         Task UpdateActivity(ActivityLogEditViewModel saveModel);
         Task SaveChanges();
 
-        bool ContainsAssociatedPeople(Dictionary<Guid, List<ActivityLogParticipantModel>> sessionStore, Guid sessionId);
         Task AssociatePeopleWithActivity(int activityId, Guid sessionId, IEnumerable<ActivityLogParticipantModel> people);
     }
 }

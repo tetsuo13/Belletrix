@@ -35,6 +35,7 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Belletrix.Core\Properties\VersionInfo.cs">
@@ -49,6 +50,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Belletrix.Core\Belletrix.Core.csproj">
+      <Project>{a0f343d6-b9b3-42b7-8c1d-2826a16280cb}</Project>
+      <Name>Belletrix.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Belletrix.DAL\Belletrix.DAL.csproj">
       <Project>{5019f75e-e5e3-4e72-9704-8744edb57880}</Project>
       <Name>Belletrix.DAL</Name>

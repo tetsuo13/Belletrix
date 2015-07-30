@@ -23,6 +23,28 @@ namespace Belletrix.Controllers
             ViewBag.ActivePage = ActivePageName;
         }
 
+        /// <summary>
+        /// Start a new collection of participants for this add/edit activity
+        /// session.
+        /// </summary>
+        /// <param name="guid">Current session ID.</param>
+        public void StartSession(Guid guid)
+        {
+            Service.StartSession(Session, guid);
+        }
+
+        /// <summary>
+        /// Add all participants for a given activity log into the session.
+        /// This should only be called when editing an existing activity.
+        /// </summary>
+        /// <param name="guid">Current session ID.</param>
+        /// <param name="activityId">Existing activity ID.</param>
+        /// <returns>Nothing</returns>
+        public async Task PopuplateSession(Guid guid, int activityId)
+        {
+            await Service.PopulateSession(Session, guid, activityId);
+        }
+
         public async Task<PartialViewResult> AddPerson(Guid guid)
         {
             IEnumerable<SelectListItem> types = from ActivityLogParticipantTypes t
@@ -36,7 +58,8 @@ namespace Belletrix.Controllers
             ViewBag.TypesSelect = new SelectList(types, "Value", "Text");
 
             IEnumerable<ActivityLogPersonModel> availablePeople = await Service.FindAllPeople();
-            IEnumerable<ActivityLogParticipantModel> participantsInSession = ParticipantsInSession(guid);
+            IEnumerable<ActivityLogParticipantModel> participantsInSession = Service.ParticipantsInSession(Session,
+                guid);
 
             // Remove people from the available list who've already been added
             // in this session.
@@ -80,7 +103,7 @@ namespace Belletrix.Controllers
                         Type = (ActivityLogParticipantTypes)model.Type
                     };
 
-                    AddParticipantToSession(model.SessionId, participant);
+                    Service.AddParticipantToSession(Session, model.SessionId, participant);
 
                     return Json(new
                         {
@@ -128,7 +151,7 @@ namespace Belletrix.Controllers
                 Person = person
             };
 
-            RemoveParticipantFromSession(sessionId, participant);
+            Service.RemoveParticipantFromSession(Session, sessionId, participant);
 
             return Json(new
             {
@@ -157,7 +180,7 @@ namespace Belletrix.Controllers
                 Type = (ActivityLogParticipantTypes)type
             };
 
-            AddParticipantToSession(sessionid, participant);
+            Service.AddParticipantToSession(Session, sessionid, participant);
 
             return Json(new
                 {
@@ -166,39 +189,9 @@ namespace Belletrix.Controllers
                 });
         }
 
-        private void RemoveParticipantFromSession(Guid sessionId, ActivityLogParticipantModel participant)
+        public async Task<JsonResult> participantsInSession(Guid guid)
         {
-            List<ActivityLogParticipantModel> participants = (Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>)[sessionId];
-
-            int index = participants.FindIndex(x => x.Person.Id == participant.Person.Id);
-
-            participants.RemoveAt(index);
-        }
-
-        private void AddParticipantToSession(Guid sessionId, ActivityLogParticipantModel participant)
-        {
-            if (Session[ActivityLogService.SessionName] == null)
-            {
-                Session[ActivityLogService.SessionName] = new Dictionary<Guid, List<ActivityLogParticipantModel>>();
-            }
-
-            if (!(Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>).ContainsKey(sessionId))
-            {
-                (Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>)[sessionId] = new List<ActivityLogParticipantModel>();
-            }
-
-            (Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>)[sessionId].Add(participant);
-        }
-
-        private IEnumerable<ActivityLogParticipantModel> ParticipantsInSession(Guid sessionId)
-        {
-            if (Session[ActivityLogService.SessionName] != null &&
-                (Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>).ContainsKey(sessionId))
-            {
-                return (Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>)[sessionId];
-            }
-
-            return null;
+            return Json(Service.ParticipantsInSession(Session, guid), JsonRequestBehavior.AllowGet);
         }
     }
 }

@@ -17,17 +17,21 @@ namespace Belletrix.Controllers
     {
         public static string ActivePageName = "activitylog";
 
-        private IActivityService activityService;
+        private readonly IActivityService ActivityService;
+        private readonly IActivityLogPersonService ActivityPersonService;
 
-        public ActivityLogController(IActivityService service)
+        public ActivityLogController(IActivityService activityService,
+            IActivityLogPersonService activityPersonService)
         {
-            this.activityService = service;
+            ActivityService = activityService;
+            ActivityPersonService = activityPersonService;
+
             ViewBag.ActivePage = ActivePageName;
         }
 
         public async Task<ActionResult> View(int id)
         {
-            var activity = await activityService.FindByid(id);
+            var activity = await ActivityService.FindByid(id);
 
             if (activity == null)
             {
@@ -43,7 +47,7 @@ namespace Belletrix.Controllers
         public async Task<ActionResult> List()
         {
             await Analytics.TrackPageView(Request, "Activity Log List", (Session["User"] as UserModel).Login);
-            var logs = await activityService.GetActivityLogs();
+            var logs = await ActivityService.GetActivityLogs();
             return View(logs);
         }
 
@@ -74,18 +78,17 @@ namespace Belletrix.Controllers
             {
                 try
                 {
-                    int activityId = await activityService.InsertActivity(model, (Session["User"] as UserModel).Id);
+                    int activityId = await ActivityService.InsertActivity(model, (Session["User"] as UserModel).Id);
 
-                    if (activityService.ContainsAssociatedPeople(Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>,
-                        model.SessionId))
+                    if (ActivityPersonService.ContainsAssociatedPeople(Session, model.SessionId))
                     {
-                        await activityService.AssociatePeopleWithActivity(activityId,
-                            model.SessionId,
-                            (Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>)[model.SessionId]);
-                        (Session[ActivityLogService.SessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>).Remove(model.SessionId);
+                        await ActivityService.AssociatePeopleWithActivity(activityId,
+                            model.SessionId, ActivityPersonService.ParticipantsInSession(Session, model.SessionId));
+
+                        ActivityPersonService.ClearSession(Session, model.SessionId);
                     }
 
-                    await activityService.SaveChanges();
+                    await ActivityService.SaveChanges();
 
                     return RedirectToAction("List");
                 }
@@ -104,7 +107,7 @@ namespace Belletrix.Controllers
 
         public async Task<ActionResult> Edit(int id)
         {
-            var activity = await activityService.FindByid(id);
+            var activity = await ActivityService.FindByid(id);
 
             if (activity == null)
             {
@@ -128,8 +131,8 @@ namespace Belletrix.Controllers
             {
                 try
                 {
-                    await activityService.UpdateActivity(model);
-                    await activityService.SaveChanges();
+                    await ActivityService.UpdateActivity(model);
+                    await ActivityService.SaveChanges();
 
                     return RedirectToAction("List");
                 }

@@ -59,15 +59,7 @@ namespace Belletrix.Domain
             IEnumerable<ActivityLogParticipantModel> people)
         {
             await ActivityLogPersonRepository.AssociatePeopleWithActivity(activityId, sessionId, people);
-            await ActivityLogPersonRepository.ClearSessionIdFromPeople(people.Select(x => x.Person));
-        }
-
-        public bool ContainsAssociatedPeople(Dictionary<Guid, List<ActivityLogParticipantModel>> sessionStore,
-            Guid sessionId)
-        {
-            return sessionStore != null &&
-                sessionStore.ContainsKey(sessionId) &&
-                sessionStore[sessionId].Count > 0;
+            //await ActivityLogPersonRepository.ClearSessionIdFromPeople(people.Select(x => x.Person));
         }
     }
 }

@@ -186,8 +186,46 @@
         row.insertBefore($('.last-row', _participantsPanelSelector));
     }
 
+    ActivityLog.initExistingParticipants = function (participantsUrl) {
+        /// <summary>Retrieve all existing participants for an existing activity log.</summary>
+        /// <param name="participantsUrl" type="String">URL to fetch existing participants.</param>
+
+        $.ajax({
+            dataType: 'json',
+            url: participantsUrl,
+            cache: false,
+            success: function (data) {
+                console.log(data);
+
+                $.each(data, function (index, value) {
+                    addParticipantRow(value.Person.FullName, value.Person.Id);
+                });
+            }
+        });
+    };
+
+    ActivityLog.initSession = function (startSessionUrl, populateSessionUrl) {
+        /// <summary>Initializes the back-end session for participants.</summary>
+        /// <param name="startSessionUrl" type="String">URL to trigger starting session.</param>
+        /// <param name="populateSessionUrl" type="String" optional="true">
+        /// URL to populate existing participants into the session for an existing activity.
+        /// </param>
+
+        $.ajax({
+            url: startSessionUrl,
+            cache: false
+        });
+
+        if (typeof populateSessionUrl !== 'undefined') {
+            $.ajax({
+                url: populateSessionUrl,
+                cache: false
+            });
+        }
+    };
+
     ActivityLog.init = function (addPersonUrl, addPersonIdUrl, removePersonIdUrl, sessionId) {
-        /// <summary></summary>
+        /// <summary>Activity log add/edit initialize routine.</summary>
         /// <param name="addPersonUrl" type="String"></param>
         /// <param name="addPersonIdUrl" type="String">URL to submit existing select person to.</param>
         /// <param name="removePersonIdUrl" type="String">URL to remove existing select person from session.</param>

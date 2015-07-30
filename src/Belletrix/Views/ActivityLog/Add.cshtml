@@ -21,6 +21,9 @@
             '@Url.Action("AddPersonId", "ActivityLogPerson")',
             '@Url.Action("RemovePersonId", "ActivityLogPerson")',
             '@sessionId');
+
+        Belletrix.ActivityLog.initSession(
+            '@Url.Action("StartSession", "ActivityLogPerson", new { guid = sessionId })');
     });
     </script>
 }
