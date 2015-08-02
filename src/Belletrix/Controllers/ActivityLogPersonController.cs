@@ -189,7 +189,7 @@ namespace Belletrix.Controllers
                 });
         }
 
-        public async Task<JsonResult> participantsInSession(Guid guid)
+        public async Task<JsonResult> ParticipantsInSession(Guid guid)
         {
             return Json(Service.ParticipantsInSession(Session, guid), JsonRequestBehavior.AllowGet);
         }

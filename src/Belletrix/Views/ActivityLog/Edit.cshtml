@@ -27,7 +27,7 @@
             '@Html.Raw(Url.Action("PopuplateSession", "ActivityLogPerson", new { guid = sessionId, activityId = Model.Id }))');
 
         Belletrix.ActivityLog.initExistingParticipants(
-            '@Url.Action("participantsInSession", "ActivityLogPerson", new { guid = sessionId })');
+            '@Url.Action("ParticipantsInSession", "ActivityLogPerson", new { guid = sessionId })');
     });
 </script>
 }
