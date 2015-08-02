@@ -80,13 +80,10 @@ namespace Belletrix.Controllers
                 {
                     int activityId = await ActivityService.InsertActivity(model, (Session["User"] as UserModel).Id);
 
-                    if (ActivityPersonService.ContainsAssociatedPeople(Session, model.SessionId))
-                    {
-                        await ActivityService.AssociatePeopleWithActivity(activityId,
-                            model.SessionId, ActivityPersonService.ParticipantsInSession(Session, model.SessionId));
+                    await ActivityService.AssociatePeopleWithActivity(activityId,
+                        ActivityPersonService.ParticipantsInSession(Session, model.SessionId));
 
-                        ActivityPersonService.ClearSession(Session, model.SessionId);
-                    }
+                    ActivityPersonService.ClearSession(Session, model.SessionId);
 
                     await ActivityService.SaveChanges();
 
@@ -132,6 +129,12 @@ namespace Belletrix.Controllers
                 try
                 {
                     await ActivityService.UpdateActivity(model);
+                    
+                    await ActivityService.AssociatePeopleWithActivity(model.Id,
+                        ActivityPersonService.ParticipantsInSession(Session, model.SessionId));
+
+                    ActivityPersonService.ClearSession(Session, model.SessionId);
+
                     await ActivityService.SaveChanges();
 
                     return RedirectToAction("List");

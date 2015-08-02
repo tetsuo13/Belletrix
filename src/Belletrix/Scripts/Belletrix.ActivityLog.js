@@ -202,6 +202,8 @@
         });
 
         if (typeof populateSessionUrl !== 'undefined') {
+            // TODO: Could these actions someday be consolidated into one server-side action perhaps? Hmmm...
+
             // Get the server-side to populate session.
             $.ajax({
                 url: populateSessionUrl,

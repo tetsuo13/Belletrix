@@ -62,8 +62,7 @@ namespace Belletrix.DAL
             return id;
         }
 
-        public async Task AssociatePeopleWithActivity(int activityId, Guid sessionId,
-            IEnumerable<ActivityLogParticipantModel> people)
+        public async Task AssociatePeopleWithActivity(int activityId, IEnumerable<ActivityLogParticipantModel> people)
         {
             const string sql = @"
                 INSERT INTO activity_log_participant
@@ -205,6 +204,33 @@ namespace Belletrix.DAL
             }
 
             return people;
+        }
+
+        /// <summary>
+        /// Remove all participants from the activity.
+        /// </summary>
+        /// <param name="activityId">Activity log ID.</param>
+        /// <returns>Nothing</returns>
+        public async Task ClearParticipantsFromActivity(int activityId)
+        {
+            const string sql = @"
+                DELETE FROM activity_log_participant
+                WHERE       event_id = @ActivityId";
+
+            try
+            {
+                using (NpgsqlCommand command = DbContext.CreateCommand())
+                {
+                    command.CommandText = sql;
+                    command.Parameters.Add("@ActivityId", NpgsqlTypes.NpgsqlDbType.Numeric).Value = activityId;
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
+            }
         }
     }
 }

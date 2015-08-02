@@ -136,12 +136,5 @@ namespace Belletrix.Domain
 
             participants.RemoveAt(index);
         }
-
-        public bool ContainsAssociatedPeople(HttpSessionStateBase session, Guid sessionId)
-        {
-            return session[Constants.ActivityLogSessionName] != null &&
-                (session[Constants.ActivityLogSessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>).ContainsKey(sessionId) &&
-                (session[Constants.ActivityLogSessionName] as Dictionary<Guid, List<ActivityLogParticipantModel>>)[sessionId].Count > 0;
-        }
     }
 }

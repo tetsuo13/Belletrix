@@ -55,11 +55,25 @@ namespace Belletrix.Domain
             await ActivityLogPersonRepository.SaveChanges();
         }
 
-        public async Task AssociatePeopleWithActivity(int activityId, Guid sessionId,
-            IEnumerable<ActivityLogParticipantModel> people)
+        /// <summary>
+        /// Manage the participants list for the selected activity.
+        /// </summary>
+        /// <param name="activityId">Current activity to associate with.</param>
+        /// <param name="people">
+        /// People in current session. Note that this collection may not have
+        /// anything in it.
+        /// </param>
+        /// <returns>Nothing</returns>
+        public async Task AssociatePeopleWithActivity(int activityId, IEnumerable<ActivityLogParticipantModel> people)
         {
-            await ActivityLogPersonRepository.AssociatePeopleWithActivity(activityId, sessionId, people);
-            //await ActivityLogPersonRepository.ClearSessionIdFromPeople(people.Select(x => x.Person));
+            if (people == null || !people.Any())
+            {
+                await ActivityLogPersonRepository.ClearParticipantsFromActivity(activityId);
+            }
+            else
+            {
+                await ActivityLogPersonRepository.AssociatePeopleWithActivity(activityId, people);
+            }
         }
     }
 }

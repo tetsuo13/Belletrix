@@ -40,8 +40,6 @@ namespace Belletrix.Domain
         void RemoveParticipantFromSession(HttpSessionStateBase session, Guid sessionId,
             ActivityLogParticipantModel participant);
 
-        bool ContainsAssociatedPeople(HttpSessionStateBase session, Guid sessionId);
-
         void ClearSession(HttpSessionStateBase session, Guid sessionId);
     }
 }

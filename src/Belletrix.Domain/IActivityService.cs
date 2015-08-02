@@ -1,9 +1,6 @@
 ﻿using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Belletrix.Domain
@@ -20,6 +17,15 @@ namespace Belletrix.Domain
         Task UpdateActivity(ActivityLogEditViewModel saveModel);
         Task SaveChanges();
 
-        Task AssociatePeopleWithActivity(int activityId, Guid sessionId, IEnumerable<ActivityLogParticipantModel> people);
+        /// <summary>
+        /// Manage the participants list for the selected activity.
+        /// </summary>
+        /// <param name="activityId">Current activity to associate with.</param>
+        /// <param name="people">
+        /// People in current session. Note that this collection may not have
+        /// anything in it.
+        /// </param>
+        /// <returns>Nothing</returns>
+        Task AssociatePeopleWithActivity(int activityId, IEnumerable<ActivityLogParticipantModel> people);
     }
 }
