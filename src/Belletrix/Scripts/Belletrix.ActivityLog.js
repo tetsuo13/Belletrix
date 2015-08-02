@@ -186,29 +186,14 @@
         row.insertBefore($('.last-row', _participantsPanelSelector));
     }
 
-    ActivityLog.initExistingParticipants = function (participantsUrl) {
-        /// <summary>Retrieve all existing participants for an existing activity log.</summary>
-        /// <param name="participantsUrl" type="String">URL to fetch existing participants.</param>
-
-        $.ajax({
-            dataType: 'json',
-            url: participantsUrl,
-            cache: false,
-            success: function (data) {
-                console.log(data);
-
-                $.each(data, function (index, value) {
-                    addParticipantRow(value.Person.FullName, value.Person.Id);
-                });
-            }
-        });
-    };
-
-    ActivityLog.initSession = function (startSessionUrl, populateSessionUrl) {
+    ActivityLog.initSession = function (startSessionUrl, populateSessionUrl, participantsUrl) {
         /// <summary>Initializes the back-end session for participants.</summary>
         /// <param name="startSessionUrl" type="String">URL to trigger starting session.</param>
         /// <param name="populateSessionUrl" type="String" optional="true">
         /// URL to populate existing participants into the session for an existing activity.
+        /// </param>
+        /// <param name="participantsUrl" type="String" optional="true">
+        /// URL to fetch existing participants.
         /// </param>
 
         $.ajax({
@@ -217,9 +202,26 @@
         });
 
         if (typeof populateSessionUrl !== 'undefined') {
+            // Get the server-side to populate session.
             $.ajax({
                 url: populateSessionUrl,
-                cache: false
+                cache: false,
+                success: function () {
+                    // Then retrieve participants from session to populate
+                    // form.
+                    $.ajax({
+                        dataType: 'json',
+                        url: participantsUrl,
+                        cache: false,
+                        success: function (data, textStatus, jqXHR) {
+                            console.log(data);
+
+                            $.each(data, function (index, value) {
+                                addParticipantRow(value.Person.FullName, value.Person.Id);
+                            });
+                        }
+                    });
+                }
             });
         }
     };

@@ -4,7 +4,7 @@
 
 @{
     ViewBag.Title = "Edit";
-    
+
     HtmlHelper.ClientValidationEnabled = true;
     HtmlHelper.UnobtrusiveJavaScriptEnabled = true;
 
@@ -24,9 +24,7 @@
 
         Belletrix.ActivityLog.initSession(
             '@Url.Action("StartSession", "ActivityLogPerson", new { guid = sessionId })',
-            '@Html.Raw(Url.Action("PopuplateSession", "ActivityLogPerson", new { guid = sessionId, activityId = Model.Id }))');
-
-        Belletrix.ActivityLog.initExistingParticipants(
+            '@Html.Raw(Url.Action("PopuplateSession", "ActivityLogPerson", new { guid = sessionId, activityId = Model.Id }))',
             '@Url.Action("ParticipantsInSession", "ActivityLogPerson", new { guid = sessionId })');
     });
 </script>
