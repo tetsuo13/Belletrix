@@ -216,8 +216,6 @@
                         url: participantsUrl,
                         cache: false,
                         success: function (data, textStatus, jqXHR) {
-                            console.log(data);
-
                             $.each(data, function (index, value) {
                                 addParticipantRow(value.Person.FullName, value.Person.Id);
                             });
