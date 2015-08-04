@@ -31,6 +31,7 @@ namespace Belletrix.Controllers
         }
 
         [AllowAnonymous]
+        [OutputCache(Duration = 86400)]
         public ActionResult Robots()
         {
             Response.ContentType = "text/plain";
