@@ -9,17 +9,6 @@ namespace Belletrix.Core
     /// Record analytics server-side. Only functions when not running a Debug
     /// build. Intended to be a "fire and forget" API.
     /// </summary>
-    /// <remarks>
-    /// We use nginx to distribute requests between multiple servers.
-    /// Because of this setup, the <b>Request.UserHostAddress</b> will be the
-    /// IP address of our load-balancer instead of the IP address of the
-    /// remote user. You can use
-    /// <b>Request.ServerVariables["HTTP_X_FORWARDED_FOR"]</b> to access the
-    /// user's IP address.
-    /// </remarks>
-    /// <seealso href="http://support.appharbor.com/kb/getting-started/information-about-our-load-balancer">
-    /// Information about our load-balancer
-    /// </seealso>
     public class Analytics
     {
         public static void TrackPageView(HttpRequestBase request, string pageTitle, string username = null)
@@ -41,15 +30,7 @@ namespace Belletrix.Core
                     if (!String.IsNullOrEmpty(token))
                     {
                         tracker.setTokenAuth(token);
-
-                        try
-                        {
-                            tracker.setIp(request.ServerVariables["HTTP_X_FORWARDED_FOR"]);
-                        }
-                        catch (Exception)
-                        {
-                            tracker.setIp(request.UserHostAddress);
-                        }
+                        tracker.setIp(request.UserHostAddress);
                     }
                 }
                 catch (Exception)
