@@ -1,14 +1,11 @@
-﻿using Npgsql;
+﻿using Belletrix.Core;
+using Dapper;
+using Npgsql;
+using StackExchange.Exceptional.Extensions;
+using StackExchange.Exceptional.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StackExchange.Exceptional;
-using StackExchange.Exceptional.Dapper;
-using StackExchange.Exceptional.Extensions;
-using StackExchange.Exceptional.Stores;
-using Belletrix.Core;
 
 namespace StackExchange.Exceptional.PostgreSql
 {
