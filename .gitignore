@@ -7,7 +7,7 @@
 *.sln.docstates
 
 # NuGet Packages Directory
-packages/*
+src/packages/*
 
 # Build results
 [Dd]ebug/
