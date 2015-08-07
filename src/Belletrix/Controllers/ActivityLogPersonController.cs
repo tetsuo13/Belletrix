@@ -15,11 +15,11 @@ namespace Belletrix.Controllers
     {
         public static string ActivePageName = "activitylogperson";
 
-        private readonly IActivityLogPersonService Service;
+        private readonly IActivityService ActivityService;
 
-        public ActivityLogPersonController(IActivityLogPersonService service)
+        public ActivityLogPersonController(IActivityService activityService)
         {
-            Service = service;
+            ActivityService = activityService;
             ViewBag.ActivePage = ActivePageName;
         }
 
@@ -30,7 +30,7 @@ namespace Belletrix.Controllers
         /// <param name="guid">Current session ID.</param>
         public void StartSession(Guid guid)
         {
-            Service.StartSession(Session, guid);
+            ActivityService.StartSession(Session, guid);
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Belletrix.Controllers
         /// <returns>Nothing</returns>
         public async Task PopuplateSession(Guid guid, int activityId)
         {
-            await Service.PopulateSession(Session, guid, activityId);
+            await ActivityService.PopulateSession(Session, guid, activityId);
         }
 
         public async Task<PartialViewResult> AddPerson(Guid guid)
@@ -57,8 +57,8 @@ namespace Belletrix.Controllers
 
             ViewBag.TypesSelect = new SelectList(types, "Value", "Text");
 
-            IEnumerable<ActivityLogPersonModel> availablePeople = await Service.FindAllPeople();
-            IEnumerable<ActivityLogParticipantModel> participantsInSession = Service.ParticipantsInSession(Session,
+            IEnumerable<ActivityLogPersonModel> availablePeople = await ActivityService.FindAllPeople();
+            IEnumerable<ActivityLogParticipantModel> participantsInSession = ActivityService.ParticipantsInSession(Session,
                 guid);
 
             // Remove people from the available list who've already been added
@@ -86,8 +86,8 @@ namespace Belletrix.Controllers
             {
                 try
                 {
-                    int id = await Service.CreatePerson(model);
-                    await Service.SaveChanges();
+                    int id = await ActivityService.CreatePerson(model);
+                    await ActivityService.SaveChanges();
 
                     ActivityLogParticipantModel participant = new ActivityLogParticipantModel()
                     {
@@ -103,7 +103,7 @@ namespace Belletrix.Controllers
                         Type = (ActivityLogParticipantTypes)model.Type
                     };
 
-                    Service.AddParticipantToSession(Session, model.SessionId, participant);
+                    ActivityService.AddParticipantToSession(Session, model.SessionId, participant);
 
                     return Json(new
                         {
@@ -135,7 +135,7 @@ namespace Belletrix.Controllers
         [HttpDelete]
         public async Task<JsonResult> RemovePersonId(int id, Guid sessionId)
         {
-            ActivityLogPersonModel person = await Service.FindPersonById(id);
+            ActivityLogPersonModel person = await ActivityService.FindPersonById(id);
 
             if (person == null)
             {
@@ -151,7 +151,7 @@ namespace Belletrix.Controllers
                 Person = person
             };
 
-            Service.RemoveParticipantFromSession(Session, sessionId, participant);
+            ActivityService.RemoveParticipantFromSession(Session, sessionId, participant);
 
             return Json(new
             {
@@ -163,7 +163,7 @@ namespace Belletrix.Controllers
         [HttpPost]
         public async Task<JsonResult> AddPersonId(int id, int type, Guid sessionid)
         {
-            ActivityLogPersonModel person = await Service.FindPersonById(id);
+            ActivityLogPersonModel person = await ActivityService.FindPersonById(id);
 
             if (person == null)
             {
@@ -180,7 +180,7 @@ namespace Belletrix.Controllers
                 Type = (ActivityLogParticipantTypes)type
             };
 
-            Service.AddParticipantToSession(Session, sessionid, participant);
+            ActivityService.AddParticipantToSession(Session, sessionid, participant);
 
             return Json(new
                 {
@@ -189,9 +189,9 @@ namespace Belletrix.Controllers
                 });
         }
 
-        public async Task<JsonResult> ParticipantsInSession(Guid guid)
+        public JsonResult ParticipantsInSession(Guid guid)
         {
-            return Json(Service.ParticipantsInSession(Session, guid), JsonRequestBehavior.AllowGet);
+            return Json(ActivityService.ParticipantsInSession(Session, guid), JsonRequestBehavior.AllowGet);
         }
     }
 }

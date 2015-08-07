@@ -1,7 +1,6 @@
 ﻿using Belletrix.Core;
 using Belletrix.Domain;
 using Belletrix.Entity.Enum;
-using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
 using Belletrix.Models;
 using System;
@@ -18,13 +17,10 @@ namespace Belletrix.Controllers
         public static string ActivePageName = "activitylog";
 
         private readonly IActivityService ActivityService;
-        private readonly IActivityLogPersonService ActivityPersonService;
 
-        public ActivityLogController(IActivityService activityService,
-            IActivityLogPersonService activityPersonService)
+        public ActivityLogController(IActivityService activityService)
         {
             ActivityService = activityService;
-            ActivityPersonService = activityPersonService;
 
             ViewBag.ActivePage = ActivePageName;
         }
@@ -81,9 +77,9 @@ namespace Belletrix.Controllers
                     int activityId = await ActivityService.InsertActivity(model, (Session["User"] as UserModel).Id);
 
                     await ActivityService.AssociatePeopleWithActivity(activityId,
-                        ActivityPersonService.ParticipantsInSession(Session, model.SessionId));
+                        ActivityService.ParticipantsInSession(Session, model.SessionId));
 
-                    ActivityPersonService.ClearSession(Session, model.SessionId);
+                    ActivityService.ClearSession(Session, model.SessionId);
 
                     await ActivityService.SaveChanges();
 
@@ -131,9 +127,9 @@ namespace Belletrix.Controllers
                     await ActivityService.UpdateActivity(model);
                     
                     await ActivityService.AssociatePeopleWithActivity(model.Id,
-                        ActivityPersonService.ParticipantsInSession(Session, model.SessionId));
+                        ActivityService.ParticipantsInSession(Session, model.SessionId));
 
-                    ActivityPersonService.ClearSession(Session, model.SessionId);
+                    ActivityService.ClearSession(Session, model.SessionId);
 
                     await ActivityService.SaveChanges();
 

@@ -26,7 +26,6 @@ namespace Belletrix.App_Start
             container.RegisterType<IActivityService, ActivityService>();
             container.RegisterType<IActivityLogRepository, ActivityLogRepository>();
             container.RegisterType<IActivityLogPersonRepository, ActivityLogPersonRepository>();
-            container.RegisterType<IActivityLogPersonService, ActivityLogPersonService>();
 
             //container.RegisterInstance<IActivityService>(new ActivityService(new ActivityLogRepository(new UnitOfWork(connectionString)),
             //    new ActivityLogPersonRepository(new UnitOfWork(connectionString))));
