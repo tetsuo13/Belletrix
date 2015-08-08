@@ -41,9 +41,7 @@
     <Compile Include="..\Belletrix.Core\Properties\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
-    <Compile Include="ActivityLogService.cs" />
     <Compile Include="ActivityService.cs" />
-    <Compile Include="IActivityLogService.cs" />
     <Compile Include="IActivityService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
