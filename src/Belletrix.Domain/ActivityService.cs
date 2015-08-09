@@ -16,6 +16,12 @@ namespace Belletrix.Domain
     /// </summary>
     public class ActivityService : IActivityService
     {
+        /// <summary>
+        /// Session key associated with Activity Log. Used to store active
+        /// participants while creating/editing an activity.
+        /// </summary>
+        private const string ParticipantsSessionName = "ActivityLog";
+
         private readonly IActivityLogRepository ActivityLogRepository;
         private readonly IActivityLogPersonRepository ActivityLogPersonRepository;
 
@@ -67,8 +73,8 @@ namespace Belletrix.Domain
         /// <returns>Nothing</returns>
         public async Task AssociatePeopleWithActivity(HttpSessionStateBase session, int activityId, Guid sessionId)
         {
-            List<ActivityLogParticipantModel> start = (session[Constants.ActivityLogSessionName] as Dictionary<Guid, ActivityLogSessionModel>)[sessionId].StartingList;
-            List<ActivityLogParticipantModel> end = (session[Constants.ActivityLogSessionName] as Dictionary<Guid, ActivityLogSessionModel>)[sessionId].WorkingList;
+            List<ActivityLogParticipantModel> start = (session[ParticipantsSessionName] as Dictionary<Guid, ActivityLogSessionModel>)[sessionId].StartingList;
+            List<ActivityLogParticipantModel> end = (session[ParticipantsSessionName] as Dictionary<Guid, ActivityLogSessionModel>)[sessionId].WorkingList;
 
             // Started and finished with no participants.
             if (start.Count == 0 && end.Count == 0)
@@ -112,23 +118,23 @@ namespace Belletrix.Domain
         public async Task PopulateSession(HttpSessionStateBase session, Guid sessionId, int activityId)
         {
             IEnumerable<ActivityLogParticipantModel> participants = await ActivityLogPersonRepository.FindActivityParticipants(activityId);
-            (session[Constants.ActivityLogSessionName] as Dictionary<Guid, ActivityLogSessionModel>)[sessionId].StartingList = new List<ActivityLogParticipantModel>(participants);
-            (session[Constants.ActivityLogSessionName] as Dictionary<Guid, ActivityLogSessionModel>)[sessionId].WorkingList = new List<ActivityLogParticipantModel>(participants);
+            (session[ParticipantsSessionName] as Dictionary<Guid, ActivityLogSessionModel>)[sessionId].StartingList = new List<ActivityLogParticipantModel>(participants);
+            (session[ParticipantsSessionName] as Dictionary<Guid, ActivityLogSessionModel>)[sessionId].WorkingList = new List<ActivityLogParticipantModel>(participants);
         }
 
         public void AddParticipantToSession(HttpSessionStateBase session, Guid sessionId,
             ActivityLogParticipantModel participant)
         {
-            (session[Constants.ActivityLogSessionName] as Dictionary<Guid, ActivityLogSessionModel>)[sessionId].WorkingList.Add(participant);
+            (session[ParticipantsSessionName] as Dictionary<Guid, ActivityLogSessionModel>)[sessionId].WorkingList.Add(participant);
         }
 
         public IEnumerable<ActivityLogParticipantModel> ParticipantsInSession(HttpSessionStateBase session,
             Guid sessionId)
         {
-            if (session[Constants.ActivityLogSessionName] != null &&
-                (session[Constants.ActivityLogSessionName] as Dictionary<Guid, ActivityLogSessionModel>).ContainsKey(sessionId))
+            if (session[ParticipantsSessionName] != null &&
+                (session[ParticipantsSessionName] as Dictionary<Guid, ActivityLogSessionModel>).ContainsKey(sessionId))
             {
-                return (session[Constants.ActivityLogSessionName] as Dictionary<Guid, ActivityLogSessionModel>)[sessionId].WorkingList;
+                return (session[ParticipantsSessionName] as Dictionary<Guid, ActivityLogSessionModel>)[sessionId].WorkingList;
             }
 
             return null;
@@ -136,12 +142,12 @@ namespace Belletrix.Domain
 
         public void StartSession(HttpSessionStateBase session, Guid sessionId)
         {
-            if (session[Constants.ActivityLogSessionName] == null)
+            if (session[ParticipantsSessionName] == null)
             {
-                session[Constants.ActivityLogSessionName] = new Dictionary<Guid, ActivityLogSessionModel>();
+                session[ParticipantsSessionName] = new Dictionary<Guid, ActivityLogSessionModel>();
             }
 
-            if (!(session[Constants.ActivityLogSessionName] as Dictionary<Guid, ActivityLogSessionModel>).ContainsKey(sessionId))
+            if (!(session[ParticipantsSessionName] as Dictionary<Guid, ActivityLogSessionModel>).ContainsKey(sessionId))
             {
                 ActivityLogSessionModel model = new ActivityLogSessionModel()
                 {
@@ -149,27 +155,27 @@ namespace Belletrix.Domain
                     WorkingList = new List<ActivityLogParticipantModel>()
                 };
 
-                (session[Constants.ActivityLogSessionName] as Dictionary<Guid, ActivityLogSessionModel>).Add(sessionId, model);
+                (session[ParticipantsSessionName] as Dictionary<Guid, ActivityLogSessionModel>).Add(sessionId, model);
             }
             else
             {
                 // The session ID should always be unique, but just in case
                 // the user revisits the activity log add/edit page using the
                 // same ID more than once, reset everything.
-                (session[Constants.ActivityLogSessionName] as Dictionary<Guid, ActivityLogSessionModel>)[sessionId].StartingList.Clear();
-                (session[Constants.ActivityLogSessionName] as Dictionary<Guid, ActivityLogSessionModel>)[sessionId].WorkingList.Clear();
+                (session[ParticipantsSessionName] as Dictionary<Guid, ActivityLogSessionModel>)[sessionId].StartingList.Clear();
+                (session[ParticipantsSessionName] as Dictionary<Guid, ActivityLogSessionModel>)[sessionId].WorkingList.Clear();
             }
         }
 
         public void ClearSession(HttpSessionStateBase session, Guid sessionId)
         {
-            (session[Constants.ActivityLogSessionName] as Dictionary<Guid, ActivityLogSessionModel>).Remove(sessionId);
+            (session[ParticipantsSessionName] as Dictionary<Guid, ActivityLogSessionModel>).Remove(sessionId);
         }
 
         public void RemoveParticipantFromSession(HttpSessionStateBase session, Guid sessionId,
             ActivityLogParticipantModel participant)
         {
-            List<ActivityLogParticipantModel> participants = (session[Constants.ActivityLogSessionName] as Dictionary<Guid, ActivityLogSessionModel>)[sessionId].WorkingList;
+            List<ActivityLogParticipantModel> participants = (session[ParticipantsSessionName] as Dictionary<Guid, ActivityLogSessionModel>)[sessionId].WorkingList;
 
             int index = participants.FindIndex(x => x.Person.Id == participant.Person.Id);
 
