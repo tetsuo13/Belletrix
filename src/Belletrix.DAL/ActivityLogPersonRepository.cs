@@ -232,5 +232,36 @@ namespace Belletrix.DAL
                 throw e;
             }
         }
+
+        /// <summary>
+        /// Remove select participants from the activity.
+        /// </summary>
+        /// <param name="activityId">Activity log ID.</param>
+        /// <param name="people">People to remove.</param>
+        /// <returns>Nothing</returns>
+        public async Task ClearParticipantsFromActivity(int activityId, IEnumerable<ActivityLogParticipantModel> people)
+        {
+            const string sql = @"
+                DELETE FROM activity_log_participant
+                WHERE       event_id = @ActivityId AND
+                            person_id = ANY(@PeopleIds)";
+
+            try
+            {
+                using (NpgsqlCommand command = DbContext.CreateCommand())
+                {
+                    command.CommandText = sql;
+                    command.Parameters.Add("@ActivityId", NpgsqlTypes.NpgsqlDbType.Numeric).Value = activityId;
+                    command.Parameters.Add("@PeopleIds", NpgsqlTypes.NpgsqlDbType.Numeric | NpgsqlTypes.NpgsqlDbType.Array).Value = people.Select(x => x.Person.Id);
+
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
+            }
+        }
     }
 }

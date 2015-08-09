@@ -19,8 +19,8 @@ namespace Belletrix.Domain
         Task UpdateActivity(ActivityLogEditViewModel saveModel);
 
         Task SaveChanges();
-
         Task PopulateSession(HttpSessionStateBase session, Guid sessionId, int activityId);
+
         IEnumerable<ActivityLogParticipantModel> ParticipantsInSession(HttpSessionStateBase session, Guid sessionId);
 
         void RemoveParticipantFromSession(HttpSessionStateBase session, Guid sessionId,
@@ -54,6 +54,6 @@ namespace Belletrix.Domain
         /// anything in it.
         /// </param>
         /// <returns>Nothing</returns>
-        Task AssociatePeopleWithActivity(int activityId, IEnumerable<ActivityLogParticipantModel> people);
+        Task AssociatePeopleWithActivity(HttpSessionStateBase session, int activityId, Guid sessionId);
     }
 }

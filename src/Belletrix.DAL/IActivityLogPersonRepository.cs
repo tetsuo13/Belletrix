@@ -25,5 +25,13 @@ namespace Belletrix.DAL
         /// <param name="activityId">Activity log ID.</param>
         /// <returns>Nothing</returns>
         Task ClearParticipantsFromActivity(int activityId);
+
+        /// <summary>
+        /// Remove select participants from the activity.
+        /// </summary>
+        /// <param name="activityId">Activity log ID.</param>
+        /// <param name="people">People to remove.</param>
+        /// <returns>Nothing</returns>
+        Task ClearParticipantsFromActivity(int activityId, IEnumerable<ActivityLogParticipantModel> people);
     }
 }
