@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading.Tasks;
+using System.Data;
+using System.Data.SqlClient;
 
 namespace Belletrix.Models
 {
@@ -46,108 +48,102 @@ namespace Belletrix.Models
 
         public static async Task<IEnumerable<EventLogModel>> GetEvents()
         {
-            ApplicationCache cacheProvider = new ApplicationCache();
-            List<EventLogModel> events = cacheProvider.Get(CacheId, () => new List<EventLogModel>());
+            ICollection<EventLogModel> events = new List<EventLogModel>();
 
-            if (events.Count == 0)
+            const string sql = @"
+                SELECT          e.id, e.date, e.modified_by,
+                                e.student_id, e.user_id, e.type,
+                                e.action, u.first_name, u.last_name,
+                                s.first_name AS student_first_name,
+                                s.last_name AS student_last_name,
+                                us.first_name AS user_first_name,
+                                us.last_Name AS user_last_name
+                FROM            event_log e
+                INNER JOIN      users u ON
+                                modified_by = u.id
+                LEFT OUTER JOIN students s ON
+                                e.student_id = s.id
+                LEFT OUTER JOIN users us ON
+                                e.user_id = us.id
+                ORDER BY        date DESC
+                LIMIT           8";
+
+            try
             {
-                const string sql = @"
-                    SELECT          e.id, e.date, e.modified_by,
-                                    e.student_id, e.user_id, e.type,
-                                    e.action, u.first_name, u.last_name,
-                                    s.first_name AS student_first_name,
-                                    s.last_name AS student_last_name,
-                                    us.first_name AS user_first_name,
-                                    us.last_Name AS user_last_name
-                    FROM            event_log e
-                    INNER JOIN      users u ON
-                                    modified_by = u.id
-                    LEFT OUTER JOIN students s ON
-                                    e.student_id = s.id
-                    LEFT OUTER JOIN users us ON
-                                    e.user_id = us.id
-                    ORDER BY        date DESC
-                    LIMIT           8";
-
-                try
+                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
                 {
-                    using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+
+                    using (NpgsqlCommand command = connection.CreateCommand())
                     {
-                        connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+                        command.CommandText = sql;
+                        await connection.OpenAsync();
 
-                        using (NpgsqlCommand command = connection.CreateCommand())
+                        using (DbDataReader reader = await command.ExecuteReaderAsync())
                         {
-                            command.CommandText = sql;
-                            await connection.OpenAsync();
-
-                            using (DbDataReader reader = await command.ExecuteReaderAsync())
+                            while (await reader.ReadAsync())
                             {
-                                while (await reader.ReadAsync())
+                                UserModel modifiedBy = new UserModel()
                                 {
-                                    UserModel modifiedBy = new UserModel()
-                                    {
-                                        Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("modified_by")),
-                                        FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("first_name")),
-                                        LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("last_name"))
-                                    };
+                                    Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("modified_by")),
+                                    FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("first_name")),
+                                    LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("last_name"))
+                                };
 
-                                    int ord = reader.GetOrdinal("action");
-                                    string action = null;
-                                    if (!reader.IsDBNull(ord))
-                                    {
-                                        action = await reader.GetFieldValueAsync<string>(ord);
-                                    }
-
-                                    StudentModel student = null;
-                                    ord = reader.GetOrdinal("student_id");
-                                    if (!reader.IsDBNull(ord))
-                                    {
-                                        student = new StudentModel()
-                                        {
-                                            Id = await reader.GetFieldValueAsync<int>(ord),
-                                            FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("student_first_name")),
-                                            LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("student_last_name"))
-                                        };
-                                    }
-
-                                    UserModel user = null;
-                                    ord = reader.GetOrdinal("user_id");
-                                    if (!reader.IsDBNull(ord))
-                                    {
-                                        user = new UserModel()
-                                        {
-                                            Id = await reader.GetFieldValueAsync<int>(ord),
-                                            FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("user_first_name")),
-                                            LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("user_last_name"))
-                                        };
-                                    }
-
-                                    EventLogModel eventLog = new EventLogModel()
-                                    {
-                                        Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("id")),
-                                        EventDate = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("date"))),
-                                        ModifiedBy = modifiedBy,
-                                        Student = student,
-                                        User = user,
-                                        Type = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("type")),
-                                        Action = action
-                                    };
-
-                                    //eventLog.RelativeDate = CalculateRelativeDate(eventLog.EventDate.ToUniversalTime());
-
-                                    events.Add(eventLog);
+                                int ord = reader.GetOrdinal("action");
+                                string action = null;
+                                if (!reader.IsDBNull(ord))
+                                {
+                                    action = await reader.GetFieldValueAsync<string>(ord);
                                 }
 
-                                cacheProvider.Set(CacheId, events);
+                                StudentModel student = null;
+                                ord = reader.GetOrdinal("student_id");
+                                if (!reader.IsDBNull(ord))
+                                {
+                                    student = new StudentModel()
+                                    {
+                                        Id = await reader.GetFieldValueAsync<int>(ord),
+                                        FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("student_first_name")),
+                                        LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("student_last_name"))
+                                    };
+                                }
+
+                                UserModel user = null;
+                                ord = reader.GetOrdinal("user_id");
+                                if (!reader.IsDBNull(ord))
+                                {
+                                    user = new UserModel()
+                                    {
+                                        Id = await reader.GetFieldValueAsync<int>(ord),
+                                        FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("user_first_name")),
+                                        LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("user_last_name"))
+                                    };
+                                }
+
+                                EventLogModel eventLog = new EventLogModel()
+                                {
+                                    Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("id")),
+                                    EventDate = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("date"))),
+                                    ModifiedBy = modifiedBy,
+                                    Student = student,
+                                    User = user,
+                                    Type = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("type")),
+                                    Action = action
+                                };
+
+                                //eventLog.RelativeDate = CalculateRelativeDate(eventLog.EventDate.ToUniversalTime());
+
+                                events.Add(eventLog);
                             }
                         }
                     }
                 }
-                catch (Exception e)
-                {
-                    e.Data["SQL"] = sql;
-                    throw e;
-                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
 
             return events;

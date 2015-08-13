@@ -336,10 +336,6 @@
       <Project>{8c8cc40a-af9f-4c3c-be73-501963c92281}</Project>
       <Name>Belletrix.Entity</Name>
     </ProjectReference>
-    <ProjectReference Include="..\StackExchange.Exceptional.PostgreSql\StackExchange.Exceptional.PostgreSQL.csproj">
-      <Project>{8dc4bf04-721a-4da4-aeca-f8fb8cf64625}</Project>
-      <Name>StackExchange.Exceptional.PostgreSQL</Name>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

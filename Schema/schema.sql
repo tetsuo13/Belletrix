@@ -1,288 +1,300 @@
-﻿-- Store all date and times in UTC.
-SET TIME ZONE 0;
+IF (OBJECT_ID('dbo.DeleteStudent', 'P') IS NOT NULL) DROP PROCEDURE [dbo].[DeleteStudent];
 
-CREATE LANGUAGE plpgsql;
+IF OBJECT_ID('dbo.StudentDesiredLanguages', 'U') IS NOT NULL DROP TABLE [dbo].[StudentDesiredLanguages];
+IF OBJECT_ID('dbo.StudentFluentLanguages', 'U') IS NOT NULL DROP TABLE [dbo].[StudentFluentLanguages];
+IF OBJECT_ID('dbo.StudentStudiedLanguages', 'U') IS NOT NULL DROP TABLE [dbo].[StudentStudiedLanguages];
+IF OBJECT_ID('dbo.Matriculation', 'U') IS NOT NULL DROP TABLE [dbo].[Matriculation];
+IF OBJECT_ID('dbo.Languages', 'U') IS NOT NULL DROP TABLE [dbo].[Languages];
+IF OBJECT_ID('dbo.Minors', 'U') IS NOT NULL DROP TABLE [dbo].[Minors];
+IF OBJECT_ID('dbo.Majors', 'U') IS NOT NULL DROP TABLE [dbo].[Majors];
+IF OBJECT_ID('dbo.StudentStudyAbroadWishlist', 'U') IS NOT NULL DROP TABLE [dbo].[StudentStudyAbroadWishlist];
+IF OBJECT_ID('dbo.StudentNotes', 'U') IS NOT NULL DROP TABLE [dbo].[StudentNotes];
+IF OBJECT_ID('dbo.EventLog', 'U') IS NOT NULL DROP TABLE [dbo].[EventLog];
+IF OBJECT_ID('dbo.StudentPromoLog', 'U') IS NOT NULL DROP TABLE [dbo].[StudentPromoLog];
+IF OBJECT_ID('dbo.StudyAbroad', 'U') IS NOT NULL DROP TABLE [dbo].[StudyAbroad];
+IF OBJECT_ID('dbo.Students', 'U') IS NOT NULL DROP TABLE [dbo].[Students];
+IF OBJECT_ID('dbo.Countries', 'U') IS NOT NULL DROP TABLE [dbo].[Countries];
+IF OBJECT_ID('dbo.UserPromo', 'U') IS NOT NULL DROP TABLE [dbo].[UserPromo];
+IF OBJECT_ID('dbo.ActivityLogParticipant', 'U') IS NOT NULL DROP TABLE [dbo].[ActivityLogParticipant];
+IF OBJECT_ID('dbo.ActivityLog', 'U') IS NOT NULL DROP TABLE [dbo].[ActivityLog];
+IF OBJECT_ID('dbo.Users', 'U') IS NOT NULL DROP TABLE [dbo].[Users];
+IF OBJECT_ID('dbo.Programs', 'U') IS NOT NULL DROP TABLE [dbo].[Programs];
+IF OBJECT_ID('dbo.StudyAbroadProgramTypes', 'U') IS NOT NULL DROP TABLE [dbo].[StudyAbroadProgramTypes];
+IF OBJECT_ID('dbo.ProgramTypes', 'U') IS NOT NULL DROP TABLE [dbo].[ProgramTypes];
+IF OBJECT_ID('dbo.ActivityLogPerson', 'U') IS NOT NULL DROP TABLE [dbo].[ActivityLogPerson];
+IF OBJECT_ID('dbo.Exceptions', 'U') IS NOT NULL DROP TABLE [dbo].[Exceptions];
 
-CREATE TABLE countries (
-id              SERIAL,
-name            VARCHAR(64) NOT NULL,
-abbreviation    VARCHAR(3) NOT NULL,
-is_region       BOOLEAN NOT NULL,
 
-PRIMARY KEY (id),
-UNIQUE (name, abbreviation, is_region)
+CREATE TABLE [dbo].[Countries] (
+    [Id]            [int] NOT NULL IDENTITY,
+    [Name]          [nvarchar](64) NOT NULL,
+    [Abbreviation]  [varchar](3) NOT NULL,
+    [IsRegion]      [bit] NOT NULL,
+
+    CONSTRAINT [PK_Countries] PRIMARY KEY ([Id]),
+    CONSTRAINT [UN_Countries_Name] UNIQUE ([Name], [Abbreviation], [IsRegion])
 );
 
-GRANT ALL PRIVILEGES ON countries TO "neoanime_belletrix-prod";
-GRANT ALL PRIVILEGES ON countries_id_seq TO "neoanime_belletrix-prod";
-
-COMMENT ON TABLE countries IS 'Countries in ISO 3166-1 and regions';
-
-INSERT INTO countries
-(abbreviation, is_region, name)
+INSERT INTO [dbo].[Countries]
+([Abbreviation], [IsRegion], [Name])
 VALUES
-('US', FALSE, 'United States'),
-('CA', FALSE, 'Canada'),
-('AF', FALSE, 'Afghanistan'),
-('AL', FALSE, 'Albania'),
-('DZ', FALSE, 'Algeria'),
-('DS', FALSE, 'American Samoa'),
-('AD', FALSE, 'Andorra'),
-('AO', FALSE, 'Angola'),
-('AI', FALSE, 'Anguilla'),
-('AQ', FALSE, 'Antarctica'),
-('AG', FALSE, 'Antigua and/or Barbuda'),
-('AR', FALSE, 'Argentina'),
-('AM', FALSE, 'Armenia'),
-('AW', FALSE, 'Aruba'),
-('AU', FALSE, 'Australia'),
-('AT', FALSE, 'Austria'),
-('AZ', FALSE, 'Azerbaijan'),
-('BS', FALSE, 'Bahamas'),
-('BH', FALSE, 'Bahrain'),
-('BD', FALSE, 'Bangladesh'),
-('BB', FALSE, 'Barbados'),
-('BY', FALSE, 'Belarus'),
-('BE', FALSE, 'Belgium'),
-('BZ', FALSE, 'Belize'),
-('BJ', FALSE, 'Benin'),
-('BM', FALSE, 'Bermuda'),
-('BT', FALSE, 'Bhutan'),
-('BO', FALSE, 'Bolivia'),
-('BA', FALSE, 'Bosnia and Herzegovina'),
-('BW', FALSE, 'Botswana'),
-('BV', FALSE, 'Bouvet Island'),
-('BR', FALSE, 'Brazil'),
-('IO', FALSE, 'British lndian Ocean Territory'),
-('BN', FALSE, 'Brunei Darussalam'),
-('BG', FALSE, 'Bulgaria'),
-('BF', FALSE, 'Burkina Faso'),
-('BI', FALSE, 'Burundi'),
-('KH', FALSE, 'Cambodia'),
-('CM', FALSE, 'Cameroon'),
-('CV', FALSE, 'Cape Verde'),
-('KY', FALSE, 'Cayman Islands'),
-('CF', FALSE, 'Central African Republic'),
-('TD', FALSE, 'Chad'),
-('CL', FALSE, 'Chile'),
-('CN', FALSE, 'China'),
-('CX', FALSE, 'Christmas Island'),
-('CC', FALSE, 'Cocos (Keeling) Islands'),
-('CO', FALSE, 'Colombia'),
-('KM', FALSE, 'Comoros'),
-('CG', FALSE, 'Congo'),
-('CK', FALSE, 'Cook Islands'),
-('CR', FALSE, 'Costa Rica'),
-('HR', FALSE, 'Croatia (Hrvatska)'),
-('CU', FALSE, 'Cuba'),
-('CY', FALSE, 'Cyprus'),
-('CZ', FALSE, 'Czech Republic'),
-('DK', FALSE, 'Denmark'),
-('DJ', FALSE, 'Djibouti'),
-('DM', FALSE, 'Dominica'),
-('DO', FALSE, 'Dominican Republic'),
-('TP', FALSE, 'East Timor'),
-('EC', FALSE, 'Ecuador'),
-('EG', FALSE, 'Egypt'),
-('SV', FALSE, 'El Salvador'),
-('GQ', FALSE, 'Equatorial Guinea'),
-('ER', FALSE, 'Eritrea'),
-('EE', FALSE, 'Estonia'),
-('ET', FALSE, 'Ethiopia'),
-('FK', FALSE, 'Falkland Islands (Malvinas)'),
-('FO', FALSE, 'Faroe Islands'),
-('FJ', FALSE, 'Fiji'),
-('FI', FALSE, 'Finland'),
-('FR', FALSE, 'France'),
-('FX', FALSE, 'France, Metropolitan'),
-('GF', FALSE, 'French Guiana'),
-('PF', FALSE, 'French Polynesia'),
-('TF', FALSE, 'French Southern Territories'),
-('GA', FALSE, 'Gabon'),
-('GM', FALSE, 'Gambia'),
-('GE', FALSE, 'Georgia'),
-('DE', FALSE, 'Germany'),
-('GH', FALSE, 'Ghana'),
-('GI', FALSE, 'Gibraltar'),
-('GR', FALSE, 'Greece'),
-('GL', FALSE, 'Greenland'),
-('GD', FALSE, 'Grenada'),
-('GP', FALSE, 'Guadeloupe'),
-('GU', FALSE, 'Guam'),
-('GT', FALSE, 'Guatemala'),
-('GN', FALSE, 'Guinea'),
-('GW', FALSE, 'Guinea-Bissau'),
-('GY', FALSE, 'Guyana'),
-('HT', FALSE, 'Haiti'),
-('HM', FALSE, 'Heard and Mc Donald Islands'),
-('HN', FALSE, 'Honduras'),
-('HK', FALSE, 'Hong Kong'),
-('HU', FALSE, 'Hungary'),
-('IS', FALSE, 'Iceland'),
-('IN', FALSE, 'India'),
-('ID', FALSE, 'Indonesia'),
-('IR', FALSE, 'Iran'),
-('IQ', FALSE, 'Iraq'),
-('IE', FALSE, 'Ireland'),
-('IL', FALSE, 'Israel'),
-('IT', FALSE, 'Italy'),
-('CI', FALSE, 'Ivory Coast'),
-('JM', FALSE, 'Jamaica'),
-('JP', FALSE, 'Japan'),
-('JO', FALSE, 'Jordan'),
-('KZ', FALSE, 'Kazakhstan'),
-('KE', FALSE, 'Kenya'),
-('KI', FALSE, 'Kiribati'),
-('KP', FALSE, 'North Korea'),
-('KR', FALSE, 'South Korea'),
-('KW', FALSE, 'Kuwait'),
-('KG', FALSE, 'Kyrgyzstan'),
-('LA', FALSE, 'Laos'),
-('LV', FALSE, 'Latvia'),
-('LB', FALSE, 'Lebanon'),
-('LS', FALSE, 'Lesotho'),
-('LR', FALSE, 'Liberia'),
-('LY', FALSE, 'Libya'),
-('LI', FALSE, 'Liechtenstein'),
-('LT', FALSE, 'Lithuania'),
-('LU', FALSE, 'Luxembourg'),
-('MO', FALSE, 'Macau'),
-('MK', FALSE, 'Macedonia'),
-('MG', FALSE, 'Madagascar'),
-('MW', FALSE, 'Malawi'),
-('MY', FALSE, 'Malaysia'),
-('MV', FALSE, 'Maldives'),
-('ML', FALSE, 'Mali'),
-('MT', FALSE, 'Malta'),
-('MH', FALSE, 'Marshall Islands'),
-('MQ', FALSE, 'Martinique'),
-('MR', FALSE, 'Mauritania'),
-('MU', FALSE, 'Mauritius'),
-('TY', FALSE, 'Mayotte'),
-('MX', FALSE, 'Mexico'),
-('FM', FALSE, 'Micronesia'),
-('MD', FALSE, 'Moldova'),
-('MC', FALSE, 'Monaco'),
-('MN', FALSE, 'Mongolia'),
-('MS', FALSE, 'Montserrat'),
-('MA', FALSE, 'Morocco'),
-('MZ', FALSE, 'Mozambique'),
-('MM', FALSE, 'Myanmar'),
-('NA', FALSE, 'Namibia'),
-('NR', FALSE, 'Nauru'),
-('NP', FALSE, 'Nepal'),
-('NL', FALSE, 'Netherlands'),
-('AN', FALSE, 'Netherlands Antilles'),
-('NC', FALSE, 'New Caledonia'),
-('NZ', FALSE, 'New Zealand'),
-('NI', FALSE, 'Nicaragua'),
-('NE', FALSE, 'Niger'),
-('NG', FALSE, 'Nigeria'),
-('NU', FALSE, 'Niue'),
-('NF', FALSE, 'Norfolk Island'),
-('MP', FALSE, 'Northern Mariana Islands'),
-('NO', FALSE, 'Norway'),
-('OM', FALSE, 'Oman'),
-('PK', FALSE, 'Pakistan'),
-('PW', FALSE, 'Palau'),
-('PA', FALSE, 'Panama'),
-('PG', FALSE, 'Papua New Guinea'),
-('PY', FALSE, 'Paraguay'),
-('PE', FALSE, 'Peru'),
-('PH', FALSE, 'Philippines'),
-('PN', FALSE, 'Pitcairn'),
-('PL', FALSE, 'Poland'),
-('PT', FALSE, 'Portugal'),
-('PR', FALSE, 'Puerto Rico'),
-('QA', FALSE, 'Qatar'),
-('RE', FALSE, 'Reunion'),
-('RO', FALSE, 'Romania'),
-('RU', FALSE, 'Russian Federation'),
-('RW', FALSE, 'Rwanda'),
-('KN', FALSE, 'Saint Kitts and Nevis'),
-('LC', FALSE, 'Saint Lucia'),
-('VC', FALSE, 'Saint Vincent and the Grenadines'),
-('WS', FALSE, 'Samoa'),
-('SM', FALSE, 'San Marino'),
-('ST', FALSE, 'Sao Tome and Principe'),
-('SA', FALSE, 'Saudi Arabia'),
-('SN', FALSE, 'Senegal'),
-('SC', FALSE, 'Seychelles'),
-('SL', FALSE, 'Sierra Leone'),
-('SG', FALSE, 'Singapore'),
-('SK', FALSE, 'Slovakia'),
-('SI', FALSE, 'Slovenia'),
-('SB', FALSE, 'Solomon Islands'),
-('SO', FALSE, 'Somalia'),
-('ZA', FALSE, 'South Africa'),
-('GS', FALSE, 'South Georgia South Sandwich Islands'),
-('ES', FALSE, 'Spain'),
-('LK', FALSE, 'Sri Lanka'),
-('SH', FALSE, 'Saint Helena'),
-('PM', FALSE, 'Saint Pierre and Miquelon'),
-('SD', FALSE, 'Sudan'),
-('SR', FALSE, 'Suriname'),
-('SJ', FALSE, 'Svalbard and Jan Mayen Islands'),
-('SZ', FALSE, 'Swaziland'),
-('SE', FALSE, 'Sweden'),
-('CH', FALSE, 'Switzerland'),
-('SY', FALSE, 'Syria'),
-('TW', FALSE, 'Taiwan'),
-('TJ', FALSE, 'Tajikistan'),
-('TZ', FALSE, 'Tanzania'),
-('TH', FALSE, 'Thailand'),
-('TG', FALSE, 'Togo'),
-('TK', FALSE, 'Tokelau'),
-('TO', FALSE, 'Tonga'),
-('TT', FALSE, 'Trinidad and Tobago'),
-('TN', FALSE, 'Tunisia'),
-('TR', FALSE, 'Turkey'),
-('TM', FALSE, 'Turkmenistan'),
-('TC', FALSE, 'Turks and Caicos Islands'),
-('TV', FALSE, 'Tuvalu'),
-('UG', FALSE, 'Uganda'),
-('UA', FALSE, 'Ukraine'),
-('AE', FALSE, 'United Arab Emirates'),
-('GB', FALSE, 'United Kingdom'),
-('UM', FALSE, 'United States minor outlying islands'),
-('UY', FALSE, 'Uruguay'),
-('UZ', FALSE, 'Uzbekistan'),
-('VU', FALSE, 'Vanuatu'),
-('VA', FALSE, 'Vatican City'),
-('VE', FALSE, 'Venezuela'),
-('VN', FALSE, 'Vietnam'),
-('VG', FALSE, 'Virgin Islands (British)'),
-('VI', FALSE, 'Virgin Islands (U.S.)'),
-('WF', FALSE, 'Wallis and Futuna Islands'),
-('EH', FALSE, 'Western Sahara'),
-('YE', FALSE, 'Yemen'),
-('YU', FALSE, 'Yugoslavia'),
-('ZR', FALSE, 'Zaire'),
-('ZM', FALSE, 'Zambia'),
-('ZW', FALSE, 'Zimbabwe'),
-('', FALSE, 'Anywhere'),
-('EU', TRUE, 'Europe'),
-('AS', TRUE, 'Asia'),
-('AF', TRUE, 'Africa'),
-('LA', TRUE, 'Latin America'),
-('ES', TRUE, 'English-speaking');
+('US', 0, N'United States'),
+('CA', 0, N'Canada'),
+('AF', 0, N'Afghanistan'),
+('AL', 0, N'Albania'),
+('DZ', 0, N'Algeria'),
+('DS', 0, N'American Samoa'),
+('AD', 0, N'Andorra'),
+('AO', 0, N'Angola'),
+('AI', 0, N'Anguilla'),
+('AQ', 0, N'Antarctica'),
+('AG', 0, N'Antigua and/or Barbuda'),
+('AR', 0, N'Argentina'),
+('AM', 0, N'Armenia'),
+('AW', 0, N'Aruba'),
+('AU', 0, N'Australia'),
+('AT', 0, N'Austria'),
+('AZ', 0, N'Azerbaijan'),
+('BS', 0, N'Bahamas'),
+('BH', 0, N'Bahrain'),
+('BD', 0, N'Bangladesh'),
+('BB', 0, N'Barbados'),
+('BY', 0, N'Belarus'),
+('BE', 0, N'Belgium'),
+('BZ', 0, N'Belize'),
+('BJ', 0, N'Benin'),
+('BM', 0, N'Bermuda'),
+('BT', 0, N'Bhutan'),
+('BO', 0, N'Bolivia'),
+('BA', 0, N'Bosnia and Herzegovina'),
+('BW', 0, N'Botswana'),
+('BV', 0, N'Bouvet Island'),
+('BR', 0, N'Brazil'),
+('IO', 0, N'British lndian Ocean Territory'),
+('BN', 0, N'Brunei Darussalam'),
+('BG', 0, N'Bulgaria'),
+('BF', 0, N'Burkina Faso'),
+('BI', 0, N'Burundi'),
+('KH', 0, N'Cambodia'),
+('CM', 0, N'Cameroon'),
+('CV', 0, N'Cape Verde'),
+('KY', 0, N'Cayman Islands'),
+('CF', 0, N'Central African Republic'),
+('TD', 0, N'Chad'),
+('CL', 0, N'Chile'),
+('CN', 0, N'China'),
+('CX', 0, N'Christmas Island'),
+('CC', 0, N'Cocos (Keeling) Islands'),
+('CO', 0, N'Colombia'),
+('KM', 0, 'Comoros'),
+('CG', 0, N'Congo'),
+('CK', 0, N'Cook Islands'),
+('CR', 0, N'Costa Rica'),
+('HR', 0, N'Croatia (Hrvatska)'),
+('CU', 0, N'Cuba'),
+('CY', 0, N'Cyprus'),
+('CZ', 0, N'Czech Republic'),
+('DK', 0, N'Denmark'),
+('DJ', 0, N'Djibouti'),
+('DM', 0, N'Dominica'),
+('DO', 0, N'Dominican Republic'),
+('TP', 0, N'East Timor'),
+('EC', 0, N'Ecuador'),
+('EG', 0, N'Egypt'),
+('SV', 0, N'El Salvador'),
+('GQ', 0, N'Equatorial Guinea'),
+('ER', 0, N'Eritrea'),
+('EE', 0, N'Estonia'),
+('ET', 0, N'Ethiopia'),
+('FK', 0, N'Falkland Islands (Malvinas)'),
+('FO', 0, N'Faroe Islands'),
+('FJ', 0, N'Fiji'),
+('FI', 0, N'Finland'),
+('FR', 0, N'France'),
+('FX', 0, N'France, Metropolitan'),
+('GF', 0, N'French Guiana'),
+('PF', 0, N'French Polynesia'),
+('TF', 0, N'French Southern Territories'),
+('GA', 0, N'Gabon'),
+('GM', 0, N'Gambia'),
+('GE', 0, N'Georgia'),
+('DE', 0, N'Germany'),
+('GH', 0, N'Ghana'),
+('GI', 0, N'Gibraltar'),
+('GR', 0, N'Greece'),
+('GL', 0, N'Greenland'),
+('GD', 0, N'Grenada'),
+('GP', 0, N'Guadeloupe'),
+('GU', 0, N'Guam'),
+('GT', 0, N'Guatemala'),
+('GN', 0, N'Guinea'),
+('GW', 0, N'Guinea-Bissau'),
+('GY', 0, N'Guyana'),
+('HT', 0, N'Haiti'),
+('HM', 0, N'Heard and Mc Donald Islands'),
+('HN', 0, N'Honduras'),
+('HK', 0, N'Hong Kong'),
+('HU', 0, N'Hungary'),
+('IS', 0, N'Iceland'),
+('IN', 0, N'India'),
+('ID', 0, N'Indonesia'),
+('IR', 0, N'Iran'),
+('IQ', 0, N'Iraq'),
+('IE', 0, N'Ireland'),
+('IL', 0, N'Israel'),
+('IT', 0, N'Italy'),
+('CI', 0, N'Ivory Coast'),
+('JM', 0, N'Jamaica'),
+('JP', 0, N'Japan'),
+('JO', 0, N'Jordan'),
+('KZ', 0, N'Kazakhstan'),
+('KE', 0, N'Kenya'),
+('KI', 0, N'Kiribati'),
+('KP', 0, N'North Korea'),
+('KR', 0, N'South Korea'),
+('KW', 0, N'Kuwait'),
+('KG', 0, N'Kyrgyzstan'),
+('LA', 0, N'Laos'),
+('LV', 0, N'Latvia'),
+('LB', 0, N'Lebanon'),
+('LS', 0, N'Lesotho'),
+('LR', 0, N'Liberia'),
+('LY', 0, N'Libya'),
+('LI', 0, N'Liechtenstein'),
+('LT', 0, N'Lithuania'),
+('LU', 0, N'Luxembourg'),
+('MO', 0, N'Macau'),
+('MK', 0, N'Macedonia'),
+('MG', 0, N'Madagascar'),
+('MW', 0, N'Malawi'),
+('MY', 0, N'Malaysia'),
+('MV', 0, N'Maldives'),
+('ML', 0, N'Mali'),
+('MT', 0, N'Malta'),
+('MH', 0, N'Marshall Islands'),
+('MQ', 0, N'Martinique'),
+('MR', 0, N'Mauritania'),
+('MU', 0, N'Mauritius'),
+('TY', 0, N'Mayotte'),
+('MX', 0, N'Mexico'),
+('FM', 0, N'Micronesia'),
+('MD', 0, N'Moldova'),
+('MC', 0, N'Monaco'),
+('MN', 0, N'Mongolia'),
+('MS', 0, N'Montserrat'),
+('MA', 0, N'Morocco'),
+('MZ', 0, N'Mozambique'),
+('MM', 0, N'Myanmar'),
+('NA', 0, N'Namibia'),
+('NR', 0, N'Nauru'),
+('NP', 0, N'Nepal'),
+('NL', 0, N'Netherlands'),
+('AN', 0, N'Netherlands Antilles'),
+('NC', 0, N'New Caledonia'),
+('NZ', 0, N'New Zealand'),
+('NI', 0, N'Nicaragua'),
+('NE', 0, N'Niger'),
+('NG', 0, N'Nigeria'),
+('NU', 0, N'Niue'),
+('NF', 0, N'Norfolk Island'),
+('MP', 0, N'Northern Mariana Islands'),
+('NO', 0, N'Norway'),
+('OM', 0, N'Oman'),
+('PK', 0, N'Pakistan'),
+('PW', 0, N'Palau'),
+('PA', 0, N'Panama'),
+('PG', 0, N'Papua New Guinea'),
+('PY', 0, N'Paraguay'),
+('PE', 0, N'Peru'),
+('PH', 0, N'Philippines'),
+('PN', 0, N'Pitcairn'),
+('PL', 0, N'Poland'),
+('PT', 0, N'Portugal'),
+('PR', 0, N'Puerto Rico'),
+('QA', 0, N'Qatar'),
+('RE', 0, N'Reunion'),
+('RO', 0, N'Romania'),
+('RU', 0, N'Russian Federation'),
+('RW', 0, N'Rwanda'),
+('KN', 0, N'Saint Kitts and Nevis'),
+('LC', 0, N'Saint Lucia'),
+('VC', 0, N'Saint Vincent and the Grenadines'),
+('WS', 0, N'Samoa'),
+('SM', 0, N'San Marino'),
+('ST', 0, N'Sao Tome and Principe'),
+('SA', 0, N'Saudi Arabia'),
+('SN', 0, N'Senegal'),
+('SC', 0, N'Seychelles'),
+('SL', 0, N'Sierra Leone'),
+('SG', 0, N'Singapore'),
+('SK', 0, N'Slovakia'),
+('SI', 0, N'Slovenia'),
+('SB', 0, N'Solomon Islands'),
+('SO', 0, N'Somalia'),
+('ZA', 0, N'South Africa'),
+('GS', 0, N'South Georgia South Sandwich Islands'),
+('ES', 0, N'Spain'),
+('LK', 0, N'Sri Lanka'),
+('SH', 0, N'Saint Helena'),
+('PM', 0, N'Saint Pierre and Miquelon'),
+('SD', 0, N'Sudan'),
+('SR', 0, N'Suriname'),
+('SJ', 0, N'Svalbard and Jan Mayen Islands'),
+('SZ', 0, N'Swaziland'),
+('SE', 0, N'Sweden'),
+('CH', 0, N'Switzerland'),
+('SY', 0, N'Syria'),
+('TW', 0, N'Taiwan'),
+('TJ', 0, N'Tajikistan'),
+('TZ', 0, N'Tanzania'),
+('TH', 0, N'Thailand'),
+('TG', 0, N'Togo'),
+('TK', 0, N'Tokelau'),
+('TO', 0, N'Tonga'),
+('TT', 0, N'Trinidad and Tobago'),
+('TN', 0, N'Tunisia'),
+('TR', 0, N'Turkey'),
+('TM', 0, N'Turkmenistan'),
+('TC', 0, N'Turks and Caicos Islands'),
+('TV', 0, N'Tuvalu'),
+('UG', 0, N'Uganda'),
+('UA', 0, N'Ukraine'),
+('AE', 0, N'United Arab Emirates'),
+('GB', 0, N'United Kingdom'),
+('UM', 0, N'United States minor outlying islands'),
+('UY', 0, N'Uruguay'),
+('UZ', 0, N'Uzbekistan'),
+('VU', 0, N'Vanuatu'),
+('VA', 0, N'Vatican City'),
+('VE', 0, N'Venezuela'),
+('VN', 0, N'Vietnam'),
+('VG', 0, N'Virgin Islands (British)'),
+('VI', 0, N'Virgin Islands (U.S.)'),
+('WF', 0, N'Wallis and Futuna Islands'),
+('EH', 0, N'Western Sahara'),
+('YE', 0, N'Yemen'),
+('YU', 0, N'Yugoslavia'),
+('ZR', 0, N'Zaire'),
+('ZM', 0, N'Zambia'),
+('ZW', 0, N'Zimbabwe'),
+('', 0, N'Anywhere'),
+('EU', 1, N'Europe'),
+('AS', 1, N'Asia'),
+('AF', 1, N'Africa'),
+('LA', 1, N'Latin America'),
+('ES', 1, N'English-speaking');
 
 
-CREATE TABLE majors (
-id      SERIAL,
-name    VARCHAR(128) NOT NULL,
+CREATE TABLE [dbo].[Majors] (
+    [Id]    [int] NOT NULL IDENTITY,
+    [Name]  [varchar](128) NOT NULL,
 
-PRIMARY KEY (id),
-UNIQUE (name)
+    CONSTRAINT [PK_Majors] PRIMARY KEY ([Id]),
+    CONSTRAINT [UN_Majors_Name] UNIQUE ([Name])
 );
 
-COMMENT ON TABLE majors IS 'Available majors';
-
-GRANT ALL PRIVILEGES ON majors TO "neoanime_belletrix-prod";
-GRANT ALL PRIVILEGES ON majors_id_seq TO "neoanime_belletrix-prod";
-
-INSERT INTO majors
-(name)
+INSERT INTO [dbo].[Majors]
+([Name])
 VALUES
 ('Arts Management'),
 ('Biology'),
@@ -310,21 +322,16 @@ VALUES
 ('Women''s Studies');
 
 
-CREATE TABLE minors (
-id      SERIAL,
-name    VARCHAR(128) NOT NULL,
+CREATE TABLE [dbo].[Minors] (
+    [Id]    [int] NOT NULL IDENTITY,
+    [Name]  [varchar](128) NOT NULL,
 
-PRIMARY KEY (id),
-UNIQUE (name)
+    CONSTRAINT [PK_Minors] PRIMARY KEY ([Id]),
+    CONSTRAINT [UN_Minors_Name] UNIQUE ([Name])
 );
 
-COMMENT ON TABLE minors IS 'Available minors';
-
-GRANT ALL PRIVILEGES ON minors TO "neoanime_belletrix-prod";
-GRANT ALL PRIVILEGES ON minors_id_seq TO "neoanime_belletrix-prod";
-
-INSERT INTO minors
-(name)
+INSERT INTO [Minors]
+([Name])
 VALUES
 ('Arts Management'),
 ('Biology'),
@@ -353,19 +360,16 @@ VALUES
 ('Women''s Studies');
 
 
-CREATE TABLE languages (
-id          SERIAL,
-name        VARCHAR(32) NOT NULL,
+CREATE TABLE [dbo].[Languages] (
+    [Id]    [int] NOT NULL IDENTITY,
+    [Name]  [varchar](32) NOT NULL,
 
-PRIMARY KEY (id),
-UNIQUE (name)
+    CONSTRAINT [PK_Languages] PRIMARY KEY ([Id]),
+    CONSTRAINT [UN_Languages_Name] UNIQUE ([Name])
 );
 
-GRANT ALL PRIVILEGES ON languages TO "neoanime_belletrix-prod";
-GRANT ALL PRIVILEGES ON languages_id_seq TO "neoanime_belletrix-prod";
-
-INSERT INTO languages
-(name)
+INSERT INTO [Languages]
+([Name])
 VALUES
 ('Mandarin'),
 ('Spanish'),
@@ -396,471 +400,381 @@ VALUES
 ('Kiswahili');
 
 
-CREATE TABLE students (
-id                      SERIAL,
-created                 TIMESTAMP NOT NULL,
-initial_meeting         DATE,
-first_name              VARCHAR(64) NOT NULL,
-middle_name             VARCHAR(64),
-last_name               VARCHAR(64) NOT NULL,
-street_address          VARCHAR(128),
-street_address2         VARCHAR(128),
-city                    VARCHAR(128),
-state                   VARCHAR(32),
-postal_code             VARCHAR(16),
-classification          INT,
-student_id              VARCHAR(32),
-phone_number            VARCHAR(32),
-living_on_campus        BOOLEAN,
-enrolled_full_time      BOOLEAN,
-citizenship             INTEGER,
-pell_grant_recipient    BOOLEAN,
-passport_holder         BOOLEAN,
-phi_beta_delta_member   BOOLEAN,
-gpa                     DECIMAL(3,2),
-campus_email            VARCHAR(128),
-alternate_email         VARCHAR(128),
-entering_year           INT,
-graduating_year         INT,
-dob                     DATE,
+CREATE TABLE [dbo].[Students] (
+    [Id]                        [int] NOT NULL IDENTITY,
+    [Created]                   [datetime] NOT NULL,
+    [InitialMeeting]            [date],
+    [FirstName]                 [nvarchar](64) NOT NULL,
+    [MiddleName]                [nvarchar](64),
+    [LastName]                  [nvarchar](64) NOT NULL,
+    [StreetAddress]             [nvarchar](128),
+    [StreetAddress2]            [nvarchar](128),
+    [City]                      [nvarchar](128),
+    [State]                     [nvarchar](32),
+    [PostalCode]                [nvarchar](16),
+    [Classification]            [int],
+    [StudentId]                 [varchar](32),
+    [PhoneNumber]               [varchar](32),
+    [LivingOnCampus]            [bit],
+    [EnrolledFullTime]          [bit],
+    [Citizenship]               [int],
+    [PellGrantRecipient]        [bit],
+    [PassportHolder]            [bit],
+    [PhiBetaDeltaMember]        [bit],
+    [Gpa]                       [decimal](3,2),
+    [CampusEmail]               [varchar](128),
+    [AlternateEmail]            [varchar](128),
+    [EnteringYear]              [int],
+    [DraduatingYear]            [int],
+    [Dob]                       [date],
 
-PRIMARY KEY (id),
-FOREIGN KEY (citizenship) REFERENCES countries (id)
+    CONSTRAINT [PK_Students] PRIMARY KEY ([id]),
+    CONSTRAINT [FK_Students_Citizenship] FOREIGN KEY ([Citizenship]) REFERENCES [dbo].[Countries] ([id])
 );
 
-COMMENT ON TABLE students IS 'Student master';
-COMMENT ON COLUMN students.graduating_year IS 'Year that student will be or has already graduated';
 
-GRANT ALL PRIVILEGES ON students TO "neoanime_belletrix-prod";
-GRANT ALL PRIVILEGES ON students_id_seq TO "neoanime_belletrix-prod";
+CREATE TABLE [dbo].[StudentFluentLanguages] (
+    [StudentId]     [int] NOT NULL,
+    [LanguageId]    [int] NOT NULL,
 
-
-CREATE TABLE student_fluent_languages (
-student_id      INT NOT NULL,
-language_id     INT NOT NULL,
-
-PRIMARY KEY (student_id, language_id)
+    CONSTRAINT [PK_StudentFluentLanguages] PRIMARY KEY ([StudentId], [LanguageId])
 );
 
-COMMENT ON TABLE student_fluent_languages IS 'Languages that students declare fluency';
 
-GRANT ALL PRIVILEGES ON student_fluent_languages TO "neoanime_belletrix-prod";
+CREATE TABLE [dbo].[StudentDesiredLanguages] (
+    [StudentId]     [int] NOT NULL,
+    [LanguageId]    [int] NOT NULL,
 
-
-CREATE TABLE student_desired_languages (
-student_id      INT NOT NULL,
-language_id     INT NOT NULL,
-
-PRIMARY KEY (student_id, language_id)
+    CONSTRAINT [PK_StudentDesiredLanguages] PRIMARY KEY ([StudentId], [LanguageId])
 );
 
-COMMENT ON TABLE student_desired_languages IS 'Languages that students would like to study abroad';
 
-GRANT ALL PRIVILEGES ON student_desired_languages TO "neoanime_belletrix-prod";
+CREATE TABLE [dbo].[StudentStudiedLanguages] (
+    [StudentId]     [int] NOT NULL,
+    [LanguageId]    [int] NOT NULL,
 
-
-CREATE TABLE student_studied_languages (
-student_id      INT NOT NULL,
-language_id     INT NOT NULL,
-
-PRIMARY KEY (student_id, language_id)
+    CONSTRAINT [PK_StudentStudiedLanguages] PRIMARY KEY ([StudentId], [LanguageId])
 );
 
-COMMENT ON TABLE student_studied_languages IS 'Languages that students have studied or are studying';
 
-GRANT ALL ON TABLE student_studied_languages TO "neoanime_belletrix-prod";
+CREATE TABLE [dbo].[Matriculation] (
+    [StudentId]     [int] NOT NULL,
+    [MajorId]       [int] NOT NULL,
+    [IsMajor]       [bit] NOT NULL,
 
-
-CREATE TABLE matriculation (
-student_id  INT NOT NULL,
-major_id    INT NOT NULL,
-is_major    BOOLEAN NOT NULL,
-
-PRIMARY KEY (student_id, major_id, is_major)
+    CONSTRAINT [PK_Matriculation] PRIMARY KEY ([StudentId], [MajorId], [IsMajor])
 );
 
-COMMENT ON TABLE matriculation IS 'Student major/minor cross reference';
 
-GRANT ALL PRIVILEGES ON matriculation TO "neoanime_belletrix-prod";
+-- Location and semesters that students wish to study abroad to.
+CREATE TABLE [dbo].[StudentStudyAbroadWishlist] (
+    [StudentId]     [int] NOT NULL,
+    [CountryId]     [int],
+    [Year]          [int], -- Desired four digit year
+    [Period]        [int], -- One of StudentStudyAbroadWishlistModel.PeriodValue
 
-
-CREATE TABLE student_study_abroad_wishlist (
-student_id  INT NOT NULL,
-country_id  INT,
-year        INT,
-period      INT,
-
-FOREIGN KEY (student_id) REFERENCES students (id)
+    CONSTRAINT [FK_StudentStudyAbroadWishlist_StudentId] FOREIGN KEY ([StudentId]) REFERENCES [dbo].[Students] ([Id])
 );
 
-COMMENT ON TABLE student_study_abroad_wishlist IS 'Location and semesters that students wish to study abroad to';
-COMMENT ON COLUMN student_study_abroad_wishlist.student_id IS 'Student ID';
-COMMENT ON COLUMN student_study_abroad_wishlist.country_id IS 'Country ID';
-COMMENT ON COLUMN student_study_abroad_wishlist.year IS 'Desired four digit year';
-COMMENT ON COLUMN student_study_abroad_wishlist.period IS 'One of StudentStudyAbroadWishlistModel.PeriodValue';
 
-CREATE INDEX student_study_abroad_wishlist_idx1 ON student_study_abroad_wishlist (student_id);
+-- Logins and information about users of the application.
+CREATE TABLE [dbo].[Users] (
+    [Id]                    [int] NOT NULL IDENTITY,
+    [FirstName]             [nvarchar](64) NOT NULL,
+    [LastName]              [nvarchar](64) NOT NULL,
+    [Login]                 [varchar](24) NOT NULL,
+    [PasswordIterations]    [int] NOT NULL,
+    [PasswordSalt]          [char](32) NOT NULL,
+    [PasswordHash]          [char](32) NOT NULL,
+    [Created]               [datetime] NOT NULL,
+    [LastLogin]             [datetime],
+    [Email]                 [varchar](128) NOT NULL,
+    [Admin]                 [bit] NOT NULL DEFAULT 0,
+    [Active]                [bit] NOT NULL DEFAULT 1,
 
-GRANT ALL PRIVILEGES ON student_study_abroad_wishlist TO "neoanime_belletrix-prod";
-
-
-CREATE TABLE users (
-id                      SERIAL,
-first_name              VARCHAR(64) NOT NULL,
-last_name               VARCHAR(64) NOT NULL,
-login                   VARCHAR(24) NOT NULL,
-password_iterations     INTEGER NOT NULL,
-password_salt           CHAR(32) NOT NULL,
-password_hash           CHAR(32) NOT NULL,
-created                 TIMESTAMP NOT NULL,
-last_login              TIMESTAMP,
-email                   VARCHAR(128) NOT NULL,
-admin                   BOOLEAN NOT NULL DEFAULT FALSE,
-active                  BOOLEAN NOT NULL DEFAULT TRUE,
-
-PRIMARY KEY (id),
-UNIQUE (login)
+    CONSTRAINT [PK_Users] PRIMARY KEY ([Id]),
+    CONSTRAINT [UN_Users_Login] UNIQUE ([Login])
 );
-
-COMMENT ON TABLE users IS 'Logins and information about users of the application';
-COMMENT ON COLUMN users.first_name IS 'Given name';
-COMMENT ON COLUMN users.last_name IS 'Family name';
-COMMENT ON COLUMN users.login IS 'Username used to log into the application';
-COMMENT ON COLUMN users.password_hash IS 'Hash of password';
-COMMENT ON COLUMN users.created IS 'Date that the user profile was created';
-COMMENT ON COLUMN users.last_login IS 'Date that the user last logged in to the application';
-COMMENT ON COLUMN users.email IS 'Email address for user';
-COMMENT ON COLUMN users.admin IS 'Administrator access?';
-COMMENT ON COLUMN users.active IS 'Active status dictates whether the user can even log in';
-
-GRANT ALL PRIVILEGES ON users TO "neoanime_belletrix-prod";
-GRANT ALL PRIVILEGES ON users_id_seq TO "neoanime_belletrix-prod";
 
 -- Password is the same as the login.
-INSERT INTO users
-(first_name, last_name, login, password_iterations, password_salt, password_hash, created, email, admin)
+INSERT INTO [dbo].[Users]
+([FirstName], [LastName], [Login], [PasswordIterations], [PasswordSalt], [PasswordHash], [Created], [Email], [Admin])
 VALUES
-('Andrei', 'Nicholson', 'anicholson', 1000, 'og85e2R6TvXl+8SuOqv3EWTc7eWX3aje', 'RzfdfsXpQQTg1E+n3wnLMEZbjJoEkqEf', NOW(), 'contact@andreinicholson.com', TRUE);
+(N'Andrei', N'Nicholson', 'anicholson', 1000, 'og85e2R6TvXl+8SuOqv3EWTc7eWX3aje', 'RzfdfsXpQQTg1E+n3wnLMEZbjJoEkqEf', GETUTCDATE(), 'contact@andreinicholson.com', 1);
 
 
-CREATE TABLE user_promo (
-id              SERIAL,
-description     VARCHAR(256) NOT NULL,
-created_by      INT NOT NULL,
-created         TIMESTAMP NOT NULL,
-code            VARCHAR(32) NOT NULL,
-active          BOOLEAN NOT NULL DEFAULT TRUE,
+-- Promotional users attached to student entries.
+CREATE TABLE [dbo].[UserPromo] (
+    [Id]                [int] NOT NULL IDENTITY,
+    [Description]       [nvarchar](256) NOT NULL,
+    [CreatedBy]         [int] NOT NULL,
+    [Created]           [datetime] NOT NULL,
+    [Code]              [varchar](32) NOT NULL,
+    [Active]            [bit] NOT NULL DEFAULT 1,
 
-PRIMARY KEY (id),
-UNIQUE (code),
-FOREIGN KEY (created_by) REFERENCES users (id)
+    CONSTRAINT [PK_UserPromo] PRIMARY KEY ([Id]),
+    CONSTRAINT [UN_UserPromo_Code] UNIQUE ([Code]),
+    CONSTRAINT [FK_UserPromo_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users] ([Id])
 );
 
-COMMENT ON TABLE user_promo IS 'Promotional users attached to student entries';
-COMMENT ON COLUMN user_promo.description IS 'Helper description';
-COMMENT ON COLUMN user_promo.created_by IS 'User that created the promo';
-COMMENT ON COLUMN user_promo.created IS 'Date and time that the promo was created';
-COMMENT ON COLUMN user_promo.code IS 'Unique promo code used to log enter the public portion of the site for the student entry forms';
-COMMENT ON COLUMN user_promo.active IS 'Whether the promo can still be used';
 
-GRANT ALL PRIVILEGES ON user_promo TO "neoanime_belletrix-prod";
-GRANT ALL PRIVILEGES ON user_promo_id_seq TO "neoanime_belletrix-prod";
+CREATE TABLE [dbo].[StudentNotes] (
+    [Id]            [int] NOT NULL IDENTITY,
+    [StudentId]     [int] NOT NULL,
+    [CreatedBy]     [int] NOT NULL,
+    [EntryDate]     [datetime] NOT NULL,
+    [Note]          [nvarchar](max) NOT NULL,
 
-
-CREATE TABLE student_notes (
-id          SERIAL,
-student_id  INT NOT NULL,
-created_by  INT NOT NULL,
-entry_date  TIMESTAMP NOT NULL,
-note        TEXT NOT NULL,
-
-PRIMARY KEY (id),
-FOREIGN KEY (student_id) REFERENCES students (id),
-FOREIGN KEY (created_by) REFERENCES users (id)
+    CONSTRAINT [PK_StudentNotes] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_StudentNotes_StudentId] FOREIGN KEY ([StudentId]) REFERENCES [dbo].[Students] ([Id]),
+    CONSTRAINT [FK_StudentNotes_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users] ([Id])
 );
 
-COMMENT ON TABLE student_notes IS 'Arbitrary notes attached to students';
-COMMENT ON COLUMN student_notes.student_id IS 'Student ID for note';
-COMMENT ON COLUMN student_notes.created_by IS 'User ID who created the note';
-COMMENT ON COLUMN student_notes.entry_date IS 'Date that the note was created';
 
-GRANT ALL PRIVILEGES ON student_notes TO "neoanime_belletrix-prod";
-GRANT ALL PRIVILEGES ON student_notes_id_seq TO "neoanime_belletrix-prod";
+CREATE TABLE [dbo].[EventLog] (
+    [Id]            [int] NOT NULL IDENTITY,
+    [Date]          [datetime] NOT NULL,
+    [ModifiedBy]    [int],
+    [StudentId]     [int],
+    [UserId]        [int],
+    [Type]          [int] NOT NULL,
+    [Action]        [nvarchar](512),
 
-
-CREATE TABLE event_log (
-id          SERIAL,
-date        TIMESTAMP NOT NULL,
-modified_by INT,
-student_id  INT,
-user_id     INT,
-type        INT NOT NULL,
-action      VARCHAR(512),
-
-PRIMARY KEY (id),
-FOREIGN KEY (modified_by) REFERENCES users (id),
-FOREIGN KEY (student_id) REFERENCES students (id),
-FOREIGN KEY (user_id) REFERENCES users (id)
+    CONSTRAINT [PK_EventLog] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_EventLog_ModifiedBy] FOREIGN KEY ([ModifiedBy]) REFERENCES [dbo].[Users] ([Id]),
+    CONSTRAINT [FK_EventLog_StudentId] FOREIGN KEY ([StudentId]) REFERENCES [dbo].[Students] ([Id]),
+    CONSTRAINT [FK_EventLog_UserId] FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users] ([Id])
 );
 
-COMMENT ON TABLE event_log IS 'Application event logging table';
-COMMENT ON COLUMN event_log.modified_by IS 'User ID who initiated the event. May be NULL to indicate promos or system events.';
-COMMENT ON COLUMN event_log.student_id IS 'Student ID that was modified';
-COMMENT ON COLUMN event_log.user_id IS 'User ID that was modified';
 
-GRANT ALL PRIVILEGES ON event_log TO "neoanime_belletrix-prod";
-GRANT ALL PRIVILEGES ON event_log_id_seq TO "neoanime_belletrix-prod";
+CREATE TABLE [dbo].[StudentPromoLog] (
+    [PromoId]       [int] NOT NULL,
+    [StudentId]     [int] NOT NULL,
+    [Created]       [datetime] NOT NULL,
 
-
-CREATE TABLE student_promo_log (
-promo_id    INT NOT NULL,
-student_id  INT NOT NULL,
-created     TIMESTAMP NOT NULL,
-
-PRIMARY KEY (promo_id, student_id),
-FOREIGN KEY (promo_id) REFERENCES user_promo (id),
-FOREIGN KEY (student_id) REFERENCES students (id)
+    CONSTRAINT [PK_StudentPromoLog] PRIMARY KEY ([PromoId], [StudentId]),
+    CONSTRAINT [FK_StudentPromoLog_PromoId] FOREIGN KEY ([PromoId]) REFERENCES [dbo].[UserPromo] ([Id]),
+    CONSTRAINT [FK_StudentPromoLog_StudentId] FOREIGN KEY ([StudentId]) REFERENCES [dbo].[Students] ([Id])
 );
 
-COMMENT ON TABLE student_promo_log IS 'Students associated with promos';
 
-CREATE INDEX student_promo_log_idx1 ON student_promo_log (promo_id);
-CREATE INDEX student_promo_log_idx2 ON student_promo_log (student_id);
+CREATE TABLE [dbo].[Programs] (
+    [id]            [int] NOT NULL IDENTITY,
+    [name]          [nvarchar](128) NOT NULL,
+    [abbreviation]  [varchar](24),
 
-GRANT ALL PRIVILEGES ON student_promo_log TO "neoanime_belletrix-prod";
-
-
-CREATE TABLE programs (
-id              SERIAL,
-name            VARCHAR(128) NOT NULL,
-abbreviation    VARCHAR(24),
-
-PRIMARY KEY (id),
-UNIQUE(name, abbreviation)
+    CONSTRAINT [PK_Programs] PRIMARY KEY ([Id]),
+    CONSTRAINT [UN_Programs_Name_Abbreviation] UNIQUE([name], [abbreviation])
 );
 
-GRANT ALL PRIVILEGES ON programs TO "neoanime_belletrix-prod";
-GRANT ALL PRIVILEGES ON programs_id_seq TO "neoanime_belletrix-prod";
 
-INSERT INTO programs
-(name, abbreviation)
+INSERT INTO [dbo].[Programs]
+([name], [abbreviation])
 VALUES
-('Organization for Tropical Studies', 'OTS'),
-('Multidisciplinary International Research Training program', 'MIRT'),
-('American Institute for Foreign Study', 'AIFS'),
-('New York University', 'NYU'),
-('Brethren Colleges Abroad', 'BCA'),
-('School for International Training', 'SIT'),
-('International Study Program', 'ISP'),
-('International Exchange Student Program', 'ISEP'),
-('University of Virgin Islands', 'UVI'),
-('University of North Carolina at Chapel Hill', 'UNC'),
-('Global Learning Semesters', NULL),
-('Semester At Sea', NULL),
-('Veritas Universidad', NULL),
-('UMC Volunteer', NULL),
-('Spring Break', NULL),
-('GlobaLinks', NULL),
-('Scranton Women''s Leadership Cntr.', NULL),
-('Bennett Maymester', NULL),
-('Global Bus. Leadership Experience', NULL),
-('UN Climate Change Conference', NULL),
-('New Media', NULL),
-('NYU Florence', NULL),
-('NYU Ghana', NULL),
-('Grahamstown Festival', NULL),
-('Council on International Educational Exchange', 'CIEE'),
-('CISabroad', 'CIS'),
-('Mid-Atlantic Consortium-Center for Academic Excellence', 'MAC-CAE'),
-('NYU London', NULL),
-('Institute for Future Global Leaders UVI', NULL),
-('Tec de Monterrey', NULL),
-('Global Semesters', NULL),
-('Global Linkages', NULL);
+(N'Organization for Tropical Studies', 'OTS'),
+(N'Multidisciplinary International Research Training program', 'MIRT'),
+(N'American Institute for Foreign Study', 'AIFS'),
+(N'New York University', 'NYU'),
+(N'Brethren Colleges Abroad', 'BCA'),
+(N'School for International Training', 'SIT'),
+(N'International Study Program', 'ISP'),
+(N'International Exchange Student Program', 'ISEP'),
+(N'University of Virgin Islands', 'UVI'),
+(N'University of North Carolina at Chapel Hill', 'UNC'),
+(N'Global Learning Semesters', NULL),
+(N'Semester At Sea', NULL),
+(N'Veritas Universidad', NULL),
+(N'UMC Volunteer', NULL),
+(N'Spring Break', NULL),
+(N'GlobaLinks', NULL),
+(N'Scranton Women''s Leadership Cntr.', NULL),
+(N'Bennett Maymester', NULL),
+(N'Global Bus. Leadership Experience', NULL),
+(N'UN Climate Change Conference', NULL),
+(N'New Media', NULL),
+(N'NYU Florence', NULL),
+(N'NYU Ghana', NULL),
+(N'Grahamstown Festival', NULL),
+(N'Council on International Educational Exchange', 'CIEE'),
+(N'CISabroad', 'CIS'),
+(N'Mid-Atlantic Consortium-Center for Academic Excellence', 'MAC-CAE'),
+(N'NYU London', NULL),
+(N'Institute for Future Global Leaders UVI', NULL),
+(N'Tec de Monterrey', NULL),
+(N'Global Semesters', NULL),
+(N'Global Linkages', NULL);
 
 
-CREATE TABLE program_types (
-id          SERIAL,
-name        VARCHAR(32) NOT NULL,
-short_term  BOOLEAN NOT NULL,
+CREATE TABLE [dbo].[ProgramTypes] (
+    [Id]            [int] NOT NULL IDENTITY,
+    [Name]          [nvarchar](32) NOT NULL,
+    [ShortTerm]     [bit] NOT NULL,
 
-PRIMARY KEY (id),
-UNIQUE (name)
+    CONSTRAINT [PK_ProgramTypes] PRIMARY KEY ([Id]),
+    CONSTRAINT [UN_ProgramTypes_Name] UNIQUE ([Name])
 );
 
-GRANT ALL PRIVILEGES ON program_types TO "neoanime_belletrix-prod";
-GRANT ALL PRIVILEGES ON program_types_id_seq TO "neoanime_belletrix-prod";
 
-INSERT INTO program_types
-(name, short_term)
+INSERT INTO [dbo].[ProgramTypes]
+([Name], [ShortTerm])
 VALUES
-('Maymester', TRUE),
-('Spring Break', TRUE),
-('Internship', TRUE),
-('Research Experience (Short-Term)', TRUE),
-('Research Experience (Long-Term)', FALSE),
-('Semester', FALSE),
-('Summer', TRUE),
-('Other', TRUE),
-('Academic Year', FALSE);
+(N'Maymester', 1),
+(N'Spring Break', 1),
+(N'Internship', 1),
+(N'Research Experience (Short-Term)', 1),
+(N'Research Experience (Long-Term)', 0),
+(N'Semester', 0),
+(N'Summer', 1),
+(N'Other', 1),
+(N'Academic Year', 0);
 
 
-CREATE TABLE study_abroad (
-id                  SERIAL NOT NULL,
-student_id          INT NOT NULL,
-semester            INT NOT NULL,
-year                INT NOT NULL,
-start_date          DATE,
-end_date            DATE,
-credit_bearing      BOOLEAN NOT NULL,
-internship          BOOLEAN NOT NULL,
-country_id          INT NOT NULL,
-city                VARCHAR(64),
-program_id          INT NOT NULL,
+CREATE TABLE [dbo].[StudyAbroad] (
+    [Id]                [int] NOT NULL IDENTITY,
+    [StudentId]         [int] NOT NULL,
+    [Semester]          [int] NOT NULL,
+    [Year]              [int] NOT NULL,
+    [StartDate]         [date],
+    [EndDate]           [date],
+    [CreditBearing]     [bit] NOT NULL,
+    [Internship]        [bit] NOT NULL,
+    [CountryId]         [int] NOT NULL,
+    [City]              [varchar](64),
+    [ProgramId]         [int] NOT NULL,
 
-PRIMARY KEY (id),
-UNIQUE (student_id, semester, year, country_id),
-FOREIGN KEY (student_id) REFERENCES students (id),
-FOREIGN KEY (country_id) REFERENCES countries (id),
-FOREIGN KEY (program_id) REFERENCES programs (id)
+    CONSTRAINT [PK_StudyAbroad] PRIMARY KEY ([Id]),
+    CONSTRAINT [UN_StudyAbroad_StudentId_Semester_Year_CountryId] UNIQUE ([StudentId], [Semester], [Year], [CountryId]),
+    CONSTRAINT [FK_StudyAbroad_StudentId] FOREIGN KEY ([StudentId]) REFERENCES [dbo].[Students] ([Id]),
+    CONSTRAINT [FK_StudyAbroad_CountryId] FOREIGN KEY ([CountryId]) REFERENCES [dbo].[Countries] ([Id]),
+    CONSTRAINT [FK_StudyAbroad_ProgramId] FOREIGN KEY ([ProgramId]) REFERENCES [dbo].[Programs] ([Id])
 );
 
-GRANT ALL PRIVILEGES ON study_abroad TO "neoanime_belletrix-prod";
-GRANT ALL PRIVILEGES ON study_abroad_id_seq TO "neoanime_belletrix-prod";
 
+CREATE TABLE [dbo].[StudyAbroadProgramTypes] (
+    [StudyAbroadId]     [int] NOT NULL,
+    [ProgramTypeId]     [int] NOT NULL,
 
-CREATE TABLE study_abroad_program_types (
-study_abroad_id     INT NOT NULL,
-program_type_id     INT NOT NULL,
-
-PRIMARY KEY (study_abroad_id, program_type_id),
-FOREIGN KEY (program_type_id) REFERENCES program_types (id)
+    CONSTRAINT [PK_StudyAbroadProgramTypes] PRIMARY KEY ([StudyAbroadId], [ProgramTypeId]),
+    CONSTRAINT [FK_StudyAbroadProgramTypes_ProgramTypeId] FOREIGN KEY ([ProgramTypeId]) REFERENCES [dbo].[ProgramTypes] ([Id])
 );
 
-GRANT ALL PRIVILEGES ON study_abroad_program_types TO "neoanime_belletrix-prod";
 
+CREATE TABLE [dbo].[ActivityLogPerson] (
+    [Id]            [int] NOT NULL IDENTITY,
+    [FullName]      [nvarchar](128) NOT NULL,
+    [Description]   [nvarchar](256),
+    [Phone]         [varchar](32),
+    [Email]         [varchar](128),
 
-CREATE TABLE activity_log_person (
-    id              SERIAL,
-    full_name       VARCHAR(128) NOT NULL,
-    description     VARCHAR(256),
-    phone           VARCHAR(32),
-    email           VARCHAR(128),
-
-    PRIMARY KEY (id),
-    UNIQUE (full_name)
+    CONSTRAINT [PK_ActivityLogPerson] PRIMARY KEY ([Id]),
+    CONSTRAINT [UN_ActivityLogPerson_FullName] UNIQUE ([FullName])
 );
 
-COMMENT ON TABLE activity_log_person IS 'Generic person associated with one or more events';
-COMMENT ON COLUMN activity_log_person.id IS 'Unique identifier';
-COMMENT ON COLUMN activity_log_person.full_name IS 'Person''s full name -- this can be as simple or complex as needed';
-COMMENT ON COLUMN activity_log_person.description IS 'Generic description to help remember the person later';
-COMMENT ON COLUMN activity_log_person.phone IS 'Contact phone number';
-COMMENT ON COLUMN activity_log_person.email IS 'Contact email address';
 
-GRANT ALL PRIVILEGES ON activity_log_person TO "neoanime_belletrix-prod";
-GRANT ALL PRIVILEGES ON activity_log_person_id_seq TO "neoanime_belletrix-prod";
+CREATE TABLE [dbo].[ActivityLog] (
+    [Id]            [int] NOT NULL IDENTITY,
+    [Created]       [datetime] NOT NULL,
+    [CreatedBy]     [int] NOT NULL,
+    [Title]         [nvarchar](256) NOT NULL,
+    [Title2]        [nvarchar](256),
+    [Title3]        [nvarchar](256),
+    [Organizers]    [nvarchar](256),
+    [Location]      [nvarchar](512),
+    --[Types]         INT[] NOT NULL,
+    [StartDate]     [date] NOT NULL,
+    [EndDate]       [date] NOT NULL,
+    [OnCampus]      [bit] NOT NULL,
+    [WebSite]       [varchar](2048),
+    [Notes]         [nvarchar](max),
 
-
-CREATE TABLE activity_log (
-    id              SERIAL,
-    created         TIMESTAMP NOT NULL,
-    created_by      INT NOT NULL,
-    title           VARCHAR(256) NOT NULL,
-    title2          VARCHAR(256),
-    title3          VARCHAR(256),
-    organizers      VARCHAR(256),
-    location        VARCHAR(512),
-    types           INT[] NOT NULL,
-    start_date      DATE NOT NULL,
-    end_date        DATE NOT NULL,
-    on_campus       BOOLEAN NOT NULL,
-    web_site        VARCHAR(2048),
-    notes           VARCHAR(4096),
-
-    PRIMARY KEY (id),
-    UNIQUE (title),
-    FOREIGN KEY (created_by) REFERENCES users (id)
+    CONSTRAINT [PK_ActivityLog] PRIMARY KEY ([Id]),
+    CONSTRAINT [UN_ActivityLog_Title] UNIQUE ([Title]),
+    CONSTRAINT [FK_ActivityLog_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users] ([Id])
 );
 
-COMMENT ON TABLE activity_log IS 'Event log';
-COMMENT ON COLUMN activity_log.types IS 'Conference, community event, etc. values derived from code';
-COMMENT ON COLUMN activity_log.start_date IS 'Starting date and time of event';
-COMMENT ON COLUMN activity_log.end_date IS 'Ending date and time of event';
 
-GRANT ALL PRIVILEGES ON activity_log TO "neoanime_belletrix-prod";
-GRANT ALL PRIVILEGES ON activity_log_id_seq TO "neoanime_belletrix-prod";
+CREATE TABLE [dbo].[ActivityLogParticipant] (
+    [EventId]           [int] NOT NULL,
+    [PersonId]          [int] NOT NULL,
+    [ParticipantType]   [int] NOT NULL,
 
-
-CREATE TABLE activity_log_participant (
-    event_id            INT NOT NULL,
-    person_id           INT NOT NULL,
-    participant_type    INT NOT NULL,
-
-    PRIMARY KEY (event_id, person_id),
-    FOREIGN KEY (event_id) REFERENCES activity_log (id),
-    FOREIGN KEY (person_id) REFERENCES activity_log_person (id)
+    CONSTRAINT [PK_ActivityLogParticipant] PRIMARY KEY ([EventId], [PersonId]),
+    CONSTRAINT [FK_ActivityLogParticipant_EventId] FOREIGN KEY ([EventId]) REFERENCES [dbo].[ActivityLog] ([Id]),
+    CONSTRAINT [FK_ActivityLogParticipant_PersonId] FOREIGN KEY ([PersonId]) REFERENCES [dbo].[ActivityLogPerson] ([Id])
 );
 
-COMMENT ON TABLE activity_log_participant IS 'Association between people and events and their type of participation';
-COMMENT ON COLUMN activity_log_participant.event_id IS 'Existing activity log event ID';
-COMMENT ON COLUMN activity_log_participant.person_id IS 'Existing person ID';
-COMMENT ON COLUMN activity_log_participant.participant_type IS 'Denotes attendee or contact (value derived from Belletrix.Entity.Enum.ActivityLogParticipantTypes)';
 
-GRANT ALL PRIVILEGES ON activity_log_participant TO "neoanime_belletrix-prod";
+CREATE TABLE [dbo].[Exceptions](
+    [Id]                [bigint] NOT NULL IDENTITY,
+    [GUID]              [uniqueidentifier] NOT NULL,
+    [ApplicationName]   [nvarchar](50) NOT NULL,
+    [MachineName]       [nvarchar](50) NOT NULL,
+    [CreationDate]      [datetime] NOT NULL,
+    [Type]              [nvarchar](100) NOT NULL,
+    [IsProtected]       [bit] NOT NULL default(0),
+    [Host]              [nvarchar](100) NULL,
+    [Url]               [nvarchar](500) NULL,
+    [HTTPMethod]        [nvarchar](10) NULL,
+    [IPAddress]         [varchar](40) NULL,
+    [Source]            [nvarchar](100) NULL,
+    [Message]           [nvarchar](1000) NULL,
+    [Detail]            [nvarchar](max) NULL,	
+    [StatusCode]        [int] NULL,
+    [SQL]               [nvarchar](max) NULL,
+    [DeletionDate]      [datetime] NULL,
+    [FullJson]          [nvarchar](max) NULL,
+    [ErrorHash]         [int] NULL,
+    [DuplicateCount]    [int] NOT NULL default(1),
 
-
-CREATE TABLE exceptions (
-Id                  BIGSERIAL NOT NULL,
-GUID                UUID NOT NULL,
-ApplicationName     VARCHAR(50) NOT NULL,
-MachineName         VARCHAR(50) NOT NULL,
-CreationDate        TIMESTAMP NOT NULL,
-Type                VARCHAR(100) NOT NULL,
-IsProtected         BOOLEAN NOT NULL DEFAULT FALSE,
-Host                VARCHAR(100) NULL,
-Url                 VARCHAR(500) NULL,
-HTTPMethod          VARCHAR(10) NULL,
-IPAddress           VARCHAR(40) NULL,
-Source              VARCHAR(100) NULL,
-Message             VARCHAR(1000) NULL,
-Detail              TEXT NULL,	
-StatusCode          INT NULL,
-SQL                 TEXT NULL,
-DeletionDate        TIMESTAMP NULL,
-FullJson            TEXT NULL,
-ErrorHash           INT NULL,
-DuplicateCount      INT NOT NULL DEFAULT 1,
-
-PRIMARY KEY (Id)
+    CONSTRAINT [PK_Exceptions] PRIMARY KEY CLUSTERED ([Id] ASC)
+    WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
 );
 
-COMMENT ON TABLE exceptions IS 'SQL store for StackExchange.Exceptional error handler';
+CREATE UNIQUE NONCLUSTERED INDEX [IX_Exceptions_GUID_ApplicationName_DeletionDate_CreationDate] ON [dbo].[Exceptions] 
+(
+	[GUID] ASC,
+	[ApplicationName] ASC,
+	[DeletionDate] ASC,
+	[CreationDate] DESC
+);
 
-CREATE INDEX IX_Exceptions_GUID_ApplicationName_DeletionDate_CreationDate ON exceptions (GUID, ApplicationName, DeletionDate, CreationDate DESC);
-CREATE INDEX IX_Exceptions_ErrorHash_AppName_CreationDate_DelDate ON exceptions (ErrorHash, ApplicationName, CreationDate DESC, DeletionDate);
+CREATE NONCLUSTERED INDEX [IX_Exceptions_ErrorHash_ApplicationName_CreationDate_DeletionDate] ON [dbo].[Exceptions] 
+(
+	[ErrorHash] ASC,
+	[ApplicationName] ASC,
+	[CreationDate] DESC,
+	[DeletionDate] ASC
+);
 
-GRANT ALL PRIVILEGES ON exceptions TO "neoanime_belletrix-prod";
-GRANT ALL PRIVILEGES ON exceptions_id_seq TO "neoanime_belletrix-prod";
+CREATE NONCLUSTERED INDEX [IX_Exceptions_ApplicationName_DeletionDate_CreationDate_Filtered] ON [dbo].[Exceptions] 
+(
+	[ApplicationName] ASC,
+	[DeletionDate] ASC,
+	[CreationDate] DESC
+)
+WHERE DeletionDate Is Null;
+
+GO
 
 
-CREATE OR REPLACE FUNCTION delete_student(INT) RETURNS VOID AS $delete_student$
-    DECLARE
-        p_student_id ALIAS FOR $1;
-    BEGIN
-        RAISE NOTICE 'Deleting student ID %', p_student_id;
+CREATE PROCEDURE [dbo].[DeleteStudent]
+    @StudentId [int]
+AS
+BEGIN
+    IF NOT EXISTS (SELECT * FROM [dbo].[Students] WHERE [StudentId] = @StudentId)
+    BEGIN TRY
+        THROW 50001, 'Student ID not found in [Users] table.', 1
+    END TRY
+    BEGIN CATCH
+    END CATCH
 
-        IF NOT EXISTS (SELECT 1 FROM students WHERE id = p_student_id) THEN
-            RAISE EXCEPTION 'Student ID % not found', p_student_id;
-        END IF;
-
-        DELETE FROM event_log WHERE student_id = p_student_id;
-        DELETE FROM matriculation WHERE student_id = p_student_id;
-        DELETE FROM student_desired_languages WHERE student_id = p_student_id;
-        DELETE FROM student_fluent_languages WHERE student_id = p_student_id;
-        DELETE FROM student_notes WHERE student_id = p_student_id;
-        DELETE FROM student_study_abroad_wishlist WHERE student_id = p_student_id;
-        DELETE FROM study_abroad WHERE student_id = p_student_id;
-        DELETE FROM students WHERE id = p_student_id;
-    END;
-$delete_student$ LANGUAGE plpgsql;
+    DELETE FROM [dbo].[EventLog] WHERE [StudentId] = @StudentId;
+    DELETE FROM [dbo].[Matriculation] WHERE [StudentId] = @StudentId;
+    DELETE FROM [dbo].[StudentDesiredLanguages] WHERE [StudentId] = @StudentId;
+    DELETE FROM [dbo].[StudentFluentLanguages] WHERE [StudentId] = @StudentId;
+    DELETE FROM [dbo].[StudentNotes] WHERE [StudentId] = @StudentId;
+    DELETE FROM [dbo].[StudentStudyAbroadWishlist] WHERE [StudentId] = @StudentId;
+    DELETE FROM [dbo].[StudyAbroad] WHERE [StudentId] = @StudentId;
+    DELETE FROM [dbo].[Students] WHERE [Id] = @StudentId;
+END
+GO
