@@ -1,98 +1,84 @@
 ﻿using Belletrix.Core;
-using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 
 namespace Belletrix.Models
 {
     public class StudentPromoLog
     {
-        private const string CacheId = "StudentPromoLog";
-
         public int PromoId { get; set; }
         public int StudentId { get; set; }
         public DateTime Created { get; set; }
 
         public static IEnumerable<StudentPromoLog> Get()
         {
-            ApplicationCache cacheProvider = new ApplicationCache();
-            ICollection<StudentPromoLog> logs = cacheProvider.Get(CacheId, () => new List<StudentPromoLog>());
+            ICollection<StudentPromoLog> logs = new List<StudentPromoLog>();
 
-            if (logs.Count == 0)
+            const string sql = @"
+                SELECT  [PromoId], [StudentId], [Created]
+                FROM    [StudentPromoLog]";
+
+            try
             {
-                const string sql = @"
-                    SELECT  promo_id, student_id, created
-                    FROM    student_promo_log";
-
-                try
+                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                    using (SqlCommand command = connection.CreateCommand())
                     {
-                        connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+                        command.CommandText = sql;
+                        connection.Open();
 
-                        using (NpgsqlCommand command = connection.CreateCommand())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            command.CommandText = sql;
-                            connection.Open();
-
-                            using (NpgsqlDataReader reader = command.ExecuteReader())
+                            while (reader.Read())
                             {
-                                while (reader.Read())
-                                {
-                                    logs.Add(new StudentPromoLog()
-                                        {
-                                            PromoId = reader.GetInt32(reader.GetOrdinal("promo_id")),
-                                            StudentId = reader.GetInt32(reader.GetOrdinal("student_id")),
-                                            Created = reader.GetDateTime(reader.GetOrdinal("created"))
-                                        });
-                                }
-
-                                cacheProvider.Set(CacheId, logs);
+                                logs.Add(new StudentPromoLog()
+                                    {
+                                        PromoId = reader.GetInt32(reader.GetOrdinal("PromoId")),
+                                        StudentId = reader.GetInt32(reader.GetOrdinal("StudentId")),
+                                        Created = reader.GetDateTime(reader.GetOrdinal("Created"))
+                                    });
                             }
                         }
                     }
                 }
-                catch (Exception e)
-                {
-                    e.Data["SQL"] = sql;
-                    throw e;
-                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
 
             return logs;
         }
 
-        public static void Save(NpgsqlConnection connection, int studentId, IEnumerable<int> promoIds)
+        public static void Save(SqlConnection connection, int studentId, IEnumerable<int> promoIds)
         {
             Delete(connection, studentId);
 
             if (promoIds != null && promoIds.Any())
             {
-                ApplicationCache cacheProvider = new ApplicationCache();
-                ICollection<StudentPromoLog> logs = cacheProvider.Get(CacheId, () => new List<StudentPromoLog>());
+                ICollection<StudentPromoLog> logs = new List<StudentPromoLog>();
 
                 const string sql = @"
-                    INSERT INTO student_promo_log
-                    (
-                        promo_id, student_id, created
-                    )
+                    INSERT INTO [dbo].[StudentPromoLog]
+                    ([PromoId], [StudentId], [Created])
                     VALUES
-                    (
-                        @PromoId, @StudentId, @Created
-                    )";
+                    (@PromoId, @StudentId, @Created)";
 
                 try
                 {
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (SqlCommand command = connection.CreateCommand())
                     {
                         DateTime created = DateTime.Now.ToUniversalTime();
 
                         command.CommandText = sql;
 
-                        command.Parameters.Add("@PromoId", NpgsqlTypes.NpgsqlDbType.Integer);
-                        command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
-                        command.Parameters.Add("@Created", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = created;
+                        command.Parameters.Add("@PromoId", SqlDbType.Int);
+                        command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
+                        command.Parameters.Add("@Created", SqlDbType.DateTime).Value = created;
 
                         command.Prepare();
 
@@ -111,8 +97,6 @@ namespace Belletrix.Models
                             logs.Add(log);
                         }
                     }
-
-                    cacheProvider.Set(CacheId, logs);
                 }
                 catch (Exception e)
                 {
@@ -136,33 +120,30 @@ namespace Belletrix.Models
         /// <param name="connection">Opened connection.</param>
         /// <param name="studentId">Student ID.</param>
         /// <param name="promoCode">Promo code.</param>
-        public static void Save(NpgsqlConnection connection, int studentId, string promoCode)
+        public static void Save(SqlConnection connection, int studentId, string promoCode)
         {
-            ApplicationCache cacheProvider = new ApplicationCache();
-            ICollection<StudentPromoLog> logs = cacheProvider.Get(CacheId, () => new List<StudentPromoLog>());
+            ICollection<StudentPromoLog> logs = new List<StudentPromoLog>();
 
             const string sql = @"
-                INSERT INTO student_promo_log
-                (
-                    promo_id, student_id, created
-                )
+                INSERT INTO [dbo].[StudentPromoLog]
+                ([PromoId], [StudentId], [Created])
+                OUTPUT INSERTED.PromoId
                 VALUES
                 (
-                    (SELECT id FROM user_promo WHERE code = @PromoCode), @StudentId, @Created
-                )
-                RETURNING promo_id";
+                    (SELECT [Id] FROM [dbo].[UserPromo] WHERE [Code] = @PromoCode), @StudentId, @Created
+                )";
 
             try
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (SqlCommand command = connection.CreateCommand())
                 {
                     DateTime created = DateTime.Now.ToUniversalTime();
 
                     command.CommandText = sql;
 
-                    command.Parameters.Add("@PromoCode", NpgsqlTypes.NpgsqlDbType.Varchar, 32).Value = promoCode.ToLower();
-                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
-                    command.Parameters.Add("@Created", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = created;
+                    command.Parameters.Add("@PromoCode", SqlDbType.VarChar, 32).Value = promoCode.ToLower();
+                    command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
+                    command.Parameters.Add("@Created", SqlDbType.DateTime).Value = created;
 
                     int promoId = Convert.ToInt32(command.ExecuteScalar());
 
@@ -172,8 +153,6 @@ namespace Belletrix.Models
                             StudentId = studentId,
                             Created = created
                         });
-
-                    cacheProvider.Set(CacheId, logs);
                 }
             }
             catch (Exception e)
@@ -189,18 +168,18 @@ namespace Belletrix.Models
             return logs.Where(x => x.PromoId == id);
         }
 
-        private static void Delete(NpgsqlConnection connection, int studentId)
+        private static void Delete(SqlConnection connection, int studentId)
         {
             const string sql = @"
-                DELETE FROM student_promo_log
-                WHERE   student_id = @StudentId";
+                DELETE FROM [dbo].[StudentPromoLog]
+                WHERE       [StudentId] = @StudentId";
 
             try
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (SqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = sql;
-                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Numeric).Value = studentId;
+                    command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
                     command.ExecuteNonQuery();
                 }
             }
@@ -209,11 +188,6 @@ namespace Belletrix.Models
                 e.Data["SQL"] = sql;
                 throw e;
             }
-
-            ApplicationCache cacheProvider = new ApplicationCache();
-            IEnumerable<StudentPromoLog> logs = cacheProvider.Get(CacheId, () => new List<StudentPromoLog>());
-            logs = logs.Where(x => x.StudentId != studentId);
-            cacheProvider.Set(CacheId, logs);
         }
     }
 }

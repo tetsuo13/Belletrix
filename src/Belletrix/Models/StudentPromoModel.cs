@@ -1,7 +1,7 @@
 ﻿using Belletrix.Core;
-using Npgsql;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data.SqlClient;
 
 namespace Belletrix.Models
 {
@@ -25,12 +25,11 @@ namespace Belletrix.Models
 
         public void Save(int? userId, string promoCode)
         {
-            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+            using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
             {
-                connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
                 connection.Open();
 
-                using (NpgsqlTransaction transaction = connection.BeginTransaction())
+                using (SqlTransaction transaction = connection.BeginTransaction())
                 {
                     base.Save(connection, userId);
 

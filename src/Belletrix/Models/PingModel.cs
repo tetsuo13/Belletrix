@@ -1,6 +1,6 @@
 ﻿using Belletrix.Core;
-using Npgsql;
 using System;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace Belletrix.Models
@@ -9,16 +9,14 @@ namespace Belletrix.Models
     {
         public static async Task<string> Ping()
         {
-            const string sql = "SELECT version() AS version";
+            const string sql = "SELECT @@version";
             string result = String.Empty;
 
             try
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (SqlCommand command = connection.CreateCommand())
                     {
                         command.CommandText = sql;
                         await connection.OpenAsync();

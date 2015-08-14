@@ -1,8 +1,9 @@
 ﻿using Belletrix.Core;
-using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
+using System.Data.SqlClient;
 
 namespace Belletrix.Models
 {
@@ -23,45 +24,44 @@ namespace Belletrix.Models
         public static IEnumerable<NoteModel> GetNotes(int studentId)
         {
             const string sql = @"
-                SELECT      n.id, u.id, u.first_name,
-                            u.last_name, entry_date, note,
-                            u.id AS user_id
-                FROM        student_notes n
-                INNER JOIN  users u ON
-                            created_by = u.id
-                WHERE       n.student_id = @StudentId
-                ORDER BY    entry_date DESC";
+                SELECT      n.Id, u.Id, u.FirstName,
+                            u.LastName, [EntryDate], [Note],
+                            u.Id AS UserId
+                FROM        [dbo].[StudentNotes] n
+                INNER JOIN  [dbo].[Users] u ON
+                            [CreatedBy] = u.[Id]
+                WHERE       n.StudentId = @StudentId
+                ORDER BY    [EntryDate] DESC";
+
             ICollection<NoteModel> notes = new List<NoteModel>();
 
             try
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (SqlCommand command = connection.CreateCommand())
                     {
                         command.CommandText = sql;
-                        command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+                        command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
                         connection.Open();
 
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
                                 NoteModel note = new NoteModel()
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
                                     StudentId = studentId,
-                                    EntryDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("entry_date"))),
-                                    Note = reader.GetString(reader.GetOrdinal("note"))
+                                    EntryDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("EntryDate"))),
+                                    Note = reader.GetString(reader.GetOrdinal("Note"))
                                 };
 
                                 note.CreatedBy = new UserModel()
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("user_id")),
-                                    FirstName = reader.GetString(reader.GetOrdinal("first_name")),
-                                    LastName = reader.GetString(reader.GetOrdinal("last_Name"))
+                                    Id = reader.GetInt32(reader.GetOrdinal("UserId")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName"))
                                 };
 
                                 notes.Add(note);
@@ -82,34 +82,27 @@ namespace Belletrix.Models
         public void Save(int userId)
         {
             const string sql = @"
-                INSERT INTO student_notes
-                (
-                    student_id, created_by, entry_date,
-                    note
-                )
+                INSERT INTO [dbo].[StudentNotes]
+                ([StudentId], [CreatedBy], [EntryDate], [Note])
                 VALUES
-                (
-                    @StudentId, @CreatedBy, @EntryDate,
-                    @Note
-                )";
+                (@StudentId, @CreatedBy, @EntryDate, @Note)";
 
             try
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
                     connection.Open();
 
-                    using (NpgsqlTransaction transaction = connection.BeginTransaction())
+                    using (SqlTransaction transaction = connection.BeginTransaction())
                     {
-                        using (NpgsqlCommand command = connection.CreateCommand())
+                        using (SqlCommand command = connection.CreateCommand())
                         {
                             command.CommandText = sql;
 
-                            command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = StudentId;
-                            command.Parameters.Add("@CreatedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = userId;
-                            command.Parameters.Add("@EntryDate", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
-                            command.Parameters.Add("@Note", NpgsqlTypes.NpgsqlDbType.Text).Value = Note.Trim();
+                            command.Parameters.Add("@StudentId", SqlDbType.Int).Value = StudentId;
+                            command.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = userId;
+                            command.Parameters.Add("@EntryDate", SqlDbType.DateTime).Value = DateTime.Now.ToUniversalTime();
+                            command.Parameters.Add("@Note", SqlDbType.NVarChar).Value = Note.Trim();
 
                             command.ExecuteNonQuery();
                         }

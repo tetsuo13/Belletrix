@@ -1,8 +1,8 @@
 ﻿using Belletrix.Core;
-using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data.SqlClient;
 
 namespace Belletrix.Models
 {
@@ -16,49 +16,40 @@ namespace Belletrix.Models
 
         public static List<LanguageModel> GetLanguages()
         {
-            ApplicationCache cacheProvider = new ApplicationCache();
-            const string cacheId = "Languages";
-            List<LanguageModel> languages = cacheProvider.Get(cacheId, () => new List<LanguageModel>());
+            List<LanguageModel> languages = new List<LanguageModel>();
 
-            if (languages.Count == 0)
+            const string sql = @"
+                SELECT      [Id], [Name]
+                FROM        [dbo].[Languages]
+                ORDER BY    [Name]";
+
+            try
             {
-                const string sql = @"
-                    SELECT      id, name
-                    FROM        languages
-                    ORDER BY    name";
-
-                try
+                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                    using (SqlCommand command = connection.CreateCommand())
                     {
-                        connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+                        command.CommandText = sql;
+                        connection.Open();
 
-                        using (NpgsqlCommand command = connection.CreateCommand())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            command.CommandText = sql;
-                            connection.Open();
-
-                            using (NpgsqlDataReader reader = command.ExecuteReader())
+                            while (reader.Read())
                             {
-                                while (reader.Read())
+                                languages.Add(new LanguageModel()
                                 {
-                                    languages.Add(new LanguageModel()
-                                    {
-                                        Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                        Name = reader.GetString(reader.GetOrdinal("name"))
-                                    });
-                                }
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name"))
+                                });
                             }
                         }
                     }
                 }
-                catch (Exception e)
-                {
-                    e.Data["SQL"] = sql;
-                    throw e;
-                }
-
-                cacheProvider.Set(cacheId, languages);
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
 
             return languages;

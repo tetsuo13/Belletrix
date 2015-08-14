@@ -1,8 +1,9 @@
 ﻿using Belletrix.Core;
-using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 
@@ -26,20 +27,19 @@ namespace Belletrix.Models
 
         public void SaveChanges(UserModel user)
         {
-            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+            using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
             {
-                connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
                 connection.Open();
 
-                using (NpgsqlTransaction transaction = connection.BeginTransaction())
+                using (SqlTransaction transaction = connection.BeginTransaction())
                 {
-                    StringBuilder sql = new StringBuilder("UPDATE students SET ");
+                    StringBuilder sql = new StringBuilder("UPDATE [dbo].[Students] SET ");
 
                     PrepareColumns(ref sql);
 
                     if (PhiBetaDeltaMember.HasValue)
                     {
-                        AddParameter(sql, "phi_beta_delta_member", NpgsqlTypes.NpgsqlDbType.Boolean, PhiBetaDeltaMember, 0);
+                        AddParameter(sql, "PhiBetaDeltaMember", SqlDbType.Bit, PhiBetaDeltaMember, 0);
                     }
 
                     foreach (KeyValuePair<string, string> pair in columns)
@@ -50,12 +50,12 @@ namespace Belletrix.Models
                     // Remove the trailing comma and space.
                     sql.Length -= 2;
 
-                    sql.Append(" WHERE id = @Id");
-                    parameters.Add(new NpgsqlParameter("@Id", NpgsqlTypes.NpgsqlDbType.Integer) { Value = Id });
+                    sql.Append(" WHERE [Id] = @Id");
+                    parameters.Add(new SqlParameter("@Id", SqlDbType.Int) { Value = Id });
 
                     try
                     {
-                        using (NpgsqlCommand command = connection.CreateCommand())
+                        using (SqlCommand command = connection.CreateCommand())
                         {
                             command.CommandText = sql.ToString();
                             command.Parameters.AddRange(parameters.ToArray());
@@ -75,9 +75,9 @@ namespace Belletrix.Models
                     SaveStudentMajors(connection, Id, SelectedMinors, false);
                     SaveStudyAbroadDestinations(connection, Id, StudyAbroadCountry, StudyAbroadYear, StudyAbroadPeriod);
 
-                    SaveStudentLanguages(connection, Id, "student_fluent_languages", SelectedLanguages);
-                    SaveStudentLanguages(connection, Id, "student_desired_languages", SelectedDesiredLanguages);
-                    SaveStudentLanguages(connection, Id, "student_studied_languages", StudiedLanguages);
+                    SaveStudentLanguages(connection, Id, "StudentFluentLanguages", SelectedLanguages);
+                    SaveStudentLanguages(connection, Id, "StudentDesiredLanguages", SelectedDesiredLanguages);
+                    SaveStudentLanguages(connection, Id, "StudentStudiedLanguages", StudiedLanguages);
 
                     StudentPromoLog.Save(connection, Id, PromoIds);
 
@@ -100,125 +100,116 @@ namespace Belletrix.Models
 
         public static IEnumerable<StudentModel> GetStudents(int? id = null)
         {
-            ApplicationCache cacheProvider = new ApplicationCache();
-            IDictionary<int, StudentModel> students = cacheProvider.Get(CacheId, () => new Dictionary<int, StudentModel>());
+            IDictionary<int, StudentModel> students = new Dictionary<int, StudentModel>();
 
-            // Select all students by default so they're cached.
-            if (students.Count == 0)
+            const string sql = @"
+                SELECT              s.Id, s.Created, s.InitialMeeting,
+                                    s.FirstName, s.MiddleName, s.LastName,
+                                    s.LivingOnCampus, s.PhoneNumber, s.StudentId,
+                                    s.Dob, s.EnrolledFullTime, s.Citizenship,
+                                    s.PellGrantRecipient, s.PassportHolder, s.Gpa,
+                                    s.CampusEmail, s.AlternateEmail, s.GraduatingYear,
+                                    s.Classification, s.StreetAddress, s.StreetAddress2,
+                                    s.City, s.State, s.PostalCode,
+                                    s.EnteringYear,
+                                    COUNT(n.Id) AS NumNotes
+                FROM                [dbo].[Students] s
+                LEFT OUTER JOIN     [dbo].[StudentNotes] n ON
+                                    s.Id = n.StudentId
+                GROUP BY            s.Id, s.Created, s.InitialMeeting,
+                                    s.FirstName, s.MiddleName, s.LastName,
+                                    s.LivingOnCampus, s.PhoneNumber, s.StudentId,
+                                    s.Dob, s.EnrolledFullTime, s.Citizenship,
+                                    s.PellGrantRecipient, s.PassportHolder, s.Gpa,
+                                    s.CampusEmail, s.AlternateEmail, s.GraduatingYear,
+                                    s.Classification, s.StreetAddress, s.StreetAddress2,
+                                    s.City, s.State, s.PostalCode,
+                                    s.EnteringYear
+                ORDER BY            s.LastName, s.FirstName";
+
+            IList<StudentModel> studentList = new List<StudentModel>();
+
+            try
             {
-                const string sql = @"
-                    SELECT              s.id, s.created, s.initial_meeting,
-                                        s.first_name, s.middle_name, s.last_name,
-                                        s.living_on_campus, s.phone_number, s.student_id,
-                                        s.dob, s.enrolled_full_time, s.citizenship,
-                                        s.pell_grant_recipient, s.passport_holder, s.gpa,
-                                        s.campus_email, s.alternate_email, s.graduating_year,
-                                        s.classification, s.street_address, s.street_address2,
-                                        s.city, s.state, s.postal_code,
-                                        s.entering_year,
-                                        COUNT(n.id) AS num_notes
-                    FROM                students s
-                    LEFT OUTER JOIN     student_notes n ON
-                                        s.id = n.student_id
-                    GROUP BY            s.id, s.created, s.initial_meeting,
-                                        s.first_name, s.middle_name, s.last_name,
-                                        s.living_on_campus, s.phone_number, s.student_id,
-                                        s.dob, s.enrolled_full_time, s.citizenship,
-                                        s.pell_grant_recipient, s.passport_holder, s.gpa,
-                                        s.campus_email, s.alternate_email, s.graduating_year,
-                                        s.classification, s.street_address, s.street_address2,
-                                        s.city, s.state, s.postal_code,
-                                        s.entering_year
-                    ORDER BY            s.last_name, s.first_name";
-
-                IList<StudentModel> studentList = new List<StudentModel>();
-
-                try
+                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                    using (SqlCommand command = connection.CreateCommand())
                     {
-                        connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+                        command.CommandText = sql;
+                        connection.Open();
 
-                        using (NpgsqlCommand command = connection.CreateCommand())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            command.CommandText = sql;
-                            connection.Open();
-
-                            using (NpgsqlDataReader reader = command.ExecuteReader())
+                            while (reader.Read())
                             {
-                                while (reader.Read())
+                                StudentModel student = new StudentModel()
                                 {
-                                    StudentModel student = new StudentModel()
-                                    {
-                                        Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                        FirstName = reader.GetString(reader.GetOrdinal("first_name")),
-                                        LastName = reader.GetString(reader.GetOrdinal("last_name"))
-                                    };
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                                };
 
-                                    student.MiddleName = StringOrDefault(reader, "middle_name");
-                                    student.LivingOnCampus = BoolOrDefault(reader, "living_on_campus");
-                                    student.StreetAddress = StringOrDefault(reader, "street_address");
-                                    student.StreetAddress2 = StringOrDefault(reader, "street_address2");
-                                    student.City = StringOrDefault(reader, "city");
-                                    student.State = StringOrDefault(reader, "state");
-                                    student.PostalCode = StringOrDefault(reader, "postal_code");
-                                    student.PhoneNumber = StringOrDefault(reader, "phone_number");
-                                    student.EnteringYear = IntOrDefault(reader, "entering_year");
-                                    student.GraduatingYear = IntOrDefault(reader, "graduating_year");
-                                    student.StudentId = StringOrDefault(reader, "student_id");
-                                    student.EnrolledFullTime = BoolOrDefault(reader, "enrolled_full_time");
-                                    student.Citizenship = IntOrDefault(reader, "citizenship");
-                                    student.PellGrantRecipient = BoolOrDefault(reader, "pell_grant_recipient");
-                                    student.HasPassport = BoolOrDefault(reader, "passport_holder");
-                                    student.CampusEmail = StringOrDefault(reader, "campus_email");
-                                    student.AlternateEmail = StringOrDefault(reader, "alternate_email");
-                                    student.Created = reader.GetDateTime(reader.GetOrdinal("created"));
-                                    student.NumberOfNotes = (int)reader.GetInt64(reader.GetOrdinal("num_notes"));
+                                student.MiddleName = StringOrDefault(reader, "MiddleName");
+                                student.LivingOnCampus = BoolOrDefault(reader, "LivingOnCampus");
+                                student.StreetAddress = StringOrDefault(reader, "StreetAddress");
+                                student.StreetAddress2 = StringOrDefault(reader, "StreetAddress2");
+                                student.City = StringOrDefault(reader, "City");
+                                student.State = StringOrDefault(reader, "State");
+                                student.PostalCode = StringOrDefault(reader, "PostalCode");
+                                student.PhoneNumber = StringOrDefault(reader, "PhoneNumber");
+                                student.EnteringYear = IntOrDefault(reader, "EnteringYear");
+                                student.GraduatingYear = IntOrDefault(reader, "GraduatingYear");
+                                student.StudentId = StringOrDefault(reader, "StudentId");
+                                student.EnrolledFullTime = BoolOrDefault(reader, "EnrolledFullTime");
+                                student.Citizenship = IntOrDefault(reader, "Citizenship");
+                                student.PellGrantRecipient = BoolOrDefault(reader, "PellGrantEecipient");
+                                student.HasPassport = BoolOrDefault(reader, "PassportHolder");
+                                student.CampusEmail = StringOrDefault(reader, "CampusEmail");
+                                student.AlternateEmail = StringOrDefault(reader, "AlternateEmail");
+                                student.Created = reader.GetDateTime(reader.GetOrdinal("Created"));
+                                student.NumberOfNotes = (int)reader.GetInt64(reader.GetOrdinal("NumNotes"));
 
-                                    int ord = reader.GetOrdinal("gpa");
-                                    if (!reader.IsDBNull(ord))
-                                    {
-                                        student.Gpa = Convert.ToDouble(reader["gpa"]);
-                                    }
-
-                                    ord = reader.GetOrdinal("dob");
-                                    if (!reader.IsDBNull(ord))
-                                    {
-                                        student.DateOfBirth = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
-                                    }
-
-                                    ord = reader.GetOrdinal("initial_meeting");
-                                    if (!reader.IsDBNull(ord))
-                                    {
-                                        student.InitialMeeting = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
-                                    }
-
-                                    student.PromoIds = StudentPromoLog.GetPromoIdsForStudent(student.Id);
-
-                                    studentList.Add(student);
+                                int ord = reader.GetOrdinal("Gpa");
+                                if (!reader.IsDBNull(ord))
+                                {
+                                    student.Gpa = Convert.ToDouble(reader["Gpa"]);
                                 }
+
+                                ord = reader.GetOrdinal("Dob");
+                                if (!reader.IsDBNull(ord))
+                                {
+                                    student.DateOfBirth = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
+                                }
+
+                                ord = reader.GetOrdinal("InitialMeeting");
+                                if (!reader.IsDBNull(ord))
+                                {
+                                    student.InitialMeeting = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
+                                }
+
+                                student.PromoIds = StudentPromoLog.GetPromoIdsForStudent(student.Id);
+
+                                studentList.Add(student);
                             }
                         }
-
-                        PopulateStudentMajorsMinors(connection, ref studentList);
-                        PopulateStudentLanguages(connection, ref studentList);
-                        PopulateDesiredStudentLanguages(connection, ref studentList);
-                        PopulateStudiedLanguages(connection, ref studentList);
-                        PopulateStudyAbroadDestinations(connection, ref studentList);
                     }
-                }
-                catch (Exception e)
-                {
-                    e.Data["SQL"] = sql;
-                    throw e;
-                }
 
-                foreach (StudentModel student in studentList)
-                {
-                    students.Add(student.Id, student);
+                    PopulateStudentMajorsMinors(connection, ref studentList);
+                    PopulateStudentLanguages(connection, ref studentList);
+                    PopulateDesiredStudentLanguages(connection, ref studentList);
+                    PopulateStudiedLanguages(connection, ref studentList);
+                    PopulateStudyAbroadDestinations(connection, ref studentList);
                 }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
+            }
 
-                cacheProvider.Set(CacheId, students);
+            foreach (StudentModel student in studentList)
+            {
+                students.Add(student.Id, student);
             }
 
             if (id.HasValue)
@@ -246,19 +237,19 @@ namespace Belletrix.Models
             return students.Where(x => x.PromoIds != null && x.PromoIds.Any(y => y == promoId));
         }
 
-        private static void PopulateStudentLanguages(NpgsqlConnection connection, ref IList<StudentModel> students)
+        private static void PopulateStudentLanguages(SqlConnection connection, ref IList<StudentModel> students)
         {
             const string sql = @"
-                SELECT  language_id
-                FROM    student_fluent_languages
-                WHERE   student_id = @StudentId";
+                SELECT  [LanguageId]
+                FROM    [dbo].[StudentFluentLanguages]
+                WHERE   [StudentId] = @StudentId";
 
             try
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (SqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = sql;
-                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer);
+                    command.Parameters.Add("@StudentId", SqlDbType.Int);
                     command.Prepare();
 
                     for (int i = 0; i < students.Count; i++)
@@ -266,11 +257,11 @@ namespace Belletrix.Models
                         ICollection<int> languages = new List<int>();
                         command.Parameters[0].Value = students[i].Id;
 
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                languages.Add(reader.GetInt32(reader.GetOrdinal("language_id")));
+                                languages.Add(reader.GetInt32(reader.GetOrdinal("LanguageId")));
                             }
                         }
 
@@ -285,19 +276,19 @@ namespace Belletrix.Models
             }
         }
 
-        private static void PopulateDesiredStudentLanguages(NpgsqlConnection connection, ref IList<StudentModel> students)
+        private static void PopulateDesiredStudentLanguages(SqlConnection connection, ref IList<StudentModel> students)
         {
             const string sql = @"
-                SELECT  language_id
-                FROM    student_desired_languages
-                WHERE   student_id = @StudentId";
+                SELECT  [LanguageId]
+                FROM    [StudentDesiredLanguages]
+                WHERE   [StudentId] = @StudentId";
 
             try
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (SqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = sql;
-                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer);
+                    command.Parameters.Add("@StudentId", SqlDbType.Int);
                     command.Prepare();
 
                     for (int i = 0; i < students.Count; i++)
@@ -305,11 +296,11 @@ namespace Belletrix.Models
                         ICollection<int> languages = new List<int>();
                         command.Parameters[0].Value = students[i].Id;
 
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                languages.Add(reader.GetInt32(reader.GetOrdinal("language_id")));
+                                languages.Add(reader.GetInt32(reader.GetOrdinal("LanguageId")));
                             }
                         }
 
@@ -324,19 +315,19 @@ namespace Belletrix.Models
             }
         }
 
-        private static void PopulateStudiedLanguages(NpgsqlConnection connection, ref IList<StudentModel> students)
+        private static void PopulateStudiedLanguages(SqlConnection connection, ref IList<StudentModel> students)
         {
             const string sql = @"
-                SELECT  language_id
-                FROM    student_studied_languages
-                WHERE   student_id = @StudentId";
+                SELECT  [LanguageId]
+                FROM    [StudentStudiedLanguages]
+                WHERE   [StudentId] = @StudentId";
 
             try
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (SqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = sql;
-                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer);
+                    command.Parameters.Add("@StudentId", SqlDbType.Int);
                     command.Prepare();
 
                     for (int i = 0; i < students.Count; i++)
@@ -344,11 +335,11 @@ namespace Belletrix.Models
                         ICollection<int> languages = new List<int>();
                         command.Parameters[0].Value = students[i].Id;
 
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                languages.Add(reader.GetInt32(reader.GetOrdinal("language_id")));
+                                languages.Add(reader.GetInt32(reader.GetOrdinal("LanguageId")));
                             }
                         }
 
@@ -363,19 +354,19 @@ namespace Belletrix.Models
             }
         }
 
-        private static void PopulateStudentMajorsMinors(NpgsqlConnection connection, ref IList<StudentModel> students)
+        private static void PopulateStudentMajorsMinors(SqlConnection connection, ref IList<StudentModel> students)
         {
             const string sql = @"
-                SELECT  major_id, is_major
-                FROM    matriculation
-                WHERE   student_id = @StudentId";
+                SELECT  [MajorId], [IsMajor]
+                FROM    [dbo].[Matriculation]
+                WHERE   [StudentId] = @StudentId";
 
             try
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (SqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = sql;
-                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer);
+                    command.Parameters.Add("@StudentId", SqlDbType.Int);
                     command.Prepare();
 
                     for (int i = 0; i < students.Count; i++)
@@ -384,13 +375,13 @@ namespace Belletrix.Models
                         ICollection<int> minors = new List<int>();
                         command.Parameters[0].Value = students[i].Id;
 
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                int majorId = reader.GetInt32(reader.GetOrdinal("major_id"));
+                                int majorId = reader.GetInt32(reader.GetOrdinal("MajorId"));
 
-                                if (reader.GetBoolean(reader.GetOrdinal("is_major")))
+                                if (reader.GetBoolean(reader.GetOrdinal("IsMajor")))
                                 {
                                     majors.Add(majorId);
                                 }
@@ -415,12 +406,11 @@ namespace Belletrix.Models
 
         public void Save(UserModel user)
         {
-            using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+            using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
             {
-                connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
                 connection.Open();
 
-                using (NpgsqlTransaction transaction = connection.BeginTransaction())
+                using (SqlTransaction transaction = connection.BeginTransaction())
                 {
                     base.Save(connection, user.Id);
 
@@ -438,19 +428,19 @@ namespace Belletrix.Models
             }
         }
 
-        private static void PopulateStudyAbroadDestinations(NpgsqlConnection connection, ref IList<StudentModel> students)
+        private static void PopulateStudyAbroadDestinations(SqlConnection connection, ref IList<StudentModel> students)
         {
             const string sql = @"
-                SELECT  country_id, year, period
-                FROM    student_study_abroad_wishlist
-                WHERE   student_id = @StudentId";
+                SELECT  [CountryId], [Year], [Period]
+                FROM    [StudentStudyAbroadWishlist]
+                WHERE   [StudentId] = @StudentId";
 
             try
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (SqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = sql;
-                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer);
+                    command.Parameters.Add("@StudentId", SqlDbType.Int);
                     command.Prepare();
 
                     for (int i = 0; i < students.Count; i++)
@@ -461,13 +451,13 @@ namespace Belletrix.Models
 
                         command.Parameters[0].Value = students[i].Id;
 
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                countries.Add(reader.GetInt32(reader.GetOrdinal("country_id")));
-                                years.Add(reader.GetInt32(reader.GetOrdinal("year")));
-                                periods.Add(reader.GetInt32(reader.GetOrdinal("period")));
+                                countries.Add(reader.GetInt32(reader.GetOrdinal("CountryId")));
+                                years.Add(reader.GetInt32(reader.GetOrdinal("Year")));
+                                periods.Add(reader.GetInt32(reader.GetOrdinal("Period")));
                             }
                         }
 

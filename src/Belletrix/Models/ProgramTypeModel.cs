@@ -1,7 +1,7 @@
 ﻿using Belletrix.Core;
-using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 
 namespace Belletrix.Models
 {
@@ -13,32 +13,30 @@ namespace Belletrix.Models
 
         public static IEnumerable<ProgramTypeModel> GetProgramTypes()
         {
-            const string sql = @"
-                SELECT      id, name, short_term
-                FROM        program_types
-                ORDER BY    name";
             ICollection<ProgramTypeModel> programTypes = new List<ProgramTypeModel>();
+            const string sql = @"
+                SELECT      [Id], [Name], [ShortTerm]
+                FROM        [ProgramTypes]
+                ORDER BY    [Name]";
 
             try
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (SqlCommand command = connection.CreateCommand())
                     {
                         command.CommandText = sql;
                         connection.Open();
 
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
                                 programTypes.Add(new ProgramTypeModel()
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                    Name = reader.GetString(reader.GetOrdinal("name")),
-                                    ShortTerm = reader.GetBoolean(reader.GetOrdinal("short_term"))
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                    ShortTerm = reader.GetBoolean(reader.GetOrdinal("ShortTerm"))
                                 });
                             }
                         }

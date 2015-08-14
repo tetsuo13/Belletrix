@@ -1,8 +1,9 @@
 ﻿using Belletrix.Core;
-using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 
@@ -10,8 +11,6 @@ namespace Belletrix.Models
 {
     public class StudyAbroadModel
     {
-        private const string CacheId = "StudyAbroad";
-
         [Key]
         public int Id { get; set; }
 
@@ -63,126 +62,114 @@ namespace Belletrix.Models
         public IEnumerable<int> ProgramTypes { get; set; }
 
         private Dictionary<string, string> columns;
-        private List<NpgsqlParameter> parameters;
+        private List<SqlParameter> parameters;
 
         public static IEnumerable<StudyAbroadModel> GetAll(int? studentId = null)
         {
-            ApplicationCache cacheProvider = new ApplicationCache();
-            List<StudyAbroadModel> studyAbroad = cacheProvider.Get(CacheId, () => new List<StudyAbroadModel>());
+            List<StudyAbroadModel> studyAbroad = new List<StudyAbroadModel>();
 
-            if (studyAbroad.Count == 0)
+            StringBuilder sql = new StringBuilder(@"
+                SELECT  [Id], [StudentId], [Semester],
+                        [Year], [StartDate], [EndDate],
+                        [CreditBearing], [Internship], [CountryId],
+                        [City], [ProgramId]
+                FROM    [StudyAbroad] ");
+
+            if (studentId.HasValue)
             {
-                StringBuilder sql = new StringBuilder(@"
-                    SELECT      id, student_id, semester,
-                                year, start_date, end_date,
-                                credit_bearing, internship, country_id,
-                                city, program_id
-                    FROM        study_abroad ");
+                sql.Append("WHERE [StudentId] = @StudentId ");
+            }
 
-                if (studentId.HasValue)
+            sql.Append("ORDER BY [Year] DESC, [Semester] DESC");
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    sql.Append("WHERE student_id = @StudentId ");
-                }
-
-                sql.Append("ORDER BY year DESC, semester DESC");
-
-                try
-                {
-                    using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                    using (SqlCommand command = connection.CreateCommand())
                     {
-                        connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+                        command.CommandText = sql.ToString();
 
-                        using (NpgsqlCommand command = connection.CreateCommand())
+                        if (studentId.HasValue)
                         {
-                            command.CommandText = sql.ToString();
+                            command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId.Value;
+                        }
 
-                            if (studentId.HasValue)
+                        connection.Open();
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
                             {
-                                command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId.Value;
-                            }
-
-                            connection.Open();
-
-                            using (NpgsqlDataReader reader = command.ExecuteReader())
-                            {
-                                while (reader.Read())
+                                StudyAbroadModel study = new StudyAbroadModel()
                                 {
-                                    StudyAbroadModel study = new StudyAbroadModel()
-                                    {
-                                        Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                        StudentId = reader.GetInt32(reader.GetOrdinal("student_id")),
-                                        Semester = reader.GetInt32(reader.GetOrdinal("semester")),
-                                        Year = reader.GetInt32(reader.GetOrdinal("year")),
-                                        CreditBearing = reader.GetBoolean(reader.GetOrdinal("credit_bearing")),
-                                        Internship = reader.GetBoolean(reader.GetOrdinal("internship")),
-                                        CountryId = reader.GetInt32(reader.GetOrdinal("country_id")),
-                                        ProgramId = reader.GetInt32(reader.GetOrdinal("program_id"))
-                                    };
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    StudentId = reader.GetInt32(reader.GetOrdinal("StudentId")),
+                                    Semester = reader.GetInt32(reader.GetOrdinal("Semester")),
+                                    Year = reader.GetInt32(reader.GetOrdinal("Year")),
+                                    CreditBearing = reader.GetBoolean(reader.GetOrdinal("CreditBearing")),
+                                    Internship = reader.GetBoolean(reader.GetOrdinal("Internship")),
+                                    CountryId = reader.GetInt32(reader.GetOrdinal("CountryId")),
+                                    ProgramId = reader.GetInt32(reader.GetOrdinal("ProgramId"))
+                                };
 
-                                    int ord = reader.GetOrdinal("start_date");
-                                    if (!reader.IsDBNull(ord))
-                                    {
-                                        study.StartDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
-                                    }
-
-                                    ord = reader.GetOrdinal("end_date");
-                                    if (!reader.IsDBNull(ord))
-                                    {
-                                        study.EndDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
-                                    }
-
-                                    ord = reader.GetOrdinal("city");
-                                    if (!reader.IsDBNull(ord))
-                                    {
-                                        study.City = reader.GetString(ord);
-                                    }
-
-                                    try
-                                    {
-                                        study.Student = StudentModel.GetStudent(study.StudentId);
-                                    }
-                                    catch (Exception)
-                                    {
-                                        throw;
-                                    }
-
-                                    studyAbroad.Add(study);
+                                int ord = reader.GetOrdinal("StartDate");
+                                if (!reader.IsDBNull(ord))
+                                {
+                                    study.StartDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
                                 }
 
-                                PopulateProgramTypes(connection, ref studyAbroad);
+                                ord = reader.GetOrdinal("EndDate");
+                                if (!reader.IsDBNull(ord))
+                                {
+                                    study.EndDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(ord));
+                                }
 
-                                cacheProvider.Set(CacheId, studyAbroad);
+                                ord = reader.GetOrdinal("City");
+                                if (!reader.IsDBNull(ord))
+                                {
+                                    study.City = reader.GetString(ord);
+                                }
+
+                                try
+                                {
+                                    study.Student = StudentModel.GetStudent(study.StudentId);
+                                }
+                                catch (Exception)
+                                {
+                                    throw;
+                                }
+
+                                studyAbroad.Add(study);
                             }
+
+                            PopulateProgramTypes(connection, ref studyAbroad);
                         }
                     }
                 }
-                catch (Exception e)
-                {
-                    e.Data["SQL"] = sql.ToString();
-                    throw e;
-                }
             }
-            else if (studentId.HasValue)
+            catch (Exception e)
             {
-                studyAbroad = studyAbroad.Where(s => s.StudentId == studentId.Value).ToList();
+                e.Data["SQL"] = sql.ToString();
+                throw e;
             }
 
             return studyAbroad;
         }
 
-        private static void PopulateProgramTypes(NpgsqlConnection connection, ref List<StudyAbroadModel> studyAbroad)
+        private static void PopulateProgramTypes(SqlConnection connection, ref List<StudyAbroadModel> studyAbroad)
         {
             const string sql = @"
-                SELECT  program_type_id
-                FROM    study_abroad_program_types
-                WHERE   study_abroad_id = @StudyAbroadId";
+                SELECT  [ProgramTypeId]
+                FROM    [dbo].[StudyAbroadProgramTypes]
+                WHERE   [StudyAbroadId] = @StudyAbroadId";
 
             try
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (SqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = sql;
-                    command.Parameters.Add("@StudyAbroadId", NpgsqlTypes.NpgsqlDbType.Integer);
+                    command.Parameters.Add("@StudyAbroadId", SqlDbType.Int);
                     command.Prepare();
 
                     for (int i = 0; i < studyAbroad.Count; i++)
@@ -190,11 +177,11 @@ namespace Belletrix.Models
                         ICollection<int> programs = new List<int>();
                         command.Parameters[0].Value = studyAbroad[i].Id;
 
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                programs.Add(reader.GetInt32(reader.GetOrdinal("program_type_id")));
+                                programs.Add(reader.GetInt32(reader.GetOrdinal("ProgramTypeId")));
                             }
                         }
 
@@ -209,19 +196,19 @@ namespace Belletrix.Models
             }
         }
 
-        private void AddParameter(StringBuilder sql, string columnName, NpgsqlTypes.NpgsqlDbType columnType,
-            object columnValue, int columnLength)
+        private void AddParameter(StringBuilder sql, string columnName, SqlDbType columnType, object columnValue,
+            int columnLength)
         {
             string parameterName = String.Format("@{0}", columnName);
             columns.Add(columnName, parameterName);
 
             if (columnLength > 0)
             {
-                parameters.Add(new NpgsqlParameter(parameterName, columnType, columnLength) { Value = columnValue });
+                parameters.Add(new SqlParameter(parameterName, columnType, columnLength) { Value = columnValue });
             }
             else
             {
-                parameters.Add(new NpgsqlParameter(parameterName, columnType) { Value = columnValue });
+                parameters.Add(new SqlParameter(parameterName, columnType) { Value = columnValue });
             }
         }
 
@@ -229,49 +216,47 @@ namespace Belletrix.Models
         {
             StringBuilder sql = new StringBuilder(@"INSERT INTO study_abroad (");
             columns = new Dictionary<string, string>();
-            parameters = new List<NpgsqlParameter>();
+            parameters = new List<SqlParameter>();
 
-            AddParameter(sql, "student_id", NpgsqlTypes.NpgsqlDbType.Integer, StudentId, 0);
-            AddParameter(sql, "year", NpgsqlTypes.NpgsqlDbType.Integer, Year, 0);
-            AddParameter(sql, "semester", NpgsqlTypes.NpgsqlDbType.Integer, Semester, 0);
-            AddParameter(sql, "credit_bearing", NpgsqlTypes.NpgsqlDbType.Boolean, CreditBearing, 0);
-            AddParameter(sql, "internship", NpgsqlTypes.NpgsqlDbType.Boolean, Internship, 0);
-            AddParameter(sql, "country_id", NpgsqlTypes.NpgsqlDbType.Integer, CountryId, 0);
-            AddParameter(sql, "program_id", NpgsqlTypes.NpgsqlDbType.Integer, ProgramId, 0);
+            AddParameter(sql, "StudentId", SqlDbType.Int, StudentId, 0);
+            AddParameter(sql, "Year", SqlDbType.Int, Year, 0);
+            AddParameter(sql, "Semester", SqlDbType.Int, Semester, 0);
+            AddParameter(sql, "CreditBearing", SqlDbType.Bit, CreditBearing, 0);
+            AddParameter(sql, "Internship", SqlDbType.Bit, Internship, 0);
+            AddParameter(sql, "CountryId", SqlDbType.Int, CountryId, 0);
+            AddParameter(sql, "ProgramId", SqlDbType.Int, ProgramId, 0);
 
             if (StartDate.HasValue)
             {
-                AddParameter(sql, "start_date", NpgsqlTypes.NpgsqlDbType.Date, StartDate.Value.ToUniversalTime(), 0);
+                AddParameter(sql, "StartDate", SqlDbType.Date, StartDate.Value.ToUniversalTime(), 0);
             }
 
             if (EndDate.HasValue)
             {
-                AddParameter(sql, "end_date", NpgsqlTypes.NpgsqlDbType.Date, EndDate.Value.ToUniversalTime(), 0);
+                AddParameter(sql, "EndDate", SqlDbType.Date, EndDate.Value.ToUniversalTime(), 0);
             }
 
             if (!String.IsNullOrEmpty(City))
             {
-                AddParameter(sql, "city", NpgsqlTypes.NpgsqlDbType.Varchar, City, 64);
+                AddParameter(sql, "City", SqlDbType.NVarChar, City, 64);
             }
 
             sql.Append(String.Join(", ", columns.Select(x => x.Key)));
-            sql.Append(") VALUES (");
+            sql.Append(") OUTPUT INSERTED.Id VALUES (");
             sql.Append(String.Join(", ", columns.Select(x => x.Value)));
-            sql.Append(") ");
-            sql.Append("RETURNING id");
+            sql.Append(")");
 
             try
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
                     connection.Open();
 
-                    using (NpgsqlTransaction transaction = connection.BeginTransaction())
+                    using (SqlTransaction transaction = connection.BeginTransaction())
                     {
                         int studyAbroadId;
 
-                        using (NpgsqlCommand command = connection.CreateCommand())
+                        using (SqlCommand command = connection.CreateCommand())
                         {
                             command.CommandText = sql.ToString();
                             command.Parameters.AddRange(parameters.ToArray());
@@ -288,12 +273,12 @@ namespace Belletrix.Models
                             }
 
                             StringBuilder insertSql = new StringBuilder();
-                            insertSql.Append("INSERT INTO study_abroad_program_types (study_abroad_id, program_type_id) VALUES ");
+                            insertSql.Append("INSERT INTO [dbo].[StudyAbroadProgramTypes] ([StudyAbroadId], [ProgramTypeId]) VALUES ");
                             insertSql.Append(String.Join(",", values));
 
                             try
                             {
-                                using (NpgsqlCommand command = connection.CreateCommand())
+                                using (SqlCommand command = connection.CreateCommand())
                                 {
                                     command.CommandText = insertSql.ToString();
                                     command.ExecuteNonQuery();
@@ -310,11 +295,6 @@ namespace Belletrix.Models
                         eventLog.AddStudentEvent(connection, userId, StudentId, EventLogModel.EventType.AddStudentExperience);
 
                         transaction.Commit();
-
-                        ApplicationCache cacheProvider = new ApplicationCache();
-                        List<StudyAbroadModel> studyAbroad = cacheProvider.Get(CacheId, () => new List<StudyAbroadModel>());
-                        studyAbroad.Add(this);
-                        cacheProvider.Set(CacheId, studyAbroad);
                     }
                 }
             }

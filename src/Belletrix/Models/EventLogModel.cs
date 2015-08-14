@@ -1,11 +1,9 @@
 ﻿using Belletrix.Core;
-using Npgsql;
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
-using System.Threading.Tasks;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace Belletrix.Models
 {
@@ -70,16 +68,14 @@ namespace Belletrix.Models
 
             try
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (SqlCommand command = connection.CreateCommand())
                     {
                         command.CommandText = sql;
                         await connection.OpenAsync();
 
-                        using (DbDataReader reader = await command.ExecuteReaderAsync())
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync())
                         {
                             while (await reader.ReadAsync())
                             {
@@ -210,12 +206,12 @@ namespace Belletrix.Models
             return years <= 1 ? "one year ago" : years + " years ago";
         }
 
-        public void AddStudentEvent(NpgsqlConnection connection, int studentId, EventType eventType)
+        public void AddStudentEvent(SqlConnection connection, int studentId, EventType eventType)
         {
             AddStudentEvent(connection, 0, studentId, eventType);
         }
 
-        public void AddStudentEvent(NpgsqlConnection connection, int modifiedBy, int studentId, EventType eventType)
+        public void AddStudentEvent(SqlConnection connection, int modifiedBy, int studentId, EventType eventType)
         {
             const string sql = @"
                 INSERT INTO event_log
@@ -227,25 +223,23 @@ namespace Belletrix.Models
                     @Date, @ModifiedBy, @StudentId, @Type
                 )";
 
-            connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
             try
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (SqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = sql;
 
-                    command.Parameters.Add("@Date", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
-                    command.Parameters.Add("@Type", NpgsqlTypes.NpgsqlDbType.Integer).Value = (int)eventType;
-                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+                    command.Parameters.Add("@Date", SqlDbType.DateTime).Value = DateTime.Now.ToUniversalTime();
+                    command.Parameters.Add("@Type", SqlDbType.Int).Value = (int)eventType;
+                    command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
 
                     if (modifiedBy == 0)
                     {
-                        command.Parameters.Add("@ModifiedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = DBNull.Value;
+                        command.Parameters.Add("@ModifiedBy", SqlDbType.Int).Value = DBNull.Value;
                     }
                     else
                     {
-                        command.Parameters.Add("@ModifiedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = modifiedBy;
+                        command.Parameters.Add("@ModifiedBy", SqlDbType.Int).Value = modifiedBy;
                     }
 
                     command.ExecuteNonQuery();

@@ -1,8 +1,9 @@
 ﻿using Belletrix.Core;
-using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 
@@ -141,9 +142,9 @@ namespace Belletrix.Models
         public IEnumerable<int> StudyAbroadPeriod { get; set; }
 
         protected IDictionary<string, string> columns;
-        protected ICollection<NpgsqlParameter> parameters;
+        protected ICollection<SqlParameter> parameters;
 
-        protected static string StringOrDefault(NpgsqlDataReader reader, string column)
+        protected static string StringOrDefault(SqlDataReader reader, string column)
         {
             int ord = reader.GetOrdinal(column);
 
@@ -155,7 +156,7 @@ namespace Belletrix.Models
             return reader.GetString(ord);
         }
 
-        protected static bool? BoolOrDefault(NpgsqlDataReader reader, string column)
+        protected static bool? BoolOrDefault(SqlDataReader reader, string column)
         {
             int ord = reader.GetOrdinal(column);
 
@@ -167,7 +168,7 @@ namespace Belletrix.Models
             return reader.GetBoolean(ord);
         }
 
-        protected static int? IntOrDefault(NpgsqlDataReader reader, string column)
+        protected static int? IntOrDefault(SqlDataReader reader, string column)
         {
             int ord = reader.GetOrdinal(column);
 
@@ -179,7 +180,7 @@ namespace Belletrix.Models
             return reader.GetInt32(ord);
         }
 
-        protected void AddParameter(StringBuilder sql, string columnName, NpgsqlTypes.NpgsqlDbType columnType,
+        protected void AddParameter(StringBuilder sql, string columnName, SqlDbType columnType,
             object columnValue, int columnLength)
         {
             string parameterName = String.Format("@{0}", columnName);
@@ -187,11 +188,11 @@ namespace Belletrix.Models
 
             if (columnLength > 0)
             {
-                parameters.Add(new NpgsqlParameter(parameterName, columnType, columnLength) { Value = columnValue });
+                parameters.Add(new SqlParameter(parameterName, columnType, columnLength) { Value = columnValue });
             }
             else
             {
-                parameters.Add(new NpgsqlParameter(parameterName, columnType) { Value = columnValue });
+                parameters.Add(new SqlParameter(parameterName, columnType) { Value = columnValue });
             }
         }
 
@@ -210,111 +211,111 @@ namespace Belletrix.Models
         protected void PrepareColumns(ref StringBuilder sql)
         {
             columns = new Dictionary<string, string>();
-            parameters = new List<NpgsqlParameter>();
+            parameters = new List<SqlParameter>();
 
             FirstName = CapitalizeFirstLetter(FirstName);
             LastName = CapitalizeFirstLetter(LastName);
 
-            AddParameter(sql, "created", NpgsqlTypes.NpgsqlDbType.Timestamp, DateTime.Now.ToUniversalTime(), 0);
-            AddParameter(sql, "first_name", NpgsqlTypes.NpgsqlDbType.Varchar, FirstName, 64);
-            AddParameter(sql, "last_name", NpgsqlTypes.NpgsqlDbType.Varchar, LastName, 64);
+            AddParameter(sql, "created", SqlDbType.DateTime, DateTime.Now.ToUniversalTime(), 0);
+            AddParameter(sql, "first_name", SqlDbType.NVarChar, FirstName, 64);
+            AddParameter(sql, "last_name", SqlDbType.NVarChar, LastName, 64);
 
             if (InitialMeeting.HasValue)
             {
-                AddParameter(sql, "initial_meeting", NpgsqlTypes.NpgsqlDbType.Date, InitialMeeting.Value.ToUniversalTime(), 0);
+                AddParameter(sql, "initial_meeting", SqlDbType.Date, InitialMeeting.Value.ToUniversalTime(), 0);
             }
 
             if (!String.IsNullOrWhiteSpace(MiddleName))
             {
                 MiddleName = CapitalizeFirstLetter(MiddleName);
-                AddParameter(sql, "middle_name", NpgsqlTypes.NpgsqlDbType.Varchar, MiddleName, 64);
+                AddParameter(sql, "middle_name", SqlDbType.NVarChar, MiddleName, 64);
             }
 
             if (LivingOnCampus.HasValue)
             {
-                AddParameter(sql, "living_on_campus", NpgsqlTypes.NpgsqlDbType.Boolean, LivingOnCampus, 0);
+                AddParameter(sql, "living_on_campus", SqlDbType.Bit, LivingOnCampus, 0);
             }
 
             if (!String.IsNullOrEmpty(StreetAddress))
             {
-                AddParameter(sql, "street_address", NpgsqlTypes.NpgsqlDbType.Varchar, StreetAddress, 128);
+                AddParameter(sql, "street_address", SqlDbType.NVarChar, StreetAddress, 128);
             }
 
             if (!String.IsNullOrEmpty(StreetAddress2))
             {
-                AddParameter(sql, "street_address2", NpgsqlTypes.NpgsqlDbType.Varchar, StreetAddress2, 128);
+                AddParameter(sql, "street_address2", SqlDbType.NVarChar, StreetAddress2, 128);
             }
 
             if (!String.IsNullOrEmpty(City))
             {
-                AddParameter(sql, "city", NpgsqlTypes.NpgsqlDbType.Varchar, City, 128);
+                AddParameter(sql, "city", SqlDbType.NVarChar, City, 128);
             }
 
             if (!String.IsNullOrEmpty(State))
             {
-                AddParameter(sql, "state", NpgsqlTypes.NpgsqlDbType.Varchar, State, 32);
+                AddParameter(sql, "state", SqlDbType.NVarChar, State, 32);
             }
 
             if (!String.IsNullOrEmpty(PostalCode))
             {
-                AddParameter(sql, "postal_code", NpgsqlTypes.NpgsqlDbType.Varchar, PostalCode, 16);
+                AddParameter(sql, "postal_code", SqlDbType.NVarChar, PostalCode, 16);
             }
 
             if (!String.IsNullOrWhiteSpace(PhoneNumber))
             {
-                AddParameter(sql, "phone_number", NpgsqlTypes.NpgsqlDbType.Varchar, PhoneNumber.Trim(), 32);
+                AddParameter(sql, "phone_number", SqlDbType.NVarChar, PhoneNumber.Trim(), 32);
             }
 
             if (Classification.HasValue)
             {
-                AddParameter(sql, "classification", NpgsqlTypes.NpgsqlDbType.Integer, Classification.Value, 0);
+                AddParameter(sql, "classification", SqlDbType.Int, Classification.Value, 0);
             }
 
             if (EnteringYear.HasValue)
             {
-                AddParameter(sql, "entering_year", NpgsqlTypes.NpgsqlDbType.Integer, EnteringYear.Value, 0);
+                AddParameter(sql, "entering_year", SqlDbType.Int, EnteringYear.Value, 0);
             }
 
             if (GraduatingYear.HasValue)
             {
-                AddParameter(sql, "graduating_year", NpgsqlTypes.NpgsqlDbType.Integer, GraduatingYear.Value, 0);
+                AddParameter(sql, "graduating_year", SqlDbType.Int, GraduatingYear.Value, 0);
             }
 
             if (!String.IsNullOrWhiteSpace(StudentId))
             {
-                AddParameter(sql, "student_id", NpgsqlTypes.NpgsqlDbType.Varchar, StudentId.Trim(), 32);
+                AddParameter(sql, "student_id", SqlDbType.VarChar, StudentId.Trim(), 32);
             }
 
             if (DateOfBirth.HasValue)
             {
-                AddParameter(sql, "dob", NpgsqlTypes.NpgsqlDbType.Date, DateOfBirth.Value.ToUniversalTime(), 0);
+                AddParameter(sql, "dob", SqlDbType.Date, DateOfBirth.Value.ToUniversalTime(), 0);
             }
 
             if (Citizenship.HasValue)
             {
-                AddParameter(sql, "citizenship", NpgsqlTypes.NpgsqlDbType.Integer, Citizenship.Value, 0);
+                AddParameter(sql, "citizenship", SqlDbType.Int, Citizenship.Value, 0);
             }
 
             if (EnrolledFullTime.HasValue)
             {
-                AddParameter(sql, "enrolled_full_time", NpgsqlTypes.NpgsqlDbType.Boolean, EnrolledFullTime.Value, 0);
+                AddParameter(sql, "enrolled_full_time", SqlDbType.Bit, EnrolledFullTime.Value, 0);
             }
 
             if (PellGrantRecipient.HasValue)
             {
-                AddParameter(sql, "pell_grant_recipient", NpgsqlTypes.NpgsqlDbType.Boolean, PellGrantRecipient.Value, 0);
+                AddParameter(sql, "pell_grant_recipient", SqlDbType.Bit, PellGrantRecipient.Value, 0);
             }
 
             if (HasPassport.HasValue)
             {
-                AddParameter(sql, "passport_holder", NpgsqlTypes.NpgsqlDbType.Boolean, HasPassport.Value, 0);
+                AddParameter(sql, "passport_holder", SqlDbType.Bit, HasPassport.Value, 0);
             }
 
             if (Gpa.HasValue)
             {
                 string parameterName = String.Format("@{0}", "gpa");
                 columns.Add("gpa", parameterName);
-                NpgsqlParameter parameter = new NpgsqlParameter(parameterName, NpgsqlTypes.NpgsqlDbType.Double)
+                SqlParameter parameter = new SqlParameter(parameterName, SqlDbType.Decimal)
                 {
                     Scale = 3,
                     Precision = 2,
@@ -326,12 +327,12 @@ namespace Belletrix.Models
 
             if (!String.IsNullOrWhiteSpace(CampusEmail))
             {
-                AddParameter(sql, "campus_email", NpgsqlTypes.NpgsqlDbType.Varchar, CampusEmail.Trim(), 128);
+                AddParameter(sql, "campus_email", SqlDbType.VarChar, CampusEmail.Trim(), 128);
             }
 
             if (!String.IsNullOrWhiteSpace(AlternateEmail))
             {
-                AddParameter(sql, "alternate_email", NpgsqlTypes.NpgsqlDbType.Varchar, AlternateEmail.Trim(), 128);
+                AddParameter(sql, "alternate_email", SqlDbType.VarChar, AlternateEmail.Trim(), 128);
             }
         }
 
@@ -343,23 +344,22 @@ namespace Belletrix.Models
         /// Optional user ID if it turns out that the person using the form
         /// happens to be a registered user who's logged in recently.
         /// </param>
-        protected void Save(NpgsqlConnection connection, int? userId)
+        protected void Save(SqlConnection connection, int? userId)
         {
             int studentId;
 
-            StringBuilder sql = new StringBuilder("INSERT INTO students (");
+            StringBuilder sql = new StringBuilder("INSERT INTO [dbo].[Students] (");
 
             try
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (SqlCommand command = connection.CreateCommand())
                 {
                     PrepareColumns(ref sql);
 
                     sql.Append(String.Join(", ", columns.Select(x => x.Key)));
-                    sql.Append(") VALUES (");
+                    sql.Append(") OUTPUT INSERTED.Id VALUES (");
                     sql.Append(String.Join(", ", columns.Select(x => x.Value)));
-                    sql.Append(") ");
-                    sql.Append("RETURNING id");
+                    sql.Append(")");
 
                     command.CommandText = sql.ToString();
                     command.Parameters.AddRange(parameters.ToArray());
@@ -407,19 +407,19 @@ namespace Belletrix.Models
             cacheProvider.Set(CacheId, students);
         }
 
-        protected void SaveStudyAbroadDestinations(NpgsqlConnection connection, int studentId,
+        protected void SaveStudyAbroadDestinations(SqlConnection connection, int studentId,
             IEnumerable<int> countries, IEnumerable<int> years, IEnumerable<int> periods)
         {
             const string sql = @"
-                DELETE FROM student_study_abroad_wishlist
-                WHERE student_id = @StudentId";
+                DELETE FROM [dbo].[StudentStudyAbroadWishlist]
+                WHERE       [StudentId] = @StudentId";
 
             try
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (SqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = sql;
-                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+                    command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
                     command.ExecuteNonQuery();
                 }
             }
@@ -451,25 +451,21 @@ namespace Belletrix.Models
             }
 
             const string insertSql = @"
-                INSERT INTO student_study_abroad_wishlist
-                (
-                    student_id, country_id, year, period
-                )
+                INSERT INTO [dbo].[StudentStudyAbroadWishlist]
+                ([StudentId], [CountryId], [Year], [Period])
                 VALUES
-                (
-                    @StudentId, @CountryId, @Year, @Period
-                )";
+                (@StudentId, @CountryId, @Year, @Period)";
 
             try
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (SqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = insertSql;
 
-                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
-                    command.Parameters.Add("@CountryId", NpgsqlTypes.NpgsqlDbType.Integer);
-                    command.Parameters.Add("@Year", NpgsqlTypes.NpgsqlDbType.Integer);
-                    command.Parameters.Add("@Period", NpgsqlTypes.NpgsqlDbType.Integer);
+                    command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
+                    command.Parameters.Add("@CountryId", SqlDbType.Int);
+                    command.Parameters.Add("@Year", SqlDbType.Int);
+                    command.Parameters.Add("@Period", SqlDbType.Int);
 
                     command.Prepare();
 
@@ -490,20 +486,20 @@ namespace Belletrix.Models
             }
         }
 
-        protected void SaveStudentLanguages(NpgsqlConnection connection, int studentId, string tableName,
+        protected void SaveStudentLanguages(SqlConnection connection, int studentId, string tableName,
             IEnumerable<int> languages)
         {
             string sql = String.Format(@"
-                DELETE FROM {0}
-                WHERE student_id = @StudentId",
+                DELETE FROM [dbo].[{0}]
+                WHERE       [StudentId] = @StudentId",
                 tableName);
 
             try
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (SqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = sql;
-                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+                    command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
                     command.ExecuteNonQuery();
                 }
             }
@@ -523,12 +519,12 @@ namespace Belletrix.Models
                 }
 
                 StringBuilder insertSql = new StringBuilder();
-                insertSql.Append("INSERT INTO ").Append(tableName).Append(" (student_id, language_id) VALUES ");
+                insertSql.Append("INSERT INTO [dbo].[").Append(tableName).Append("] ([StudentId], [LanguageId]) VALUES ");
                 insertSql.Append(String.Join(",", values));
 
                 try
                 {
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (SqlCommand command = connection.CreateCommand())
                     {
                         command.CommandText = insertSql.ToString();
                         command.ExecuteNonQuery();
@@ -542,20 +538,20 @@ namespace Belletrix.Models
             }
         }
 
-        protected void SaveStudentMajors(NpgsqlConnection connection, int studentId, IEnumerable<int> majors, bool isMajor)
+        protected void SaveStudentMajors(SqlConnection connection, int studentId, IEnumerable<int> majors, bool isMajor)
         {
             const string sql = @"
-                DELETE FROM matriculation
-                WHERE   student_id = @StudentId AND
-                        is_major = @IsMajor";
+                DELETE FROM [dbo].[Matriculation]
+                WHERE       [StudentId] = @StudentId AND
+                            [IsMajor] = @IsMajor";
 
             try
             {
-                using (NpgsqlCommand command = connection.CreateCommand())
+                using (SqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = sql;
-                    command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
-                    command.Parameters.Add("@IsMajor", NpgsqlTypes.NpgsqlDbType.Boolean).Value = isMajor;
+                    command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
+                    command.Parameters.Add("@IsMajor", SqlDbType.Bit).Value = isMajor;
                     command.ExecuteNonQuery();
                 }
             }
@@ -567,7 +563,7 @@ namespace Belletrix.Models
 
             if (majors != null && majors.Cast<int>().Count() > 0)
             {
-                StringBuilder insertSql = new StringBuilder("INSERT INTO matriculation (student_id, major_id, is_major) VALUES ");
+                StringBuilder insertSql = new StringBuilder("INSERT INTO [dbo].[Matriculation] ([StudentId], [MajorId], [IsMajor]) VALUES ");
                 ICollection<string> values = new List<string>();
 
                 foreach (int majorId in majors)
@@ -579,7 +575,7 @@ namespace Belletrix.Models
 
                 try
                 {
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (SqlCommand command = connection.CreateCommand())
                     {
                         command.CommandText = insertSql.ToString();
                         command.ExecuteNonQuery();
