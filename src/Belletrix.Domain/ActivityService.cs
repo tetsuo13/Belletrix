@@ -47,13 +47,17 @@ namespace Belletrix.Domain
             ActivityLogModel model = (ActivityLogModel)createModel;
             model.CreatedBy = userId;
 
-            return await ActivityLogRepository.InsertActivity(model, userId);
+            int activityId = await ActivityLogRepository.InsertActivity(model, userId);
+            await ActivityLogRepository.MergeActivityTypes(activityId, createModel.Types);
+
+            return activityId;
         }
 
         public async Task UpdateActivity(ActivityLogEditViewModel saveModel)
         {
             ActivityLogModel model = (ActivityLogModel)saveModel;
             await ActivityLogRepository.UpdateActivity(model);
+            await ActivityLogRepository.MergeActivityTypes(model.Id, model.Types.Cast<int>());
         }
 
         public async Task SaveChanges()

@@ -1,3 +1,5 @@
+USE [belletrix];
+
 IF (OBJECT_ID('dbo.DeleteStudent', 'P') IS NOT NULL) DROP PROCEDURE [dbo].[DeleteStudent];
 
 IF OBJECT_ID('dbo.StudentDesiredLanguages', 'U') IS NOT NULL DROP TABLE [dbo].[StudentDesiredLanguages];
@@ -680,7 +682,6 @@ CREATE TABLE [dbo].[ActivityLog] (
     [Title3]        [nvarchar](256),
     [Organizers]    [nvarchar](256),
     [Location]      [nvarchar](512),
-    --[Types]         INT[] NOT NULL,
     [StartDate]     [date] NOT NULL,
     [EndDate]       [date] NOT NULL,
     [OnCampus]      [bit] NOT NULL,
@@ -690,6 +691,17 @@ CREATE TABLE [dbo].[ActivityLog] (
     CONSTRAINT [PK_ActivityLog] PRIMARY KEY ([Id]),
     CONSTRAINT [UN_ActivityLog_Title] UNIQUE ([Title]),
     CONSTRAINT [FK_ActivityLog_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users] ([Id])
+);
+
+
+-- Each activity log much have at least one record in this table. The TypeId
+-- value matches the ActivityLogTypes enum.
+CREATE TABLE [dbo].[ActivityLogTypes] (
+    [EventId]       [int] NOT NULL,
+    [TypeId]        [int] NOT NULL,
+
+    CONSTRAINT [PK_ActivityLogTypes] PRIMARY KEY ([EventId], [TypeId]),
+    CONSTRAINT [FK_ActivityLogTypes_EventId] FOREIGN KEY ([EventId]) REFERENCES [dbo].[ActivityLog] ([Id])
 );
 
 

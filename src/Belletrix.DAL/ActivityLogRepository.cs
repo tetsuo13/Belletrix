@@ -116,23 +116,78 @@ namespace Belletrix.DAL
             return activities;
         }
 
+        /// <summary>
+        /// Associates a collection of activity log types with an activity
+        /// log. This performs an "upsert," meaning it can be used both when
+        /// creating a new activity log or updating an existing one.
+        /// </summary>
+        /// <param name="activityId">Activity log ID.</param>
+        /// <param name="types">One or more types to associate.</param>
+        /// <returns>Nothing</returns>
+        public async Task MergeActivityTypes(int activityId, IEnumerable<int> types)
+        {
+            const string deleteSql = @"
+                DELETE FROM [dbo].[ActivityLogTypes]
+                WHERE       [EventId] = @EventId";
+
+            try
+            {
+                using (SqlCommand command = DbContext.CreateCommand())
+                {
+                    command.CommandText = deleteSql;
+                    command.Parameters.Add("@EventId", SqlDbType.Int).Value = activityId;
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = deleteSql;
+                throw e;
+            }
+
+            const string insertSql = @"
+                INSERT INTO [dbo].[ActivityLogTypes]
+                ([EventId], [TypeId])
+                VALUES
+                (@EventId, @TypeId)";
+
+            try
+            {
+                using (SqlCommand command = DbContext.CreateCommand())
+                {
+                    command.CommandText = insertSql;
+                    command.Parameters.Add("@EventId", SqlDbType.Int).Value = activityId;
+                    command.Parameters.Add("@TypeId", SqlDbType.Int);
+
+                    foreach (int type in types)
+                    {
+                        command.Parameters["@TypeId"].Value = type;
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = insertSql;
+                throw e;
+            }
+        }
+
         public async Task<int> InsertActivity(ActivityLogModel model, int userId)
         {
             const string sql = @"
                 INSERT INTO [dbo].[ActivityLog]
                 (
                     [Title], [Title2], [Title3], [Organizers],
-                    [Location], [Types], [StartDate], [EndDate],
-                    [OnCampus], [WebSite], [Notes], [Created],
-                    [CreatedBy]
+                    [Location], [StartDate], [EndDate], [OnCampus],
+                    [WebSite], [Notes], [Created], [CreatedBy]
                 )
                 OUTPUT INSERTING.Id
                 VALUES
                 (
                     @Title, @Title2, @Title3, @Organizers,
-                    @Location, @Types, @StartDate, @EndDate,
-                    @OnCampus, @WebSite, @Notes, @Created,
-                    @CreatedBy
+                    @Location, @StartDate, @EndDate, @OnCampus,
+                    @WebSite, @Notes, @Created, @CreatedBy
                 )";
 
             int id;
@@ -148,7 +203,6 @@ namespace Belletrix.DAL
                     command.Parameters.Add("@Title3", SqlDbType.VarChar, 256).Value = !String.IsNullOrEmpty(model.Title3) ? (object)model.Title3 : DBNull.Value;
                     command.Parameters.Add("@Organizers", SqlDbType.VarChar, 256).Value = !String.IsNullOrEmpty(model.Organizers) ? (object)model.Organizers : DBNull.Value;
                     command.Parameters.Add("@Location", SqlDbType.VarChar, 512).Value = !String.IsNullOrEmpty(model.Location) ? (object)model.Location : DBNull.Value;
-                    command.Parameters.Add("@Types", NpgsqlTypes.NpgsqlDbType.Array | NpgsqlTypes.NpgsqlDbType.Integer).Value = model.Types;
                     command.Parameters.Add("@StartDate", SqlDbType.Date).Value = model.StartDate.ToUniversalTime();
                     command.Parameters.Add("@EndDate", SqlDbType.Date).Value = model.EndDate.ToUniversalTime();
                     command.Parameters.Add("@OnCampus", SqlDbType.Bit).Value = model.OnCampus;
@@ -178,7 +232,6 @@ namespace Belletrix.DAL
                         [Title3] = @Title3,
                         [Organizers] = @Organizers,
                         [Location] = @Location,
-                        [Types] = @Types,
                         [StartDate] = @StartDate,
                         [EndDate] = @EndDate,
                         [OnCampus] = @OnCampus,
@@ -197,7 +250,6 @@ namespace Belletrix.DAL
                     command.Parameters.Add("@Title3", SqlDbType.VarChar, 256).Value = !String.IsNullOrEmpty(model.Title3) ? (object)model.Title3 : DBNull.Value;
                     command.Parameters.Add("@Organizers", SqlDbType.VarChar, 256).Value = !String.IsNullOrEmpty(model.Organizers) ? (object)model.Organizers : DBNull.Value;
                     command.Parameters.Add("@Location", SqlDbType.VarChar, 512).Value = !String.IsNullOrEmpty(model.Location) ? (object)model.Location : DBNull.Value;
-                    command.Parameters.Add("@Types", NpgsqlTypes.NpgsqlDbType.Array | NpgsqlTypes.NpgsqlDbType.Integer).Value = model.Types;
                     command.Parameters.Add("@StartDate", SqlDbType.Date).Value = model.StartDate.ToUniversalTime();
                     command.Parameters.Add("@EndDate", SqlDbType.Date).Value = model.EndDate.ToUniversalTime();
                     command.Parameters.Add("@OnCampus", SqlDbType.Bit).Value = model.OnCampus;

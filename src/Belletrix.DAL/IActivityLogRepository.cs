@@ -1,8 +1,6 @@
-﻿using Belletrix.Entity.Model;
-using System;
+﻿using Belletrix.Entity.Enum;
+using Belletrix.Entity.Model;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Belletrix.DAL
@@ -15,5 +13,15 @@ namespace Belletrix.DAL
         Task<int> InsertActivity(ActivityLogModel model, int userId);
         Task UpdateActivity(ActivityLogModel model);
         Task SaveChanges();
+
+        /// <summary>
+        /// Associates a collection of activity log types with an activity
+        /// log. This performs an "upsert," meaning it can be used both when
+        /// creating a new activity log or updating an existing one.
+        /// </summary>
+        /// <param name="activityId">Activity log ID.</param>
+        /// <param name="types">One or more types to associate.</param>
+        /// <returns>Nothing</returns>
+        Task MergeActivityTypes(int activityId, IEnumerable<int> types);
     }
 }
