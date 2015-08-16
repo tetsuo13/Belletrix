@@ -97,6 +97,7 @@ namespace Belletrix.Models
                     {
                         using (SqlCommand command = connection.CreateCommand())
                         {
+                            command.Transaction = transaction;
                             command.CommandText = sql;
 
                             command.Parameters.Add("@StudentId", SqlDbType.Int).Value = StudentId;
@@ -108,7 +109,7 @@ namespace Belletrix.Models
                         }
 
                         EventLogModel eventLog = new EventLogModel();
-                        eventLog.AddStudentEvent(connection, userId, StudentId, EventLogModel.EventType.AddStudentNote);
+                        eventLog.AddStudentEvent(connection, transaction, userId, StudentId, EventLogModel.EventType.AddStudentNote);
 
                         transaction.Commit();
                     }

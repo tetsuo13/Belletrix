@@ -11,6 +11,13 @@ namespace Belletrix.Controllers
     [Authorize]
     public class UserController : Controller
     {
+        public static string ActivePageName = "user";
+
+        public UserController()
+        {
+            ViewBag.ActivePage = ActivePageName;
+        }
+
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {

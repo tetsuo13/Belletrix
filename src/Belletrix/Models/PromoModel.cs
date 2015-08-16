@@ -145,6 +145,7 @@ namespace Belletrix.Models
 
                         using (SqlCommand command = connection.CreateCommand())
                         {
+                            command.Transaction = transaction;
                             command.CommandText = sql;
 
                             command.Parameters.Add("@Description", SqlDbType.VarChar, 256).Value = Description;
@@ -157,13 +158,6 @@ namespace Belletrix.Models
                         }
 
                         transaction.Commit();
-
-                        ApplicationCache cacheProvider = new ApplicationCache();
-                        List<PromoModel> promos = cacheProvider.Get(CacheId, () => new List<PromoModel>());
-                        Id = promoId;
-                        CreatedBy = UserModel.GetUser(userId);
-                        promos.Add(this);
-                        cacheProvider.Set(CacheId, promos);
                     }
                 }
             }

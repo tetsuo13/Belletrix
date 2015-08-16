@@ -189,7 +189,7 @@ namespace Belletrix.Models
                 UPDATE  [dbo].[Users]
                 SET     [FirstName] = @FirstName,
                         [LastName] = @LastName,
-                        [Amail] = @Email ");
+                        [Email] = @Email ");
 
             if (updatePassword)
             {

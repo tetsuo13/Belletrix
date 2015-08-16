@@ -12,35 +12,33 @@ namespace Belletrix.DAL
 {
     public class ActivityLogPersonRepository : IActivityLogPersonRepository
     {
-        private readonly SqlConnection DbContext;
         private readonly IUnitOfWork UnitOfWork;
 
         public ActivityLogPersonRepository(IUnitOfWork unitOfWork)
         {
             UnitOfWork = unitOfWork;
-            DbContext = unitOfWork.DbContext;
         }
 
         public async Task<int> CreatePerson(ActivityLogPersonModel model)
         {
             const string sql = @"
-                INSERT INTO activity_log_person
+                INSERT INTO [dbo].[ActivityLogPerson]
                 (
-                    id, full_name, description,
-                    phone, email
+                    [FullName], [Description],
+                    [Phone], [Email]
                 )
+                OUTPUT INSERTED.Id
                 VALUES
                 (
-                    DEFAULT, @FullName, @Description,
+                    @FullName, @Description,
                     @Phone, @Email
-                )
-                RETURNING id";
+                )";
 
             int id;
 
             try
             {
-                using (SqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = sql;
 
@@ -64,14 +62,14 @@ namespace Belletrix.DAL
         public async Task AssociatePeopleWithActivity(int activityId, IEnumerable<ActivityLogParticipantModel> people)
         {
             const string sql = @"
-                INSERT INTO activity_log_participant
-                (event_id, person_id, participant_type)
+                INSERT INTO [dbo].[ActivityLogParticipant]
+                ([EventId], [PersonId], [ParticipantType])
                 VALUES
                 (@EventId, @PersonId, @Type)";
 
             try
             {
-                using (SqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = sql;
 
@@ -119,14 +117,14 @@ namespace Belletrix.DAL
         {
             const string sql = @"
                 SELECT      [Id], [FullName], [Description], [Phone], [Email]
-                FROM        [ActivityLogPerson]
+                FROM        [dbo].[ActivityLogPerson]
                 ORDER BY    [FullName]";
 
             ICollection<ActivityLogPersonModel> people = new List<ActivityLogPersonModel>();
 
             try
             {
-                using (SqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = sql;
 
@@ -168,8 +166,8 @@ namespace Belletrix.DAL
         {
             const string sql = @"
                 SELECT      [Id], [FullName], [Description], [Phone], [Email], [ParticipantType]
-                FROM        [ActivityLogPerson]
-                INNER JOIN  [ActivityLogParticipant] ON
+                FROM        [dbo].[ActivityLogPerson]
+                INNER JOIN  [dbo].[ActivityLogParticipant] ON
                             [PersonId] = id
                 WHERE       [EventId] = @ActivityId";
 
@@ -177,7 +175,7 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = sql;
                     command.Parameters.Add("@ActivityId", SqlDbType.Int).Value = activityId;
@@ -218,7 +216,7 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = sql;
                     command.Parameters.Add("@ActivityId", SqlDbType.Int).Value = activityId;
@@ -249,7 +247,7 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = String.Format(sql, String.Join(",", paramNames));
 

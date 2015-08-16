@@ -4,6 +4,7 @@ using System.Web;
 
 namespace Belletrix.Core
 {
+    [Obsolete("Not used", true)]
     public class ApplicationCache : ICacheService
     {
         public T Get<T>(string cacheId, Func<T> getItemCallback) where T : class

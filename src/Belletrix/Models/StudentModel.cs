@@ -57,6 +57,7 @@ namespace Belletrix.Models
                     {
                         using (SqlCommand command = connection.CreateCommand())
                         {
+                            command.Transaction = transaction;
                             command.CommandText = sql.ToString();
                             command.Parameters.AddRange(parameters.ToArray());
                             command.ExecuteNonQuery();
@@ -71,29 +72,24 @@ namespace Belletrix.Models
                     // Always call the next two functions. User may be
                     // removing all values from a student which previous has
                     // some selected.
-                    SaveStudentMajors(connection, Id, SelectedMajors, true);
-                    SaveStudentMajors(connection, Id, SelectedMinors, false);
-                    SaveStudyAbroadDestinations(connection, Id, StudyAbroadCountry, StudyAbroadYear, StudyAbroadPeriod);
+                    SaveStudentMajors(connection, transaction, Id, SelectedMajors, true);
+                    SaveStudentMajors(connection, transaction, Id, SelectedMinors, false);
+                    SaveStudyAbroadDestinations(connection, transaction, Id, StudyAbroadCountry, StudyAbroadYear, StudyAbroadPeriod);
 
-                    SaveStudentLanguages(connection, Id, "StudentFluentLanguages", SelectedLanguages);
-                    SaveStudentLanguages(connection, Id, "StudentDesiredLanguages", SelectedDesiredLanguages);
-                    SaveStudentLanguages(connection, Id, "StudentStudiedLanguages", StudiedLanguages);
+                    SaveStudentLanguages(connection, transaction, Id, "StudentFluentLanguages", SelectedLanguages);
+                    SaveStudentLanguages(connection, transaction, Id, "StudentDesiredLanguages", SelectedDesiredLanguages);
+                    SaveStudentLanguages(connection, transaction, Id, "StudentStudiedLanguages", StudiedLanguages);
 
-                    StudentPromoLog.Save(connection, Id, PromoIds);
+                    StudentPromoLog.Save(connection, transaction, Id, PromoIds);
 
                     EventLogModel eventLog = new EventLogModel()
                     {
                         Student = this,
                         ModifiedBy = user
                     };
-                    eventLog.AddStudentEvent(connection, user.Id, Id, EventLogModel.EventType.EditStudent);
+                    eventLog.AddStudentEvent(connection, transaction, user.Id, Id, EventLogModel.EventType.EditStudent);
 
                     transaction.Commit();
-
-                    ApplicationCache cacheProvider = new ApplicationCache();
-                    IDictionary<int, StudentModel> students = cacheProvider.Get(CacheId, () => new Dictionary<int, StudentModel>());
-                    students[Id] = this;
-                    cacheProvider.Set(CacheId, students);
                 }
             }
         }
@@ -412,16 +408,16 @@ namespace Belletrix.Models
 
                 using (SqlTransaction transaction = connection.BeginTransaction())
                 {
-                    base.Save(connection, user.Id);
+                    base.Save(connection, transaction, user.Id);
 
-                    StudentPromoLog.Save(connection, Id, PromoIds);
+                    StudentPromoLog.Save(connection, transaction, Id, PromoIds);
 
                     EventLogModel eventLog = new EventLogModel()
                     {
                         Student = this,
                         ModifiedBy = user
                     };
-                    eventLog.AddStudentEvent(connection, user.Id, Id, EventLogModel.EventType.AddStudent);
+                    eventLog.AddStudentEvent(connection, transaction, user.Id, Id, EventLogModel.EventType.AddStudent);
 
                     transaction.Commit();
                 }

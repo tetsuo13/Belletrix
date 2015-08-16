@@ -1,42 +1,39 @@
 ﻿using Belletrix.Core;
 using Belletrix.Entity.Enum;
-using System.Linq;
 using Belletrix.Entity.Model;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
-using System.Threading.Tasks;
 using System.Data.SqlClient;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Belletrix.DAL
 {
     public class ActivityLogRepository : IActivityLogRepository
     {
-        private readonly SqlConnection DbContext;
         private readonly IUnitOfWork UnitOfWork;
 
         public ActivityLogRepository(IUnitOfWork unitOfWork)
         {
             UnitOfWork = unitOfWork;
-            DbContext = unitOfWork.DbContext;
         }
 
         public async Task<ActivityLogModel> GetActivityById(int id)
         {
             const string sql = @"
                 SELECT  [Id], [Title], [Title2], [Title3],
-                        [Organizers], [Location], [Types], [StartDate],
+                        [Organizers], [Location], [StartDate],
                         [EndDate], [OnCampus], [WebSite], [Notes],
                         [Created], [CreatedBy]
-                FROM    [dbo].[AtivityLog]
+                FROM    [dbo].[ActivityLog]
                 WHERE   [Id] = @Id";
 
             ActivityLogModel activity = null;
 
             try
             {
-                using (SqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = sql;
                     command.Parameters.Add("@Id", SqlDbType.Int).Value = id;
@@ -56,6 +53,11 @@ namespace Belletrix.DAL
                 throw e;
             }
 
+            if (activity != null)
+            {
+                activity.Types = await GetActivityTypes(activity.Id);
+            }
+
             return activity;
         }
 
@@ -70,9 +72,8 @@ namespace Belletrix.DAL
                 Title2 = await reader.GetText("Title2"),
                 Title3 = await reader.GetText("Title3"),
                 Location = await reader.GetText("Location"),
-                StartDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("StartDate"))),
-                EndDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("EndDate"))),
-                Types = await reader.GetFieldValueAsync<ActivityLogTypes[]>(reader.GetOrdinal("Types")),
+                StartDate = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("StartDate"))),
+                EndDate = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("EndDate"))),
                 Organizers = await reader.GetText("Organizers"),
                 OnCampus = await reader.GetFieldValueAsync<bool>(reader.GetOrdinal("OnCampus")),
                 WebSite = await reader.GetText("WebSite"),
@@ -84,7 +85,7 @@ namespace Belletrix.DAL
         {
             const string sql = @"
                 SELECT      [Id], [Title], [Title2], [Title3],
-                            [Organizers], [Location], [Types], [StartDate],
+                            [Organizers], [Location], [StartDate],
                             [EndDate], [OnCampus], [WebSite], [Notes],
                             [Created], [CreatedBy]
                 FROM        [dbo].[ActivityLog]
@@ -94,7 +95,7 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = sql;
 
@@ -113,7 +114,51 @@ namespace Belletrix.DAL
                 throw e;
             }
 
+            foreach (ActivityLogModel activity in activities)
+            {
+                activity.Types = await GetActivityTypes(activity.Id);
+            }
+
             return activities;
+        }
+
+        /// <summary>
+        /// Get all types for a given activity log.
+        /// </summary>
+        /// <param name="activityId">Activity log ID.</param>
+        /// <returns>Types for the activity.</returns>
+        public async Task<ActivityLogTypes[]> GetActivityTypes(int activityId)
+        {
+            const string sql = @"
+                SELECT  [TypeId]
+                FROM    [dbo].[ActivityLogTypes]
+                WHERE   [EventId] = @EventId";
+
+            ICollection<int> types = new List<int>();
+
+            try
+            {
+                using (SqlCommand command = UnitOfWork.CreateCommand())
+                {
+                    command.CommandText = sql;
+                    command.Parameters.Add("@EventId", SqlDbType.Int).Value = activityId;
+
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            types.Add(await reader.GetFieldValueAsync<int>(reader.GetOrdinal("TypeId")));
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
+            }
+
+            return types.Cast<ActivityLogTypes>().ToArray();
         }
 
         /// <summary>
@@ -132,7 +177,7 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = deleteSql;
                     command.Parameters.Add("@EventId", SqlDbType.Int).Value = activityId;
@@ -153,7 +198,7 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = insertSql;
                     command.Parameters.Add("@EventId", SqlDbType.Int).Value = activityId;
@@ -182,7 +227,7 @@ namespace Belletrix.DAL
                     [Location], [StartDate], [EndDate], [OnCampus],
                     [WebSite], [Notes], [Created], [CreatedBy]
                 )
-                OUTPUT INSERTING.Id
+                OUTPUT INSERTED.Id
                 VALUES
                 (
                     @Title, @Title2, @Title3, @Organizers,
@@ -194,7 +239,7 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = sql;
 
@@ -241,7 +286,7 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = sql;
 

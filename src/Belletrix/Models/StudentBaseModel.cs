@@ -216,105 +216,105 @@ namespace Belletrix.Models
             FirstName = CapitalizeFirstLetter(FirstName);
             LastName = CapitalizeFirstLetter(LastName);
 
-            AddParameter(sql, "created", SqlDbType.DateTime, DateTime.Now.ToUniversalTime(), 0);
-            AddParameter(sql, "first_name", SqlDbType.NVarChar, FirstName, 64);
-            AddParameter(sql, "last_name", SqlDbType.NVarChar, LastName, 64);
+            AddParameter(sql, "Created", SqlDbType.DateTime, DateTime.Now.ToUniversalTime(), 0);
+            AddParameter(sql, "FirstName", SqlDbType.NVarChar, FirstName, 64);
+            AddParameter(sql, "LastName", SqlDbType.NVarChar, LastName, 64);
 
             if (InitialMeeting.HasValue)
             {
-                AddParameter(sql, "initial_meeting", SqlDbType.Date, InitialMeeting.Value.ToUniversalTime(), 0);
+                AddParameter(sql, "InitialMeeting", SqlDbType.Date, InitialMeeting.Value.ToUniversalTime(), 0);
             }
 
             if (!String.IsNullOrWhiteSpace(MiddleName))
             {
                 MiddleName = CapitalizeFirstLetter(MiddleName);
-                AddParameter(sql, "middle_name", SqlDbType.NVarChar, MiddleName, 64);
+                AddParameter(sql, "MiddleName", SqlDbType.NVarChar, MiddleName, 64);
             }
 
             if (LivingOnCampus.HasValue)
             {
-                AddParameter(sql, "living_on_campus", SqlDbType.Bit, LivingOnCampus, 0);
+                AddParameter(sql, "LivingOnCampus", SqlDbType.Bit, LivingOnCampus, 0);
             }
 
             if (!String.IsNullOrEmpty(StreetAddress))
             {
-                AddParameter(sql, "street_address", SqlDbType.NVarChar, StreetAddress, 128);
+                AddParameter(sql, "StreetAddress", SqlDbType.NVarChar, StreetAddress, 128);
             }
 
             if (!String.IsNullOrEmpty(StreetAddress2))
             {
-                AddParameter(sql, "street_address2", SqlDbType.NVarChar, StreetAddress2, 128);
+                AddParameter(sql, "StreetAddress2", SqlDbType.NVarChar, StreetAddress2, 128);
             }
 
             if (!String.IsNullOrEmpty(City))
             {
-                AddParameter(sql, "city", SqlDbType.NVarChar, City, 128);
+                AddParameter(sql, "City", SqlDbType.NVarChar, City, 128);
             }
 
             if (!String.IsNullOrEmpty(State))
             {
-                AddParameter(sql, "state", SqlDbType.NVarChar, State, 32);
+                AddParameter(sql, "State", SqlDbType.NVarChar, State, 32);
             }
 
             if (!String.IsNullOrEmpty(PostalCode))
             {
-                AddParameter(sql, "postal_code", SqlDbType.NVarChar, PostalCode, 16);
+                AddParameter(sql, "PostalCode", SqlDbType.NVarChar, PostalCode, 16);
             }
 
             if (!String.IsNullOrWhiteSpace(PhoneNumber))
             {
-                AddParameter(sql, "phone_number", SqlDbType.NVarChar, PhoneNumber.Trim(), 32);
+                AddParameter(sql, "PhoneNumber", SqlDbType.NVarChar, PhoneNumber.Trim(), 32);
             }
 
             if (Classification.HasValue)
             {
-                AddParameter(sql, "classification", SqlDbType.Int, Classification.Value, 0);
+                AddParameter(sql, "Classification", SqlDbType.Int, Classification.Value, 0);
             }
 
             if (EnteringYear.HasValue)
             {
-                AddParameter(sql, "entering_year", SqlDbType.Int, EnteringYear.Value, 0);
+                AddParameter(sql, "EnteringYear", SqlDbType.Int, EnteringYear.Value, 0);
             }
 
             if (GraduatingYear.HasValue)
             {
-                AddParameter(sql, "graduating_year", SqlDbType.Int, GraduatingYear.Value, 0);
+                AddParameter(sql, "GraduatingYear", SqlDbType.Int, GraduatingYear.Value, 0);
             }
 
             if (!String.IsNullOrWhiteSpace(StudentId))
             {
-                AddParameter(sql, "student_id", SqlDbType.VarChar, StudentId.Trim(), 32);
+                AddParameter(sql, "StudentId", SqlDbType.VarChar, StudentId.Trim(), 32);
             }
 
             if (DateOfBirth.HasValue)
             {
-                AddParameter(sql, "dob", SqlDbType.Date, DateOfBirth.Value.ToUniversalTime(), 0);
+                AddParameter(sql, "Dob", SqlDbType.Date, DateOfBirth.Value.ToUniversalTime(), 0);
             }
 
             if (Citizenship.HasValue)
             {
-                AddParameter(sql, "citizenship", SqlDbType.Int, Citizenship.Value, 0);
+                AddParameter(sql, "Citizenship", SqlDbType.Int, Citizenship.Value, 0);
             }
 
             if (EnrolledFullTime.HasValue)
             {
-                AddParameter(sql, "enrolled_full_time", SqlDbType.Bit, EnrolledFullTime.Value, 0);
+                AddParameter(sql, "EnrolledFullTime", SqlDbType.Bit, EnrolledFullTime.Value, 0);
             }
 
             if (PellGrantRecipient.HasValue)
             {
-                AddParameter(sql, "pell_grant_recipient", SqlDbType.Bit, PellGrantRecipient.Value, 0);
+                AddParameter(sql, "PellGrantEecipient", SqlDbType.Bit, PellGrantRecipient.Value, 0);
             }
 
             if (HasPassport.HasValue)
             {
-                AddParameter(sql, "passport_holder", SqlDbType.Bit, HasPassport.Value, 0);
+                AddParameter(sql, "PassportHolder", SqlDbType.Bit, HasPassport.Value, 0);
             }
 
             if (Gpa.HasValue)
             {
-                string parameterName = String.Format("@{0}", "gpa");
-                columns.Add("gpa", parameterName);
+                string parameterName = String.Format("@{0}", "Gpa");
+                columns.Add("Gpa", parameterName);
                 SqlParameter parameter = new SqlParameter(parameterName, SqlDbType.Decimal)
                 {
                     Scale = 3,
@@ -327,12 +327,12 @@ namespace Belletrix.Models
 
             if (!String.IsNullOrWhiteSpace(CampusEmail))
             {
-                AddParameter(sql, "campus_email", SqlDbType.VarChar, CampusEmail.Trim(), 128);
+                AddParameter(sql, "CampusEmail", SqlDbType.VarChar, CampusEmail.Trim(), 128);
             }
 
             if (!String.IsNullOrWhiteSpace(AlternateEmail))
             {
-                AddParameter(sql, "alternate_email", SqlDbType.VarChar, AlternateEmail.Trim(), 128);
+                AddParameter(sql, "AlternateEmail", SqlDbType.VarChar, AlternateEmail.Trim(), 128);
             }
         }
 
@@ -340,11 +340,12 @@ namespace Belletrix.Models
         /// Create a new student.
         /// </summary>
         /// <param name="connection"></param>
+        /// <param name="transaction"></param>
         /// <param name="userId">
         /// Optional user ID if it turns out that the person using the form
         /// happens to be a registered user who's logged in recently.
         /// </param>
-        protected void Save(SqlConnection connection, int? userId)
+        protected void Save(SqlConnection connection, SqlTransaction transaction, int? userId)
         {
             int studentId;
 
@@ -361,6 +362,7 @@ namespace Belletrix.Models
                     sql.Append(String.Join(", ", columns.Select(x => x.Value)));
                     sql.Append(")");
 
+                    command.Transaction = transaction;
                     command.CommandText = sql.ToString();
                     command.Parameters.AddRange(parameters.ToArray());
                     studentId = (int)command.ExecuteScalar();
@@ -374,40 +376,34 @@ namespace Belletrix.Models
 
             if (SelectedMajors != null)
             {
-                SaveStudentMajors(connection, studentId, SelectedMajors, true);
+                SaveStudentMajors(connection, transaction, studentId, SelectedMajors, true);
             }
 
             if (SelectedMinors != null)
             {
-                SaveStudentMajors(connection, studentId, SelectedMinors, false);
+                SaveStudentMajors(connection, transaction, studentId, SelectedMinors, false);
             }
 
             if (SelectedLanguages != null)
             {
-                SaveStudentLanguages(connection, studentId, "student_fluent_languages", SelectedLanguages);
+                SaveStudentLanguages(connection, transaction, studentId, "StudentFluentLanguages", SelectedLanguages);
             }
 
             if (SelectedDesiredLanguages != null)
             {
-                SaveStudentLanguages(connection, studentId, "student_desired_languages", SelectedDesiredLanguages);
+                SaveStudentLanguages(connection, transaction, studentId, "StudentDesiredLanguages", SelectedDesiredLanguages);
             }
 
             if (StudiedLanguages != null)
             {
-                SaveStudentLanguages(connection, studentId, "student_studied_languages", StudiedLanguages);
+                SaveStudentLanguages(connection, transaction, studentId, "StudentStudiedLanguages", StudiedLanguages);
             }
 
-            SaveStudyAbroadDestinations(connection, studentId, StudyAbroadCountry, StudyAbroadYear,
+            SaveStudyAbroadDestinations(connection, transaction, studentId, StudyAbroadCountry, StudyAbroadYear,
                 StudyAbroadPeriod);
-
-            ApplicationCache cacheProvider = new ApplicationCache();
-            Dictionary<int, StudentBaseModel> students = cacheProvider.Get(CacheId, () => new Dictionary<int, StudentBaseModel>());
-            Id = studentId;
-            students.Add(studentId, this);
-            cacheProvider.Set(CacheId, students);
         }
 
-        protected void SaveStudyAbroadDestinations(SqlConnection connection, int studentId,
+        protected void SaveStudyAbroadDestinations(SqlConnection connection, SqlTransaction transaction, int studentId,
             IEnumerable<int> countries, IEnumerable<int> years, IEnumerable<int> periods)
         {
             const string sql = @"
@@ -418,6 +414,7 @@ namespace Belletrix.Models
             {
                 using (SqlCommand command = connection.CreateCommand())
                 {
+                    command.Transaction = transaction;
                     command.CommandText = sql;
                     command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
                     command.ExecuteNonQuery();
@@ -486,8 +483,8 @@ namespace Belletrix.Models
             }
         }
 
-        protected void SaveStudentLanguages(SqlConnection connection, int studentId, string tableName,
-            IEnumerable<int> languages)
+        protected void SaveStudentLanguages(SqlConnection connection, SqlTransaction transaction, int studentId,
+            string tableName, IEnumerable<int> languages)
         {
             string sql = String.Format(@"
                 DELETE FROM [dbo].[{0}]
@@ -498,6 +495,7 @@ namespace Belletrix.Models
             {
                 using (SqlCommand command = connection.CreateCommand())
                 {
+                    command.Transaction = transaction;
                     command.CommandText = sql;
                     command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
                     command.ExecuteNonQuery();
@@ -538,7 +536,8 @@ namespace Belletrix.Models
             }
         }
 
-        protected void SaveStudentMajors(SqlConnection connection, int studentId, IEnumerable<int> majors, bool isMajor)
+        protected void SaveStudentMajors(SqlConnection connection, SqlTransaction transaction, int studentId,
+            IEnumerable<int> majors, bool isMajor)
         {
             const string sql = @"
                 DELETE FROM [dbo].[Matriculation]
@@ -549,6 +548,7 @@ namespace Belletrix.Models
             {
                 using (SqlCommand command = connection.CreateCommand())
                 {
+                    command.Transaction = transaction;
                     command.CommandText = sql;
                     command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
                     command.Parameters.Add("@IsMajor", SqlDbType.Bit).Value = isMajor;

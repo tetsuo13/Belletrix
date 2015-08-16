@@ -142,10 +142,10 @@ namespace Belletrix.Models
 
                                 studyAbroad.Add(study);
                             }
-
-                            PopulateProgramTypes(connection, ref studyAbroad);
                         }
                     }
+
+                    PopulateProgramTypes(connection, ref studyAbroad);
                 }
             }
             catch (Exception e)
@@ -258,6 +258,7 @@ namespace Belletrix.Models
 
                         using (SqlCommand command = connection.CreateCommand())
                         {
+                            command.Transaction = transaction;
                             command.CommandText = sql.ToString();
                             command.Parameters.AddRange(parameters.ToArray());
                             studyAbroadId = (int)command.ExecuteScalar();
@@ -280,6 +281,7 @@ namespace Belletrix.Models
                             {
                                 using (SqlCommand command = connection.CreateCommand())
                                 {
+                                    command.Transaction = transaction;
                                     command.CommandText = insertSql.ToString();
                                     command.ExecuteNonQuery();
                                 }
@@ -292,7 +294,8 @@ namespace Belletrix.Models
                         }
 
                         EventLogModel eventLog = new EventLogModel();
-                        eventLog.AddStudentEvent(connection, userId, StudentId, EventLogModel.EventType.AddStudentExperience);
+                        eventLog.AddStudentEvent(connection, transaction, userId, StudentId,
+                            EventLogModel.EventType.AddStudentExperience);
 
                         transaction.Commit();
                     }

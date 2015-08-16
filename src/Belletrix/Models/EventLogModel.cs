@@ -9,8 +9,6 @@ namespace Belletrix.Models
 {
     public class EventLogModel
     {
-        private const string CacheId = "EventLog";
-
         public enum EventType
         {
             AddStudent,
@@ -49,22 +47,21 @@ namespace Belletrix.Models
             ICollection<EventLogModel> events = new List<EventLogModel>();
 
             const string sql = @"
-                SELECT          e.id, e.date, e.modified_by,
-                                e.student_id, e.user_id, e.type,
-                                e.action, u.first_name, u.last_name,
-                                s.first_name AS student_first_name,
-                                s.last_name AS student_last_name,
-                                us.first_name AS user_first_name,
-                                us.last_Name AS user_last_name
-                FROM            event_log e
-                INNER JOIN      users u ON
-                                modified_by = u.id
-                LEFT OUTER JOIN students s ON
-                                e.student_id = s.id
-                LEFT OUTER JOIN users us ON
-                                e.user_id = us.id
-                ORDER BY        date DESC
-                LIMIT           8";
+                SELECT          TOP(8) e.Id, e.Date, e.ModifiedBy,
+                                e.StudentId, e.UserId, e.Type,
+                                e.Action, u.FirstName, u.LastName,
+                                s.FirstName AS StudentFirstName,
+                                s.LastName AS StudentLastName,
+                                us.FirstName AS UserFirstName,
+                                us.LastName AS UserLastName
+                FROM            [dbo].[EventLog] e
+                INNER JOIN      [dbo].[Users] u ON
+                                [ModifiedBy] = u.id
+                LEFT OUTER JOIN [dbo].[Students] s ON
+                                e.StudentId = s.id
+                LEFT OUTER JOIN [dbo].[Users] us ON
+                                e.UserId = us.id
+                ORDER BY        [Date] DESC";
 
             try
             {
@@ -81,12 +78,12 @@ namespace Belletrix.Models
                             {
                                 UserModel modifiedBy = new UserModel()
                                 {
-                                    Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("modified_by")),
-                                    FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("first_name")),
-                                    LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("last_name"))
+                                    Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("ModifiedBy")),
+                                    FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("FirstName")),
+                                    LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("LastName"))
                                 };
 
-                                int ord = reader.GetOrdinal("action");
+                                int ord = reader.GetOrdinal("Action");
                                 string action = null;
                                 if (!reader.IsDBNull(ord))
                                 {
@@ -94,37 +91,37 @@ namespace Belletrix.Models
                                 }
 
                                 StudentModel student = null;
-                                ord = reader.GetOrdinal("student_id");
+                                ord = reader.GetOrdinal("StudentId");
                                 if (!reader.IsDBNull(ord))
                                 {
                                     student = new StudentModel()
                                     {
                                         Id = await reader.GetFieldValueAsync<int>(ord),
-                                        FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("student_first_name")),
-                                        LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("student_last_name"))
+                                        FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("StudentFirstName")),
+                                        LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("StudentLastName"))
                                     };
                                 }
 
                                 UserModel user = null;
-                                ord = reader.GetOrdinal("user_id");
+                                ord = reader.GetOrdinal("UserId");
                                 if (!reader.IsDBNull(ord))
                                 {
                                     user = new UserModel()
                                     {
                                         Id = await reader.GetFieldValueAsync<int>(ord),
-                                        FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("user_first_name")),
-                                        LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("user_last_name"))
+                                        FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("UserFirstName")),
+                                        LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("UserLastName"))
                                     };
                                 }
 
                                 EventLogModel eventLog = new EventLogModel()
                                 {
-                                    Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("id")),
-                                    EventDate = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("date"))),
+                                    Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
+                                    EventDate = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("Date"))),
                                     ModifiedBy = modifiedBy,
                                     Student = student,
                                     User = user,
-                                    Type = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("type")),
+                                    Type = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Type")),
                                     Action = action
                                 };
 
@@ -206,27 +203,25 @@ namespace Belletrix.Models
             return years <= 1 ? "one year ago" : years + " years ago";
         }
 
-        public void AddStudentEvent(SqlConnection connection, int studentId, EventType eventType)
+        public void AddStudentEvent(SqlConnection connection, SqlTransaction transaction, int studentId,
+            EventType eventType)
         {
-            AddStudentEvent(connection, 0, studentId, eventType);
+            AddStudentEvent(connection, transaction, 0, studentId, eventType);
         }
 
-        public void AddStudentEvent(SqlConnection connection, int modifiedBy, int studentId, EventType eventType)
+        public void AddStudentEvent(SqlConnection connection, SqlTransaction transaction, int modifiedBy, int studentId, EventType eventType)
         {
             const string sql = @"
-                INSERT INTO event_log
-                (
-                    date, modified_by, student_id, type
-                )
+                INSERT INTO [dbo].[EventLog]
+                ([Date], [ModifiedBy], [StudentId], [Type])
                 VALUES
-                (
-                    @Date, @ModifiedBy, @StudentId, @Type
-                )";
+                (@Date, @ModifiedBy, @StudentId, @Type)";
 
             try
             {
                 using (SqlCommand command = connection.CreateCommand())
                 {
+                    command.Transaction = transaction;
                     command.CommandText = sql;
 
                     command.Parameters.Add("@Date", SqlDbType.DateTime).Value = DateTime.Now.ToUniversalTime();
@@ -243,14 +238,6 @@ namespace Belletrix.Models
                     }
 
                     command.ExecuteNonQuery();
-
-                    ApplicationCache cacheProvider = new ApplicationCache();
-                    List<EventLogModel> events = cacheProvider.Get(CacheId, () => new List<EventLogModel>());
-
-                    // Make this event the newest.
-                    events.Insert(0, this);
-
-                    cacheProvider.Set(CacheId, events);
                 }
             }
             catch (Exception e)

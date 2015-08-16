@@ -54,9 +54,10 @@ namespace Belletrix.Models
             return logs;
         }
 
-        public static void Save(SqlConnection connection, int studentId, IEnumerable<int> promoIds)
+        public static void Save(SqlConnection connection, SqlTransaction transaction, int studentId,
+            IEnumerable<int> promoIds)
         {
-            Delete(connection, studentId);
+            Delete(connection, transaction, studentId);
 
             if (promoIds != null && promoIds.Any())
             {
@@ -74,6 +75,7 @@ namespace Belletrix.Models
                     {
                         DateTime created = DateTime.Now.ToUniversalTime();
 
+                        command.Transaction = transaction;
                         command.CommandText = sql;
 
                         command.Parameters.Add("@PromoId", SqlDbType.Int);
@@ -118,9 +120,10 @@ namespace Belletrix.Models
         /// Save a single student ID to promo code association.
         /// </summary>
         /// <param name="connection">Opened connection.</param>
+        /// <param name="transaction"></param>
         /// <param name="studentId">Student ID.</param>
         /// <param name="promoCode">Promo code.</param>
-        public static void Save(SqlConnection connection, int studentId, string promoCode)
+        public static void Save(SqlConnection connection, SqlTransaction transaction, int studentId, string promoCode)
         {
             ICollection<StudentPromoLog> logs = new List<StudentPromoLog>();
 
@@ -139,6 +142,7 @@ namespace Belletrix.Models
                 {
                     DateTime created = DateTime.Now.ToUniversalTime();
 
+                    command.Transaction = transaction;
                     command.CommandText = sql;
 
                     command.Parameters.Add("@PromoCode", SqlDbType.VarChar, 32).Value = promoCode.ToLower();
@@ -168,7 +172,7 @@ namespace Belletrix.Models
             return logs.Where(x => x.PromoId == id);
         }
 
-        private static void Delete(SqlConnection connection, int studentId)
+        private static void Delete(SqlConnection connection, SqlTransaction transaction, int studentId)
         {
             const string sql = @"
                 DELETE FROM [dbo].[StudentPromoLog]
@@ -178,6 +182,7 @@ namespace Belletrix.Models
             {
                 using (SqlCommand command = connection.CreateCommand())
                 {
+                    command.Transaction = transaction;
                     command.CommandText = sql;
                     command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
                     command.ExecuteNonQuery();

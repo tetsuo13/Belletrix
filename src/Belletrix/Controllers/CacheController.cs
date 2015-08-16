@@ -1,5 +1,4 @@
-﻿using Belletrix.Core;
-using Belletrix.Models;
+﻿using Belletrix.Models;
 using System;
 using System.Web;
 using System.Web.Http;
@@ -32,14 +31,6 @@ namespace Belletrix.Controllers
 
             return String.Format("Cached {0} objects in {1} seconds",
                 HttpRuntime.Cache.Count, span.TotalSeconds);
-        }
-
-        [HttpGet]
-        public string Refresh()
-        {
-            ApplicationCache cacheProvider = new ApplicationCache();
-            cacheProvider.Clear();
-            return "Cleared. " + Get();
         }
     }
 }

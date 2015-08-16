@@ -23,5 +23,12 @@ namespace Belletrix.DAL
         /// <param name="types">One or more types to associate.</param>
         /// <returns>Nothing</returns>
         Task MergeActivityTypes(int activityId, IEnumerable<int> types);
+
+        /// <summary>
+        /// Get all types for a given activity log.
+        /// </summary>
+        /// <param name="activityId">Activity log ID.</param>
+        /// <returns>Types for the activity.</returns>
+        Task<ActivityLogTypes[]> GetActivityTypes(int activityId);
     }
 }

@@ -24,27 +24,21 @@ namespace Belletrix.DAL
     /// </remarks>
     public class UnitOfWork : IUnitOfWork
     {
-        protected readonly string ConnectionString;
         private SqlConnection context;
         private SqlTransaction transaction;
 
         public UnitOfWork(string connectionString)
         {
-            ConnectionString = connectionString;
+            context = new SqlConnection(connectionString);
+            context.Open();
+            transaction = context.BeginTransaction();
         }
 
-        public SqlConnection DbContext
+        public SqlCommand CreateCommand()
         {
-            get
-            {
-                if (context == null)
-                {
-                    context = new SqlConnection(ConnectionString);
-                    context.Open();
-                    transaction = context.BeginTransaction();
-                }
-                return context;
-            }
+            SqlCommand command = context.CreateCommand();
+            command.Transaction = transaction;
+            return command;
         }
 
         public void SaveChanges()

@@ -31,13 +31,13 @@ namespace Belletrix.Models
 
                 using (SqlTransaction transaction = connection.BeginTransaction())
                 {
-                    base.Save(connection, userId);
+                    base.Save(connection, transaction, userId);
 
                     EventLogModel eventLog = new EventLogModel();
                     eventLog.Student = this;
-                    eventLog.AddStudentEvent(connection, Id, EventLogModel.EventType.AddStudent);
+                    eventLog.AddStudentEvent(connection, transaction, Id, EventLogModel.EventType.AddStudent);
 
-                    StudentPromoLog.Save(connection, Id, promoCode);
+                    StudentPromoLog.Save(connection, transaction, Id, promoCode);
 
                     transaction.Commit();
                 }

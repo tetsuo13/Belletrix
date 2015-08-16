@@ -427,7 +427,7 @@ CREATE TABLE [dbo].[Students] (
     [CampusEmail]               [varchar](128),
     [AlternateEmail]            [varchar](128),
     [EnteringYear]              [int],
-    [DraduatingYear]            [int],
+    [GraduatingYear]            [int],
     [Dob]                       [date],
 
     CONSTRAINT [PK_Students] PRIMARY KEY ([id]),

@@ -5,7 +5,7 @@ namespace Belletrix.DAL
 {
     public interface IUnitOfWork : IDisposable
     {
-        SqlConnection DbContext { get; }
+        SqlCommand CreateCommand();
         void SaveChanges();
     }
 }
