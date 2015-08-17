@@ -214,7 +214,7 @@ namespace Belletrix.Models
 
         public void Save(int userId)
         {
-            StringBuilder sql = new StringBuilder(@"INSERT INTO study_abroad (");
+            StringBuilder sql = new StringBuilder(@"INSERT INTO [dbo].[StudyAbroad] (");
             columns = new Dictionary<string, string>();
             parameters = new List<SqlParameter>();
 

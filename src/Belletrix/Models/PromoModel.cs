@@ -124,40 +124,30 @@ namespace Belletrix.Models
         public void Save(int userId)
         {
             const string sql = @"
-                INSERT INTO user_promo
-                (description, created_by, created, code, active)
+                INSERT INTO [dbo].[UserPromo]
+                ([Description], [CreatedBy], [Created], [Code], [Active])
                 OUTPUT INSERTED.Id
                 VALUES
                 (@Description, @CreatedBy, @Created, @Code, @Active)";
 
             Created = DateTime.Now.ToUniversalTime();
-            IsActive = true;
 
             try
             {
                 using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    connection.Open();
-
-                    using (SqlTransaction transaction = connection.BeginTransaction())
+                    using (SqlCommand command = connection.CreateCommand())
                     {
-                        int promoId;
+                        command.CommandText = sql;
 
-                        using (SqlCommand command = connection.CreateCommand())
-                        {
-                            command.Transaction = transaction;
-                            command.CommandText = sql;
+                        command.Parameters.Add("@Description", SqlDbType.VarChar, 256).Value = Description;
+                        command.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = userId;
+                        command.Parameters.Add("@Created", SqlDbType.DateTime).Value = Created;
+                        command.Parameters.Add("@Code", SqlDbType.VarChar, 32).Value = Code.ToLower();
+                        command.Parameters.Add("@Active", SqlDbType.Bit).Value = true;
 
-                            command.Parameters.Add("@Description", SqlDbType.VarChar, 256).Value = Description;
-                            command.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = userId;
-                            command.Parameters.Add("@Created", SqlDbType.DateTime).Value = Created;
-                            command.Parameters.Add("@Code", SqlDbType.VarChar, 32).Value = Code.ToLower();
-                            command.Parameters.Add("@Active", SqlDbType.Bit).Value = IsActive;
-
-                            promoId = (int)command.ExecuteScalar();
-                        }
-
-                        transaction.Commit();
+                        connection.Open();
+                        Id = (int)command.ExecuteScalar();
                     }
                 }
             }

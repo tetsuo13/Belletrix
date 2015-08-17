@@ -401,6 +401,8 @@ namespace Belletrix.Models
 
             SaveStudyAbroadDestinations(connection, transaction, studentId, StudyAbroadCountry, StudyAbroadYear,
                 StudyAbroadPeriod);
+
+            Id = studentId;
         }
 
         protected void SaveStudyAbroadDestinations(SqlConnection connection, SqlTransaction transaction, int studentId,

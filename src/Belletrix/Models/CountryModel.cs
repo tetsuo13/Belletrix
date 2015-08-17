@@ -26,7 +26,7 @@ namespace Belletrix.Models
             const string sql = @"
                 SELECT      [Id], [Name], [Abbreviation]
                 FROM        [dbo].[Countries]
-                WHERE       [IsRegion] = 1
+                WHERE       [IsRegion] = 0
                 ORDER BY    CASE [Abbreviation]
                                 WHEN 'US' THEN 1
                                 WHEN '' THEN 2

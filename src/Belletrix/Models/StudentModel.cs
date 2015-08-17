@@ -158,12 +158,12 @@ namespace Belletrix.Models
                                 student.StudentId = StringOrDefault(reader, "StudentId");
                                 student.EnrolledFullTime = BoolOrDefault(reader, "EnrolledFullTime");
                                 student.Citizenship = IntOrDefault(reader, "Citizenship");
-                                student.PellGrantRecipient = BoolOrDefault(reader, "PellGrantEecipient");
+                                student.PellGrantRecipient = BoolOrDefault(reader, "PellGrantRecipient");
                                 student.HasPassport = BoolOrDefault(reader, "PassportHolder");
                                 student.CampusEmail = StringOrDefault(reader, "CampusEmail");
                                 student.AlternateEmail = StringOrDefault(reader, "AlternateEmail");
                                 student.Created = reader.GetDateTime(reader.GetOrdinal("Created"));
-                                student.NumberOfNotes = (int)reader.GetInt64(reader.GetOrdinal("NumNotes"));
+                                student.NumberOfNotes = (int)reader.GetInt32(reader.GetOrdinal("NumNotes"));
 
                                 int ord = reader.GetOrdinal("Gpa");
                                 if (!reader.IsDBNull(ord))
