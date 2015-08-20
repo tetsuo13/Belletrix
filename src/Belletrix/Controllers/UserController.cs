@@ -11,6 +11,13 @@ namespace Belletrix.Controllers
     [Authorize]
     public class UserController : Controller
     {
+        public static string ActivePageName = "user";
+
+        public UserController()
+        {
+            ViewBag.ActivePage = ActivePageName;
+        }
+
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
@@ -22,7 +29,7 @@ namespace Belletrix.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public ActionResult Login(LoginModel model, string returnUrl)
+        public ActionResult Login(LoginViewModel model, string returnUrl)
         {
             string mainError = "Invalid login credentials";
 

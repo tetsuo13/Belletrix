@@ -1,8 +1,8 @@
 ﻿using Belletrix.Core;
-using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data.SqlClient;
 
 namespace Belletrix.Models
 {
@@ -21,55 +21,46 @@ namespace Belletrix.Models
 
         public static List<CountryModel> GetCountries()
         {
-            ApplicationCache cacheProvider = new ApplicationCache();
-            string cacheId = "Countries";
-            List<CountryModel> countries = cacheProvider.Get(cacheId, () => new List<CountryModel>());
+            List<CountryModel> countries = new List<CountryModel>();
 
-            if (countries.Count == 0)
+            const string sql = @"
+                SELECT      [Id], [Name], [Abbreviation]
+                FROM        [dbo].[Countries]
+                WHERE       [IsRegion] = 0
+                ORDER BY    CASE [Abbreviation]
+                                WHEN 'US' THEN 1
+                                WHEN '' THEN 2
+                                ELSE 3
+                            END, [Name]";
+
+            try
             {
-                const string sql = @"
-                    SELECT      id, name, abbreviation
-                    FROM        countries
-                    WHERE       is_region = FALSE
-                    ORDER BY    CASE abbreviation
-                                    WHEN 'US' THEN 1
-                                    WHEN '' THEN 2
-                                    ELSE 3
-                                END, name";
-
-                try
+                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                    using (SqlCommand command = connection.CreateCommand())
                     {
-                        connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+                        command.CommandText = sql;
+                        connection.Open();
 
-                        using (NpgsqlCommand command = connection.CreateCommand())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            command.CommandText = sql;
-                            connection.Open();
-
-                            using (NpgsqlDataReader reader = command.ExecuteReader())
+                            while (reader.Read())
                             {
-                                while (reader.Read())
+                                countries.Add(new CountryModel()
                                 {
-                                    countries.Add(new CountryModel()
-                                    {
-                                        Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                        Name = reader.GetString(reader.GetOrdinal("name")),
-                                        Abbreviation = reader.GetString(reader.GetOrdinal("abbreviation"))
-                                    });
-                                }
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                    Abbreviation = reader.GetString(reader.GetOrdinal("Abbreviation"))
+                                });
                             }
                         }
                     }
                 }
-                catch (Exception e)
-                {
-                    e.Data["SQL"] = sql;
-                    throw e;
-                }
-
-                cacheProvider.Set(cacheId, countries);
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
 
             return countries;
@@ -77,51 +68,42 @@ namespace Belletrix.Models
 
         public static List<CountryModel> GetRegions()
         {
-            ApplicationCache cacheProvider = new ApplicationCache();
-            string cacheId = "Regions";
-            List<CountryModel> regions = cacheProvider.Get(cacheId, () => new List<CountryModel>());
+            List<CountryModel> regions = new List<CountryModel>();
 
-            if (regions.Count == 0)
+            const string sql = @"
+                SELECT      [Id], [Name], [Abbreviation]
+                FROM        [dbo].[Countries]
+                WHERE       [IsRegion] = 1
+                ORDER BY    [Name]";
+
+            try
             {
-                const string sql = @"
-                    SELECT      id, name, abbreviation
-                    FROM        countries
-                    WHERE       is_region = TRUE
-                    ORDER BY    name";
-
-                try
+                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                    using (SqlCommand command = connection.CreateCommand())
                     {
-                        connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+                        command.CommandText = sql;
+                        connection.Open();
 
-                        using (NpgsqlCommand command = connection.CreateCommand())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            command.CommandText = sql;
-                            connection.Open();
-
-                            using (NpgsqlDataReader reader = command.ExecuteReader())
+                            while (reader.Read())
                             {
-                                while (reader.Read())
+                                regions.Add(new CountryModel()
                                 {
-                                    regions.Add(new CountryModel()
-                                    {
-                                        Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                        Name = reader.GetString(reader.GetOrdinal("name")),
-                                        Abbreviation = reader.GetString(reader.GetOrdinal("abbreviation"))
-                                    });
-                                }
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                    Abbreviation = reader.GetString(reader.GetOrdinal("Abbreviation"))
+                                });
                             }
                         }
                     }
                 }
-                catch (Exception e)
-                {
-                    e.Data["SQL"] = sql;
-                    throw e;
-                }
-
-                cacheProvider.Set(cacheId, regions);
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
 
             return regions;

@@ -1,11 +1,10 @@
 ﻿using Belletrix.Core;
 using Belletrix.Entity.Enum;
 using Belletrix.Entity.Model;
-using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,42 +12,40 @@ namespace Belletrix.DAL
 {
     public class ActivityLogPersonRepository : IActivityLogPersonRepository
     {
-        private readonly NpgsqlConnection DbContext;
         private readonly IUnitOfWork UnitOfWork;
 
         public ActivityLogPersonRepository(IUnitOfWork unitOfWork)
         {
             UnitOfWork = unitOfWork;
-            DbContext = unitOfWork.DbContext;
         }
 
         public async Task<int> CreatePerson(ActivityLogPersonModel model)
         {
             const string sql = @"
-                INSERT INTO activity_log_person
+                INSERT INTO [dbo].[ActivityLogPerson]
                 (
-                    id, full_name, description,
-                    phone, email
+                    [FullName], [Description],
+                    [Phone], [Email]
                 )
+                OUTPUT INSERTED.Id
                 VALUES
                 (
-                    DEFAULT, @FullName, @Description,
+                    @FullName, @Description,
                     @Phone, @Email
-                )
-                RETURNING id";
+                )";
 
             int id;
 
             try
             {
-                using (NpgsqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = sql;
 
-                    command.Parameters.Add("@FullName", NpgsqlTypes.NpgsqlDbType.Varchar, 128).Value = model.FullName;
-                    command.Parameters.Add("@Description", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Description) ? (object)model.Description : DBNull.Value;
-                    command.Parameters.Add("@Phone", NpgsqlTypes.NpgsqlDbType.Varchar, 32).Value = !String.IsNullOrEmpty(model.PhoneNumber) ? (object)model.PhoneNumber : DBNull.Value;
-                    command.Parameters.Add("@Email", NpgsqlTypes.NpgsqlDbType.Varchar, 128).Value = !String.IsNullOrEmpty(model.Email) ? (object)model.Email : DBNull.Value;
+                    command.Parameters.Add("@FullName", SqlDbType.VarChar, 128).Value = model.FullName;
+                    command.Parameters.Add("@Description", SqlDbType.VarChar, 256).Value = !String.IsNullOrEmpty(model.Description) ? (object)model.Description : DBNull.Value;
+                    command.Parameters.Add("@Phone", SqlDbType.VarChar, 32).Value = !String.IsNullOrEmpty(model.PhoneNumber) ? (object)model.PhoneNumber : DBNull.Value;
+                    command.Parameters.Add("@Email", SqlDbType.VarChar, 128).Value = !String.IsNullOrEmpty(model.Email) ? (object)model.Email : DBNull.Value;
 
                     id = (int)await command.ExecuteScalarAsync();
                 }
@@ -65,22 +62,22 @@ namespace Belletrix.DAL
         public async Task AssociatePeopleWithActivity(int activityId, IEnumerable<ActivityLogParticipantModel> people)
         {
             const string sql = @"
-                INSERT INTO activity_log_participant
-                (event_id, person_id, participant_type)
+                INSERT INTO [dbo].[ActivityLogParticipant]
+                ([EventId], [PersonId], [ParticipantType])
                 VALUES
                 (@EventId, @PersonId, @Type)";
 
             try
             {
-                using (NpgsqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = sql;
 
-                    NpgsqlParameter eventIdParam = new NpgsqlParameter("@EventId", DbType.Int32);
+                    SqlParameter eventIdParam = new SqlParameter("@EventId", SqlDbType.Int);
                     eventIdParam.Value = activityId;
 
-                    NpgsqlParameter personIdParam = new NpgsqlParameter("@PersonId", DbType.Int32);
-                    NpgsqlParameter typeParam = new NpgsqlParameter("@Type", DbType.Int32);
+                    SqlParameter personIdParam = new SqlParameter("@PersonId", SqlDbType.Int);
+                    SqlParameter typeParam = new SqlParameter("@Type", SqlDbType.Int);
 
                     command.Parameters.Add(eventIdParam);
                     command.Parameters.Add(personIdParam);
@@ -104,34 +101,34 @@ namespace Belletrix.DAL
             }
         }
 
-        private async Task<ActivityLogPersonModel> ReadPerson(DbDataReader reader)
+        private async Task<ActivityLogPersonModel> ReadPerson(SqlDataReader reader)
         {
             return new ActivityLogPersonModel()
             {
-                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("id")),
-                FullName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("full_name")),
-                Description = await reader.GetText("description"),
-                PhoneNumber = await reader.GetText("phone"),
-                Email = await reader.GetText("email")
+                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
+                FullName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("FullName")),
+                Description = await reader.GetText("Description"),
+                PhoneNumber = await reader.GetText("Phone"),
+                Email = await reader.GetText("Email")
             };
         }
 
         public async Task<IEnumerable<ActivityLogPersonModel>> FindAllPeople()
         {
             const string sql = @"
-                SELECT      id, full_name, description, phone, email
-                FROM        activity_log_person
-                ORDER BY    full_name";
+                SELECT      [Id], [FullName], [Description], [Phone], [Email]
+                FROM        [dbo].[ActivityLogPerson]
+                ORDER BY    [FullName]";
 
             ICollection<ActivityLogPersonModel> people = new List<ActivityLogPersonModel>();
 
             try
             {
-                using (NpgsqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = sql;
 
-                    using (DbDataReader reader = await command.ExecuteReaderAsync())
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
@@ -168,22 +165,22 @@ namespace Belletrix.DAL
         public async Task<IEnumerable<ActivityLogParticipantModel>> FindActivityParticipants(int activityId)
         {
             const string sql = @"
-                SELECT      id, full_name, description, phone, email, participant_type
-                FROM        activity_log_person person
-                INNER JOIN  activity_log_participant participant ON
-                            person_id = id
-                WHERE       event_id = @ActivityId";
+                SELECT      [Id], [FullName], [Description], [Phone], [Email], [ParticipantType]
+                FROM        [dbo].[ActivityLogPerson]
+                INNER JOIN  [dbo].[ActivityLogParticipant] ON
+                            [PersonId] = id
+                WHERE       [EventId] = @ActivityId";
 
             ICollection<ActivityLogParticipantModel> people = new List<ActivityLogParticipantModel>();
 
             try
             {
-                using (NpgsqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = sql;
-                    command.Parameters.Add("@ActivityId", NpgsqlTypes.NpgsqlDbType.Numeric).Value = activityId;
+                    command.Parameters.Add("@ActivityId", SqlDbType.Int).Value = activityId;
 
-                    using (DbDataReader reader = await command.ExecuteReaderAsync())
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
@@ -191,7 +188,7 @@ namespace Belletrix.DAL
                             {
                                 Event = new ActivityLogModel { Id = activityId },
                                 Person = await ReadPerson(reader),
-                                Type = await reader.GetFieldValueAsync<ActivityLogParticipantTypes>(reader.GetOrdinal("participant_type"))
+                                Type = await reader.GetFieldValueAsync<ActivityLogParticipantTypes>(reader.GetOrdinal("ParticipantType"))
                             });
                         }
                     }
@@ -214,15 +211,15 @@ namespace Belletrix.DAL
         public async Task ClearParticipantsFromActivity(int activityId)
         {
             const string sql = @"
-                DELETE FROM activity_log_participant
-                WHERE       event_id = @ActivityId";
+                DELETE FROM [dbo].[ActivityLogParticipant]
+                WHERE       [EventId] = @ActivityId";
 
             try
             {
-                using (NpgsqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = sql;
-                    command.Parameters.Add("@ActivityId", NpgsqlTypes.NpgsqlDbType.Numeric).Value = activityId;
+                    command.Parameters.Add("@ActivityId", SqlDbType.Int).Value = activityId;
                     await command.ExecuteNonQueryAsync();
                 }
             }
@@ -241,18 +238,25 @@ namespace Belletrix.DAL
         /// <returns>Nothing</returns>
         public async Task ClearParticipantsFromActivity(int activityId, IEnumerable<ActivityLogParticipantModel> people)
         {
-            const string sql = @"
-                DELETE FROM activity_log_participant
-                WHERE       event_id = @ActivityId AND
-                            person_id = ANY(@PeopleIds)";
+            string sql = @"
+                DELETE FROM [dbo].[ActivityLogParticipant]
+                WHERE       [EventId] = @ActivityId AND
+                            [PersonId] IN ({0})";
+
+            string[] paramNames = people.Select((s, i) => "@param" + i.ToString()).ToArray();
 
             try
             {
-                using (NpgsqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
-                    command.CommandText = sql;
-                    command.Parameters.Add("@ActivityId", NpgsqlTypes.NpgsqlDbType.Numeric).Value = activityId;
-                    command.Parameters.Add("@PeopleIds", NpgsqlTypes.NpgsqlDbType.Numeric | NpgsqlTypes.NpgsqlDbType.Array).Value = people.Select(x => x.Person.Id);
+                    command.CommandText = String.Format(sql, String.Join(",", paramNames));
+
+                    command.Parameters.Add("@ActivityId", SqlDbType.Int).Value = activityId;
+
+                    for (int i = 0; i < paramNames.Length; i++)
+                    {
+                        command.Parameters.AddWithValue(paramNames[i], people.ElementAt(i));
+                    }
 
                     await command.ExecuteNonQueryAsync();
                 }

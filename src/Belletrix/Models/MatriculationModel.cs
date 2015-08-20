@@ -1,7 +1,8 @@
 ﻿using Belletrix.Core;
-using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 
 namespace Belletrix.Models
 {
@@ -14,24 +15,23 @@ namespace Belletrix.Models
         public static IEnumerable<MatriculationModel> GetDeclarations(int studentId)
         {
             const string sql = @"
-                SELECT  major_id, is_major
-                FROM    matriculation
-                WHERE   student_id = @StudentId";
+                SELECT  [MajorId], [IsMajor]
+                FROM    [Matriculation]
+                WHERE   [StudentId] = @StudentId";
+
             ICollection<MatriculationModel> declarations = new List<MatriculationModel>();
 
             try
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (SqlCommand command = connection.CreateCommand())
                     {
                         command.CommandText = sql;
-                        command.Parameters.Add("@StudentId", NpgsqlTypes.NpgsqlDbType.Integer).Value = studentId;
+                        command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
                         connection.Open();
 
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {

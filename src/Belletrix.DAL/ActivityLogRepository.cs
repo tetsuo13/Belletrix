@@ -1,47 +1,44 @@
 ﻿using Belletrix.Core;
 using Belletrix.Entity.Enum;
-using System.Linq;
 using Belletrix.Entity.Model;
-using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
+using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Belletrix.DAL
 {
     public class ActivityLogRepository : IActivityLogRepository
     {
-        private readonly NpgsqlConnection DbContext;
         private readonly IUnitOfWork UnitOfWork;
 
         public ActivityLogRepository(IUnitOfWork unitOfWork)
         {
             UnitOfWork = unitOfWork;
-            DbContext = unitOfWork.DbContext;
         }
 
         public async Task<ActivityLogModel> GetActivityById(int id)
         {
             const string sql = @"
-                SELECT      id, title, title2, title3,
-                            organizers, location, types, start_date,
-                            end_date, on_campus, web_site, notes,
-                            created, created_by
-                FROM        activity_log
-                WHERE       id = @Id";
+                SELECT  [Id], [Title], [Title2], [Title3],
+                        [Organizers], [Location], [StartDate],
+                        [EndDate], [OnCampus], [WebSite], [Notes],
+                        [Created], [CreatedBy]
+                FROM    [dbo].[ActivityLog]
+                WHERE   [Id] = @Id";
 
             ActivityLogModel activity = null;
 
             try
             {
-                using (NpgsqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = sql;
-                    command.Parameters.Add("@Id", NpgsqlTypes.NpgsqlDbType.Numeric).Value = id;
+                    command.Parameters.Add("@Id", SqlDbType.Int).Value = id;
 
-                    using (var reader = await command.ExecuteReaderAsync())
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
@@ -56,49 +53,53 @@ namespace Belletrix.DAL
                 throw e;
             }
 
+            if (activity != null)
+            {
+                activity.Types = await GetActivityTypes(activity.Id);
+            }
+
             return activity;
         }
 
-        private async Task<ActivityLogModel> ProcessRow(DbDataReader reader)
+        private async Task<ActivityLogModel> ProcessRow(SqlDataReader reader)
         {
             return new ActivityLogModel()
             {
-                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("id")),
-                Created = await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("created")),
-                CreatedBy = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("created_by")),
-                Title = await reader.GetText("title"),
-                Title2 = await reader.GetText("title2"),
-                Title3 = await reader.GetText("title3"),
-                Location = await reader.GetText("location"),
-                StartDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("start_date"))),
-                EndDate = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("end_date"))),
-                Types = await reader.GetFieldValueAsync<ActivityLogTypes[]>(reader.GetOrdinal("types")),
-                Organizers = await reader.GetText("organizers"),
-                OnCampus = await reader.GetFieldValueAsync<bool>(reader.GetOrdinal("on_campus")),
-                WebSite = await reader.GetText("web_site"),
-                Notes = await reader.GetText("notes")
+                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
+                Created = await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("Created")),
+                CreatedBy = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("CreatedBy")),
+                Title = await reader.GetText("Title"),
+                Title2 = await reader.GetText("Title2"),
+                Title3 = await reader.GetText("Title3"),
+                Location = await reader.GetText("Location"),
+                StartDate = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("StartDate"))),
+                EndDate = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("EndDate"))),
+                Organizers = await reader.GetText("Organizers"),
+                OnCampus = await reader.GetFieldValueAsync<bool>(reader.GetOrdinal("OnCampus")),
+                WebSite = await reader.GetText("WebSite"),
+                Notes = await reader.GetText("Notes")
             };
         }
 
         public async Task<IEnumerable<ActivityLogModel>> GetAllActivities()
         {
             const string sql = @"
-                SELECT      id, title, title2, title3,
-                            organizers, location, types, start_date,
-                            end_date, on_campus, web_site, notes,
-                            created, created_by
-                FROM        activity_log
-                ORDER BY    created_by DESC";
+                SELECT      [Id], [Title], [Title2], [Title3],
+                            [Organizers], [Location], [StartDate],
+                            [EndDate], [OnCampus], [WebSite], [Notes],
+                            [Created], [CreatedBy]
+                FROM        [dbo].[ActivityLog]
+                ORDER BY    [CreatedBy] DESC";
 
             ICollection<ActivityLogModel> activities = new List<ActivityLogModel>();
 
             try
             {
-                using (NpgsqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = sql;
 
-                    using (DbDataReader reader = await command.ExecuteReaderAsync())
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
@@ -113,49 +114,147 @@ namespace Belletrix.DAL
                 throw e;
             }
 
+            foreach (ActivityLogModel activity in activities)
+            {
+                activity.Types = await GetActivityTypes(activity.Id);
+            }
+
             return activities;
+        }
+
+        /// <summary>
+        /// Get all types for a given activity log.
+        /// </summary>
+        /// <param name="activityId">Activity log ID.</param>
+        /// <returns>Types for the activity.</returns>
+        public async Task<ActivityLogTypes[]> GetActivityTypes(int activityId)
+        {
+            const string sql = @"
+                SELECT  [TypeId]
+                FROM    [dbo].[ActivityLogTypes]
+                WHERE   [EventId] = @EventId";
+
+            ICollection<int> types = new List<int>();
+
+            try
+            {
+                using (SqlCommand command = UnitOfWork.CreateCommand())
+                {
+                    command.CommandText = sql;
+                    command.Parameters.Add("@EventId", SqlDbType.Int).Value = activityId;
+
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            types.Add(await reader.GetFieldValueAsync<int>(reader.GetOrdinal("TypeId")));
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
+            }
+
+            return types.Cast<ActivityLogTypes>().ToArray();
+        }
+
+        /// <summary>
+        /// Associates a collection of activity log types with an activity
+        /// log. This performs an "upsert," meaning it can be used both when
+        /// creating a new activity log or updating an existing one.
+        /// </summary>
+        /// <param name="activityId">Activity log ID.</param>
+        /// <param name="types">One or more types to associate.</param>
+        /// <returns>Nothing</returns>
+        public async Task MergeActivityTypes(int activityId, IEnumerable<int> types)
+        {
+            const string deleteSql = @"
+                DELETE FROM [dbo].[ActivityLogTypes]
+                WHERE       [EventId] = @EventId";
+
+            try
+            {
+                using (SqlCommand command = UnitOfWork.CreateCommand())
+                {
+                    command.CommandText = deleteSql;
+                    command.Parameters.Add("@EventId", SqlDbType.Int).Value = activityId;
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = deleteSql;
+                throw e;
+            }
+
+            const string insertSql = @"
+                INSERT INTO [dbo].[ActivityLogTypes]
+                ([EventId], [TypeId])
+                VALUES
+                (@EventId, @TypeId)";
+
+            try
+            {
+                using (SqlCommand command = UnitOfWork.CreateCommand())
+                {
+                    command.CommandText = insertSql;
+                    command.Parameters.Add("@EventId", SqlDbType.Int).Value = activityId;
+                    command.Parameters.Add("@TypeId", SqlDbType.Int);
+
+                    foreach (int type in types)
+                    {
+                        command.Parameters["@TypeId"].Value = type;
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = insertSql;
+                throw e;
+            }
         }
 
         public async Task<int> InsertActivity(ActivityLogModel model, int userId)
         {
             const string sql = @"
-                INSERT INTO activity_log
+                INSERT INTO [dbo].[ActivityLog]
                 (
-                    title, title2, title3, organizers,
-                    location, types, start_date, end_date,
-                    on_campus, web_site, notes, created,
-                    created_by
+                    [Title], [Title2], [Title3], [Organizers],
+                    [Location], [StartDate], [EndDate], [OnCampus],
+                    [WebSite], [Notes], [Created], [CreatedBy]
                 )
+                OUTPUT INSERTED.Id
                 VALUES
                 (
                     @Title, @Title2, @Title3, @Organizers,
-                    @Location, @Types, @StartDate, @EndDate,
-                    @OnCampus, @WebSite, @Notes, @Created,
-                    @CreatedBy
-                )
-                RETURNING id";
+                    @Location, @StartDate, @EndDate, @OnCampus,
+                    @WebSite, @Notes, @Created, @CreatedBy
+                )";
 
             int id;
 
             try
             {
-                using (NpgsqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = sql;
 
-                    command.Parameters.Add("@Title", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = model.Title;
-                    command.Parameters.Add("@Title2", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Title2) ? (object)model.Title2 : DBNull.Value;
-                    command.Parameters.Add("@Title3", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Title3) ? (object)model.Title3 : DBNull.Value;
-                    command.Parameters.Add("@Organizers", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Organizers) ? (object)model.Organizers : DBNull.Value;
-                    command.Parameters.Add("@Location", NpgsqlTypes.NpgsqlDbType.Varchar, 512).Value = !String.IsNullOrEmpty(model.Location) ? (object)model.Location : DBNull.Value;
-                    command.Parameters.Add("@Types", NpgsqlTypes.NpgsqlDbType.Array | NpgsqlTypes.NpgsqlDbType.Integer).Value = model.Types;
-                    command.Parameters.Add("@StartDate", NpgsqlTypes.NpgsqlDbType.Date).Value = model.StartDate.ToUniversalTime();
-                    command.Parameters.Add("@EndDate", NpgsqlTypes.NpgsqlDbType.Date).Value = model.EndDate.ToUniversalTime();
-                    command.Parameters.Add("@OnCampus", NpgsqlTypes.NpgsqlDbType.Boolean).Value = model.OnCampus;
-                    command.Parameters.Add("@WebSite", NpgsqlTypes.NpgsqlDbType.Varchar, 2048).Value = !String.IsNullOrEmpty(model.WebSite) ? (object)model.WebSite : DBNull.Value;
-                    command.Parameters.Add("@Notes", NpgsqlTypes.NpgsqlDbType.Varchar, 4096).Value = !String.IsNullOrEmpty(model.Notes) ? (object)model.Notes : DBNull.Value;
-                    command.Parameters.Add("@Created", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = DateTime.Now.ToUniversalTime();
-                    command.Parameters.Add("@CreatedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = userId;
+                    command.Parameters.Add("@Title", SqlDbType.VarChar, 256).Value = model.Title;
+                    command.Parameters.Add("@Title2", SqlDbType.VarChar, 256).Value = !String.IsNullOrEmpty(model.Title2) ? (object)model.Title2 : DBNull.Value;
+                    command.Parameters.Add("@Title3", SqlDbType.VarChar, 256).Value = !String.IsNullOrEmpty(model.Title3) ? (object)model.Title3 : DBNull.Value;
+                    command.Parameters.Add("@Organizers", SqlDbType.VarChar, 256).Value = !String.IsNullOrEmpty(model.Organizers) ? (object)model.Organizers : DBNull.Value;
+                    command.Parameters.Add("@Location", SqlDbType.VarChar, 512).Value = !String.IsNullOrEmpty(model.Location) ? (object)model.Location : DBNull.Value;
+                    command.Parameters.Add("@StartDate", SqlDbType.Date).Value = model.StartDate.ToUniversalTime();
+                    command.Parameters.Add("@EndDate", SqlDbType.Date).Value = model.EndDate.ToUniversalTime();
+                    command.Parameters.Add("@OnCampus", SqlDbType.Bit).Value = model.OnCampus;
+                    command.Parameters.Add("@WebSite", SqlDbType.VarChar, 2048).Value = !String.IsNullOrEmpty(model.WebSite) ? (object)model.WebSite : DBNull.Value;
+                    command.Parameters.Add("@Notes", SqlDbType.VarChar, 4096).Value = !String.IsNullOrEmpty(model.Notes) ? (object)model.Notes : DBNull.Value;
+                    command.Parameters.Add("@Created", SqlDbType.DateTime).Value = DateTime.Now.ToUniversalTime();
+                    command.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = userId;
 
                     id = (int)await command.ExecuteScalarAsync();
                 }
@@ -172,38 +271,36 @@ namespace Belletrix.DAL
         public async Task UpdateActivity(ActivityLogModel model)
         {
             const string sql = @"
-                UPDATE  activity_log
-                SET     title = @Title,
-                        title2 = @Title2,
-                        title3 = @Title3,
-                        organizers = @Organizers,
-                        location = @Location,
-                        types = @Types,
-                        start_date = @StartDate,
-                        end_date = @EndDate,
-                        on_campus = @OnCampus,
-                        web_site = @WebSite,
-                        notes = @Notes
-                WHERE   id = @Id";
+                UPDATE  [dbo].[ActivityLog]
+                SET     [Title] = @Title,
+                        [Title2] = @Title2,
+                        [Title3] = @Title3,
+                        [Organizers] = @Organizers,
+                        [Location] = @Location,
+                        [StartDate] = @StartDate,
+                        [EndDate] = @EndDate,
+                        [OnCampus] = @OnCampus,
+                        [WebSite] = @WebSite,
+                        [Notes] = @Notes
+                WHERE   [Id] = @Id";
 
             try
             {
-                using (NpgsqlCommand command = DbContext.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = sql;
 
-                    command.Parameters.Add("@Title", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = model.Title;
-                    command.Parameters.Add("@Title2", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Title2) ? (object)model.Title2 : DBNull.Value;
-                    command.Parameters.Add("@Title3", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Title3) ? (object)model.Title3 : DBNull.Value;
-                    command.Parameters.Add("@Organizers", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = !String.IsNullOrEmpty(model.Organizers) ? (object)model.Organizers : DBNull.Value;
-                    command.Parameters.Add("@Location", NpgsqlTypes.NpgsqlDbType.Varchar, 512).Value = !String.IsNullOrEmpty(model.Location) ? (object)model.Location : DBNull.Value;
-                    command.Parameters.Add("@Types", NpgsqlTypes.NpgsqlDbType.Array | NpgsqlTypes.NpgsqlDbType.Integer).Value = model.Types;
-                    command.Parameters.Add("@StartDate", NpgsqlTypes.NpgsqlDbType.Date).Value = model.StartDate.ToUniversalTime();
-                    command.Parameters.Add("@EndDate", NpgsqlTypes.NpgsqlDbType.Date).Value = model.EndDate.ToUniversalTime();
-                    command.Parameters.Add("@OnCampus", NpgsqlTypes.NpgsqlDbType.Boolean).Value = model.OnCampus;
-                    command.Parameters.Add("@WebSite", NpgsqlTypes.NpgsqlDbType.Varchar, 2048).Value = !String.IsNullOrEmpty(model.WebSite) ? (object)model.WebSite : DBNull.Value;
-                    command.Parameters.Add("@Notes", NpgsqlTypes.NpgsqlDbType.Varchar, 4096).Value = !String.IsNullOrEmpty(model.Notes) ? (object)model.Notes : DBNull.Value;
-                    command.Parameters.Add("@Id", NpgsqlTypes.NpgsqlDbType.Integer).Value = model.Id;
+                    command.Parameters.Add("@Title", SqlDbType.VarChar, 256).Value = model.Title;
+                    command.Parameters.Add("@Title2", SqlDbType.VarChar, 256).Value = !String.IsNullOrEmpty(model.Title2) ? (object)model.Title2 : DBNull.Value;
+                    command.Parameters.Add("@Title3", SqlDbType.VarChar, 256).Value = !String.IsNullOrEmpty(model.Title3) ? (object)model.Title3 : DBNull.Value;
+                    command.Parameters.Add("@Organizers", SqlDbType.VarChar, 256).Value = !String.IsNullOrEmpty(model.Organizers) ? (object)model.Organizers : DBNull.Value;
+                    command.Parameters.Add("@Location", SqlDbType.VarChar, 512).Value = !String.IsNullOrEmpty(model.Location) ? (object)model.Location : DBNull.Value;
+                    command.Parameters.Add("@StartDate", SqlDbType.Date).Value = model.StartDate.ToUniversalTime();
+                    command.Parameters.Add("@EndDate", SqlDbType.Date).Value = model.EndDate.ToUniversalTime();
+                    command.Parameters.Add("@OnCampus", SqlDbType.Bit).Value = model.OnCampus;
+                    command.Parameters.Add("@WebSite", SqlDbType.VarChar, 2048).Value = !String.IsNullOrEmpty(model.WebSite) ? (object)model.WebSite : DBNull.Value;
+                    command.Parameters.Add("@Notes", SqlDbType.VarChar, 4096).Value = !String.IsNullOrEmpty(model.Notes) ? (object)model.Notes : DBNull.Value;
+                    command.Parameters.Add("@Id", SqlDbType.Int).Value = model.Id;
 
                     await command.ExecuteNonQueryAsync();
                 }

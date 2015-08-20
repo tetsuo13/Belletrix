@@ -1,9 +1,8 @@
 ﻿using Belletrix.Core;
-using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
+using System.Data.SqlClient;
 
 namespace Belletrix.Models
 {
@@ -17,49 +16,40 @@ namespace Belletrix.Models
 
         public static IEnumerable<MinorsModel> GetMinors()
         {
-            ApplicationCache cacheProvider = new ApplicationCache();
-            const string cacheId = "Minors";
-            List<MinorsModel> minors = cacheProvider.Get(cacheId, () => new List<MinorsModel>());
+            List<MinorsModel> minors = new List<MinorsModel>();
 
-            if (minors.Count == 0)
+            const string sql = @"
+                SELECT      [Id], [Name]
+                FROM        [Minors]
+                ORDER BY    [Name]";
+
+            try
             {
-                const string sql = @"
-                    SELECT      id, name
-                    FROM        minors
-                    ORDER BY    name";
-
-                try
+                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                    using (SqlCommand command = connection.CreateCommand())
                     {
-                        connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+                        command.CommandText = sql;
+                        connection.Open();
 
-                        using (NpgsqlCommand command = connection.CreateCommand())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            command.CommandText = sql;
-                            connection.Open();
-
-                            using (NpgsqlDataReader reader = command.ExecuteReader())
+                            while (reader.Read())
                             {
-                                while (reader.Read())
+                                minors.Add(new MinorsModel()
                                 {
-                                    minors.Add(new MinorsModel()
-                                    {
-                                        Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                        Name = reader.GetString(reader.GetOrdinal("name"))
-                                    });
-                                }
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name"))
+                                });
                             }
                         }
                     }
                 }
-                catch (Exception e)
-                {
-                    e.Data["SQL"] = sql;
-                    throw e;
-                }
-
-                cacheProvider.Set(cacheId, minors);
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
 
             return minors;

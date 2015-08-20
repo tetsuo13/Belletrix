@@ -1,8 +1,9 @@
 ﻿using Belletrix.Core;
-using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 
 namespace Belletrix.Models
@@ -33,44 +34,42 @@ namespace Belletrix.Models
 
         public static IEnumerable<PromoModel> GetPromos(bool withLogs = false)
         {
-            const string sql = @"
-                SELECT      p.id AS promo_id, description, created_by, p.created, code, p.active,
-                            u.first_name, u.last_name
-                FROM        user_promo p
-                INNER JOIN  users u ON
-                            created_by = u.id
-                ORDER BY    code";
             ICollection<PromoModel> promos = new List<PromoModel>();
+            const string sql = @"
+                SELECT      p.Id AS PromoId, [Description], [CreatedBy], p.Created, [Code], p.Active,
+                            u.FirstName, u.LastName
+                FROM        [dbo].[UserPromo] p
+                INNER JOIN  [dbo].[Users] u ON
+                            [CreatedBy] = u.id
+                ORDER BY    [Code]";
 
             try
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (SqlCommand command = connection.CreateCommand())
                     {
                         command.CommandText = sql;
                         connection.Open();
 
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
                                 PromoModel promo = new PromoModel()
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("promo_id")),
-                                    Description = reader.GetString(reader.GetOrdinal("description")),
-                                    Created = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("created"))),
-                                    Code = reader.GetString(reader.GetOrdinal("code")),
-                                    IsActive = reader.GetBoolean(reader.GetOrdinal("active"))
+                                    Id = reader.GetInt32(reader.GetOrdinal("PromoId")),
+                                    Description = reader.GetString(reader.GetOrdinal("Description")),
+                                    Created = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("Created"))),
+                                    Code = reader.GetString(reader.GetOrdinal("Code")),
+                                    IsActive = reader.GetBoolean(reader.GetOrdinal("Active"))
                                 };
 
                                 UserModel user = new UserModel()
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("created_by")),
-                                    FirstName = reader.GetString(reader.GetOrdinal("first_name")),
-                                    LastName = reader.GetString(reader.GetOrdinal("last_name"))
+                                    Id = reader.GetInt32(reader.GetOrdinal("CreatedBy")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName"))
                                 };
 
                                 promo.CreatedBy = user;
@@ -125,53 +124,30 @@ namespace Belletrix.Models
         public void Save(int userId)
         {
             const string sql = @"
-                INSERT INTO user_promo
-                (
-                    description, created_by, created,
-                    code, active
-                )
+                INSERT INTO [dbo].[UserPromo]
+                ([Description], [CreatedBy], [Created], [Code], [Active])
+                OUTPUT INSERTED.Id
                 VALUES
-                (
-                    @Description, @CreatedBy, @Created,
-                    @Code, @Active
-                )
-                RETURNING id";
+                (@Description, @CreatedBy, @Created, @Code, @Active)";
 
             Created = DateTime.Now.ToUniversalTime();
-            IsActive = true;
 
             try
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-                    connection.Open();
-
-                    using (NpgsqlTransaction transaction = connection.BeginTransaction())
+                    using (SqlCommand command = connection.CreateCommand())
                     {
-                        int promoId;
+                        command.CommandText = sql;
 
-                        using (NpgsqlCommand command = connection.CreateCommand())
-                        {
-                            command.CommandText = sql;
+                        command.Parameters.Add("@Description", SqlDbType.VarChar, 256).Value = Description;
+                        command.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = userId;
+                        command.Parameters.Add("@Created", SqlDbType.DateTime).Value = Created;
+                        command.Parameters.Add("@Code", SqlDbType.VarChar, 32).Value = Code.ToLower();
+                        command.Parameters.Add("@Active", SqlDbType.Bit).Value = true;
 
-                            command.Parameters.Add("@Description", NpgsqlTypes.NpgsqlDbType.Varchar, 256).Value = Description;
-                            command.Parameters.Add("@CreatedBy", NpgsqlTypes.NpgsqlDbType.Integer).Value = userId;
-                            command.Parameters.Add("@Created", NpgsqlTypes.NpgsqlDbType.Timestamp).Value = Created;
-                            command.Parameters.Add("@Code", NpgsqlTypes.NpgsqlDbType.Varchar, 32).Value = Code.ToLower();
-                            command.Parameters.Add("@Active", NpgsqlTypes.NpgsqlDbType.Boolean).Value = IsActive;
-
-                            promoId = (int)command.ExecuteScalar();
-                        }
-
-                        transaction.Commit();
-
-                        ApplicationCache cacheProvider = new ApplicationCache();
-                        List<PromoModel> promos = cacheProvider.Get(CacheId, () => new List<PromoModel>());
-                        Id = promoId;
-                        CreatedBy = UserModel.GetUser(userId);
-                        promos.Add(this);
-                        cacheProvider.Set(CacheId, promos);
+                        connection.Open();
+                        Id = (int)command.ExecuteScalar();
                     }
                 }
             }
@@ -192,23 +168,21 @@ namespace Belletrix.Models
             }
 
             const string sql = @"
-                SELECT  id
-                FROM    user_promo
-                WHERE   LOWER(code) = @Code";
+                SELECT  [Id]
+                FROM    [UserPromo]
+                WHERE   LOWER([Code]) = @Code";
 
             try
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (SqlCommand command = connection.CreateCommand())
                     {
                         command.CommandText = sql;
-                        command.Parameters.Add("@Code", NpgsqlTypes.NpgsqlDbType.Varchar, 32).Value = name.ToLower();
+                        command.Parameters.Add("@Code", SqlDbType.VarChar, 32).Value = name.ToLower();
                         connection.Open();
 
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
                             result = !reader.HasRows;
                         }
@@ -228,30 +202,28 @@ namespace Belletrix.Models
         {
             IList<PromoModel> promos = new List<PromoModel>();
             const string sql = @"
-                SELECT      id, code, description
-                FROM        user_promo
-                ORDER BY    description";
+                SELECT      [Id], [Code], [Description]
+                FROM        [UserPromo]
+                ORDER BY    [Description]";
 
             try
             {
-                using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-
-                    using (NpgsqlCommand command = connection.CreateCommand())
+                    using (SqlCommand command = connection.CreateCommand())
                     {
                         command.CommandText = sql;
                         connection.Open();
 
-                        using (NpgsqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
                                 promos.Add(new PromoModel()
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                    Code = reader.GetString(reader.GetOrdinal("code")),
-                                    Description = reader.GetString(reader.GetOrdinal("description"))
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    Code = reader.GetString(reader.GetOrdinal("Code")),
+                                    Description = reader.GetString(reader.GetOrdinal("Description"))
                                 });
                             }
                         }

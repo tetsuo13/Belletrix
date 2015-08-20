@@ -1,6 +1,5 @@
-﻿using Belletrix.Core;
-using Npgsql;
-using System;
+﻿using System;
+using System.Data.SqlClient;
 
 namespace Belletrix.DAL
 {
@@ -25,28 +24,21 @@ namespace Belletrix.DAL
     /// </remarks>
     public class UnitOfWork : IUnitOfWork
     {
-        protected readonly string ConnectionString;
-        private NpgsqlConnection context;
-        private NpgsqlTransaction transaction;
+        private SqlConnection context;
+        private SqlTransaction transaction;
 
         public UnitOfWork(string connectionString)
         {
-            ConnectionString = connectionString;
+            context = new SqlConnection(connectionString);
+            context.Open();
+            transaction = context.BeginTransaction();
         }
 
-        public NpgsqlConnection DbContext
+        public SqlCommand CreateCommand()
         {
-            get
-            {
-                if (context == null)
-                {
-                    context = new NpgsqlConnection(ConnectionString);
-                    context.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
-                    context.Open();
-                    transaction = context.BeginTransaction();
-                }
-                return context;
-            }
+            SqlCommand command = context.CreateCommand();
+            command.Transaction = transaction;
+            return command;
         }
 
         public void SaveChanges()

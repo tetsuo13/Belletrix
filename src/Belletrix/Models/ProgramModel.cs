@@ -1,7 +1,7 @@
 ﻿using Belletrix.Core;
-using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 
 namespace Belletrix.Models
 {
@@ -13,58 +13,49 @@ namespace Belletrix.Models
 
         public static IEnumerable<ProgramModel> GetPrograms()
         {
-            ApplicationCache cacheProvider = new ApplicationCache();
-            const string cacheId = "Programs";
-            List<ProgramModel> programs = cacheProvider.Get(cacheId, () => new List<ProgramModel>());
+            List<ProgramModel> programs = new List<ProgramModel>();
 
-            if (programs.Count == 0)
+            const string sql = @"
+                SELECT      [Id], [Name], [Abbreviation]
+                FROM        [Programs]
+                ORDER BY    [Name]";
+
+            try
             {
-                const string sql = @"
-                    SELECT      id, name, abbreviation
-                    FROM        programs
-                    ORDER BY    name";
-
-                try
+                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
                 {
-                    using (NpgsqlConnection connection = new NpgsqlConnection(Connections.Database.Dsn))
+                    using (SqlCommand command = connection.CreateCommand())
                     {
-                        connection.ValidateRemoteCertificateCallback += Connections.Database.connection_ValidateRemoteCertificateCallback;
+                        command.CommandText = sql;
+                        connection.Open();
 
-                        using (NpgsqlCommand command = connection.CreateCommand())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            command.CommandText = sql;
-                            connection.Open();
-
-                            using (NpgsqlDataReader reader = command.ExecuteReader())
+                            while (reader.Read())
                             {
-                                while (reader.Read())
+                                ProgramModel program = new ProgramModel()
                                 {
-                                    ProgramModel program = new ProgramModel()
-                                    {
-                                        Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                        Name = reader.GetString(reader.GetOrdinal("name"))
-                                    };
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name"))
+                                };
 
-                                    int ord = reader.GetOrdinal("abbreviation");
+                                int ord = reader.GetOrdinal("Abbreviation");
 
-                                    if (!reader.IsDBNull(ord))
-                                    {
-                                        program.Abbreviation = reader.GetString(ord);
-                                    }
-
-                                    programs.Add(program);
+                                if (!reader.IsDBNull(ord))
+                                {
+                                    program.Abbreviation = reader.GetString(ord);
                                 }
 
-                                cacheProvider.Set(cacheId, programs);
+                                programs.Add(program);
                             }
                         }
                     }
                 }
-                catch (Exception e)
-                {
-                    e.Data["SQL"] = sql;
-                    throw e;
-                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
             }
 
             return programs;

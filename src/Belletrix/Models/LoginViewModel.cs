@@ -2,7 +2,7 @@
 
 namespace Belletrix.Models
 {
-    public class LoginModel
+    public class LoginViewModel
     {
         [Required(ErrorMessage = "Please enter your user name")]
         [Display(Name = "Username")]

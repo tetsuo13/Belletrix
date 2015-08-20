@@ -1,11 +1,11 @@
-﻿using Npgsql;
-using System;
+﻿using System;
+using System.Data.SqlClient;
 
 namespace Belletrix.DAL
 {
     public interface IUnitOfWork : IDisposable
     {
-        NpgsqlConnection DbContext { get; }
+        SqlCommand CreateCommand();
         void SaveChanges();
     }
 }
