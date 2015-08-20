@@ -69,15 +69,18 @@ namespace Belletrix.Models
             List<StudyAbroadModel> studyAbroad = new List<StudyAbroadModel>();
 
             StringBuilder sql = new StringBuilder(@"
-                SELECT  [Id], [StudentId], [Semester],
-                        [Year], [StartDate], [EndDate],
-                        [CreditBearing], [Internship], [CountryId],
-                        [City], [ProgramId]
-                FROM    [StudyAbroad] ");
+                SELECT      a.[Id], a.[StudentId], [Semester],
+                            [Year], [StartDate], [EndDate],
+                            [CreditBearing], [Internship], [CountryId],
+                            a.[City], [ProgramId],
+                            [FirstName], [MiddleName], [LastName]
+                FROM        [dbo].[StudyAbroad] a
+                INNER JOIN  [dbo].[Students] s ON
+                            a.[StudentId] = s.[Id]");
 
             if (studentId.HasValue)
             {
-                sql.Append("WHERE [StudentId] = @StudentId ");
+                sql.Append("WHERE a.[StudentId] = @StudentId ");
             }
 
             sql.Append("ORDER BY [Year] DESC, [Semester] DESC");
@@ -131,14 +134,14 @@ namespace Belletrix.Models
                                     study.City = reader.GetString(ord);
                                 }
 
-                                try
+                                ord = reader.GetOrdinal("MiddleName");
+
+                                study.Student = new StudentModel()
                                 {
-                                    study.Student = StudentModel.GetStudent(study.StudentId);
-                                }
-                                catch (Exception)
-                                {
-                                    throw;
-                                }
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    MiddleName = reader.IsDBNull(ord) ? null : reader.GetString(ord),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                                };
 
                                 studyAbroad.Add(study);
                             }
