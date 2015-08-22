@@ -1,0 +1,148 @@
+﻿@using Belletrix.Models;
+
+@model StudyAbroadModel
+
+@{
+    ViewBag.Title = "Add";
+}
+
+@section FooterScript {
+    <script>
+        $(function () {
+            'use strict';
+
+            Belletrix.handleMvcEditor();
+
+            $('.multiselect').multiselect({
+                numberDisplayed: 1,
+                buttonContainer: '<div class="button-default" />'
+            });
+
+            Belletrix.singleSubmit();
+        });
+    </script>
+}
+
+@section Body {
+    <div class="row">
+        <div class="col-lg-12">
+            <h1>Create Experience for @ViewBag.Student.FirstName @ViewBag.Student.LastName</h1>
+            <ol class="breadcrumb">
+                <li><a href="@Url.Action("List", "Student")"><i class="fa fa-users"></i> Students</a></li>
+                <li><a href="@Url.Action("Edit", "Student", new { Id = ViewBag.Student.Id })"><i class="fa fa-user"></i> @ViewBag.Student.FirstName @ViewBag.Student.LastName</a></li>
+                <li class="active"><i class="fa fa-edit"></i> Create Experience</li>
+            </ol>
+        </div>
+    </div>
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { role = "form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary()
+        @Html.Hidden("StudentId", (int)ViewBag.Student.Id)
+        
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Destination</h3>
+                    </div>
+
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                @Html.LabelFor(s => s.CountryId)
+                                @Html.DropDownListFor(s => s.CountryId, ViewBag.Countries as SelectList, "Please Select", new { @class = "form-control" })
+                            </div>
+                            <div class="col-lg-6">
+                                @Html.LabelFor(s => s.City) <i>(Optional)</i>
+                                @Html.TextBoxFor(s => s.City, new { @class = "form-control "})
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                @Html.LabelFor(s => s.Year)
+                                @Html.DropDownListFor(s => s.Year, ViewBag.Years as SelectList, "Please Select", new { @class = "form-control" })
+                            </div>
+                            <div class="col-lg-6">
+                                @Html.LabelFor(s => s.Semester)
+                                @Html.DropDownListFor(s => s.Semester, new SelectList(ViewBag.Semesters, "Id", "Name"), "Please Select", new { @class = "form-control" })
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                @Html.LabelFor(s => s.StartDate) <i>(Optional)</i>
+                                @Html.EditorFor(s => s.StartDate)
+                            </div>
+                            <div class="col-lg-6">
+                                @Html.LabelFor(s => s.EndDate) <i>(Optional)</i>
+                                @Html.EditorFor(s => s.EndDate)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Details</h3>
+                    </div>
+
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(s => s.CreditBearing)
+                                    @Html.DropDownListFor(s => s.CreditBearing, new SelectList(
+                                        new[]
+                                        {
+                                            new { Value = false, Text = "No" },
+                                            new { Value = true, Text = "Yes" }
+                                        },
+                                        "Value",
+                                        "Text",
+                                        Model), "Please Select", new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(s => s.Internship)
+                                    @Html.DropDownListFor(s => s.Internship, new SelectList(
+                                        new[]
+                                        {
+                                            new { Value = false, Text = "No" },
+                                            new { Value = true, Text = "Yes" }
+                                        },
+                                        "Value",
+                                        "Text",
+                                        Model), "Please Select", new { @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                @Html.LabelFor(s => s.ProgramId)
+                                @Html.DropDownListFor(s => s.ProgramId, ViewBag.Programs as SelectList, "Please Select", new { @class = "form-control" })
+                            </div>
+                            <div class="col-lg-6">
+                                @Html.LabelFor(s => s.ProgramTypes)
+                                @Html.ListBoxFor(s => s.ProgramTypes, new MultiSelectList(ViewBag.ProgramTypes, "Id", "Name"), new { @class = "multiselect", multiple = "multiple" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <button type="submit" class="btn btn-default">Add Experience</button>
+                <a href="@Url.Action("Edit", "Student", new { Id = ViewBag.Student.Id })" class="btn btn-link" role="button">Cancel</a>
+            </div>
+        </div>
+    }
+}
