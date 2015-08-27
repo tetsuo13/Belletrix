@@ -34,9 +34,8 @@ namespace Belletrix.Entity.ViewModel
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
 
-        [Required]
         [Display(Name = "On Campus?")]
-        public bool OnCampus { get; set; }
+        public bool? OnCampus { get; set; }
 
         [MaxLength(2048)]
         [Display(Name = "Web Site")]

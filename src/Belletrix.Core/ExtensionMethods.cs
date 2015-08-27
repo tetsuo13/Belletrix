@@ -5,15 +5,15 @@ namespace Belletrix.Core
 {
     public static class ExtensionMethods
     {
-        public static async Task<string> GetText(this DbDataReader reader, string columnName)
+        public static async Task<T> GetValueOrDefault<T>(this DbDataReader reader, string columnName)
         {
             int ord = reader.GetOrdinal(columnName);
 
             if (await reader.IsDBNullAsync(ord))
             {
-                return null;
+                return default(T);
             }
-            return await reader.GetFieldValueAsync<string>(ord);
+            return await reader.GetFieldValueAsync<T>(ord);
         }
     }
 }

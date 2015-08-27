@@ -107,9 +107,9 @@ namespace Belletrix.DAL
             {
                 Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
                 FullName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("FullName")),
-                Description = await reader.GetText("Description"),
-                PhoneNumber = await reader.GetText("Phone"),
-                Email = await reader.GetText("Email")
+                Description = await reader.GetValueOrDefault<string>("Description"),
+                PhoneNumber = await reader.GetValueOrDefault<string>("Phone"),
+                Email = await reader.GetValueOrDefault<string>("Email")
             };
         }
 

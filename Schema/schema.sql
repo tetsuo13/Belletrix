@@ -686,7 +686,7 @@ CREATE TABLE [dbo].[ActivityLog] (
     [Location]      [nvarchar](512),
     [StartDate]     [date] NOT NULL,
     [EndDate]       [date] NOT NULL,
-    [OnCampus]      [bit] NOT NULL,
+    [OnCampus]      [bit],
     [WebSite]       [varchar](2048),
     [Notes]         [nvarchar](max),
 

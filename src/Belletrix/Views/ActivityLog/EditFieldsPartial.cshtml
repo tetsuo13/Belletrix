@@ -70,17 +70,17 @@
                         </div>
                     </div>
                     <div class="col-lg-3">
-                        <div class="form-group has-error">
+                        <div class="form-group">
                             @Html.LabelFor(x => x.OnCampus)
                             @Html.DropDownListFor(x => x.OnCampus, new SelectList(
-                                        new[]
-                                        {
-                                            new { Value = false, Text = "No" },
-                                            new { Value = true, Text = "Yes" }
-                                        },
-                                        "Value",
-                                        "Text",
-                                        Model), "Please Select", new { @class = "form-control" })
+                                new[]
+                                {
+                                    new { Value = false, Text = "No" },
+                                    new { Value = true, Text = "Yes" }
+                                },
+                                "Value",
+                                "Text",
+                                Model), "Please Select", new { @class = "form-control" })
                             @Html.ValidationMessageFor(x => x.OnCampus)
                         </div>
                     </div>
