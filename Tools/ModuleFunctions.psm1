@@ -10,7 +10,7 @@ dictionary.
 function Get-ConnectionString()
 {
     $PSScriptRoot = Split-Path $script:MyInvocation.MyCommand.Path
-    $webConfigPath = (Join-Path (Join-Path (Get-Item $PSScriptRoot).parent.FullName "Belletrix") "Web.Release.config")
+    $webConfigPath = (Join-Path (Join-Path (Join-Path (Get-Item $PSScriptRoot).parent.FullName "src") "Belletrix") "Web.Release.config")
 
     $webConfig = New-Object XML
     $webConfig.Load($webConfigPath)
