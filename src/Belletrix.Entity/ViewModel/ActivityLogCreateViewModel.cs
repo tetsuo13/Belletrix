@@ -8,13 +8,15 @@ namespace Belletrix.Entity.ViewModel
     public class ActivityLogCreateViewModel
     {
         [Required]
-        [Display(Name = "Title")]
+        [Display(Name = "Main")]
         [MaxLength(256)]
         public string Title { get; set; }
 
+        [Display(Name = "Subtitle")]
         [MaxLength(256)]
         public string Title2 { get; set; }
 
+        [Display(Name = "Additional")]
         [MaxLength(256)]
         public string Title3 { get; set; }
 
