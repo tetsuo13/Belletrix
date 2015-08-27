@@ -317,8 +317,8 @@ namespace Belletrix.Models
                 columns.Add("Gpa", parameterName);
                 SqlParameter parameter = new SqlParameter(parameterName, SqlDbType.Decimal)
                 {
-                    Scale = 3,
-                    Precision = 2,
+                    Scale = 2,
+                    Precision = 3,
                     Value = Gpa.Value
                 };
 
