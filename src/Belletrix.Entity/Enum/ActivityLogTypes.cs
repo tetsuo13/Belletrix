@@ -13,6 +13,7 @@ namespace Belletrix.Entity.Enum
         [Display(Name = "Site Visit")]
         SiteVisit,
 
-        Meeting
+        Meeting,
+        Other
     }
 }
