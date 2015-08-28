@@ -4,14 +4,13 @@ namespace Belletrix.Entity.Enum
 {
     public enum ActivityLogTypes
     {
-        Conference = 1,
-        Institute,
-        Summit,
+        [Display(Name = "Conference/Institute/Summit")]
+        ConferenceInstituteSummit = 1,
         Grant,
         Community,
         Student,
 
-        [Display(Name="Site Visit")]
+        [Display(Name = "Site Visit")]
         SiteVisit,
 
         Meeting
