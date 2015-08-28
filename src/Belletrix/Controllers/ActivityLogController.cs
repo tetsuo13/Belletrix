@@ -54,7 +54,7 @@ namespace Belletrix.Controllers
                                                 select new SelectListItem
                                                 {
                                                     Value = ((int)a).ToString(),
-                                                    Text = a.ToString()
+                                                    Text = a.GetDisplayName()
                                                 };
 
             ViewBag.TypesSelect = new MultiSelectList(types, "Value", "Text", model.Types);
