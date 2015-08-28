@@ -10,7 +10,7 @@
         /// <summary>Disable the form submit button after clicking it.</summary>
 
         $('form').submit(function () {
-            // We're doing to disable all submit buttons unless otherwise
+            // We're going to disable all submit buttons unless otherwise
             // told to.
             var disableButtons = true;
 
