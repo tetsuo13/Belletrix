@@ -606,7 +606,8 @@ VALUES
 (N'Institute for Future Global Leaders UVI', NULL),
 (N'Tec de Monterrey', NULL),
 (N'Global Semesters', NULL),
-(N'Global Linkages', NULL);
+(N'Global Linkages', NULL),
+(N'Other', 'OTHER');
 
 
 CREATE TABLE [dbo].[ProgramTypes] (
