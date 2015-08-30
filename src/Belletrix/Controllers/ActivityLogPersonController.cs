@@ -87,7 +87,7 @@ namespace Belletrix.Controllers
                 try
                 {
                     int id = await ActivityService.CreatePerson(model);
-                    await ActivityService.SaveChanges();
+                    ActivityService.SaveChanges();
 
                     ActivityLogParticipantModel participant = new ActivityLogParticipantModel()
                     {

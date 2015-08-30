@@ -80,7 +80,7 @@ namespace Belletrix.Controllers
 
                     ActivityService.ClearSession(Session, model.SessionId);
 
-                    await ActivityService.SaveChanges();
+                    ActivityService.SaveChanges();
 
                     return RedirectToAction("List");
                 }
@@ -129,7 +129,7 @@ namespace Belletrix.Controllers
 
                     ActivityService.ClearSession(Session, model.SessionId);
 
-                    await ActivityService.SaveChanges();
+                    ActivityService.SaveChanges();
 
                     return RedirectToAction("List");
                 }

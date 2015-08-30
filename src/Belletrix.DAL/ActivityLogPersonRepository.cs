@@ -146,7 +146,7 @@ namespace Belletrix.DAL
             return people;
         }
 
-        public async Task SaveChanges()
+        public void SaveChanges()
         {
             UnitOfWork.SaveChanges();
         }

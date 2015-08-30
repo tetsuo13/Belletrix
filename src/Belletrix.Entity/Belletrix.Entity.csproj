@@ -40,6 +40,7 @@
     <Compile Include="Enum\ActivityLogParticipantTypes.cs" />
     <Compile Include="Enum\ActivityLogTypes.cs" />
     <Compile Include="Model\ActivityLogSessionModel.cs" />
+    <Compile Include="Model\NoteModel.cs" />
     <Compile Include="ViewModel\ActivityLogCreateViewModel.cs" />
     <Compile Include="Model\ActivityLogModel.cs" />
     <Compile Include="Model\ActivityLogParticipantModel.cs" />

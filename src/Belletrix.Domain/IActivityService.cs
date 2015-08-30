@@ -18,7 +18,7 @@ namespace Belletrix.Domain
         Task<int> InsertActivity(ActivityLogCreateViewModel createModel, int userId);
         Task UpdateActivity(ActivityLogEditViewModel saveModel);
 
-        Task SaveChanges();
+        void SaveChanges();
         Task PopulateSession(HttpSessionStateBase session, Guid sessionId, int activityId);
 
         IEnumerable<ActivityLogParticipantModel> ParticipantsInSession(HttpSessionStateBase session, Guid sessionId);

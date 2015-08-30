@@ -312,7 +312,7 @@ namespace Belletrix.DAL
             }
         }
 
-        public async Task SaveChanges()
+        public void SaveChanges()
         {
             UnitOfWork.SaveChanges();
         }

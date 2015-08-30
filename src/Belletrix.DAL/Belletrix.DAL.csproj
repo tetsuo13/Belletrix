@@ -45,8 +45,10 @@
     <Compile Include="ActivityLogRepository.cs" />
     <Compile Include="IActivityLogPersonRepository.cs" />
     <Compile Include="IActivityLogRepository.cs" />
+    <Compile Include="IStudentNoteRepository.cs" />
     <Compile Include="IUnitOfWork.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StudentNoteRepository.cs" />
     <Compile Include="UnitOfWork.cs" />
   </ItemGroup>
   <ItemGroup>

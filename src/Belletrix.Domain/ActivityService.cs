@@ -60,10 +60,10 @@ namespace Belletrix.Domain
             await ActivityLogRepository.MergeActivityTypes(model.Id, model.Types.Cast<int>());
         }
 
-        public async Task SaveChanges()
+        public void SaveChanges()
         {
-            await ActivityLogRepository.SaveChanges();
-            await ActivityLogPersonRepository.SaveChanges();
+            ActivityLogRepository.SaveChanges();
+            ActivityLogPersonRepository.SaveChanges();
         }
 
         /// <summary>

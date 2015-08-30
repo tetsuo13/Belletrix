@@ -1,4 +1,5 @@
 ﻿using Belletrix.Core;
+using Belletrix.Domain;
 using Belletrix.Models;
 using System;
 using System.Collections.Generic;
@@ -13,8 +14,12 @@ namespace Belletrix.Controllers
     {
         public static string ActivePageName = "students";
 
-        public StudentController()
+        private readonly IStudentNoteService StudentNoteService;
+
+        public StudentController(IStudentNoteService studentNoteService)
         {
+            StudentNoteService = studentNoteService;
+
             ViewBag.ActivePage = ActivePageName;
         }
 
@@ -53,7 +58,7 @@ namespace Belletrix.Controllers
             }
 
             ViewBag.StudyAbroad = StudyAbroadModel.GetAll(id);
-            ViewBag.Notes = NoteModel.GetNotes(id);
+            ViewBag.Notes = StudentNoteService.GetAllNotes(id);
             PrepareDropDowns();
             PrepareStudyAbroadDropDowns();
             Analytics.TrackPageView(Request, "Student", (Session["User"] as UserModel).Login);
@@ -74,7 +79,7 @@ namespace Belletrix.Controllers
             }
 
             ViewBag.StudyAbroad = StudyAbroadModel.GetAll(id);
-            ViewBag.Notes = NoteModel.GetNotes(id);
+            ViewBag.Notes = StudentNoteService.GetAllNotes(id);
             PrepareDropDowns();
             PrepareStudyAbroadDropDowns();
             return PartialView("View.NameCheck", student);
