@@ -1,4 +1,5 @@
 ﻿using Belletrix.Core;
+using Belletrix.Entity.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -85,7 +86,9 @@ namespace Belletrix.Models
                     EventLogModel eventLog = new EventLogModel()
                     {
                         Student = this,
-                        ModifiedBy = user
+                        ModifiedById = user.Id,
+                        ModifiedByFirstName = user.FirstName,
+                        ModifiedByLastName = user.LastName
                     };
                     eventLog.AddStudentEvent(connection, transaction, user.Id, Id, EventLogModel.EventType.EditStudent);
 
@@ -415,7 +418,9 @@ namespace Belletrix.Models
                     EventLogModel eventLog = new EventLogModel()
                     {
                         Student = this,
-                        ModifiedBy = user
+                        ModifiedById = user.Id,
+                        ModifiedByFirstName = user.FirstName,
+                        ModifiedByLastName = user.LastName
                     };
                     eventLog.AddStudentEvent(connection, transaction, user.Id, Id, EventLogModel.EventType.AddStudent);
 

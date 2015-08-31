@@ -19,7 +19,9 @@ namespace Belletrix.Models
         [MaxLength(256)]
         public string Description { get; set; }
 
-        public UserModel CreatedBy { get; set; }
+        public int CreatedById { get; set; }
+        public string CreatedByFirstName { get; set; }
+        public string CreatedByLastName { get; set; }
 
         public DateTime Created { get; set; }
 
@@ -62,17 +64,11 @@ namespace Belletrix.Models
                                     Description = reader.GetString(reader.GetOrdinal("Description")),
                                     Created = DateTimeFilter.UtcToLocal(reader.GetDateTime(reader.GetOrdinal("Created"))),
                                     Code = reader.GetString(reader.GetOrdinal("Code")),
-                                    IsActive = reader.GetBoolean(reader.GetOrdinal("Active"))
+                                    IsActive = reader.GetBoolean(reader.GetOrdinal("Active")),
+                                    CreatedById = reader.GetInt32(reader.GetOrdinal("CreatedBy")),
+                                    CreatedByFirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    CreatedByLastName = reader.GetString(reader.GetOrdinal("LastName"))
                                 };
-
-                                UserModel user = new UserModel()
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("CreatedBy")),
-                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                    LastName = reader.GetString(reader.GetOrdinal("LastName"))
-                                };
-
-                                promo.CreatedBy = user;
 
                                 if (withLogs)
                                 {

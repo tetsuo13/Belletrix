@@ -41,6 +41,7 @@
     <Compile Include="Enum\ActivityLogTypes.cs" />
     <Compile Include="Model\ActivityLogSessionModel.cs" />
     <Compile Include="Model\NoteModel.cs" />
+    <Compile Include="Model\UserModel.cs" />
     <Compile Include="ViewModel\ActivityLogCreateViewModel.cs" />
     <Compile Include="Model\ActivityLogModel.cs" />
     <Compile Include="Model\ActivityLogParticipantModel.cs" />
@@ -48,6 +49,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModel\ActivityLogEditViewModel.cs" />
     <Compile Include="ViewModel\ActivityLogPersonCreateViewModel.cs" />
+    <Compile Include="ViewModel\LoginViewModel.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

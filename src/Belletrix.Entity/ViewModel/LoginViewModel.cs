@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Belletrix.Models
+namespace Belletrix.Entity.ViewModel
 {
     public class LoginViewModel
     {

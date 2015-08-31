@@ -1,4 +1,5 @@
 ﻿using Belletrix.Core;
+using Belletrix.Entity.Model;
 using Belletrix.Models;
 using StackExchange.Exceptional;
 using System.Threading.Tasks;

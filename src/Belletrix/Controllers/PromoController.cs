@@ -1,4 +1,5 @@
 ﻿using Belletrix.Core;
+using Belletrix.Entity.Model;
 using Belletrix.Models;
 using System;
 using System.Collections.Generic;

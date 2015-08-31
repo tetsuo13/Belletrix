@@ -26,6 +26,8 @@ namespace Belletrix.App_Start
             container.RegisterType<IActivityService, ActivityService>();
             container.RegisterType<IActivityLogRepository, ActivityLogRepository>();
             container.RegisterType<IActivityLogPersonRepository, ActivityLogPersonRepository>();
+            container.RegisterType<IUserRepository, UserRepository>();
+            container.RegisterType<IUserService, UserService>();
             container.RegisterType<IStudentNoteRepository, StudentNoteRepository>();
             container.RegisterType<IStudentNoteService, StudentNoteService>();
         }

@@ -22,7 +22,7 @@
                         {
                             string action = String.Empty;
                             string personName = eventLog.Student.FirstName + " " + eventLog.Student.LastName;
-                            bool modifiedByRealUser = eventLog.ModifiedBy != null;
+                            bool modifiedByRealUser = eventLog.ModifiedById != default(int);
                             string iconClass = String.Empty;
                             
                             switch (eventLog.Type)
@@ -48,7 +48,7 @@
                                     break;
                             }
 
-                            string eventBy = !modifiedByRealUser ? "System" : eventLog.ModifiedBy.FirstName;
+                            string eventBy = !modifiedByRealUser ? "System" : eventLog.ModifiedByFirstName;
                             
                             <a href="#" class="list-group-item" title="@eventBy @action @personName">
                                 <i class="@iconClass fa-fw"></i> @personName

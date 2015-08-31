@@ -1,8 +1,8 @@
 ﻿using Belletrix.Core;
 using Belletrix.Domain;
 using Belletrix.Entity.Enum;
+using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
-using Belletrix.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

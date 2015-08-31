@@ -168,7 +168,6 @@
     <Compile Include="Models\CountryModel.cs" />
     <Compile Include="Models\EventLogModel.cs" />
     <Compile Include="Models\LanguageModel.cs" />
-    <Compile Include="Models\LoginViewModel.cs" />
     <Compile Include="Models\MajorsModel.cs" />
     <Compile Include="Models\MatriculationModel.cs" />
     <Compile Include="Models\MinorsModel.cs" />
@@ -182,7 +181,6 @@
     <Compile Include="Models\StudentSearchModel.cs" />
     <Compile Include="Models\StudentStudyAbroadWishlistModel.cs" />
     <Compile Include="Models\StudyAbroadModel.cs" />
-    <Compile Include="Models\UserModel.cs" />
     <Compile Include="Models\StudentPromoLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

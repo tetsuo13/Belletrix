@@ -29,11 +29,15 @@ namespace Belletrix.Models
         
         public string Action { get; set; }
 
-        public UserModel ModifiedBy { get; set; }
+        public int ModifiedById { get; set; }
+        public string ModifiedByFirstName { get; set; }
+        public string ModifiedByLastName { get; set; }
 
         public StudentBaseModel Student { get; set; }
 
-        public UserModel User { get; set; }
+        public int UserId { get; set; }
+        public string UserFirstName { get; set; }
+        public string UserLastName { get; set; }
 
         public string RelativeDate { get; set; }
 
@@ -76,13 +80,6 @@ namespace Belletrix.Models
                         {
                             while (await reader.ReadAsync())
                             {
-                                UserModel modifiedBy = new UserModel()
-                                {
-                                    Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("ModifiedBy")),
-                                    FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("FirstName")),
-                                    LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("LastName"))
-                                };
-
                                 int ord = reader.GetOrdinal("Action");
                                 string action = null;
                                 if (!reader.IsDBNull(ord))
@@ -102,28 +99,26 @@ namespace Belletrix.Models
                                     };
                                 }
 
-                                UserModel user = null;
-                                ord = reader.GetOrdinal("UserId");
-                                if (!reader.IsDBNull(ord))
-                                {
-                                    user = new UserModel()
-                                    {
-                                        Id = await reader.GetFieldValueAsync<int>(ord),
-                                        FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("UserFirstName")),
-                                        LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("UserLastName"))
-                                    };
-                                }
-
                                 EventLogModel eventLog = new EventLogModel()
                                 {
                                     Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
                                     EventDate = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("Date"))),
-                                    ModifiedBy = modifiedBy,
+                                    ModifiedById = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("ModifiedBy")),
+                                    ModifiedByFirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("FirstName")),
+                                    ModifiedByLastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("LastName")),
                                     Student = student,
-                                    User = user,
                                     Type = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Type")),
                                     Action = action
                                 };
+
+                                ord = reader.GetOrdinal("UserId");
+
+                                if (!reader.IsDBNull(ord))
+                                {
+                                    eventLog.UserId = await reader.GetFieldValueAsync<int>(ord);
+                                    eventLog.UserFirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("UserFirstName"));
+                                    eventLog.UserLastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("UserLastName"));
+                                }
 
                                 //eventLog.RelativeDate = CalculateRelativeDate(eventLog.EventDate.ToUniversalTime());
 

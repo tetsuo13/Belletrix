@@ -1,8 +1,11 @@
 ﻿using Belletrix.Core;
-using Belletrix.Models;
+using Belletrix.Domain;
+using Belletrix.Entity.Model;
+using Belletrix.Entity.ViewModel;
 using System;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using System.Web.Security;
 
@@ -13,15 +16,19 @@ namespace Belletrix.Controllers
     {
         public static string ActivePageName = "user";
 
-        public UserController()
+        private readonly IUserService UserService;
+
+        public UserController(IUserService userService)
         {
+            UserService = userService;
+
             ViewBag.ActivePage = ActivePageName;
         }
 
         [AllowAnonymous]
-        public ActionResult Login(string returnUrl)
+        public async Task<ActionResult> Login(string returnUrl)
         {
-            Analytics.TrackPageView(Request, "Belletrix", null);
+            await Analytics.TrackPageView(Request, "Belletrix", null);
             ViewBag.ReturnUrl = returnUrl;
             return View();
         }
@@ -29,7 +36,7 @@ namespace Belletrix.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public ActionResult Login(LoginViewModel model, string returnUrl)
+        public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
             string mainError = "Invalid login credentials";
 
@@ -37,14 +44,14 @@ namespace Belletrix.Controllers
             {
                 try
                 {
-                    UserModel user = UserModel.GetUser(model.UserName);
+                    UserModel user = await UserService.GetUser(model.UserName);
                     string correctHash = user.PasswordIterations + ":" + user.PasswordSalt + ":" + user.Password;
 
                     if (user.IsActive && PasswordHash.ValidatePassword(model.Password, correctHash))
                     {
-                        UserModel.UpdateLastLogin(model.UserName);
+                        UserService.UpdateLastLogin(model.UserName);
                         FormsAuthentication.SetAuthCookie(model.UserName, true);
-                        Session["User"] = UserModel.GetUser(model.UserName);
+                        Session["User"] = await UserService.GetUser(model.UserName);
 
                         if (Url.IsLocalUrl(returnUrl) &&
                             returnUrl.Length > 1 &&
@@ -65,7 +72,7 @@ namespace Belletrix.Controllers
                 }
             }
 
-            Analytics.TrackPageView(Request, "Belletrix", null);
+            await Analytics.TrackPageView(Request, "Belletrix", null);
             ModelState.AddModelError("", mainError);
             return View(model);
         }
@@ -76,9 +83,9 @@ namespace Belletrix.Controllers
             return RedirectToAction("Login", "User");
         }
 
-        new public ActionResult Profile()
+        new public async Task<ActionResult> Profile()
         {
-            Analytics.TrackPageView(Request, "Profile", (Session["User"] as UserModel).Login);
+            await Analytics.TrackPageView(Request, "Profile", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Profile";
             return View(Session["User"]);
         }
@@ -90,23 +97,25 @@ namespace Belletrix.Controllers
         /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        new public ActionResult Profile(UserModel model)
+        new public async Task<ActionResult> Profile(UserModel model)
         {
             if (ModelState.IsValid)
             {
                 UserModel currentUser = Session["User"] as UserModel;
                 model.Id = currentUser.Id;
-                model.SaveChanges(currentUser.IsAdmin);
+
+                UserService.UpdateUser(currentUser, currentUser.IsAdmin);
+
                 Session["User"] = model;
                 return RedirectToAction("Index", "Home");
             }
 
-            Analytics.TrackPageView(Request, "Profile", (Session["User"] as UserModel).Login);
+            await Analytics.TrackPageView(Request, "Profile", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Profile";
             return View("Profile", model);
         }
 
-        public ActionResult Add()
+        public async Task<ActionResult> Add()
         {
             UserModel currentUser = Session["User"] as UserModel;
 
@@ -115,14 +124,14 @@ namespace Belletrix.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            Analytics.TrackPageView(Request, "Add User", (Session["User"] as UserModel).Login);
+            await Analytics.TrackPageView(Request, "Add User", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Add";
             return View("Profile");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Add(UserModel model)
+        public async Task<ActionResult> Add(UserModel model)
         {
             UserModel currentUser = Session["User"] as UserModel;
 
@@ -143,30 +152,30 @@ namespace Belletrix.Controllers
 
             if (ModelState.IsValid)
             {
-                model.Save();
+                UserService.InsertUser(model);
                 return RedirectToAction("List");
             }
 
-            Analytics.TrackPageView(Request, "Add User", (Session["User"] as UserModel).Login);
+            await Analytics.TrackPageView(Request, "Add User", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Add";
             return View("Profile", model);
         }
 
-        public ActionResult Edit(string username)
+        public async Task<ActionResult> Edit(string username)
         {
             if (username == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            UserModel user = UserModel.GetUsers(username).FirstOrDefault();
+            UserModel user = (await UserService.GetUsers(username)).FirstOrDefault();
 
             if (user == null)
             {
                 return HttpNotFound();
             }
 
-            Analytics.TrackPageView(Request, "Edit User", (Session["User"] as UserModel).Login);
+            await Analytics.TrackPageView(Request, "Edit User", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Edit";
             return View("Profile", user);
         }
@@ -178,21 +187,21 @@ namespace Belletrix.Controllers
         /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(UserModel model)
+        public async Task<ActionResult> Edit(UserModel model)
         {
             if (ModelState.IsValid)
             {
                 UserModel currentUser = Session["User"] as UserModel;
-                model.SaveChanges(currentUser.IsAdmin);
+                UserService.UpdateUser(currentUser, currentUser.IsAdmin);
                 return RedirectToAction("Index", "Home");
             }
 
-            Analytics.TrackPageView(Request, "Edit User", (Session["User"] as UserModel).Login);
+            await Analytics.TrackPageView(Request, "Edit User", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Edit";
             return View("Profile", model);
         }
 
-        public ActionResult List()
+        public async Task<ActionResult> List()
         {
             UserModel currentUser = Session["User"] as UserModel;
 
@@ -201,8 +210,8 @@ namespace Belletrix.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            Analytics.TrackPageView(Request, "User List", (Session["User"] as UserModel).Login);
-            return View(UserModel.GetUsers());
+            await Analytics.TrackPageView(Request, "User List", (Session["User"] as UserModel).Login);
+            return View(await UserService.GetUsers());
         }
     }
 }
