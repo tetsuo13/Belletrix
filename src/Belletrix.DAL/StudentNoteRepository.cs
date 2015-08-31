@@ -88,8 +88,9 @@ namespace Belletrix.DAL
                     command.ExecuteNonQuery();
                 }
 
-                EventLogModel eventLog = new EventLogModel();
-                eventLog.AddStudentEvent(connection, transaction, userId, StudentId, EventLogModel.EventType.AddStudentNote);
+                // TODO: Replace all references of EventLogModel
+                //EventLogModel eventLog = new EventLogModel();
+                //eventLog.AddStudentEvent(connection, transaction, userId, StudentId, EventLogModel.EventType.AddStudentNote);
             }
             catch (Exception e)
             {
