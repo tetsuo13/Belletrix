@@ -1,11 +1,11 @@
 ﻿using Belletrix.Core;
 using Belletrix.Domain;
 using Belletrix.Entity.Model;
-using Belletrix.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace Belletrix.Controllers
@@ -15,20 +15,22 @@ namespace Belletrix.Controllers
     {
         public static string ActivePageName = "students";
 
+        private readonly IStudentService StudentService;
         private readonly IStudentNoteService StudentNoteService;
 
-        public StudentController(IStudentNoteService studentNoteService)
+        public StudentController(IStudentService studentService, IStudentNoteService studentNoteService)
         {
+            StudentService = studentService;
             StudentNoteService = studentNoteService;
 
             ViewBag.ActivePage = ActivePageName;
         }
 
-        public ActionResult List()
+        public async Task<ActionResult> List()
         {
-            Analytics.TrackPageView(Request, "Student List", (Session["User"] as UserModel).Login);
+            await Analytics.TrackPageView(Request, "Student List", (Session["User"] as UserModel).Login);
             PrepareDropDowns();
-            return View(StudentModel.GetStudents());
+            return View(await StudentService.GetStudents());
         }
 
         [HttpPost]
@@ -45,15 +47,20 @@ namespace Belletrix.Controllers
             return List();
         }
 
-        public ActionResult View(int id)
+        public async Task<ActionResult> View(int id)
         {
-            StudentModel student;
+            StudentModel student = null;
 
             try
             {
-                student = StudentModel.GetStudent(id);
+                student = await StudentService.GetStudent(id);
             }
             catch (Exception)
+            {
+                return HttpNotFound();
+            }
+
+            if (student == null)
             {
                 return HttpNotFound();
             }

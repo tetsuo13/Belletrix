@@ -30,6 +30,8 @@ namespace Belletrix.App_Start
             container.RegisterType<IUserService, UserService>();
             container.RegisterType<IStudentNoteRepository, StudentNoteRepository>();
             container.RegisterType<IStudentNoteService, StudentNoteService>();
+            container.RegisterType<IStudentRepository, StudentRepository>();
+            container.RegisterType<IStudentService, StudentService>();
         }
     }
 }

@@ -163,7 +163,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\BelletrixDependencyResolver.cs" />
-    <Compile Include="Models\IStudentModel.cs" />
     <Compile Include="Models\StudentBaseModel.cs" />
     <Compile Include="Models\CountryModel.cs" />
     <Compile Include="Models\EventLogModel.cs" />

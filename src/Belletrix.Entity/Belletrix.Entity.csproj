@@ -41,6 +41,7 @@
     <Compile Include="Enum\ActivityLogTypes.cs" />
     <Compile Include="Model\ActivityLogSessionModel.cs" />
     <Compile Include="Model\NoteModel.cs" />
+    <Compile Include="Model\StudentModels.cs" />
     <Compile Include="Model\UserModel.cs" />
     <Compile Include="ViewModel\ActivityLogCreateViewModel.cs" />
     <Compile Include="Model\ActivityLogModel.cs" />
