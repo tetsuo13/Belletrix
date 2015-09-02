@@ -30,6 +30,14 @@ namespace Belletrix.DAL
 
             string sql = @"
                 SELECT              s.Id, s.Created, s.InitialMeeting,
+                                    (SELECT DISTINCT STUFF((SELECT ',' + CAST([MajorId] AS VARCHAR(3)) FROM [dbo].[Matriculation] WHERE [StudentId] = s.Id AND IsMajor = 1 FOR XML PATH('')),1,1,'')) AS MajorIds,
+                                    (SELECT DISTINCT STUFF((SELECT ',' + CAST([MajorId] AS VARCHAR(3)) FROM [dbo].[Matriculation] WHERE [StudentId] = s.Id AND IsMajor = 0 FOR XML PATH('')),1,1,'')) AS MinorIds,
+                                    (SELECT DISTINCT STUFF((SELECT ',' + CAST([LanguageId] AS VARCHAR(3)) FROM [dbo].[StudentStudiedLanguages] WHERE [StudentId] = s.Id FOR XML PATH('')),1,1,'')) AS StudiedLanguageIds,
+                                    (SELECT DISTINCT STUFF((SELECT ',' + CAST([LanguageId] AS VARCHAR(3)) FROM [dbo].[StudentDesiredLanguages] WHERE [StudentId] = s.Id FOR XML PATH('')),1,1,'')) AS DesiredLanguageIds,
+                                    (SELECT DISTINCT STUFF((SELECT ',' + CAST([LanguageId] AS VARCHAR(3)) FROM [dbo].[StudentFluentLanguages] WHERE [StudentId] = s.Id FOR XML PATH('')),1,1,'')) AS FluentLanguageIds,
+                                    (SELECT DISTINCT STUFF((SELECT ',' + CAST([CountryId] AS VARCHAR(3)) FROM [dbo].[StudentStudyAbroadWishlist] WHERE [StudentId] = s.Id FOR XML PATH('')),1,1,'')) AS StudyAbroadCountryIds,
+                                    (SELECT DISTINCT STUFF((SELECT ',' + CAST([Year] AS VARCHAR(4)) FROM [dbo].[StudentStudyAbroadWishlist] WHERE [StudentId] = s.Id FOR XML PATH('')),1,1,'')) AS StudyAbroadYearIds,
+                                    (SELECT DISTINCT STUFF((SELECT ',' + CAST([Period] AS VARCHAR(3)) FROM [dbo].[StudentStudyAbroadWishlist] WHERE [StudentId] = s.Id FOR XML PATH('')),1,1,'')) AS StudyAbroadPeriodIds,
                                     s.FirstName, s.MiddleName, s.LastName,
                                     s.LivingOnCampus, s.PhoneNumber, s.StudentId,
                                     s.Dob, s.EnrolledFullTime, s.Citizenship,
@@ -104,17 +112,53 @@ namespace Belletrix.DAL
                             student.Gpa = await reader.GetValueOrDefault<double?>("Gpa");
 
                             int ord = reader.GetOrdinal("Dob");
-
                             if (!reader.IsDBNull(ord))
                             {
                                 student.DateOfBirth = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(ord));
                             }
 
                             ord = reader.GetOrdinal("InitialMeeting");
-
                             if (!reader.IsDBNull(ord))
                             {
                                 student.InitialMeeting = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(ord));
+                            }
+
+                            ord = reader.GetOrdinal("MajorIds");
+                            if (!reader.IsDBNull(ord))
+                            {
+                                student.SelectedMajors = (await reader.GetFieldValueAsync<string>(ord)).Split(',').Cast<int>();
+                            }
+
+                            ord = reader.GetOrdinal("MinorIds");
+                            if (!reader.IsDBNull(ord))
+                            {
+                                student.SelectedMinors = (await reader.GetFieldValueAsync<string>(ord)).Split(',').Cast<int>();
+                            }
+
+                            ord = reader.GetOrdinal("StudiedLanguageIds");
+                            if (!reader.IsDBNull(ord))
+                            {
+                                student.StudiedLanguages = (await reader.GetFieldValueAsync<string>(ord)).Split(',').Cast<int>();
+                            }
+
+                            ord = reader.GetOrdinal("DesiredLanguageIds");
+                            if (!reader.IsDBNull(ord))
+                            {
+                                student.SelectedDesiredLanguages = (await reader.GetFieldValueAsync<string>(ord)).Split(',').Cast<int>();
+                            }
+
+                            ord = reader.GetOrdinal("FluentLanguageIds");
+                            if (!reader.IsDBNull(ord))
+                            {
+                                student.SelectedLanguages = (await reader.GetFieldValueAsync<string>(ord)).Split(',').Cast<int>();
+                            }
+
+                            ord = reader.GetOrdinal("StudyAbroadCountryIds");
+                            if (!reader.IsDBNull(ord))
+                            {
+                                student.StudyAbroadCountry = (await reader.GetFieldValueAsync<string>(ord)).Split(',').Cast<int>();
+                                student.StudyAbroadYear = (await reader.GetFieldValueAsync<string>(reader.GetOrdinal("StudyAbroadYearIds"))).Split(',').Cast<int>();
+                                student.StudyAbroadPeriod = (await reader.GetFieldValueAsync<string>(reader.GetOrdinal("StudyAbroadPeriodIds"))).Split(',').Cast<int>();
                             }
 
                             student.PromoIds = StudentPromoLog.GetPromoIdsForStudent(student.Id);
@@ -123,12 +167,6 @@ namespace Belletrix.DAL
                         }
                     }
                 }
-
-                PopulateStudentMajorsMinors(connection, ref studentList);
-                PopulateStudentLanguages(connection, ref studentList);
-                PopulateDesiredStudentLanguages(connection, ref studentList);
-                PopulateStudiedLanguages(connection, ref studentList);
-                PopulateStudyAbroadDestinations(connection, ref studentList);
             }
             catch (Exception e)
             {
@@ -136,56 +174,6 @@ namespace Belletrix.DAL
             }
 
             return students;
-        }
-
-        private static void PopulateStudentMajorsMinors(SqlConnection connection, ref IList<StudentModel> students)
-        {
-            const string sql = @"
-                SELECT  [MajorId], [IsMajor]
-                FROM    [dbo].[Matriculation]
-                WHERE   [StudentId] = @StudentId";
-
-            try
-            {
-                using (SqlCommand command = connection.CreateCommand())
-                {
-                    command.CommandText = sql;
-                    command.Parameters.Add("@StudentId", SqlDbType.Int);
-                    command.Prepare();
-
-                    for (int i = 0; i < students.Count; i++)
-                    {
-                        ICollection<int> majors = new List<int>();
-                        ICollection<int> minors = new List<int>();
-                        command.Parameters[0].Value = students[i].Id;
-
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                int majorId = reader.GetInt32(reader.GetOrdinal("MajorId"));
-
-                                if (reader.GetBoolean(reader.GetOrdinal("IsMajor")))
-                                {
-                                    majors.Add(majorId);
-                                }
-                                else
-                                {
-                                    minors.Add(majorId);
-                                }
-                            }
-                        }
-
-                        students[i].SelectedMajors = majors;
-                        students[i].SelectedMinors = minors;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                e.Data["SQL"] = sql;
-                throw e;
-            }
         }
     }
 }
