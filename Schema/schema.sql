@@ -606,7 +606,8 @@ VALUES
 (N'Institute for Future Global Leaders UVI', NULL),
 (N'Tec de Monterrey', NULL),
 (N'Global Semesters', NULL),
-(N'Global Linkages', NULL);
+(N'Global Linkages', NULL),
+(N'Other', 'OTHER');
 
 
 CREATE TABLE [dbo].[ProgramTypes] (
@@ -686,7 +687,7 @@ CREATE TABLE [dbo].[ActivityLog] (
     [Location]      [nvarchar](512),
     [StartDate]     [date] NOT NULL,
     [EndDate]       [date] NOT NULL,
-    [OnCampus]      [bit] NOT NULL,
+    [OnCampus]      [bit],
     [WebSite]       [varchar](2048),
     [Notes]         [nvarchar](max),
 

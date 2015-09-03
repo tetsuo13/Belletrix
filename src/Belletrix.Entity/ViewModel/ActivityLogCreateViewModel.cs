@@ -8,13 +8,15 @@ namespace Belletrix.Entity.ViewModel
     public class ActivityLogCreateViewModel
     {
         [Required]
-        [Display(Name = "Title")]
+        [Display(Name = "Main")]
         [MaxLength(256)]
         public string Title { get; set; }
 
+        [Display(Name = "Subtitle")]
         [MaxLength(256)]
         public string Title2 { get; set; }
 
+        [Display(Name = "Additional")]
         [MaxLength(256)]
         public string Title3 { get; set; }
 
@@ -34,9 +36,8 @@ namespace Belletrix.Entity.ViewModel
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
 
-        [Required]
         [Display(Name = "On Campus?")]
-        public bool OnCampus { get; set; }
+        public bool? OnCampus { get; set; }
 
         [MaxLength(2048)]
         [Display(Name = "Web Site")]

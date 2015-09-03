@@ -68,16 +68,16 @@ namespace Belletrix.DAL
                 Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
                 Created = await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("Created")),
                 CreatedBy = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("CreatedBy")),
-                Title = await reader.GetText("Title"),
-                Title2 = await reader.GetText("Title2"),
-                Title3 = await reader.GetText("Title3"),
-                Location = await reader.GetText("Location"),
+                Title = await reader.GetValueOrDefault<string>("Title"),
+                Title2 = await reader.GetValueOrDefault<string>("Title2"),
+                Title3 = await reader.GetValueOrDefault<string>("Title3"),
+                Location = await reader.GetValueOrDefault<string>("Location"),
                 StartDate = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("StartDate"))),
                 EndDate = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("EndDate"))),
-                Organizers = await reader.GetText("Organizers"),
-                OnCampus = await reader.GetFieldValueAsync<bool>(reader.GetOrdinal("OnCampus")),
-                WebSite = await reader.GetText("WebSite"),
-                Notes = await reader.GetText("Notes")
+                Organizers = await reader.GetValueOrDefault<string>("Organizers"),
+                OnCampus = await reader.GetValueOrDefault<bool?>("OnCampus"),
+                WebSite = await reader.GetValueOrDefault<string>("WebSite"),
+                Notes = await reader.GetValueOrDefault<string>("Notes")
             };
         }
 
@@ -250,7 +250,7 @@ namespace Belletrix.DAL
                     command.Parameters.Add("@Location", SqlDbType.VarChar, 512).Value = !String.IsNullOrEmpty(model.Location) ? (object)model.Location : DBNull.Value;
                     command.Parameters.Add("@StartDate", SqlDbType.Date).Value = model.StartDate.ToUniversalTime();
                     command.Parameters.Add("@EndDate", SqlDbType.Date).Value = model.EndDate.ToUniversalTime();
-                    command.Parameters.Add("@OnCampus", SqlDbType.Bit).Value = model.OnCampus;
+                    command.Parameters.Add("@OnCampus", SqlDbType.Bit).Value = model.OnCampus.HasValue ? (object)model.OnCampus.Value : DBNull.Value;
                     command.Parameters.Add("@WebSite", SqlDbType.VarChar, 2048).Value = !String.IsNullOrEmpty(model.WebSite) ? (object)model.WebSite : DBNull.Value;
                     command.Parameters.Add("@Notes", SqlDbType.VarChar, 4096).Value = !String.IsNullOrEmpty(model.Notes) ? (object)model.Notes : DBNull.Value;
                     command.Parameters.Add("@Created", SqlDbType.DateTime).Value = DateTime.Now.ToUniversalTime();
@@ -297,7 +297,7 @@ namespace Belletrix.DAL
                     command.Parameters.Add("@Location", SqlDbType.VarChar, 512).Value = !String.IsNullOrEmpty(model.Location) ? (object)model.Location : DBNull.Value;
                     command.Parameters.Add("@StartDate", SqlDbType.Date).Value = model.StartDate.ToUniversalTime();
                     command.Parameters.Add("@EndDate", SqlDbType.Date).Value = model.EndDate.ToUniversalTime();
-                    command.Parameters.Add("@OnCampus", SqlDbType.Bit).Value = model.OnCampus;
+                    command.Parameters.Add("@OnCampus", SqlDbType.Bit).Value = model.OnCampus.HasValue ? (object)model.OnCampus.Value : DBNull.Value;
                     command.Parameters.Add("@WebSite", SqlDbType.VarChar, 2048).Value = !String.IsNullOrEmpty(model.WebSite) ? (object)model.WebSite : DBNull.Value;
                     command.Parameters.Add("@Notes", SqlDbType.VarChar, 4096).Value = !String.IsNullOrEmpty(model.Notes) ? (object)model.Notes : DBNull.Value;
                     command.Parameters.Add("@Id", SqlDbType.Int).Value = model.Id;

@@ -10,7 +10,7 @@ dictionary.
 function Get-ConnectionString()
 {
     $PSScriptRoot = Split-Path $script:MyInvocation.MyCommand.Path
-    $webConfigPath = (Join-Path (Join-Path (Get-Item $PSScriptRoot).parent.FullName "Belletrix") "Web.Release.config")
+    $webConfigPath = (Join-Path (Join-Path (Join-Path (Get-Item $PSScriptRoot).parent.FullName "src") "Belletrix") "Web.Release.config")
 
     $webConfig = New-Object XML
     $webConfig.Load($webConfigPath)
@@ -19,49 +19,4 @@ function Get-ConnectionString()
     $dbConnectionString.set_ConnectionString($webConfig.configuration.connectionStrings.add.connectionString)
 
     return $dbConnectionString
-}
-
-function Get-PostgresBinaryPath()
-{
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory=$True)]
-        [string]$binary
-    )
-
-    $binaryPath = Get-ChildItem (Join-Path ${env:ProgramFiles(x86)} "PostgreSQL") -Recurse -Filter $binary
-
-    if ($binaryPath -eq $null)
-    {
-        Throw "Could not find PostgreSQL binary $binaryPath"
-    }
-
-    return $binaryPath
-}
-
-<#
-.SYNOPSIS
-Returns the path to the PostgreSQL interactive terminal (psql)
-#>
-function Get-PostgresInteractiveTerminalPath()
-{
-    return Get-PostgresBinaryPath "psql.exe"
-}
-
-<#
-.SYNOPSIS
-Returns the path to pg_dump
-#>
-function Get-PostgresDumpPath()
-{
-    return Get-PostgresBinaryPath "pg_dump.exe"
-}
-
-<#
-.SYNOPSIS
-Returns the path to the PostgreSQL create DB command
-#>
-function Get-PostgresCreateDbPath()
-{
-    return Get-PostgresBinaryPath "createdb.exe"
 }

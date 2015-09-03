@@ -106,6 +106,7 @@
         /// <summary>Initialize the student list page.</summary>
 
         $('#studentlist').dataTable({
+            orderClasses: false,
             columnDefs: [{
                 targets: -1,
                 orderable: false

@@ -29,7 +29,7 @@ namespace Belletrix.Entity.Model
 
         public DateTime EndDate { get; set; }
 
-        public bool OnCampus { get; set; }
+        public bool? OnCampus { get; set; }
 
         public string WebSite { get; set; }
 

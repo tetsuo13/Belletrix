@@ -14,13 +14,13 @@ namespace Belletrix.Domain.Tests
         {
             ActivityLogEditViewModel vm = new ActivityLogEditViewModel()
             {
-                Types = new List<int> { (int)ActivityLogTypes.Conference, (int)ActivityLogTypes.SiteVisit }
+                Types = new List<int> { (int)ActivityLogTypes.Community, (int)ActivityLogTypes.SiteVisit }
             };
             ActivityLogModel model = (ActivityLogModel)vm;
 
             Assert.IsNotNull(model.Types);
             Assert.AreEqual(2, model.Types.Length);
-            Assert.AreEqual(ActivityLogTypes.Conference, model.Types[0]);
+            Assert.AreEqual(ActivityLogTypes.Community, model.Types[0]);
             Assert.AreEqual(ActivityLogTypes.SiteVisit, model.Types[1]);
         }
     }
