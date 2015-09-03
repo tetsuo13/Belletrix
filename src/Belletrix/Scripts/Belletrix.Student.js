@@ -15,6 +15,7 @@
 
         Belletrix.initMultiselect(1);
         Belletrix.handleMvcEditor();
+        $('#DateOfBirth, #InitialMeeting').datepicker();
 
         $('a#studyAbroadDestinations').click(function (e) {
             e.preventDefault();
