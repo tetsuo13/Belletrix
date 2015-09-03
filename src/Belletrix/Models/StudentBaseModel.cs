@@ -526,6 +526,7 @@ namespace Belletrix.Models
                 {
                     using (SqlCommand command = connection.CreateCommand())
                     {
+                        command.Transaction = transaction;
                         command.CommandText = insertSql.ToString();
                         command.ExecuteNonQuery();
                     }
