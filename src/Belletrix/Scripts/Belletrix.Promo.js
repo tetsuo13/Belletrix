@@ -47,6 +47,7 @@
         Belletrix.initPinger(pingerUrl);
         Belletrix.initMultiselect(0, 300);
         Belletrix.handleMvcEditor();
+        $('#DateOfBirth').datepicker();
 
         $('a#studyAbroadDestinations').click(function (e) {
             e.preventDefault();
