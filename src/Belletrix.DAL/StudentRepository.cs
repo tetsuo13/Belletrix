@@ -1,12 +1,11 @@
-﻿using Belletrix.Entity.Model;
+﻿using Belletrix.Core;
+using Belletrix.Entity.Model;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Belletrix.Core;
-using System.Data;
 
 namespace Belletrix.DAL
 {
@@ -174,6 +173,269 @@ namespace Belletrix.DAL
             }
 
             return students;
+        }
+
+        public async Task<IEnumerable<CountryModel>> GetCountries()
+        {
+            ICollection<CountryModel> countries = new List<CountryModel>();
+
+            const string sql = @"
+                SELECT      [Id], [Name], [Abbreviation]
+                FROM        [dbo].[Countries]
+                WHERE       [IsRegion] = 0
+                ORDER BY    CASE [Abbreviation]
+                                WHEN 'US' THEN 1
+                                WHEN '' THEN 2
+                                ELSE 3
+                            END, [Name]";
+
+            try
+            {
+                using (SqlCommand command = UnitOfWork.CreateCommand())
+                {
+                    command.CommandText = sql;
+
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            countries.Add(new CountryModel()
+                            {
+                                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
+                                Name = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("Name")),
+                                Abbreviation = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("Abbreviation"))
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+            }
+
+            return countries;
+        }
+
+        public async Task<IEnumerable<CountryModel>> GetRegions()
+        {
+            ICollection<CountryModel> regions = new List<CountryModel>();
+
+            const string sql = @"
+                SELECT      [Id], [Name], [Abbreviation]
+                FROM        [dbo].[Countries]
+                WHERE       [IsRegion] = 1
+                ORDER BY    [Name]";
+
+            try
+            {
+                using (SqlCommand command = UnitOfWork.CreateCommand())
+                {
+                    command.CommandText = sql;
+
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            regions.Add(new CountryModel()
+                            {
+                                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
+                                Name = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("Name")),
+                                Abbreviation = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("Abbreviation"))
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+            }
+
+            return regions;
+        }
+
+        public async Task<IEnumerable<LanguageModel>> GetLanguages()
+        {
+            ICollection<LanguageModel> languages = new List<LanguageModel>();
+
+            const string sql = @"
+                SELECT      [Id], [Name]
+                FROM        [dbo].[Languages]
+                ORDER BY    [Name]";
+
+            try
+            {
+                using (SqlCommand command = UnitOfWork.CreateCommand())
+                {
+                    command.CommandText = sql;
+
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            languages.Add(new LanguageModel()
+                            {
+                                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
+                                Name = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("Name"))
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+            }
+
+            return languages;
+        }
+
+        public async Task<IEnumerable<MajorsModel>> GetMajors()
+        {
+            ICollection<MajorsModel> majors = new List<MajorsModel>();
+
+            const string sql = @"
+                SELECT      [Id], [Name]
+                FROM        [Majors]
+                ORDER BY    [Name]";
+
+            try
+            {
+                using (SqlCommand command = UnitOfWork.CreateCommand())
+                {
+                    command.CommandText = sql;
+
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            majors.Add(new MajorsModel()
+                            {
+                                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
+                                Name = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("Name"))
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+            }
+
+            return majors;
+        }
+
+        public async Task<IEnumerable<MinorsModel>> GetMinors()
+        {
+            ICollection<MinorsModel> minors = new List<MinorsModel>();
+
+            const string sql = @"
+                SELECT      [Id], [Name]
+                FROM        [Minors]
+                ORDER BY    [Name]";
+
+            try
+            {
+                using (SqlCommand command = UnitOfWork.CreateCommand())
+                {
+                    command.CommandText = sql;
+
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            minors.Add(new MinorsModel()
+                            {
+                                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
+                                Name = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("Name"))
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+            }
+
+            return minors;
+        }
+
+        public async Task<IEnumerable<ProgramModel>> GetPrograms()
+        {
+            ICollection<ProgramModel> programs = new List<ProgramModel>();
+
+            const string sql = @"
+                SELECT      [Id], [Name], [Abbreviation]
+                FROM        [Programs]
+                ORDER BY    [Name]";
+
+            try
+            {
+                using (SqlCommand command = UnitOfWork.CreateCommand())
+                {
+                    command.CommandText = sql;
+
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            ProgramModel program = new ProgramModel()
+                            {
+                                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
+                                Name = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("Name")),
+                                Abbreviation = await reader.GetValueOrDefault<string>("Abbreviation")
+                            };
+
+                            programs.Add(program);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+            }
+
+            return programs;
+        }
+
+        public async Task<IEnumerable<ProgramTypeModel>> GetProgramTypes()
+        {
+            ICollection<ProgramTypeModel> programTypes = new List<ProgramTypeModel>();
+            const string sql = @"
+                SELECT      [Id], [Name], [ShortTerm]
+                FROM        [ProgramTypes]
+                ORDER BY    [Name]";
+
+            try
+            {
+                using (SqlCommand command = UnitOfWork.CreateCommand())
+                {
+                    command.CommandText = sql;
+
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            programTypes.Add(new ProgramTypeModel()
+                            {
+                                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
+                                Name = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("Name")),
+                                ShortTerm = await reader.GetFieldValueAsync<bool>(reader.GetOrdinal("ShortTerm"))
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+            }
+
+            return programTypes;
         }
     }
 }

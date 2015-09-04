@@ -1,8 +1,5 @@
 ﻿using Belletrix.Entity.Model;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Belletrix.DAL
@@ -11,5 +8,16 @@ namespace Belletrix.DAL
     {
         Task<IEnumerable<StudentModel>> GetStudents(int? id = null);
         Task<StudentModel> GetStudent(int id);
+
+        Task<IEnumerable<CountryModel>> GetCountries();
+        Task<IEnumerable<CountryModel>> GetRegions();
+
+        Task<IEnumerable<LanguageModel>> GetLanguages();
+
+        Task<IEnumerable<MajorsModel>> GetMajors();
+        Task<IEnumerable<MinorsModel>> GetMinors();
+
+        Task<IEnumerable<ProgramModel>> GetPrograms();
+        Task<IEnumerable<ProgramTypeModel>> GetProgramTypes();
     }
 }

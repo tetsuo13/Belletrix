@@ -13,15 +13,6 @@ namespace Belletrix.Controllers
         {
             DateTime startDate = DateTime.Now;
 
-            CountryModel.GetCountries();
-            LanguageModel.GetLanguages();
-            StudentClassificationModel.GetClassifications();
-            MajorsModel.GetMajors();
-            MinorsModel.GetMinors();
-            CountryModel.GetRegions();
-            StudentStudyAbroadWishlistModel.GetPeriods();
-            ProgramModel.GetPrograms();
-            ProgramTypeModel.GetProgramTypes();
             StudentModel.GetStudents();
             StudyAbroadModel.GetAll();
             PromoModel.GetPromos(true);

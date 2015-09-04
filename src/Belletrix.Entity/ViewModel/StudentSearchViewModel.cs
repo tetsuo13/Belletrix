@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Belletrix.Models
+namespace Belletrix.Entity.ViewModel
 {
-    public class StudentSearchModel
+    public class StudentSearchViewModel
     {
         public IEnumerable<int> SelectedMajors { get; set; }
         public IEnumerable<int> SelectedGraduatingYears { get; set; }

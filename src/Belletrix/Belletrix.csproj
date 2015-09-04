@@ -164,21 +164,12 @@
     </Compile>
     <Compile Include="Infrastructure\BelletrixDependencyResolver.cs" />
     <Compile Include="Models\StudentBaseModel.cs" />
-    <Compile Include="Models\CountryModel.cs" />
     <Compile Include="Models\EventLogModel.cs" />
-    <Compile Include="Models\LanguageModel.cs" />
-    <Compile Include="Models\MajorsModel.cs" />
     <Compile Include="Models\MatriculationModel.cs" />
-    <Compile Include="Models\MinorsModel.cs" />
     <Compile Include="Models\PingModel.cs" />
-    <Compile Include="Models\ProgramModel.cs" />
-    <Compile Include="Models\ProgramTypeModel.cs" />
     <Compile Include="Models\PromoModel.cs" />
-    <Compile Include="Models\StudentClassificationModel.cs" />
     <Compile Include="Models\StudentModel.cs" />
     <Compile Include="Models\StudentPromoModel.cs" />
-    <Compile Include="Models\StudentSearchModel.cs" />
-    <Compile Include="Models\StudentStudyAbroadWishlistModel.cs" />
     <Compile Include="Models\StudyAbroadModel.cs" />
     <Compile Include="Models\StudentPromoLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

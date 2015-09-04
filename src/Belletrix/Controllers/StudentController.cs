@@ -1,6 +1,7 @@
 ﻿using Belletrix.Core;
 using Belletrix.Domain;
 using Belletrix.Entity.Model;
+using Belletrix.Entity.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,22 +30,24 @@ namespace Belletrix.Controllers
         public async Task<ActionResult> List()
         {
             await Analytics.TrackPageView(Request, "Student List", (Session["User"] as UserModel).Login);
-            PrepareDropDowns();
+            await PrepareDropDowns();
+
             return View(await StudentService.GetStudents());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Search(StudentSearchModel model)
+        public async Task<ActionResult> Search(StudentSearchViewModel model)
         {
             if (ModelState.IsValid)
             {
-                PrepareDropDowns();
-                Analytics.TrackPageView(Request, "Student List", (Session["User"] as UserModel).Login);
-                return View("List", StudentModel.Search(model));
+                await PrepareDropDowns();
+                await Analytics.TrackPageView(Request, "Student List", (Session["User"] as UserModel).Login);
+
+                return View("List", await StudentService.Search(model));
             }
 
-            return List();
+            return await List();
         }
 
         public async Task<ActionResult> View(int id)
@@ -67,33 +70,40 @@ namespace Belletrix.Controllers
 
             ViewBag.StudyAbroad = StudyAbroadModel.GetAll(id);
             ViewBag.Notes = StudentNoteService.GetAllNotes(id);
-            PrepareDropDowns();
-            PrepareStudyAbroadDropDowns();
-            Analytics.TrackPageView(Request, "Student", (Session["User"] as UserModel).Login);
+            await PrepareDropDowns();
+            await PrepareStudyAbroadDropDowns();
+            await Analytics.TrackPageView(Request, "Student", (Session["User"] as UserModel).Login);
+
             return View(student);
         }
 
-        public ActionResult ViewInline(int id)
+        public async Task<ActionResult> ViewInline(int id)
         {
             StudentModel student;
 
             try
             {
-                student = StudentModel.GetStudent(id);
+                student = await StudentService.GetStudent(id);
             }
             catch (Exception)
             {
                 return HttpNotFound();
             }
 
+            if (student == null)
+            {
+                return HttpNotFound();
+            }
+
             ViewBag.StudyAbroad = StudyAbroadModel.GetAll(id);
             ViewBag.Notes = StudentNoteService.GetAllNotes(id);
-            PrepareDropDowns();
-            PrepareStudyAbroadDropDowns();
+            await PrepareDropDowns();
+            await PrepareStudyAbroadDropDowns();
+
             return PartialView("View.NameCheck", student);
         }
 
-        public ActionResult Edit(int? id)
+        public async Task<ActionResult> Edit(int? id)
         {
             if (id == null)
             {
@@ -104,21 +114,27 @@ namespace Belletrix.Controllers
 
             try
             {
-                student = StudentModel.GetStudent(id.Value);
+                student = await StudentService.GetStudent(id.Value);
             }
             catch (Exception)
             {
                 return HttpNotFound();
             }
 
-            PrepareDropDowns();
-            Analytics.TrackPageView(Request, "Student Edit", (Session["User"] as UserModel).Login);
+            if (student == null)
+            {
+                return HttpNotFound();
+            }
+
+            await PrepareDropDowns();
+            await Analytics.TrackPageView(Request, "Student Edit", (Session["User"] as UserModel).Login);
+
             return View(student);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(StudentModel model)
+        public async Task<ActionResult> Edit(StudentModel model)
         {
             if (ModelState.IsValid)
             {
@@ -126,21 +142,23 @@ namespace Belletrix.Controllers
                 return RedirectToAction("List");
             }
 
-            Analytics.TrackPageView(Request, "Student Edit", (Session["User"] as UserModel).Login);
-            PrepareDropDowns();
+            await Analytics.TrackPageView(Request, "Student Edit", (Session["User"] as UserModel).Login);
+            await PrepareDropDowns();
+
             return View(model);
         }
 
-        public ActionResult Add()
+        public async Task<ActionResult> Add()
         {
-            PrepareDropDowns();
-            Analytics.TrackPageView(Request, "Student Add", (Session["User"] as UserModel).Login);
+            await PrepareDropDowns();
+            await Analytics.TrackPageView(Request, "Student Add", (Session["User"] as UserModel).Login);
+
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Add(StudentModel model)
+        public async Task<ActionResult> Add(StudentModel model)
         {
             if (ModelState.IsValid)
             {
@@ -148,44 +166,46 @@ namespace Belletrix.Controllers
                 return RedirectToAction("List");
             }
 
-            Analytics.TrackPageView(Request, "Student Add", (Session["User"] as UserModel).Login);
-            PrepareDropDowns();
+            await Analytics.TrackPageView(Request, "Student Add", (Session["User"] as UserModel).Login);
+            await PrepareDropDowns();
+
             return View(model);
         }
 
-        public PartialViewResult StudyAbroad(int id)
+        public async Task<PartialViewResult> StudyAbroad(int id)
         {
             ViewBag.StudentId = id;
-            PrepareStudyAbroadDropDowns();
+            await PrepareStudyAbroadDropDowns();
+
             return PartialView(StudyAbroadModel.GetAll(id));
         }
 
-        private void PrepareDropDowns()
+        private async Task PrepareDropDowns()
         {
             IEnumerable<object> years = Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 7))
                 .Reverse()
                 .Select(i => new { Id = i, Name = i.ToString() });
 
-            IEnumerable<CountryModel> countries = CountryModel.GetCountries();
+            IEnumerable<CountryModel> countries = await StudentService.GetCountries();
 
             ViewBag.Countries = new SelectList(countries, "Id", "Name");
-            ViewBag.Languages = LanguageModel.GetLanguages();
+            ViewBag.Languages = await StudentService.GetLanguages();
 
             ViewBag.EnteringYears = new SelectList(Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 2)).Reverse());
             ViewBag.GraduatingYears = new SelectList(years, "Id", "Name");
             ViewBag.GraduatingYearsAsEnumerable = years;
-            ViewBag.Classifications = new SelectList(StudentClassificationModel.GetClassifications(), "Id", "Name");
-            
-            ViewBag.AvailableMajors = MajorsModel.GetMajors();
-            ViewBag.AvailableMinors = MinorsModel.GetMinors();
+            ViewBag.Classifications = new SelectList(StudentService.GetClassifications(), "Id", "Name");
+
+            ViewBag.AvailableMajors = await StudentService.GetMajors();
+            ViewBag.AvailableMinors = await StudentService.GetMinors();
 
             IList<object> studyYears = new List<object>(years);
-            studyYears.Insert(0, new { Id = StudentStudyAbroadWishlistModel.CatchAllYearValue, Name = "Any Year" });
+            studyYears.Insert(0, new { Id = StudentService.GetStudyAbroadWishlistCatchAllYearValue(), Name = "Any Year" });
 
             ViewBag.StudyAbroadYears = new SelectList(studyYears, "Id", "Name");
-            ViewBag.StudyAbroadSemesters = StudentStudyAbroadWishlistModel.GetPeriodsWithCatchAll();
+            ViewBag.StudyAbroadSemesters = StudentService.GetStudyAbroadWishlistPeriodsWithCatchAll();
 
-            List<GroupedSelectListItem> places = CountryModel.GetRegions().Select(r => new GroupedSelectListItem()
+            List<GroupedSelectListItem> places = (await StudentService.GetRegions()).Select(r => new GroupedSelectListItem()
                 {
                     GroupKey = "1",
                     GroupName = "Regions",
@@ -205,17 +225,17 @@ namespace Belletrix.Controllers
             ViewBag.Promos = PromoModel.AsSources();
         }
 
-        private void PrepareStudyAbroadDropDowns()
+        private async Task PrepareStudyAbroadDropDowns()
         {
-            ViewBag.Countries = CountryModel.GetCountries();
-            ViewBag.Semesters = StudentStudyAbroadWishlistModel.GetPeriods();
-            ViewBag.Programs = ProgramModel.GetPrograms();
-            ViewBag.ProgramTypes = ProgramTypeModel.GetProgramTypes();
+            ViewBag.Countries = await StudentService.GetCountries();
+            ViewBag.Semesters = StudentService.GetStudyAbroadWishlistPeriods();
+            ViewBag.Programs = await StudentService.GetPrograms();
+            ViewBag.ProgramTypes = await StudentService.GetProgramTypes();
         }
 
-        public PartialViewResult NameCheck(string firstName, string lastName)
+        public async Task<PartialViewResult> NameCheck(string firstName, string lastName)
         {
-            return PartialView(StudentModel.SearchByFullName(firstName, lastName));
+            return PartialView(await StudentService.SearchByFullName(firstName, lastName));
         }
     }
 }

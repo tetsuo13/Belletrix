@@ -1,8 +1,10 @@
 ﻿using Belletrix.Core;
+using Belletrix.Domain;
 using Belletrix.Entity.Model;
 using Belletrix.Models;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace Belletrix.Controllers
@@ -12,44 +14,48 @@ namespace Belletrix.Controllers
     {
         public static string ActivePageName = "experiences";
 
-        public ExperienceController()
+        private readonly IStudentService StudentService;
+
+        public ExperienceController(IStudentService studentService)
         {
+            StudentService = studentService;
+
             ViewBag.ActivePage = ActivePageName;
         }
 
-        public ActionResult List()
+        public async Task<ActionResult> List()
         {
-            Analytics.TrackPageView(Request, "Active Experiences", (Session["User"] as UserModel).Login);
-            
-            ViewBag.Countries = CountryModel.GetCountries();
-            ViewBag.Semesters = StudentStudyAbroadWishlistModel.GetPeriods();
-            ViewBag.Programs = ProgramModel.GetPrograms();
-            ViewBag.ProgramTypes = ProgramTypeModel.GetProgramTypes();
+            await Analytics.TrackPageView(Request, "Active Experiences", (Session["User"] as UserModel).Login);
+
+            ViewBag.Countries = await StudentService.GetCountries();
+            ViewBag.Semesters = StudentService.GetStudyAbroadWishlistPeriods();
+            ViewBag.Programs = await StudentService.GetPrograms();
+            ViewBag.ProgramTypes = await StudentService.GetProgramTypes();
 
             return View(StudyAbroadModel.GetAll());
         }
 
-        public ActionResult Add(int studentId)
+        public async Task<ActionResult> Add(int studentId)
         {
-            Analytics.TrackPageView(Request, "Add Experience", (Session["User"] as UserModel).Login);
+            await Analytics.TrackPageView(Request, "Add Experience", (Session["User"] as UserModel).Login);
 
             try
             {
-                PrepareStudent(studentId);
+                await PrepareStudent(studentId);
             }
             catch (Exception)
             {
                 return HttpNotFound("Invalid student");
             }
 
-            PrepareDropDowns();
+            await PrepareDropDowns();
 
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Add(StudyAbroadModel model)
+        public async Task<ActionResult> Add(StudyAbroadModel model)
         {
             if (ModelState.IsValid)
             {
@@ -59,23 +65,24 @@ namespace Belletrix.Controllers
 
             try
             {
-                PrepareStudent(model.StudentId);
+                await PrepareStudent(model.StudentId);
             }
             catch (Exception)
             {
                 return HttpNotFound("Invalid student");
             }
 
-            PrepareDropDowns();
-            Analytics.TrackPageView(Request, "Add Experience", (Session["User"] as UserModel).Login);
+            await PrepareDropDowns();
+            await Analytics.TrackPageView(Request, "Add Experience", (Session["User"] as UserModel).Login);
+
             return View(model);
         }
 
-        private void PrepareStudent(int studentId)
+        private async Task PrepareStudent(int studentId)
         {
             try
             {
-                ViewBag.Student = StudentModel.GetStudent(studentId);
+                ViewBag.Student = await StudentService.GetStudent(studentId);
             }
             catch (Exception)
             {
@@ -83,13 +90,13 @@ namespace Belletrix.Controllers
             }
         }
 
-        private void PrepareDropDowns()
+        private async Task PrepareDropDowns()
         {
             ViewBag.Years = new SelectList(Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 7)).Reverse());
-            ViewBag.Semesters = StudentStudyAbroadWishlistModel.GetPeriods();
-            ViewBag.Countries = new SelectList(CountryModel.GetCountries(), "Id", "Name");
-            ViewBag.Programs = new SelectList(ProgramModel.GetPrograms(), "Id", "Name");
-            ViewBag.ProgramTypes = ProgramTypeModel.GetProgramTypes();
+            ViewBag.Semesters = StudentService.GetStudyAbroadWishlistPeriods();
+            ViewBag.Countries = new SelectList(await StudentService.GetCountries(), "Id", "Name");
+            ViewBag.Programs = new SelectList(await StudentService.GetPrograms(), "Id", "Name");
+            ViewBag.ProgramTypes = await StudentService.GetProgramTypes();
         }
     }
 }

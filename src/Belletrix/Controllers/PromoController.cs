@@ -1,9 +1,11 @@
 ﻿using Belletrix.Core;
+using Belletrix.Domain;
 using Belletrix.Entity.Model;
 using Belletrix.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -14,8 +16,12 @@ namespace Belletrix.Controllers
     {
         public static string ActivePageName = "promos";
 
-        public PromoController()
+        private readonly IStudentService StudentService;
+
+        public PromoController(IStudentService studentService)
         {
+            StudentService = studentService;
+
             ViewBag.ActivePage = ActivePageName;
         }
 
@@ -129,7 +135,7 @@ namespace Belletrix.Controllers
         }
 
         [AllowAnonymous]
-        public ActionResult Form()
+        public async Task<ActionResult> Form()
         {
             HttpCookie cookie = HttpContext.Request.Cookies["promo"] ?? null;
 
@@ -139,7 +145,7 @@ namespace Belletrix.Controllers
             }
 
             TrackPageView("Promo Form for " + cookie.Value);
-            PrepareDropDowns();
+            await PrepareDropDowns();
 
             return View();
         }
@@ -147,7 +153,7 @@ namespace Belletrix.Controllers
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Form(StudentPromoModel model)
+        public async Task<ActionResult> Form(StudentPromoModel model)
         {
             HttpCookie cookie = HttpContext.Request.Cookies["promo"];
 
@@ -164,9 +170,10 @@ namespace Belletrix.Controllers
                 return RedirectToAction("Success");
             }
 
-            Analytics.TrackPageView(Request, "Student Add", (Session["User"] as UserModel).Login);
+            await Analytics.TrackPageView(Request, "Student Add", (Session["User"] as UserModel).Login);
             TrackPageView("Promo Form for " + cookie.Value);
-            PrepareDropDowns();
+            await PrepareDropDowns();
+
             return View(model);
         }
 
@@ -184,27 +191,27 @@ namespace Belletrix.Controllers
             return View();
         }
 
-        private void PrepareDropDowns()
+        private async Task PrepareDropDowns()
         {
             IEnumerable<object> years = Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 7))
                 .Reverse()
                 .Select(i => new { Id = i, Name = i.ToString() });
 
-            ViewBag.Countries = CountryModel.GetCountries();
-            ViewBag.Languages = LanguageModel.GetLanguages();
+            ViewBag.Countries = await StudentService.GetCountries();
+            ViewBag.Languages = await StudentService.GetLanguages();
 
             ViewBag.GraduatingYears = new SelectList(years, "Id", "Name");
             ViewBag.GraduatingYearsAsEnumerable = years;
-            ViewBag.Classifications = new SelectList(StudentClassificationModel.GetClassifications(), "Id", "Name");
+            ViewBag.Classifications = new SelectList(StudentService.GetClassifications(), "Id", "Name");
 
-            ViewBag.AvailableMajors = MajorsModel.GetMajors();
-            ViewBag.AvailableMinors = MinorsModel.GetMinors();
+            ViewBag.AvailableMajors = await StudentService.GetMajors();
+            ViewBag.AvailableMinors = await StudentService.GetMinors();
 
             IList<object> studyYears = new List<object>(years);
             studyYears.Insert(0, new { Id = 1, Name = "Any Year" });
 
             ViewBag.StudyAbroadYears = new SelectList(studyYears, "Id", "Name");
-            ViewBag.StudyAbroadSemesters = StudentStudyAbroadWishlistModel.GetPeriodsWithCatchAll();
+            ViewBag.StudyAbroadSemesters = StudentService.GetStudyAbroadWishlistPeriodsWithCatchAll();
         }
     }
 }
