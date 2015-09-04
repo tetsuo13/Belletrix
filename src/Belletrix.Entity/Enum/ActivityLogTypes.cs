@@ -14,6 +14,7 @@ namespace Belletrix.Entity.Enum
         SiteVisit,
 
         Meeting,
-        Other
+        Other,
+        Workshop
     }
 }

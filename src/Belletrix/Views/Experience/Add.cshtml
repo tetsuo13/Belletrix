@@ -18,6 +18,8 @@
                 buttonContainer: '<div class="button-default" />'
             });
 
+            $('#StartDate, #EndDate').datepicker();
+
             Belletrix.singleSubmit();
         });
     </script>
@@ -74,11 +76,11 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 @Html.LabelFor(s => s.StartDate) <i>(Optional)</i>
-                                @Html.EditorFor(s => s.StartDate)
+                                @Html.TextBoxFor(s => s.StartDate, new { @class = "form-control" })
                             </div>
                             <div class="col-lg-6">
                                 @Html.LabelFor(s => s.EndDate) <i>(Optional)</i>
-                                @Html.EditorFor(s => s.EndDate)
+                                @Html.TextBoxFor(s => s.EndDate, new { @class = "form-control" })
                             </div>
                         </div>
                     </div>

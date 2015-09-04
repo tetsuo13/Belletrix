@@ -97,7 +97,7 @@
         /// were generated with the MVC EditorFor() HTML helper.
         /// </summary>
 
-        $('input[type=date], input[type=email]').addClass('form-control');
+        $('input[type=email]').addClass('form-control');
     };
 
     Belletrix.randomString = function () {

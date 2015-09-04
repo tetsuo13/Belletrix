@@ -303,7 +303,7 @@ namespace Belletrix.Models
 
             if (PellGrantRecipient.HasValue)
             {
-                AddParameter(sql, "PellGrantEecipient", SqlDbType.Bit, PellGrantRecipient.Value, 0);
+                AddParameter(sql, "PellGrantRecipient", SqlDbType.Bit, PellGrantRecipient.Value, 0);
             }
 
             if (HasPassport.HasValue)
@@ -526,6 +526,7 @@ namespace Belletrix.Models
                 {
                     using (SqlCommand command = connection.CreateCommand())
                     {
+                        command.Transaction = transaction;
                         command.CommandText = insertSql.ToString();
                         command.ExecuteNonQuery();
                     }
