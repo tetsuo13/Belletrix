@@ -18,11 +18,14 @@ namespace Belletrix.Controllers
 
         private readonly IStudentService StudentService;
         private readonly IStudentNoteService StudentNoteService;
+        private readonly IPromoService PromoService;
 
-        public StudentController(IStudentService studentService, IStudentNoteService studentNoteService)
+        public StudentController(IStudentService studentService, IStudentNoteService studentNoteService,
+            IPromoService promoService)
         {
             StudentService = studentService;
             StudentNoteService = studentNoteService;
+            PromoService = promoService;
 
             ViewBag.ActivePage = ActivePageName;
         }
@@ -222,7 +225,7 @@ namespace Belletrix.Controllers
                 }));
 
             ViewBag.StudyAbroadPlaces = places;
-            ViewBag.Promos = PromoModel.AsSources();
+            ViewBag.Promos = await PromoService.AsSources();
         }
 
         private async Task PrepareStudyAbroadDropDowns()

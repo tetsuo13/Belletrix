@@ -167,7 +167,6 @@
     <Compile Include="Models\EventLogModel.cs" />
     <Compile Include="Models\MatriculationModel.cs" />
     <Compile Include="Models\PingModel.cs" />
-    <Compile Include="Models\PromoModel.cs" />
     <Compile Include="Models\StudentModel.cs" />
     <Compile Include="Models\StudentPromoModel.cs" />
     <Compile Include="Models\StudyAbroadModel.cs" />

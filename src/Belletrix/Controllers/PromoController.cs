@@ -1,7 +1,6 @@
 ﻿using Belletrix.Core;
 using Belletrix.Domain;
 using Belletrix.Entity.Model;
-using Belletrix.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,75 +16,77 @@ namespace Belletrix.Controllers
         public static string ActivePageName = "promos";
 
         private readonly IStudentService StudentService;
+        private readonly IPromoService PromoService;
 
-        public PromoController(IStudentService studentService)
+        public PromoController(IStudentService studentService, IPromoService promoService)
         {
             StudentService = studentService;
+            PromoService = promoService;
 
             ViewBag.ActivePage = ActivePageName;
         }
 
-        private void TrackPageView(string pageTitle)
+        private async Task TrackPageView(string pageTitle)
         {
             if (Session["User"] != null)
             {
-                Analytics.TrackPageView(Request, pageTitle, (Session["User"] as UserModel).Login);
+                await Analytics.TrackPageView(Request, pageTitle, (Session["User"] as UserModel).Login);
             }
             else
             {
-                Analytics.TrackPageView(Request, pageTitle);
+                await Analytics.TrackPageView(Request, pageTitle);
             }
         }
 
-        public ActionResult List()
+        public async Task<ActionResult> List()
         {
-            Analytics.TrackPageView(Request, "Promo List", (Session["User"] as UserModel).Login);
-            return View(PromoModel.GetPromos(true));
+            await Analytics.TrackPageView(Request, "Promo List", (Session["User"] as UserModel).Login);
+            return View(await PromoService.GetPromos(true));
         }
 
-        public ActionResult Add()
+        public async Task<ActionResult> Add()
         {
-            Analytics.TrackPageView(Request, "Add Promo", (Session["User"] as UserModel).Login);
+            await Analytics.TrackPageView(Request, "Add Promo", (Session["User"] as UserModel).Login);
             return View();
         }
 
         [HttpPost]
-        public ActionResult CheckUniqueName(string name)
+        public async Task<ActionResult> CheckUniqueName(string name)
         {
-            bool result = PromoModel.CheckNameForUniqueness(name.Trim());
+            bool result = await PromoService.CheckNameForUniqueness(name.Trim());
             return Content(result ? "win" : "fail");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Add(PromoModel model)
+        public async Task<ActionResult> Add(PromoModel model)
         {
             if (ModelState.IsValid)
             {
-                model.Save((Session["User"] as UserModel).Id);
+                await PromoService.Save(model, (Session["User"] as UserModel).Id);
                 return RedirectToAction("Info", new { id = model.Id });
             }
 
-            Analytics.TrackPageView(Request, "Add Promo", (Session["User"] as UserModel).Login);
+            await Analytics.TrackPageView(Request, "Add Promo", (Session["User"] as UserModel).Login);
             return View();
         }
 
-        public ActionResult Info(int id)
+        public async Task<ActionResult> Info(int id)
         {
-            PromoModel promo = PromoModel.GetPromo(id);
+            PromoModel promo = await PromoService.GetPromo(id);
 
             if (promo == null)
             {
                 return HttpNotFound();
             }
 
-            Analytics.TrackPageView(Request, "Promo Info", (Session["User"] as UserModel).Login);
+            await Analytics.TrackPageView(Request, "Promo Info", (Session["User"] as UserModel).Login);
             return View(promo);
         }
 
-        public ActionResult Students(int id)
+        public async Task<ActionResult> Students(int id)
         {
-            PromoModel promo = PromoModel.GetPromo(id);
+            PromoModel promo = await PromoService.GetPromo(id);
 
             if (promo == null)
             {
@@ -95,21 +96,21 @@ namespace Belletrix.Controllers
             ViewBag.Promo = promo;
 
             string title = String.Format("Students of {0} promo ({1})", promo.Description, promo.Code);
-            Analytics.TrackPageView(Request, title, (Session["User"] as UserModel).Login);
+            await Analytics.TrackPageView(Request, title, (Session["User"] as UserModel).Login);
             return View(StudentModel.FromPromo(id));
         }
 
         [AllowAnonymous]
-        public ActionResult Entry()
+        public async Task<ActionResult> Entry()
         {
-            TrackPageView("Promo Entry");
+            await TrackPageView("Promo Entry");
             return View();
         }
 
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Entry(string code)
+        public async Task<ActionResult> Entry(string code)
         {
             if (code == null || String.IsNullOrWhiteSpace(code))
             {
@@ -117,11 +118,11 @@ namespace Belletrix.Controllers
                 return View();
             }
 
-            PromoModel promo = PromoModel.GetPromo(code);
+            PromoModel promo = await PromoService.GetPromo(code);
 
             if (promo == null)
             {
-                TrackPageView("Promo Invalid Code");
+                await TrackPageView("Promo Invalid Code");
                 ViewBag.ErrorMessage = "Invalid code";
                 return View();
             }
@@ -130,7 +131,7 @@ namespace Belletrix.Controllers
             cookie.Expires = DateTime.Now.AddHours(8);
             HttpContext.Response.SetCookie(cookie);
 
-            TrackPageView("Promo Form for " + code);
+            await TrackPageView("Promo Form for " + code);
             return RedirectToAction("Form");
         }
 
@@ -144,7 +145,7 @@ namespace Belletrix.Controllers
                 return RedirectToAction("Entry");
             }
 
-            TrackPageView("Promo Form for " + cookie.Value);
+            await TrackPageView("Promo Form for " + cookie.Value);
             await PrepareDropDowns();
 
             return View();
@@ -171,14 +172,14 @@ namespace Belletrix.Controllers
             }
 
             await Analytics.TrackPageView(Request, "Student Add", (Session["User"] as UserModel).Login);
-            TrackPageView("Promo Form for " + cookie.Value);
+            await TrackPageView("Promo Form for " + cookie.Value);
             await PrepareDropDowns();
 
             return View(model);
         }
 
         [AllowAnonymous]
-        public ActionResult Success()
+        public async Task<ActionResult> Success()
         {
             HttpCookie cookie = HttpContext.Request.Cookies["promo"] ?? null;
 
@@ -187,7 +188,7 @@ namespace Belletrix.Controllers
                 return RedirectToAction("Entry");
             }
 
-            TrackPageView("Promo Success for " + cookie.Value);
+            await TrackPageView("Promo Success for " + cookie.Value);
             return View();
         }
 
