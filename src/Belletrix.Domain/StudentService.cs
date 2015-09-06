@@ -13,10 +13,12 @@ namespace Belletrix.Domain
     public class StudentService : IStudentService
     {
         private readonly IStudentRepository StudentRepository;
+        private readonly IStudentPromoRepository StudentPromoRepository;
 
-        public StudentService(IStudentRepository studentRepository)
+        public StudentService(IStudentRepository studentRepository, IStudentPromoRepository studentPromoRepository)
         {
             StudentRepository = studentRepository;
+            StudentPromoRepository = studentPromoRepository;
         }
 
         public async Task<IEnumerable<StudentModel>> GetStudents(int? id = null)

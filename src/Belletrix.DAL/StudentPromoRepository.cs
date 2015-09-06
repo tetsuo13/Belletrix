@@ -1,19 +1,23 @@
-﻿using Belletrix.Core;
+﻿using Belletrix.Entity.Model;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 
-namespace Belletrix.Models
+namespace Belletrix.DAL
 {
-    public class StudentPromoLog
+    public class StudentPromoRepository : IStudentPromoRepository
     {
-        public int PromoId { get; set; }
-        public int StudentId { get; set; }
-        public DateTime Created { get; set; }
+        private IUnitOfWork UnitOfWork;
 
-        public static IEnumerable<StudentPromoLog> Get()
+        public StudentPromoRepository(IUnitOfWork unitOfWork)
+        {
+            UnitOfWork = unitOfWork;
+        }
+
+        public async Task<IEnumerable<StudentPromoLog>> Get()
         {
             ICollection<StudentPromoLog> logs = new List<StudentPromoLog>();
 
@@ -23,24 +27,20 @@ namespace Belletrix.Models
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(Connections.Database.Dsn))
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
-                    using (SqlCommand command = connection.CreateCommand())
-                    {
-                        command.CommandText = sql;
-                        connection.Open();
+                    command.CommandText = sql;
 
-                        using (SqlDataReader reader = command.ExecuteReader())
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
                         {
-                            while (reader.Read())
+                            logs.Add(new StudentPromoLog()
                             {
-                                logs.Add(new StudentPromoLog()
-                                    {
-                                        PromoId = reader.GetInt32(reader.GetOrdinal("PromoId")),
-                                        StudentId = reader.GetInt32(reader.GetOrdinal("StudentId")),
-                                        Created = reader.GetDateTime(reader.GetOrdinal("Created"))
-                                    });
-                            }
+                                PromoId = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("PromoId")),
+                                StudentId = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("StudentId")),
+                                Created = await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("Created"))
+                            });
                         }
                     }
                 }
@@ -48,16 +48,14 @@ namespace Belletrix.Models
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
-                throw e;
             }
 
             return logs;
         }
 
-        public static void Save(SqlConnection connection, SqlTransaction transaction, int studentId,
-            IEnumerable<int> promoIds)
+        public void Save(SqlTransaction transaction, int studentId, IEnumerable<int> promoIds)
         {
-            Delete(connection, transaction, studentId);
+            Delete(transaction, studentId);
 
             if (promoIds != null && promoIds.Any())
             {
@@ -71,7 +69,7 @@ namespace Belletrix.Models
 
                 try
                 {
-                    using (SqlCommand command = connection.CreateCommand())
+                    using (SqlCommand command = UnitOfWork.CreateCommand())
                     {
                         DateTime created = DateTime.Now.ToUniversalTime();
 
@@ -103,27 +101,18 @@ namespace Belletrix.Models
                 catch (Exception e)
                 {
                     e.Data["SQL"] = sql;
-                    throw e;
                 }
             }
         }
 
-        public static IEnumerable<int> GetPromoIdsForStudent(int studentId)
+        public async Task<IEnumerable<int>> GetPromoIdsForStudent(int studentId)
         {
-            IEnumerable<StudentPromoLog> logs = Get();
-            return logs
+            return (await Get())
                 .Where(x => x.StudentId == studentId)
                 .Select(x => x.PromoId);
         }
 
-        /// <summary>
-        /// Save a single student ID to promo code association.
-        /// </summary>
-        /// <param name="connection">Opened connection.</param>
-        /// <param name="transaction"></param>
-        /// <param name="studentId">Student ID.</param>
-        /// <param name="promoCode">Promo code.</param>
-        public static void Save(SqlConnection connection, SqlTransaction transaction, int studentId, string promoCode)
+        public void Save(SqlTransaction transaction, int studentId, string promoCode)
         {
             ICollection<StudentPromoLog> logs = new List<StudentPromoLog>();
 
@@ -138,7 +127,7 @@ namespace Belletrix.Models
 
             try
             {
-                using (SqlCommand command = connection.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     DateTime created = DateTime.Now.ToUniversalTime();
 
@@ -152,27 +141,25 @@ namespace Belletrix.Models
                     int promoId = Convert.ToInt32(command.ExecuteScalar());
 
                     logs.Add(new StudentPromoLog()
-                        {
-                            PromoId = promoId,
-                            StudentId = studentId,
-                            Created = created
-                        });
+                    {
+                        PromoId = promoId,
+                        StudentId = studentId,
+                        Created = created
+                    });
                 }
             }
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
-                throw e;
             }
         }
 
-        public static IEnumerable<StudentPromoLog> GetLogsForPromo(int id)
+        public async Task<IEnumerable<StudentPromoLog>> GetLogsForPromo(int id)
         {
-            IEnumerable<StudentPromoLog> logs = Get();
-            return logs.Where(x => x.PromoId == id);
+            return (await Get()).Where(x => x.PromoId == id);
         }
 
-        private static void Delete(SqlConnection connection, SqlTransaction transaction, int studentId)
+        private void Delete(SqlTransaction transaction, int studentId)
         {
             const string sql = @"
                 DELETE FROM [dbo].[StudentPromoLog]
@@ -180,7 +167,7 @@ namespace Belletrix.Models
 
             try
             {
-                using (SqlCommand command = connection.CreateCommand())
+                using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.Transaction = transaction;
                     command.CommandText = sql;

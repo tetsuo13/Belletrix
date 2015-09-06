@@ -15,7 +15,6 @@ namespace Belletrix.Controllers
 
             StudentModel.GetStudents();
             StudyAbroadModel.GetAll();
-            StudentPromoLog.Get();
 
             TimeSpan span = DateTime.Now - startDate;
 

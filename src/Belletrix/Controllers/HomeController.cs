@@ -1,4 +1,5 @@
 ﻿using Belletrix.Core;
+using Belletrix.Domain;
 using Belletrix.Entity.Model;
 using Belletrix.Models;
 using StackExchange.Exceptional;
@@ -12,11 +13,20 @@ namespace Belletrix.Controllers
     {
         public static string ActivePageName = "dashboard";
 
+        private readonly IPingService PingService;
+        private readonly IEventLogService EventLogService;
+
+        public HomeController(IPingService pingService, IEventLogService eventLogService)
+        {
+            PingService = pingService;
+            EventLogService = eventLogService;
+        }
+
         public async Task<ActionResult> Index()
         {
             await Analytics.TrackPageView(Request, "Dashboard", (Session["User"] as UserModel).Login);
             ViewBag.ActivePage = ActivePageName;
-            ViewBag.RecentActivity = await EventLogModel.GetEvents();
+            ViewBag.RecentActivity = await EventLogService.GetEvents();
             return View();
         }
 
@@ -28,7 +38,7 @@ namespace Belletrix.Controllers
         [AllowAnonymous]
         public async Task<string> Ping()
         {
-            return await PingModel.Ping();
+            return await PingService.Ping();
         }
 
         [AllowAnonymous]
