@@ -14,21 +14,51 @@ namespace Belletrix.Domain
     {
         private readonly IStudentRepository StudentRepository;
         private readonly IStudentPromoRepository StudentPromoRepository;
+        private readonly IStudyAbroadRepository StudyAbroadRepository;
+        private readonly IEventLogRepository EventLogRepository;
 
-        public StudentService(IStudentRepository studentRepository, IStudentPromoRepository studentPromoRepository)
+        public StudentService(IStudentRepository studentRepository, IStudentPromoRepository studentPromoRepository,
+            IStudyAbroadRepository studyAbroadRepository, IEventLogRepository eventLogRepository)
         {
             StudentRepository = studentRepository;
             StudentPromoRepository = studentPromoRepository;
+            StudyAbroadRepository = studyAbroadRepository;
+            EventLogRepository = eventLogRepository;
+        }
+
+        private IEnumerable<StudentModel> PopulatePromoLogs(IEnumerable<StudentModel> students)
+        {
+            if (students == null || !students.Any())
+            {
+                return students;
+            }
+
+            List<StudentModel> updatedStudents = new List<StudentModel>(students);
+
+            updatedStudents.ForEach(async x => x.PromoIds = await StudentPromoRepository.GetPromoIdsForStudent(x.Id));
+
+            return updatedStudents;
         }
 
         public async Task<IEnumerable<StudentModel>> GetStudents(int? id = null)
         {
-            return await StudentRepository.GetStudents(id);
+            IEnumerable<StudentModel> students = await StudentRepository.GetStudents(id);
+            return PopulatePromoLogs(students);
         }
 
         public async Task<StudentModel> GetStudent(int id)
         {
-            return await StudentRepository.GetStudent(id);
+            StudentModel student = await StudentRepository.GetStudent(id);
+
+            if (student != null)
+            {
+                ICollection<StudentModel> x = new List<StudentModel>();
+                x.Add(student);
+
+                return PopulatePromoLogs(x).First();
+            }
+
+            return null;
         }
 
         public async Task<IEnumerable<StudentModel>> Search(StudentSearchViewModel search)
@@ -60,7 +90,7 @@ namespace Belletrix.Domain
 
             if (filterByCountries)
             {
-                IEnumerable<StudyAbroadModel> studyAbroad = StudyAbroadModel.GetAll();
+                IEnumerable<StudyAbroadModel> studyAbroad = await StudyAbroadRepository.GetAll();
 
                 students = studyAbroad
                     .Where(x => search.SelectedCountries.Any(y => y == x.CountryId))
@@ -81,6 +111,11 @@ namespace Belletrix.Domain
                 return String.Equals(x.FirstName, firstName, StringComparison.InvariantCultureIgnoreCase) &&
                     String.Equals(x.LastName, lastName, StringComparison.InvariantCultureIgnoreCase);
             });
+        }
+
+        public async Task<IEnumerable<StudentModel>> FromPromo(int promoId)
+        {
+            return (await GetStudents()).Where(x => x.PromoIds != null && x.PromoIds.Any(y => y == promoId));
         }
 
         public async Task<IEnumerable<CountryModel>> GetCountries()
@@ -165,6 +200,44 @@ namespace Belletrix.Domain
         public async Task<IEnumerable<ProgramTypeModel>> GetProgramTypes()
         {
             return await StudentRepository.GetProgramTypes();
+        }
+
+        public async Task InsertStudent(StudentModel model, UserModel user)
+        {
+            int studentId = await StudentRepository.InsertStudent(model);
+
+            model.Id = studentId;
+
+            EventLogModel eventLog = new EventLogModel()
+            {
+                Student = model,
+                ModifiedById = user.Id,
+                ModifiedByFirstName = user.FirstName,
+                ModifiedByLastName = user.LastName
+            };
+
+            await EventLogRepository.AddStudentEvent(eventLog, user.Id, studentId, EventLogTypes.AddStudent);
+
+            StudentRepository.SaveChanges();
+            EventLogRepository.SaveChanges();
+        }
+
+        public async Task UpdateStudent(StudentModel model, UserModel user)
+        {
+            await StudentRepository.UpdateStudent(model);
+
+            EventLogModel eventLog = new EventLogModel()
+            {
+                Student = model,
+                ModifiedById = user.Id,
+                ModifiedByFirstName = user.FirstName,
+                ModifiedByLastName = user.LastName
+            };
+
+            await EventLogRepository.AddStudentEvent(eventLog, user.Id, model.Id, EventLogTypes.EditStudent);
+
+            StudentRepository.SaveChanges();
+            EventLogRepository.SaveChanges();
         }
     }
 }

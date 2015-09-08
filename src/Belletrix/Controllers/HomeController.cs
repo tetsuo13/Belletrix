@@ -1,7 +1,6 @@
 ﻿using Belletrix.Core;
 using Belletrix.Domain;
 using Belletrix.Entity.Model;
-using Belletrix.Models;
 using StackExchange.Exceptional;
 using System.Threading.Tasks;
 using System.Web.Mvc;

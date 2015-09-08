@@ -19,5 +19,9 @@ namespace Belletrix.DAL
 
         Task<IEnumerable<ProgramModel>> GetPrograms();
         Task<IEnumerable<ProgramTypeModel>> GetProgramTypes();
+
+        Task<int> InsertStudent(StudentModel model);
+        Task UpdateStudent(StudentModel model);
+        void SaveChanges();
     }
 }

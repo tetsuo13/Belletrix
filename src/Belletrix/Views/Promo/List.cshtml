@@ -1,5 +1,5 @@
 ﻿@using Belletrix.Core;
-@using Belletrix.Models;
+@using Belletrix.Entity.Model;
 
 @model IEnumerable<PromoModel>
 
@@ -58,7 +58,7 @@
 
                         <tr>
                             <td>@Html.ActionLink(promo.Code, "Info", new { id = promo.Id })</td>
-                            <td>@promo.CreatedBy.FirstName @promo.CreatedBy.LastName</td>
+                            <td>@promo.CreatedByFirstName @promo.CreatedByLastName</td>
                             <td>@DateTimeFilter.UtcToLocal(promo.Created)</td>
                             <td>@promo.Description</td>
                             <td>

@@ -19,13 +19,15 @@ namespace Belletrix.Controllers
         private readonly IStudentService StudentService;
         private readonly IStudentNoteService StudentNoteService;
         private readonly IPromoService PromoService;
+        private readonly IStudyAbroadService StudyAbroadService;
 
         public StudentController(IStudentService studentService, IStudentNoteService studentNoteService,
-            IPromoService promoService)
+            IPromoService promoService, IStudyAbroadService studyAbroadService)
         {
             StudentService = studentService;
             StudentNoteService = studentNoteService;
             PromoService = promoService;
+            StudyAbroadService = studyAbroadService;
 
             ViewBag.ActivePage = ActivePageName;
         }
@@ -71,7 +73,7 @@ namespace Belletrix.Controllers
                 return HttpNotFound();
             }
 
-            ViewBag.StudyAbroad = StudyAbroadModel.GetAll(id);
+            ViewBag.StudyAbroad = await StudyAbroadService.GetAll(id);
             ViewBag.Notes = StudentNoteService.GetAllNotes(id);
             await PrepareDropDowns();
             await PrepareStudyAbroadDropDowns();
@@ -98,7 +100,7 @@ namespace Belletrix.Controllers
                 return HttpNotFound();
             }
 
-            ViewBag.StudyAbroad = StudyAbroadModel.GetAll(id);
+            ViewBag.StudyAbroad = await StudyAbroadService.GetAll(id);
             ViewBag.Notes = StudentNoteService.GetAllNotes(id);
             await PrepareDropDowns();
             await PrepareStudyAbroadDropDowns();
@@ -141,7 +143,7 @@ namespace Belletrix.Controllers
         {
             if (ModelState.IsValid)
             {
-                model.SaveChanges(Session["User"] as UserModel);
+                StudentService.UpdateStudent(model, Session["User"] as UserModel);
                 return RedirectToAction("List");
             }
 
@@ -165,7 +167,7 @@ namespace Belletrix.Controllers
         {
             if (ModelState.IsValid)
             {
-                model.Save(Session["User"] as UserModel);
+                await StudentService.InsertStudent(model, Session["User"] as UserModel);
                 return RedirectToAction("List");
             }
 
@@ -180,7 +182,7 @@ namespace Belletrix.Controllers
             ViewBag.StudentId = id;
             await PrepareStudyAbroadDropDowns();
 
-            return PartialView(StudyAbroadModel.GetAll(id));
+            return PartialView(await StudyAbroadService.GetAll(id));
         }
 
         private async Task PrepareDropDowns()

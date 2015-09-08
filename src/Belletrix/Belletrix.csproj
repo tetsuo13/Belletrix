@@ -167,7 +167,6 @@
     <Compile Include="Models\MatriculationModel.cs" />
     <Compile Include="Models\StudentModel.cs" />
     <Compile Include="Models\StudentPromoModel.cs" />
-    <Compile Include="Models\StudyAbroadModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

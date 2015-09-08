@@ -1,4 +1,6 @@
-﻿@using Belletrix.Models;
+﻿@using Belletrix.Core;
+@using Belletrix.Entity.Enum;
+@using Belletrix.Entity.Model;
 
 @{
     ViewBag.Title = "Index";
@@ -27,22 +29,22 @@
                             
                             switch (eventLog.Type)
                             {
-                                case (int)EventLogModel.EventType.AddStudent:
+                                case (int)EventLogTypes.AddStudent:
                                     action = "added";
                                     iconClass = modifiedByRealUser ? "fa fa-user-plus" : "fa fa-certificate";
                                     break;
                                     
-                                case (int)EventLogModel.EventType.EditStudent:
+                                case (int)EventLogTypes.EditStudent:
                                     action = "modified";
                                     iconClass = "fa fa-pencil-square-o";
                                     break;
                                     
-                                case (int)EventLogModel.EventType.AddStudentExperience:
+                                case (int)EventLogTypes.AddStudentExperience:
                                     action = "created experience for";
                                     iconClass = "fa fa-plane";
                                     break;
                                     
-                                case (int)EventLogModel.EventType.AddStudentNote:
+                                case (int)EventLogTypes.AddStudentNote:
                                     action = "commented on";
                                     iconClass = "fa fa-comment";
                                     break;
@@ -52,7 +54,7 @@
                             
                             <a href="#" class="list-group-item" title="@eventBy @action @personName">
                                 <i class="@iconClass fa-fw"></i> @personName
-                                <span class="pull-right text-muted small" title="@eventLog.EventDate.ToString("dddd, MMMM d, yyyy \\a\\t h:mm tt")"><em>@EventLogModel.CalculateRelativeDate(eventLog.EventDate)</em></span>
+                                <span class="pull-right text-muted small" title="@eventLog.EventDate.ToString("dddd, MMMM d, yyyy \\a\\t h:mm tt")"><em>@DateTimeFilter.CalculateRelativeDate(eventLog.EventDate)</em></span>
                             </a>
                         }
                     </div>

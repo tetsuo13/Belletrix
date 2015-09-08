@@ -1,5 +1,4 @@
-﻿using Belletrix.Models;
-using System;
+﻿using System;
 using System.Web;
 using System.Web.Http;
 
@@ -13,8 +12,7 @@ namespace Belletrix.Controllers
         {
             DateTime startDate = DateTime.Now;
 
-            StudentModel.GetStudents();
-            StudyAbroadModel.GetAll();
+            // Cache stuff here.
 
             TimeSpan span = DateTime.Now - startDate;
 

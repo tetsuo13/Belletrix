@@ -44,5 +44,17 @@ namespace Belletrix.Core
 
             return attribute.GetName();
         }
+
+        public static string CapitalizeFirstLetter(this string value)
+        {
+            value = value.Trim();
+
+            if (value.Length == 1)
+            {
+                return value.ToUpper();
+            }
+
+            return value.Substring(0, 1).ToUpper() + value.Substring(1);
+        }
     }
 }

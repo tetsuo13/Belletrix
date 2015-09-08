@@ -1,7 +1,6 @@
 ﻿using Belletrix.Core;
 using Belletrix.Domain;
 using Belletrix.Entity.Model;
-using Belletrix.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,10 +14,12 @@ namespace Belletrix.Controllers
         public static string ActivePageName = "experiences";
 
         private readonly IStudentService StudentService;
+        private readonly IStudyAbroadService StudyAbroadService;
 
-        public ExperienceController(IStudentService studentService)
+        public ExperienceController(IStudentService studentService, IStudyAbroadService studyAbroadService)
         {
             StudentService = studentService;
+            StudyAbroadService = studyAbroadService;
 
             ViewBag.ActivePage = ActivePageName;
         }
@@ -32,7 +33,7 @@ namespace Belletrix.Controllers
             ViewBag.Programs = await StudentService.GetPrograms();
             ViewBag.ProgramTypes = await StudentService.GetProgramTypes();
 
-            return View(StudyAbroadModel.GetAll());
+            return View(await StudyAbroadService.GetAll());
         }
 
         public async Task<ActionResult> Add(int studentId)
@@ -59,7 +60,7 @@ namespace Belletrix.Controllers
         {
             if (ModelState.IsValid)
             {
-                model.Save((Session["User"] as UserModel).Id);
+                await StudyAbroadService.Save(model, (Session["User"] as UserModel).Id);
                 return RedirectToAction("View", "Student", new { Id = model.StudentId });
             }
 

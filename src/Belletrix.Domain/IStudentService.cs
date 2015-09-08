@@ -9,6 +9,7 @@ namespace Belletrix.Domain
     {
         Task<IEnumerable<StudentModel>> GetStudents(int? id = null);
         Task<StudentModel> GetStudent(int id);
+        Task<IEnumerable<StudentModel>> FromPromo(int promoId);
 
         Task<IEnumerable<StudentModel>> Search(StudentSearchViewModel search);
         Task<IEnumerable<StudentModel>> SearchByFullName(string firstName, string lastName);
@@ -34,5 +35,8 @@ namespace Belletrix.Domain
 
         Task<IEnumerable<ProgramModel>> GetPrograms();
         Task<IEnumerable<ProgramTypeModel>> GetProgramTypes();
+
+        Task InsertStudent(StudentModel model, UserModel user);
+        Task UpdateStudent(StudentModel model, UserModel user);
     }
 }

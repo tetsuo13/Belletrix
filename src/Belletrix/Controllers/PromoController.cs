@@ -1,6 +1,7 @@
 ﻿using Belletrix.Core;
 using Belletrix.Domain;
 using Belletrix.Entity.Model;
+using Belletrix.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -97,7 +98,7 @@ namespace Belletrix.Controllers
 
             string title = String.Format("Students of {0} promo ({1})", promo.Description, promo.Code);
             await Analytics.TrackPageView(Request, title, (Session["User"] as UserModel).Login);
-            return View(StudentModel.FromPromo(id));
+            return View(await StudentService.FromPromo(id));
         }
 
         [AllowAnonymous]

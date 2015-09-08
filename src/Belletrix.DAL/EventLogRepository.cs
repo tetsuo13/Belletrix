@@ -82,7 +82,7 @@ namespace Belletrix.DAL
                                 eventLog.UserLastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("UserLastName"));
                             }
 
-                            eventLog.RelativeDate = CalculateRelativeDate(eventLog.EventDate.ToUniversalTime());
+                            eventLog.RelativeDate = DateTimeFilter.CalculateRelativeDate(eventLog.EventDate.ToUniversalTime());
 
                             events.Add(eventLog);
                         }
@@ -98,75 +98,12 @@ namespace Belletrix.DAL
             return events;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="date"></param>
-        /// <returns></returns>
-        /// <seealso href="https://stackoverflow.com/a/1248">
-        /// How do I calculate relative time?
-        /// </seealso>
-        private string CalculateRelativeDate(DateTime date)
+        public async Task AddStudentEvent(EventLogModel model, int studentId, EventLogTypes eventType)
         {
-            const int Second = 1;
-            const int Minute = 60 * Second;
-            const int Hour = 60 * Minute;
-            const int Day = 24 * Hour;
-            const int Month = 30 * Day;
-
-            TimeSpan ts = new TimeSpan(DateTime.UtcNow.Ticks - date.ToUniversalTime().Ticks);
-            double delta = Math.Abs(ts.TotalSeconds);
-
-            if (delta < 0)
-            {
-                return "not yet";
-            }
-            if (delta < 1 * Minute)
-            {
-                return ts.Seconds == 1 ? "one second ago" : ts.Seconds + " seconds ago";
-            }
-            if (delta < 2 * Minute)
-            {
-                return "a minute ago";
-            }
-            if (delta < 45 * Minute)
-            {
-                return ts.Minutes + " minutes ago";
-            }
-            if (delta < 90 * Minute)
-            {
-                return "an hour ago";
-            }
-            if (delta < 24 * Hour)
-            {
-                return ts.Hours + " hours ago";
-            }
-            if (delta < 48 * Hour)
-            {
-                return "yesterday";
-            }
-            if (delta < 30 * Day)
-            {
-                return ts.Days + " days ago";
-            }
-            if (delta < 12 * Month)
-            {
-                int months = Convert.ToInt32(Math.Floor((double)ts.Days / 30));
-                return months <= 1 ? "one month ago" : months + " months ago";
-            }
-
-            int years = Convert.ToInt32(Math.Floor((double)ts.Days / 365));
-            return years <= 1 ? "one year ago" : years + " years ago";
+            await AddStudentEvent(model, 0, studentId, eventType);
         }
 
-        public async Task AddStudentEvent(EventLogModel model, SqlTransaction transaction, int studentId,
-            EventLogTypes eventType)
-        {
-            await AddStudentEvent(model, transaction, 0, studentId, eventType);
-        }
-
-        public async Task AddStudentEvent(EventLogModel model, SqlTransaction transaction, int modifiedBy, int studentId,
-            EventLogTypes eventType)
+        public async Task AddStudentEvent(EventLogModel model, int modifiedBy, int studentId, EventLogTypes eventType)
         {
             const string sql = @"
                 INSERT INTO [dbo].[EventLog]
@@ -178,7 +115,6 @@ namespace Belletrix.DAL
             {
                 using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
-                    command.Transaction = transaction;
                     command.CommandText = sql;
 
                     command.Parameters.Add("@Date", SqlDbType.DateTime).Value = DateTime.Now.ToUniversalTime();
@@ -202,6 +138,11 @@ namespace Belletrix.DAL
                 e.Data["SQL"] = sql;
                 throw e;
             }
+        }
+
+        public void SaveChanges()
+        {
+            UnitOfWork.SaveChanges();
         }
     }
 }

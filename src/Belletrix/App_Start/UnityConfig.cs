@@ -39,6 +39,7 @@ namespace Belletrix.App_Start
             container.RegisterType<IStudentRepository, StudentRepository>();
             container.RegisterType<IStudentService, StudentService>();
             container.RegisterType<IStudyAbroadRepository, StudyAbroadRepository>();
+            container.RegisterType<IStudyAbroadService, StudyAbroadService>();
         }
     }
 }
