@@ -2,7 +2,6 @@
 using Belletrix.Entity.Enum;
 using Belletrix.Entity.Model;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace Belletrix.Domain
@@ -21,16 +20,14 @@ namespace Belletrix.Domain
             return await EventLogRepository.GetEvents();
         }
 
-        public async Task AddStudentEvent(EventLogModel model, SqlTransaction transaction, int studentId,
-            EventLogTypes eventType)
+        public async Task AddStudentEvent(EventLogModel model, int studentId, EventLogTypes eventType)
         {
-            await EventLogRepository.AddStudentEvent(model, transaction, studentId, eventType);
+            await EventLogRepository.AddStudentEvent(model, studentId, eventType);
         }
 
-        public async Task AddStudentEvent(EventLogModel model, SqlTransaction transaction, int modifiedBy,
-            int studentId, EventLogTypes eventType)
+        public async Task AddStudentEvent(EventLogModel model, int modifiedBy, int studentId, EventLogTypes eventType)
         {
-            await EventLogRepository.AddStudentEvent(model, transaction, modifiedBy, studentId, eventType);
+            await EventLogRepository.AddStudentEvent(model, modifiedBy, studentId, eventType);
         }
     }
 }

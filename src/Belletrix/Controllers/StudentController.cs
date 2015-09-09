@@ -143,7 +143,7 @@ namespace Belletrix.Controllers
         {
             if (ModelState.IsValid)
             {
-                StudentService.UpdateStudent(model, Session["User"] as UserModel);
+                await StudentService.UpdateStudent(model, Session["User"] as UserModel);
                 return RedirectToAction("List");
             }
 

@@ -53,9 +53,9 @@ namespace Belletrix.DAL
             return logs;
         }
 
-        public void Save(SqlTransaction transaction, int studentId, IEnumerable<int> promoIds)
+        public async Task Save(int studentId, IEnumerable<int> promoIds)
         {
-            Delete(transaction, studentId);
+            await Delete(studentId);
 
             if (promoIds != null && promoIds.Any())
             {
@@ -73,7 +73,6 @@ namespace Belletrix.DAL
                     {
                         DateTime created = DateTime.Now.ToUniversalTime();
 
-                        command.Transaction = transaction;
                         command.CommandText = sql;
 
                         command.Parameters.Add("@PromoId", SqlDbType.Int);
@@ -92,7 +91,7 @@ namespace Belletrix.DAL
                             };
 
                             command.Parameters[0].Value = promoId;
-                            command.ExecuteNonQuery();
+                            await command.ExecuteNonQueryAsync();
 
                             logs.Add(log);
                         }
@@ -112,7 +111,7 @@ namespace Belletrix.DAL
                 .Select(x => x.PromoId);
         }
 
-        public void Save(SqlTransaction transaction, int studentId, string promoCode)
+        public async Task Save(int studentId, string promoCode)
         {
             ICollection<StudentPromoLog> logs = new List<StudentPromoLog>();
 
@@ -131,14 +130,13 @@ namespace Belletrix.DAL
                 {
                     DateTime created = DateTime.Now.ToUniversalTime();
 
-                    command.Transaction = transaction;
                     command.CommandText = sql;
 
                     command.Parameters.Add("@PromoCode", SqlDbType.VarChar, 32).Value = promoCode.ToLower();
                     command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
                     command.Parameters.Add("@Created", SqlDbType.DateTime).Value = created;
 
-                    int promoId = Convert.ToInt32(command.ExecuteScalar());
+                    int promoId = Convert.ToInt32(await command.ExecuteScalarAsync());
 
                     logs.Add(new StudentPromoLog()
                     {
@@ -159,7 +157,7 @@ namespace Belletrix.DAL
             return (await Get()).Where(x => x.PromoId == id);
         }
 
-        private void Delete(SqlTransaction transaction, int studentId)
+        private async Task Delete(int studentId)
         {
             const string sql = @"
                 DELETE FROM [dbo].[StudentPromoLog]
@@ -169,10 +167,9 @@ namespace Belletrix.DAL
             {
                 using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
-                    command.Transaction = transaction;
                     command.CommandText = sql;
                     command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync();
                 }
             }
             catch (Exception e)
@@ -180,6 +177,11 @@ namespace Belletrix.DAL
                 e.Data["SQL"] = sql;
                 throw e;
             }
+        }
+
+        public void SaveChanges()
+        {
+            UnitOfWork.SaveChanges();
         }
     }
 }

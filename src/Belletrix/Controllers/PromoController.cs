@@ -1,7 +1,6 @@
 ﻿using Belletrix.Core;
 using Belletrix.Domain;
 using Belletrix.Entity.Model;
-using Belletrix.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -168,7 +167,7 @@ namespace Belletrix.Controllers
                     userId = (Session["User"] as UserModel).Id;
                 }
 
-                model.Save(userId, cookie.Value);
+                await StudentService.InsertStudent(model, userId, cookie.Value);
                 return RedirectToAction("Success");
             }
 

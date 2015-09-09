@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Belletrix.Entity.Model
 {
@@ -26,6 +23,25 @@ namespace Belletrix.Entity.Model
         /// </summary>
         [Display(Name = "Promo")]
         public IEnumerable<int> PromoIds { get; set; }
+    }
+
+    /// <summary>
+    /// Student model related to promos.
+    /// </summary>
+    /// <remarks>
+    /// Some of the fields are copied from the base class just to provide a
+    /// different display name than the base class defines.
+    /// </remarks>
+    public class StudentPromoModel : StudentBaseModel, IStudentModel
+    {
+        [Display(Name = "Are you a Pell Grant Recipient?")]
+        new public bool? PellGrantRecipient { get; set; }
+
+        [Display(Name = "Do you have a passport?")]
+        new public bool? HasPassport { get; set; }
+
+        [Display(Name = "Desired Language Abroad")]
+        public new IEnumerable<int> SelectedDesiredLanguages { get; set; }
     }
 
     /// <summary>

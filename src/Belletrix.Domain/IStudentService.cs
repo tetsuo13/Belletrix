@@ -37,6 +37,7 @@ namespace Belletrix.Domain
         Task<IEnumerable<ProgramTypeModel>> GetProgramTypes();
 
         Task InsertStudent(StudentModel model, UserModel user);
+        Task InsertStudent(StudentPromoModel model, int? userId, string promoCode);
         Task UpdateStudent(StudentModel model, UserModel user);
     }
 }

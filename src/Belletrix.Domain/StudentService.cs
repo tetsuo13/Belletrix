@@ -222,9 +222,34 @@ namespace Belletrix.Domain
             EventLogRepository.SaveChanges();
         }
 
+        public async Task InsertStudent(StudentPromoModel model, int? userId, string promoCode)
+        {
+            int studentId = await StudentRepository.InsertStudent(model);
+            model.Id = studentId;
+
+            await StudentPromoRepository.Save(model.Id, promoCode);
+
+            EventLogModel eventLog = new EventLogModel()
+            {
+                Student = model
+            };
+
+            if (userId.HasValue)
+            {
+                eventLog.ModifiedById = userId.Value;
+            }
+
+            await EventLogRepository.AddStudentEvent(eventLog, model.Id, EventLogTypes.EditStudent);
+
+            StudentRepository.SaveChanges();
+            StudentPromoRepository.SaveChanges();
+            EventLogRepository.SaveChanges();
+        }
+
         public async Task UpdateStudent(StudentModel model, UserModel user)
         {
             await StudentRepository.UpdateStudent(model);
+            await StudentPromoRepository.Save(model.Id, model.PromoIds);
 
             EventLogModel eventLog = new EventLogModel()
             {
@@ -237,6 +262,7 @@ namespace Belletrix.Domain
             await EventLogRepository.AddStudentEvent(eventLog, user.Id, model.Id, EventLogTypes.EditStudent);
 
             StudentRepository.SaveChanges();
+            StudentPromoRepository.SaveChanges();
             EventLogRepository.SaveChanges();
         }
     }

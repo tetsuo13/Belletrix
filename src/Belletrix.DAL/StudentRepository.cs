@@ -437,7 +437,7 @@ namespace Belletrix.DAL
             return programTypes;
         }
 
-        public async Task<int> InsertStudent(StudentModel model)
+        public async Task<int> InsertStudent(StudentBaseModel model)
         {
             int studentId;
 
@@ -508,6 +508,10 @@ namespace Belletrix.DAL
 
                     studentId = (int)await command.ExecuteScalarAsync();
                 }
+
+                await SaveAssociatedTables(studentId, model.SelectedMajors, model.SelectedMinors,
+                    model.StudyAbroadCountry, model.StudyAbroadYear, model.StudyAbroadPeriod,
+                    model.SelectedLanguages, model.SelectedDesiredLanguages, model.StudiedLanguages);
             }
             catch (Exception e)
             {
@@ -516,6 +520,11 @@ namespace Belletrix.DAL
             }
 
             return studentId;
+        }
+
+        public async Task<int> InsertStudent(StudentPromoModel model)
+        {
+            return await InsertStudent(model);
         }
 
         public async Task UpdateStudent(StudentModel model)
@@ -594,11 +603,212 @@ namespace Belletrix.DAL
 
                     await command.ExecuteNonQueryAsync();
                 }
+
+                await SaveAssociatedTables(model.Id, model.SelectedMajors, model.SelectedMinors,
+                    model.StudyAbroadCountry, model.StudyAbroadYear, model.StudyAbroadPeriod,
+                    model.SelectedLanguages, model.SelectedDesiredLanguages, model.StudiedLanguages);
             }
             catch (Exception e)
             {
                 e.Data["SQL"] = sql.ToString();
                 throw e;
+            }
+        }
+
+        private async Task SaveAssociatedTables(int studentId, IEnumerable<int> majors, IEnumerable<int> minors,
+            IEnumerable<int> studyAbroadCountry, IEnumerable<int> studyAbroadYear, IEnumerable<int> studyAbroadPeriod,
+            IEnumerable<int> languages, IEnumerable<int> desiredLanguages, IEnumerable<int> studiedLanguages)
+        {
+            // Always call the next two functions. User may be removing
+            // all values from a student which previous has some selected.
+            await SaveStudentMajors(studentId, majors, true);
+            await SaveStudentMajors(studentId, minors, false);
+
+            await SaveStudyAbroadDestinations(studentId, studyAbroadCountry, studyAbroadYear, studyAbroadPeriod);
+
+            await SaveStudentLanguages(studentId, "StudentFluentLanguages", languages);
+            await SaveStudentLanguages(studentId, "StudentDesiredLanguages", desiredLanguages);
+            await SaveStudentLanguages(studentId, "StudentStudiedLanguages", studiedLanguages);
+        }
+
+        private async Task SaveStudentLanguages(int studentId, string tableName, IEnumerable<int> languages)
+        {
+            string sql = String.Format(@"
+                DELETE FROM [dbo].[{0}]
+                WHERE       [StudentId] = @StudentId",
+                tableName);
+
+            try
+            {
+                using (SqlCommand command = UnitOfWork.CreateCommand())
+                {
+                    command.CommandText = sql;
+                    command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
+            }
+
+            if (languages != null && languages.Any())
+            {
+                ICollection<string> values = new List<string>();
+
+                foreach (int languageId in languages)
+                {
+                    values.Add(String.Format("({0}, {1})", studentId, languageId));
+                }
+
+                StringBuilder insertSql = new StringBuilder();
+                insertSql.Append("INSERT INTO [dbo].[").Append(tableName).Append("] ([StudentId], [LanguageId]) VALUES ");
+                insertSql.Append(String.Join(",", values));
+
+                try
+                {
+                    using (SqlCommand command = UnitOfWork.CreateCommand())
+                    {
+                        command.CommandText = insertSql.ToString();
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.Data["SQL"] = insertSql.ToString();
+                    throw e;
+                }
+            }
+        }
+
+        private async Task SaveStudyAbroadDestinations(int studentId, IEnumerable<int> countries,
+            IEnumerable<int> years, IEnumerable<int> periods)
+        {
+            const string sql = @"
+                DELETE FROM [dbo].[StudentStudyAbroadWishlist]
+                WHERE       [StudentId] = @StudentId";
+
+            try
+            {
+                using (SqlCommand command = UnitOfWork.CreateCommand())
+                {
+                    command.CommandText = sql;
+                    command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
+            }
+
+            if (countries == null || years == null || periods == null)
+            {
+                return;
+            }
+
+            int countriesCount = countries.Count();
+
+            // Each collection should have the same number of elements.
+            if (countriesCount == 0 || countriesCount != years.Count() || countriesCount != periods.Count())
+            {
+                return;
+            }
+
+            // The default if the user doesn't selecting anything at all is
+            // that all three enumerables will have a single element of value
+            // zero.
+            if (countries.ElementAt(0) == 0 && years.ElementAt(0) == 0 && periods.ElementAt(0) == 0)
+            {
+                return;
+            }
+
+            const string insertSql = @"
+                INSERT INTO [dbo].[StudentStudyAbroadWishlist]
+                ([StudentId], [CountryId], [Year], [Period])
+                VALUES
+                (@StudentId, @CountryId, @Year, @Period)";
+
+            try
+            {
+                using (SqlCommand command = UnitOfWork.CreateCommand())
+                {
+                    command.CommandText = insertSql;
+
+                    command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
+                    command.Parameters.Add("@CountryId", SqlDbType.Int);
+                    command.Parameters.Add("@Year", SqlDbType.Int);
+                    command.Parameters.Add("@Period", SqlDbType.Int);
+
+                    command.Prepare();
+
+                    for (int i = 0; i < countriesCount; i++)
+                    {
+                        command.Parameters[1].Value = countries.ElementAt(i);
+                        command.Parameters[2].Value = years.ElementAt(i);
+                        command.Parameters[3].Value = periods.ElementAt(i);
+
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = insertSql;
+                throw e;
+            }
+        }
+
+        private async Task SaveStudentMajors(int studentId, IEnumerable<int> majors, bool isMajor)
+        {
+            const string sql = @"
+                DELETE FROM [dbo].[Matriculation]
+                WHERE       [StudentId] = @StudentId AND
+                            [IsMajor] = @IsMajor";
+
+            try
+            {
+                using (SqlCommand command = UnitOfWork.CreateCommand())
+                {
+                    command.CommandText = sql;
+                    command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
+                    command.Parameters.Add("@IsMajor", SqlDbType.Bit).Value = isMajor;
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                throw e;
+            }
+
+            if (majors != null && majors.Any())
+            {
+                StringBuilder insertSql = new StringBuilder("INSERT INTO [dbo].[Matriculation] ([StudentId], [MajorId], [IsMajor]) VALUES ");
+                ICollection<string> values = new List<string>();
+
+                foreach (int majorId in majors)
+                {
+                    values.Add(String.Format("({0}, {1}, '{2}')", studentId, majorId, isMajor ? 1 : 0));
+                }
+
+                insertSql.Append(String.Join(",", values));
+
+                try
+                {
+                    using (SqlCommand command = UnitOfWork.CreateCommand())
+                    {
+                        command.CommandText = insertSql.ToString();
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.Data["SQL"] = insertSql.ToString();
+                    throw e;
+                }
             }
         }
 

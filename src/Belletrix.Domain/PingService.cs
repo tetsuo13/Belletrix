@@ -5,7 +5,7 @@ namespace Belletrix.Domain
 {
     public class PingService : IPingService
     {
-        private IPingRepository PingRepository;
+        private readonly IPingRepository PingRepository;
 
         public PingService(IPingRepository pingRepository)
         {
