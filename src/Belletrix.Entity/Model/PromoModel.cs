@@ -26,6 +26,8 @@ namespace Belletrix.Entity.Model
 
         public bool IsActive { get; set; }
 
+        // TODO: Not needed?
         public IEnumerable<StudentPromoLog> Logs { get; set; }
+        public int Stuents { get; set; }
     }
 }

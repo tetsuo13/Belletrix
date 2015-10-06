@@ -18,12 +18,13 @@ namespace Belletrix.DAL
             UnitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<PromoModel>> GetPromos(bool withLogs = false)
+        public async Task<IEnumerable<PromoModel>> GetPromos()
         {
             ICollection<PromoModel> promos = new List<PromoModel>();
             const string sql = @"
                 SELECT      p.Id AS PromoId, [Description], [CreatedBy], p.Created, [Code], p.Active,
-                            u.FirstName, u.LastName
+                            u.FirstName, u.LastName,
+                            (SELECT COUNT(*) FROM [StudentPromoLog] WHERE [PromoId] = p.Id) AS NumStudents
                 FROM        [dbo].[UserPromo] p
                 INNER JOIN  [dbo].[Users] u ON
                             [CreatedBy] = u.id
@@ -48,13 +49,9 @@ namespace Belletrix.DAL
                                 IsActive = await reader.GetFieldValueAsync<bool>(reader.GetOrdinal("Active")),
                                 CreatedById = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("CreatedBy")),
                                 CreatedByFirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("FirstName")),
-                                CreatedByLastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("LastName"))
+                                CreatedByLastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("LastName")),
+                                Stuents = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("NumStudents"))
                             };
-
-                            if (withLogs)
-                            {
-                                promo.Logs = StudentPromoLog.GetLogsForPromo(promo.Id);
-                            }
 
                             promos.Add(promo);
                         }

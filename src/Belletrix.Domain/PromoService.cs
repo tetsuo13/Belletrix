@@ -14,9 +14,9 @@ namespace Belletrix.Domain
             PromoRepository = promoRepository;
         }
 
-        public async Task<IEnumerable<PromoModel>> GetPromos(bool withLogs = false)
+        public async Task<IEnumerable<PromoModel>> GetPromos()
         {
-            return await PromoRepository.GetPromos(withLogs);
+            return await PromoRepository.GetPromos();
         }
 
         public async Task<PromoModel> GetPromo(int id)

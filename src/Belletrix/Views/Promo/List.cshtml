@@ -54,21 +54,15 @@
                 <tbody>
                     @foreach (PromoModel promo in Model)
                     {
-                        int students = promo.Logs.Count();
-
                         <tr>
                             <td>@Html.ActionLink(promo.Code, "Info", new { id = promo.Id })</td>
                             <td>@promo.CreatedByFirstName @promo.CreatedByLastName</td>
                             <td>@DateTimeFilter.UtcToLocal(promo.Created)</td>
                             <td>@promo.Description</td>
                             <td>
-                                @if (students > 0)
+                                @if (promo.Stuents > 0)
                                 {
-                                    @Html.ActionLink(students.ToString("N0"), "Students", new { id = promo.Id })
-                                }
-                                else
-                                {
-                                    @students
+                                    @Html.ActionLink(promo.Stuents.ToString("N0"), "Students", new { id = promo.Id })
                                 }
                             </td>
                             <td>

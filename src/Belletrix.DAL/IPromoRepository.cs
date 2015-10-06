@@ -6,7 +6,7 @@ namespace Belletrix.DAL
 {
     public interface IPromoRepository
     {
-        Task<IEnumerable<PromoModel>> GetPromos(bool withLogs = false);
+        Task<IEnumerable<PromoModel>> GetPromos();
         Task<PromoModel> GetPromo(int id);
         Task<PromoModel> GetPromo(string code);
         Task Save(PromoModel model, int userId);

@@ -41,7 +41,7 @@ namespace Belletrix.Controllers
         public async Task<ActionResult> List()
         {
             await Analytics.TrackPageView(Request, "Promo List", (Session["User"] as UserModel).Login);
-            return View(await PromoService.GetPromos(true));
+            return View(await PromoService.GetPromos());
         }
 
         public async Task<ActionResult> Add()
