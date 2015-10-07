@@ -437,20 +437,26 @@ namespace Belletrix.DAL
             return programTypes;
         }
 
-        public async Task<int> InsertStudent(StudentBaseModel model)
+        public async Task<int> InsertStudent(object model)
         {
             int studentId;
 
-            const string sql = @"
+            StringBuilder sql = new StringBuilder(@"
                 INSERT INTO [dbo].[Students]
                 (
                     [Created], [InitialMeeting], [FirstName], [MiddleName],
                     [LastName], [StreetAddress], [StreetAddress2], [City],
                     [State], [PostalCode], [Classification], [StudentId],
                     [PhoneNumber], [LivingOnCampus], [EnrolledFullTime], [Citizenship],
-                    [PellGrantRecipient], [PassportHolder], [PhiBetaDeltaMember], [Gpa],
-                    [CampusEmail], [AlternateEmail], [EnteringYear], [GraduatingYear],
-                    [Dob]
+                    [PellGrantRecipient], [PassportHolder], [Gpa], [CampusEmail],
+                    [AlternateEmail], [EnteringYear], [GraduatingYear], [Dob]");
+
+            if (model is StudentModel)
+            {
+                sql.Append(", [PhiBetaDeltaMember]");
+            }
+
+            sql.Append(@"
                 )
                 OUTPUT INSERTED.Id
                 VALUES
@@ -459,48 +465,60 @@ namespace Belletrix.DAL
                     @LastName, @StreetAddress, @StreetAddress2, @City,
                     @State, @PostalCode, @Classification, @StudentId,
                     @PhoneNumber, @LivingOnCampus, @EnrolledFullTime, @Citizenship,
-                    @PellGrantRecipient, @PassportHolder, @PhiBetaDeltaMember, @Gpa,
-                    @CampusEmail, @AlternateEmail, @EnteringYear, @GraduatingYear,
-                    @Dob
-                )";
+                    @PellGrantRecipient, @PassportHolder, @Gpa, @CampusEmail,
+                    @AlternateEmail, @EnteringYear, @GraduatingYear, @Dob");
+
+            if (model is StudentModel)
+            {
+                sql.Append(", @PhiBetaDeltaMember");
+            }
+
+            sql.Append(")");
 
             try
             {
+                StudentBaseModel baseModel = model as StudentBaseModel;
+
                 using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
-                    command.CommandText = sql;
-                    command.Parameters.Add("@Created", SqlDbType.DateTime).Value = DateTime.Now.ToUniversalTime();
-                    command.Parameters.Add("@FirstName", SqlDbType.NVarChar, 64).Value = model.FirstName.CapitalizeFirstLetter();
-                    command.Parameters.Add("@LastName", SqlDbType.NVarChar, 64).Value = model.LastName.CapitalizeFirstLetter();
-                    command.Parameters.Add("@InitialMeeting", SqlDbType.Date).Value = model.InitialMeeting.HasValue ? (object)model.InitialMeeting.Value.ToUniversalTime() : DBNull.Value;
-                    command.Parameters.Add("@MiddleName", SqlDbType.NVarChar, 64).Value = !String.IsNullOrWhiteSpace(model.MiddleName) ? (object)model.MiddleName.CapitalizeFirstLetter() : DBNull.Value;
-                    command.Parameters.Add("@LivingOnCampus", SqlDbType.Bit).Value = model.LivingOnCampus.HasValue ? (object)model.LivingOnCampus.Value : DBNull.Value;
-                    command.Parameters.Add("@StreetAddress", SqlDbType.NVarChar, 128).Value = !String.IsNullOrEmpty(model.StreetAddress) ? (object)model.StreetAddress : DBNull.Value;
-                    command.Parameters.Add("@StreetAddress2", SqlDbType.NVarChar, 128).Value = !String.IsNullOrEmpty(model.StreetAddress2) ? (object)model.StreetAddress2 : DBNull.Value;
-                    command.Parameters.Add("@City", SqlDbType.NVarChar, 128).Value = !String.IsNullOrEmpty(model.City) ? (object)model.City : DBNull.Value;
-                    command.Parameters.Add("@State", SqlDbType.NVarChar, 32).Value = !String.IsNullOrEmpty(model.State) ? (object)model.State : DBNull.Value;
-                    command.Parameters.Add("@PostalCode", SqlDbType.NVarChar, 16).Value = !String.IsNullOrEmpty(model.PostalCode) ? (object)model.PostalCode : DBNull.Value;
-                    command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar, 32).Value = !String.IsNullOrEmpty(model.PhoneNumber) ? (object)model.PhoneNumber.Trim() : DBNull.Value;
-                    command.Parameters.Add("@Classification", SqlDbType.Int).Value = model.Classification.HasValue ? (object)model.Classification.Value : DBNull.Value;
-                    command.Parameters.Add("@EnteringYear", SqlDbType.Int).Value = model.EnteringYear.HasValue ? (object)model.EnteringYear.Value : DBNull.Value;
-                    command.Parameters.Add("@GraduatingYear", SqlDbType.Int).Value = model.GraduatingYear.HasValue ? (object)model.GraduatingYear.Value : DBNull.Value;
-                    command.Parameters.Add("@StudentId", SqlDbType.VarChar, 32).Value = !String.IsNullOrEmpty(model.StudentId) ? (object)model.StudentId.Trim() : DBNull.Value;
-                    command.Parameters.Add("@DateOfBirth", SqlDbType.Date).Value = model.DateOfBirth.HasValue ? (object)model.DateOfBirth.Value.ToUniversalTime() : DBNull.Value;
-                    command.Parameters.Add("@Citizenship", SqlDbType.Int).Value = model.Citizenship.HasValue ? (object)model.Citizenship.Value : DBNull.Value;
-                    command.Parameters.Add("@EnrolledFullTime", SqlDbType.Bit).Value = model.EnrolledFullTime.HasValue ? (object)model.EnrolledFullTime.Value : DBNull.Value;
-                    command.Parameters.Add("@PellGrantRecipient", SqlDbType.Bit).Value = model.PellGrantRecipient.HasValue ? (object)model.PellGrantRecipient.Value : DBNull.Value;
-                    command.Parameters.Add("@HasPassport", SqlDbType.Bit).Value = model.HasPassport.HasValue ? (object)model.HasPassport.Value : DBNull.Value;
-                    command.Parameters.Add("@PhiBetaDeltaMember", SqlDbType.Bit).Value = model.PhiBetaDeltaMember.HasValue ? (object)model.PhiBetaDeltaMember.Value : DBNull.Value;
-                    command.Parameters.Add("@CampusEmail", SqlDbType.VarChar, 128).Value = !String.IsNullOrEmpty(model.CampusEmail) ? (object)model.CampusEmail.Trim() : DBNull.Value;
-                    command.Parameters.Add("@AlternateEmail", SqlDbType.VarChar, 128).Value = !String.IsNullOrEmpty(model.AlternateEmail) ? (object)model.AlternateEmail.Trim() : DBNull.Value;
+                    command.CommandText = sql.ToString();
 
-                    if (model.Gpa.HasValue)
+                    command.Parameters.Add("@Created", SqlDbType.DateTime).Value = DateTime.Now.ToUniversalTime();
+                    command.Parameters.Add("@FirstName", SqlDbType.NVarChar, 64).Value = baseModel.FirstName.CapitalizeFirstLetter();
+                    command.Parameters.Add("@LastName", SqlDbType.NVarChar, 64).Value = baseModel.LastName.CapitalizeFirstLetter();
+                    command.Parameters.Add("@InitialMeeting", SqlDbType.Date).Value = baseModel.InitialMeeting.HasValue ? (object)baseModel.InitialMeeting.Value.ToUniversalTime() : DBNull.Value;
+                    command.Parameters.Add("@MiddleName", SqlDbType.NVarChar, 64).Value = !String.IsNullOrWhiteSpace(baseModel.MiddleName) ? (object)baseModel.MiddleName.CapitalizeFirstLetter() : DBNull.Value;
+                    command.Parameters.Add("@LivingOnCampus", SqlDbType.Bit).Value = baseModel.LivingOnCampus.HasValue ? (object)baseModel.LivingOnCampus.Value : DBNull.Value;
+                    command.Parameters.Add("@StreetAddress", SqlDbType.NVarChar, 128).Value = !String.IsNullOrEmpty(baseModel.StreetAddress) ? (object)baseModel.StreetAddress : DBNull.Value;
+                    command.Parameters.Add("@StreetAddress2", SqlDbType.NVarChar, 128).Value = !String.IsNullOrEmpty(baseModel.StreetAddress2) ? (object)baseModel.StreetAddress2 : DBNull.Value;
+                    command.Parameters.Add("@City", SqlDbType.NVarChar, 128).Value = !String.IsNullOrEmpty(baseModel.City) ? (object)baseModel.City : DBNull.Value;
+                    command.Parameters.Add("@State", SqlDbType.NVarChar, 32).Value = !String.IsNullOrEmpty(baseModel.State) ? (object)baseModel.State : DBNull.Value;
+                    command.Parameters.Add("@PostalCode", SqlDbType.NVarChar, 16).Value = !String.IsNullOrEmpty(baseModel.PostalCode) ? (object)baseModel.PostalCode : DBNull.Value;
+                    command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar, 32).Value = !String.IsNullOrEmpty(baseModel.PhoneNumber) ? (object)baseModel.PhoneNumber.Trim() : DBNull.Value;
+                    command.Parameters.Add("@Classification", SqlDbType.Int).Value = baseModel.Classification.HasValue ? (object)baseModel.Classification.Value : DBNull.Value;
+                    command.Parameters.Add("@EnteringYear", SqlDbType.Int).Value = baseModel.EnteringYear.HasValue ? (object)baseModel.EnteringYear.Value : DBNull.Value;
+                    command.Parameters.Add("@GraduatingYear", SqlDbType.Int).Value = baseModel.GraduatingYear.HasValue ? (object)baseModel.GraduatingYear.Value : DBNull.Value;
+                    command.Parameters.Add("@StudentId", SqlDbType.VarChar, 32).Value = !String.IsNullOrEmpty(baseModel.StudentId) ? (object)baseModel.StudentId.Trim() : DBNull.Value;
+                    command.Parameters.Add("@DateOfBirth", SqlDbType.Date).Value = baseModel.DateOfBirth.HasValue ? (object)baseModel.DateOfBirth.Value.ToUniversalTime() : DBNull.Value;
+                    command.Parameters.Add("@Citizenship", SqlDbType.Int).Value = baseModel.Citizenship.HasValue ? (object)baseModel.Citizenship.Value : DBNull.Value;
+                    command.Parameters.Add("@EnrolledFullTime", SqlDbType.Bit).Value = baseModel.EnrolledFullTime.HasValue ? (object)baseModel.EnrolledFullTime.Value : DBNull.Value;
+                    command.Parameters.Add("@PellGrantRecipient", SqlDbType.Bit).Value = baseModel.PellGrantRecipient.HasValue ? (object)baseModel.PellGrantRecipient.Value : DBNull.Value;
+                    command.Parameters.Add("@HasPassport", SqlDbType.Bit).Value = baseModel.HasPassport.HasValue ? (object)baseModel.HasPassport.Value : DBNull.Value;
+                    command.Parameters.Add("@CampusEmail", SqlDbType.VarChar, 128).Value = !String.IsNullOrEmpty(baseModel.CampusEmail) ? (object)baseModel.CampusEmail.Trim() : DBNull.Value;
+                    command.Parameters.Add("@AlternateEmail", SqlDbType.VarChar, 128).Value = !String.IsNullOrEmpty(baseModel.AlternateEmail) ? (object)baseModel.AlternateEmail.Trim() : DBNull.Value;
+
+                    if (model is StudentModel)
+                    {
+                        command.Parameters.Add("@PhiBetaDeltaMember", SqlDbType.Bit).Value = (model as StudentModel).PhiBetaDeltaMember.HasValue ? (object)(model as StudentModel).PhiBetaDeltaMember.Value : DBNull.Value;
+                    }
+
+                    if (baseModel.Gpa.HasValue)
                     {
                         SqlParameter parameter = new SqlParameter("@Gpa", SqlDbType.Decimal)
                         {
                             Scale = 2,
                             Precision = 3,
-                            Value = model.Gpa.Value
+                            Value = baseModel.Gpa.Value
                         };
 
                         command.Parameters.Add(parameter);
@@ -509,9 +527,9 @@ namespace Belletrix.DAL
                     studentId = (int)await command.ExecuteScalarAsync();
                 }
 
-                await SaveAssociatedTables(studentId, model.SelectedMajors, model.SelectedMinors,
-                    model.StudyAbroadCountry, model.StudyAbroadYear, model.StudyAbroadPeriod,
-                    model.SelectedLanguages, model.SelectedDesiredLanguages, model.StudiedLanguages);
+                await SaveAssociatedTables(studentId, baseModel.SelectedMajors, baseModel.SelectedMinors,
+                    baseModel.StudyAbroadCountry, baseModel.StudyAbroadYear, baseModel.StudyAbroadPeriod,
+                    baseModel.SelectedLanguages, baseModel.SelectedDesiredLanguages, baseModel.StudiedLanguages);
             }
             catch (Exception e)
             {
@@ -520,11 +538,6 @@ namespace Belletrix.DAL
             }
 
             return studentId;
-        }
-
-        public async Task<int> InsertStudent(StudentPromoModel model)
-        {
-            return await InsertStudent(model);
         }
 
         public async Task UpdateStudent(StudentModel model)
