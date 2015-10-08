@@ -1,5 +1,6 @@
 ﻿@using Belletrix.Core;
-@using Belletrix.Models;
+@using Belletrix.Entity.Enum;
+@using Belletrix.Entity.Model;
 @using System.Linq;
 
 @model IEnumerable<StudyAbroadModel>
@@ -28,23 +29,23 @@
 
                 switch (study.Semester)
                 {
-                    case (int)StudentStudyAbroadWishlistModel.PeriodValue.Fall:
+                    case (int)StudentStudyAbroadPeriods.Fall:
                         semesterName = "Fall";
                         break;
 
-                    case (int)StudentStudyAbroadWishlistModel.PeriodValue.Spring:
+                    case (int)StudentStudyAbroadPeriods.Spring:
                         semesterName = "Spring";
                         break;
 
-                    case (int)StudentStudyAbroadWishlistModel.PeriodValue.Summer:
+                    case (int)StudentStudyAbroadPeriods.Summer:
                         semesterName = "Summer";
                         break;
 
-                    case (int)StudentStudyAbroadWishlistModel.PeriodValue.Maymester:
+                    case (int)StudentStudyAbroadPeriods.Maymester:
                         semesterName = "Maymester";
                         break;
 
-                    case (int)StudentStudyAbroadWishlistModel.PeriodValue.AcademicYear:
+                    case (int)StudentStudyAbroadPeriods.AcademicYear:
                         semesterName = "Academic Year";
                         break;
 

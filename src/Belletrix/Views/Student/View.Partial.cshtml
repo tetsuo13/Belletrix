@@ -1,5 +1,6 @@
 ﻿@using Belletrix.Core;
-@using Belletrix.Models;
+@using Belletrix.Entity.Enum;
+@using Belletrix.Entity.Model;
 
 @model StudentModel
 
@@ -16,23 +17,23 @@
 
                         switch (studyAbroad.Semester)
                         {
-                            case (int)StudentStudyAbroadWishlistModel.PeriodValue.Fall:
+                            case (int)StudentStudyAbroadPeriods.Fall:
                                 semesterName = "Fall";
                                 break;
 
-                            case (int)StudentStudyAbroadWishlistModel.PeriodValue.Spring:
+                            case (int)StudentStudyAbroadPeriods.Spring:
                                 semesterName = "Spring";
                                 break;
 
-                            case (int)StudentStudyAbroadWishlistModel.PeriodValue.Summer:
+                            case (int)StudentStudyAbroadPeriods.Summer:
                                 semesterName = "Summer";
                                 break;
 
-                            case (int)StudentStudyAbroadWishlistModel.PeriodValue.Maymester:
+                            case (int)StudentStudyAbroadPeriods.Maymester:
                                 semesterName = "Maymester";
                                 break;
 
-                            case (int)StudentStudyAbroadWishlistModel.PeriodValue.AcademicYear:
+                            case (int)StudentStudyAbroadPeriods.AcademicYear:
                                 semesterName = "Academic Year";
                                 break;
                         }
@@ -111,7 +112,7 @@
                         <br />
                         <small class="text-muted">
                             by
-                            @note.CreatedBy.FirstName @note.CreatedBy.LastName
+                            @note.CreatedByFirstName @note.CreatedByLastName
                             on
                             @note.EntryDate.ToString("dddd, MMMM d, yyyy \\a\\t h:mm tt")
                         </small>
