@@ -81,8 +81,6 @@ namespace Belletrix
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             GlobalConfiguration.Configuration.Filters.Add(new System.Web.Http.AuthorizeAttribute());
-
-            UnityConfig.ConfigureIocUnityContainer();
         }
     }
 }
