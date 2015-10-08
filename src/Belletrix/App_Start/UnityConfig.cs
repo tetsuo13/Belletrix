@@ -51,12 +51,13 @@ namespace Belletrix.App_Start
             container.RegisterType<IStudyAbroadService, StudyAbroadService>();
             container.RegisterType<IUserService, UserService>();
 
-            container.RegisterType<IActivityLogRepository, ActivityLogRepository>();
             container.RegisterType<IActivityLogPersonRepository, ActivityLogPersonRepository>();
+            container.RegisterType<IActivityLogRepository, ActivityLogRepository>();
             container.RegisterType<IEventLogRepository, EventLogRepository>();
             container.RegisterType<IPingRepository, PingRepository>();
             container.RegisterType<IPromoRepository, PromoRepository>();
             container.RegisterType<IStudentNoteRepository, StudentNoteRepository>();
+            container.RegisterType<IStudentPromoRepository, StudentPromoRepository>();
             container.RegisterType<IStudentRepository, StudentRepository>();
             container.RegisterType<IStudyAbroadRepository, StudyAbroadRepository>();
             container.RegisterType<IUserRepository, UserRepository>();
