@@ -26,7 +26,7 @@ namespace Belletrix.Domain
             EventLogRepository = eventLogRepository;
         }
 
-        private IEnumerable<StudentModel> PopulatePromoLogs(IEnumerable<StudentModel> students)
+        private async Task<IEnumerable<StudentModel>> PopulatePromoLogs(IEnumerable<StudentModel> students)
         {
             if (students == null || !students.Any())
             {
@@ -43,7 +43,7 @@ namespace Belletrix.Domain
         public async Task<IEnumerable<StudentModel>> GetStudents(int? id = null)
         {
             IEnumerable<StudentModel> students = await StudentRepository.GetStudents(id);
-            return PopulatePromoLogs(students);
+            return await PopulatePromoLogs(students);
         }
 
         public async Task<StudentModel> GetStudent(int id)
@@ -55,7 +55,7 @@ namespace Belletrix.Domain
                 ICollection<StudentModel> x = new List<StudentModel>();
                 x.Add(student);
 
-                return PopulatePromoLogs(x).First();
+                return (await PopulatePromoLogs(x)).First();
             }
 
             return null;
