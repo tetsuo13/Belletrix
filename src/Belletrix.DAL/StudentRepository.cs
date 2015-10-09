@@ -111,7 +111,7 @@ namespace Belletrix.DAL
                             student.AlternateEmail = await reader.GetValueOrDefault<string>("AlternateEmail");
                             student.Created = await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("Created"));
                             student.NumberOfNotes = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("NumNotes"));
-                            student.Gpa = await reader.GetValueOrDefault<double?>("Gpa");
+                            student.Gpa = await reader.GetValueOrDefault<decimal?>("Gpa");
 
                             int ord = reader.GetOrdinal("Dob");
                             if (!reader.IsDBNull(ord))

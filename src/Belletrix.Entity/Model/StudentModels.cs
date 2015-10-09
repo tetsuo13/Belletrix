@@ -128,7 +128,7 @@ namespace Belletrix.Entity.Model
 
         [Range(0.00, 9.99)]
         [Display(Name = "Current GPA")]
-        public double? Gpa { get; set; }
+        public decimal? Gpa { get; set; }
 
         [StringLength(128)]
         [EmailAddress]
