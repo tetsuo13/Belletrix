@@ -1,5 +1,6 @@
 ﻿using Belletrix.Core;
 using Belletrix.Entity.Model;
+using StackExchange.Exceptional;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -7,6 +8,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Belletrix.DAL
 {
@@ -169,6 +171,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
             }
 
             return students;
@@ -211,6 +214,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
             }
 
             return countries;
@@ -249,6 +253,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
             }
 
             return regions;
@@ -285,6 +290,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
             }
 
             return languages;
@@ -321,6 +327,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
             }
 
             return majors;
@@ -357,6 +364,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
             }
 
             return minors;
@@ -396,6 +404,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
             }
 
             return programs;
@@ -432,6 +441,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
             }
 
             return programTypes;
@@ -534,6 +544,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql.ToString();
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
 
@@ -624,6 +635,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql.ToString();
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
         }
@@ -663,6 +675,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
 
@@ -690,6 +703,7 @@ namespace Belletrix.DAL
                 catch (Exception e)
                 {
                     e.Data["SQL"] = insertSql.ToString();
+                    ErrorStore.LogException(e, HttpContext.Current);
                     throw e;
                 }
             }
@@ -714,6 +728,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
 
@@ -770,6 +785,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = insertSql;
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
         }
@@ -794,6 +810,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
 
@@ -820,6 +837,7 @@ namespace Belletrix.DAL
                 catch (Exception e)
                 {
                     e.Data["SQL"] = insertSql.ToString();
+                    ErrorStore.LogException(e, HttpContext.Current);
                     throw e;
                 }
             }

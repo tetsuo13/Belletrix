@@ -1,11 +1,13 @@
 ﻿using Belletrix.Core;
 using Belletrix.Entity.Enum;
 using Belletrix.Entity.Model;
+using StackExchange.Exceptional;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Belletrix.DAL
 {
@@ -92,6 +94,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
 
@@ -136,6 +139,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
         }
