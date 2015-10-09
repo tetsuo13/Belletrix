@@ -1,6 +1,6 @@
 ﻿using System.Web.Http;
 
-namespace Belletrix
+namespace Belletrix.Web
 {
     public static class WebApiConfig
     {

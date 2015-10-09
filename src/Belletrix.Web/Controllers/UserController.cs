@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using System.Web.Security;
 
-namespace Belletrix.Controllers
+namespace Belletrix.Web.Controllers
 {
     [Authorize]
     public class UserController : Controller

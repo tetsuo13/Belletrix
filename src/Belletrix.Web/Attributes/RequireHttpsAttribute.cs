@@ -2,7 +2,7 @@
 using System.Web.Mvc;
 using RequireHttpsAttributeBase = System.Web.Mvc.RequireHttpsAttribute;
 
-namespace Belletrix.Attributes
+namespace Belletrix.Web.Attributes
 {
     /// <summary>
     /// RequireHttpsAttribute using X-Forwarded-Proto header that AppHarbor

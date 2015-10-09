@@ -5,7 +5,7 @@ using System;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
-namespace Belletrix.Controllers
+namespace Belletrix.Web.Controllers
 {
     public class NoteController : Controller
     {

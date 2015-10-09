@@ -1,6 +1,6 @@
 ﻿using System.Web.Mvc;
 
-namespace Belletrix
+namespace Belletrix.Web
 {
     public class FilterConfig
     {

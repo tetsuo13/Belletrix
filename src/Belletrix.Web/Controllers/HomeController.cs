@@ -5,7 +5,7 @@ using StackExchange.Exceptional;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
-namespace Belletrix.Controllers
+namespace Belletrix.Web.Controllers
 {
     [Authorize]
     public class HomeController : Controller

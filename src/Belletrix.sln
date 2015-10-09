@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Belletrix", "Belletrix\Belletrix.csproj", "{72018DEC-CA2F-4AC1-A83B-FFEAB8087989}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Belletrix.Web", "Belletrix.Web\Belletrix.Web.csproj", "{72018DEC-CA2F-4AC1-A83B-FFEAB8087989}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Belletrix.Core", "Belletrix.Core\Belletrix.Core.csproj", "{A0F343D6-B9B3-42B7-8C1D-2826A16280CB}"
 EndProject

@@ -1,7 +1,7 @@
 ﻿using Belletrix.Core;
 using System.Web.Mvc;
 
-namespace Belletrix.Controllers
+namespace Belletrix.Web.Controllers
 {
     public class ErrorController : Controller
     {

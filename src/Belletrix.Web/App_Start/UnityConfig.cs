@@ -4,7 +4,7 @@ using Belletrix.Domain;
 using Microsoft.Practices.Unity;
 using System;
 
-namespace Belletrix.App_Start
+namespace Belletrix.Web.App_Start
 {
     /// <summary>
     /// Specifies the Unity configuration for the main container.

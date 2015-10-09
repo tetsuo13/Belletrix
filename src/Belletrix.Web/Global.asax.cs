@@ -1,4 +1,4 @@
-﻿using Belletrix.App_Start;
+﻿using Belletrix.Web.App_Start;
 using StackExchange.Exceptional;
 using System;
 using System.Web;
@@ -8,7 +8,7 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 
-namespace Belletrix
+namespace Belletrix.Web
 {
     public class MvcApplication : HttpApplication
     {

@@ -2,7 +2,7 @@
 using System.Web;
 using System.Web.Http;
 
-namespace Belletrix.Controllers
+namespace Belletrix.Web.Controllers
 {
     [AllowAnonymous]
     public class CacheController : ApiController

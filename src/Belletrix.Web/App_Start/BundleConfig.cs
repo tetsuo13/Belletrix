@@ -1,6 +1,6 @@
 ﻿using System.Web.Optimization;
 
-namespace Belletrix.App_Start
+namespace Belletrix.Web.App_Start
 {
     public class BundleConfig
     {
