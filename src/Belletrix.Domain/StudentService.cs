@@ -35,7 +35,10 @@ namespace Belletrix.Domain
 
             List<StudentModel> updatedStudents = new List<StudentModel>(students);
 
-            updatedStudents.ForEach(async x => x.PromoIds = await StudentPromoRepository.GetPromoIdsForStudent(x.Id));
+            // Done this was instead of List<T>.ForEach() because the former
+            // doesn't play well with async.
+            var tasks = updatedStudents.Select(async x => x.PromoIds = await StudentPromoRepository.GetPromoIdsForStudent(x.Id));
+            var result = await Task.WhenAll(tasks);
 
             return updatedStudents;
         }
