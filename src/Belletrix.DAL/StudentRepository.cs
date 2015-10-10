@@ -513,7 +513,7 @@ namespace Belletrix.DAL
                     command.Parameters.Add("@Citizenship", SqlDbType.Int).Value = baseModel.Citizenship.HasValue ? (object)baseModel.Citizenship.Value : DBNull.Value;
                     command.Parameters.Add("@EnrolledFullTime", SqlDbType.Bit).Value = baseModel.EnrolledFullTime.HasValue ? (object)baseModel.EnrolledFullTime.Value : DBNull.Value;
                     command.Parameters.Add("@PellGrantRecipient", SqlDbType.Bit).Value = baseModel.PellGrantRecipient.HasValue ? (object)baseModel.PellGrantRecipient.Value : DBNull.Value;
-                    command.Parameters.Add("@HasPassport", SqlDbType.Bit).Value = baseModel.HasPassport.HasValue ? (object)baseModel.HasPassport.Value : DBNull.Value;
+                    command.Parameters.Add("@PassportHolder", SqlDbType.Bit).Value = baseModel.HasPassport.HasValue ? (object)baseModel.HasPassport.Value : DBNull.Value;
                     command.Parameters.Add("@CampusEmail", SqlDbType.VarChar, 128).Value = !String.IsNullOrEmpty(baseModel.CampusEmail) ? (object)baseModel.CampusEmail.Trim() : DBNull.Value;
                     command.Parameters.Add("@AlternateEmail", SqlDbType.VarChar, 128).Value = !String.IsNullOrEmpty(baseModel.AlternateEmail) ? (object)baseModel.AlternateEmail.Trim() : DBNull.Value;
 
@@ -607,7 +607,7 @@ namespace Belletrix.DAL
                     command.Parameters.Add("@Citizenship", SqlDbType.Int).Value = model.Citizenship.HasValue ? (object)model.Citizenship.Value : DBNull.Value;
                     command.Parameters.Add("@EnrolledFullTime", SqlDbType.Bit).Value = model.EnrolledFullTime.HasValue ? (object)model.EnrolledFullTime.Value : DBNull.Value;
                     command.Parameters.Add("@PellGrantRecipient", SqlDbType.Bit).Value = model.PellGrantRecipient.HasValue ? (object)model.PellGrantRecipient.Value : DBNull.Value;
-                    command.Parameters.Add("@HasPassport", SqlDbType.Bit).Value = model.HasPassport.HasValue ? (object)model.HasPassport.Value : DBNull.Value;
+                    command.Parameters.Add("@PassportHolder", SqlDbType.Bit).Value = model.HasPassport.HasValue ? (object)model.HasPassport.Value : DBNull.Value;
                     command.Parameters.Add("@CampusEmail", SqlDbType.VarChar, 128).Value = !String.IsNullOrEmpty(model.CampusEmail) ? (object)model.CampusEmail.Trim() : DBNull.Value;
                     command.Parameters.Add("@AlternateEmail", SqlDbType.VarChar, 128).Value = !String.IsNullOrEmpty(model.AlternateEmail) ? (object)model.AlternateEmail.Trim() : DBNull.Value;
                     command.Parameters.Add("@PhiBetaDeltaMember", SqlDbType.Bit).Value = model.PhiBetaDeltaMember.HasValue ? (object)model.PhiBetaDeltaMember.Value : DBNull.Value;
