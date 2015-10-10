@@ -476,7 +476,7 @@ namespace Belletrix.DAL
                     @State, @PostalCode, @Classification, @StudentId,
                     @PhoneNumber, @LivingOnCampus, @EnrolledFullTime, @Citizenship,
                     @PellGrantRecipient, @PassportHolder, @Gpa, @CampusEmail,
-                    @AlternateEmail, @EnteringYear, @GraduatingYear, @Dob");
+                    @AlternateEmail, @EnteringYear, @GraduatingYear, @DateOfBirth");
 
             if (model is StudentModel)
             {
@@ -522,17 +522,14 @@ namespace Belletrix.DAL
                         command.Parameters.Add("@PhiBetaDeltaMember", SqlDbType.Bit).Value = (model as StudentModel).PhiBetaDeltaMember.HasValue ? (object)(model as StudentModel).PhiBetaDeltaMember.Value : DBNull.Value;
                     }
 
-                    if (baseModel.Gpa.HasValue)
+                    SqlParameter parameter = new SqlParameter("@Gpa", SqlDbType.Decimal)
                     {
-                        SqlParameter parameter = new SqlParameter("@Gpa", SqlDbType.Decimal)
-                        {
-                            Scale = 2,
-                            Precision = 3,
-                            Value = baseModel.Gpa.Value
-                        };
+                        Scale = 2,
+                        Precision = 3,
+                        Value = baseModel.Gpa.HasValue ? (object)baseModel.Gpa.Value : DBNull.Value
+                    };
 
-                        command.Parameters.Add(parameter);
-                    }
+                    command.Parameters.Add(parameter);
 
                     studentId = (int)await command.ExecuteScalarAsync();
                 }
@@ -579,7 +576,7 @@ namespace Belletrix.DAL
                         [AlternateEmail] = @AlternateEmail,
                         [EnteringYear] = @EnteringYear,
                         [GraduatingYear] = @GraduatingYear,
-                        [Dob] = @Dob
+                        [Dob] = @DateOfBirth
                 WHERE   [Id] = @Id";
 
             try
