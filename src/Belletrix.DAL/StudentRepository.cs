@@ -128,39 +128,39 @@ namespace Belletrix.DAL
                             ord = reader.GetOrdinal("MajorIds");
                             if (!reader.IsDBNull(ord))
                             {
-                                student.SelectedMajors = (await reader.GetFieldValueAsync<string>(ord)).Split(',').Cast<int>();
+                                student.SelectedMajors = Array.ConvertAll((await reader.GetFieldValueAsync<string>(ord)).Split(','), int.Parse);
                             }
 
                             ord = reader.GetOrdinal("MinorIds");
                             if (!reader.IsDBNull(ord))
                             {
-                                student.SelectedMinors = (await reader.GetFieldValueAsync<string>(ord)).Split(',').Cast<int>();
+                                student.SelectedMinors = Array.ConvertAll((await reader.GetFieldValueAsync<string>(ord)).Split(','), int.Parse);
                             }
 
                             ord = reader.GetOrdinal("StudiedLanguageIds");
                             if (!reader.IsDBNull(ord))
                             {
-                                student.StudiedLanguages = (await reader.GetFieldValueAsync<string>(ord)).Split(',').Cast<int>();
+                                student.StudiedLanguages = Array.ConvertAll((await reader.GetFieldValueAsync<string>(ord)).Split(','), int.Parse);
                             }
 
                             ord = reader.GetOrdinal("DesiredLanguageIds");
                             if (!reader.IsDBNull(ord))
                             {
-                                student.SelectedDesiredLanguages = (await reader.GetFieldValueAsync<string>(ord)).Split(',').Cast<int>();
+                                student.SelectedDesiredLanguages = Array.ConvertAll((await reader.GetFieldValueAsync<string>(ord)).Split(','), int.Parse);
                             }
 
                             ord = reader.GetOrdinal("FluentLanguageIds");
                             if (!reader.IsDBNull(ord))
                             {
-                                student.SelectedLanguages = (await reader.GetFieldValueAsync<string>(ord)).Split(',').Cast<int>();
+                                student.SelectedLanguages = Array.ConvertAll((await reader.GetFieldValueAsync<string>(ord)).Split(','), int.Parse);
                             }
 
                             ord = reader.GetOrdinal("StudyAbroadCountryIds");
                             if (!reader.IsDBNull(ord))
                             {
-                                student.StudyAbroadCountry = (await reader.GetFieldValueAsync<string>(ord)).Split(',').Cast<int>();
-                                student.StudyAbroadYear = (await reader.GetFieldValueAsync<string>(reader.GetOrdinal("StudyAbroadYearIds"))).Split(',').Cast<int>();
-                                student.StudyAbroadPeriod = (await reader.GetFieldValueAsync<string>(reader.GetOrdinal("StudyAbroadPeriodIds"))).Split(',').Cast<int>();
+                                student.StudyAbroadCountry = Array.ConvertAll((await reader.GetFieldValueAsync<string>(ord)).Split(','), int.Parse);
+                                student.StudyAbroadYear = Array.ConvertAll((await reader.GetFieldValueAsync<string>(reader.GetOrdinal("StudyAbroadYearIds"))).Split(','), int.Parse);
+                                student.StudyAbroadPeriod = Array.ConvertAll((await reader.GetFieldValueAsync<string>(reader.GetOrdinal("StudyAbroadPeriodIds"))).Split(','), int.Parse);
                             }
 
                             students.Add(student);
