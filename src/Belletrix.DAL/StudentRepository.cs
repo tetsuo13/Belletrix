@@ -155,12 +155,20 @@ namespace Belletrix.DAL
                                 student.SelectedLanguages = Array.ConvertAll((await reader.GetFieldValueAsync<string>(ord)).Split(','), int.Parse);
                             }
 
+                            // View and JavaScript expects these collections
+                            // to never be null.
                             ord = reader.GetOrdinal("StudyAbroadCountryIds");
                             if (!reader.IsDBNull(ord))
                             {
                                 student.StudyAbroadCountry = Array.ConvertAll((await reader.GetFieldValueAsync<string>(ord)).Split(','), int.Parse);
                                 student.StudyAbroadYear = Array.ConvertAll((await reader.GetFieldValueAsync<string>(reader.GetOrdinal("StudyAbroadYearIds"))).Split(','), int.Parse);
                                 student.StudyAbroadPeriod = Array.ConvertAll((await reader.GetFieldValueAsync<string>(reader.GetOrdinal("StudyAbroadPeriodIds"))).Split(','), int.Parse);
+                            }
+                            else
+                            {
+                                student.StudyAbroadCountry = new List<int>();
+                                student.StudyAbroadYear = new List<int>();
+                                student.StudyAbroadPeriod = new List<int>();
                             }
 
                             students.Add(student);
