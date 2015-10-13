@@ -34,6 +34,16 @@ namespace Belletrix.Web
             );
 
             routes.MapRoute(
+                name: "Sitemap",
+                url: "sitemap.xml",
+                defaults: new
+                {
+                    controller = "Home",
+                    action = "Sitemap"
+                }
+            );
+
+            routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
                 defaults: new

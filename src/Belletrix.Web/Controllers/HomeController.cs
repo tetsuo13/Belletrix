@@ -48,6 +48,14 @@ namespace Belletrix.Web.Controllers
             return View();
         }
 
+        [AllowAnonymous]
+        [OutputCache(Duration = 86400)]
+        public ActionResult Sitemap()
+        {
+            Response.ContentType = "text/xml";
+            return View();
+        }
+
         /// <summary>
         /// This lets you access the error handler via a route in your application, secured by whatever
         /// mechanisms are already in place.
