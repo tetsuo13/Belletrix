@@ -37,11 +37,13 @@ namespace Belletrix.Domain
         public void UpdateUser(UserModel model, bool isAdmin)
         {
             UserRepository.UpdateUser(model, isAdmin);
+            UserRepository.SaveChanges();
         }
 
         public void InsertUser(UserModel model)
         {
             UserRepository.InsertUser(model);
+            UserRepository.SaveChanges();
         }
     }
 }

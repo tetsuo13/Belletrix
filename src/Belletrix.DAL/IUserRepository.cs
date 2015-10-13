@@ -12,5 +12,6 @@ namespace Belletrix.DAL
         Task<UserModel> GetUser(int id);
         void UpdateUser(UserModel model, bool isAdmin);
         void InsertUser(UserModel model);
+        void SaveChanges();
     }
 }

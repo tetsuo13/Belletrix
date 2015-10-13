@@ -254,5 +254,10 @@ namespace Belletrix.DAL
                 throw;
             }
         }
+
+        public void SaveChanges()
+        {
+            UnitOfWork.SaveChanges();
+        }
     }
 }
