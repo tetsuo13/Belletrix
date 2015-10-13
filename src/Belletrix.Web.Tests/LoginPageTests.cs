@@ -1,28 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Firefox;
 
 namespace Belletrix.Web.Tests
 {
     [TestClass]
-    public class LoginPageTests
+    public class LoginPageTests : RootWebDriver
     {
-        private IWebDriver WebDriver { get; set; }
-
-        [TestInitialize]
-        public void Setup()
-        {
-            WebDriver = new FirefoxDriver();
-            WebDriver.Navigate().GoToUrl("http://localhost:50758/");
-        }
-
-        [TestCleanup]
-        public void TearDown()
-        {
-            WebDriver.Close();
-            WebDriver.Dispose();
-        }
-
         [TestMethod]
         public void LoginFieldsExist()
         {
@@ -68,6 +51,16 @@ namespace Belletrix.Web.Tests
             WebDriver.FindElement(By.XPath("/html/body/div/form/button")).Submit();
 
             Assert.IsNotNull(WebDriver.FindElement(By.ClassName("validation-summary-errors")));
+        }
+
+        [TestMethod]
+        public void LoginWithValidCredentials_GoToHomePage()
+        {
+            WebDriver.FindElement(By.Id("UserName")).SendKeys(TestLoginUserName);
+            WebDriver.FindElement(By.Id("Password")).SendKeys(TestLoginPassword);
+            WebDriver.FindElement(By.XPath("/html/body/div/form/button")).Submit();
+
+            Assert.AreEqual(BaseUrl + "home/index", WebDriver.Url);
         }
     }
 }

@@ -74,6 +74,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LoginPageTests.cs" />
+    <Compile Include="RootWebDriver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
