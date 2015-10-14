@@ -8,10 +8,10 @@ namespace Belletrix.Web.Tests
     {
         protected const string BaseUrl = "http://localhost:50758/";
 
-        protected const string TestLoginUserName = "aaAuXiIo";
-        protected const string TestLoginPassword = "tEd4VxAnMbm9E";
-
         protected IWebDriver WebDriver { get; set; }
+
+        private const string TestLoginUserName = "aaAuXiIo";
+        private const string TestLoginPassword = "tEd4VxAnMbm9E";
 
         [TestInitialize]
         public void Setup()
@@ -25,6 +25,15 @@ namespace Belletrix.Web.Tests
         {
             WebDriver.Close();
             WebDriver.Dispose();
+        }
+
+        protected void Login()
+        {
+            WebDriver.FindElement(By.Id("UserName")).SendKeys(TestLoginUserName);
+            WebDriver.FindElement(By.Id("Password")).SendKeys(TestLoginPassword);
+            WebDriver.FindElement(By.XPath("/html/body/div/form/button")).Submit();
+
+            Assert.AreEqual(BaseUrl + "home/index", WebDriver.Url);
         }
     }
 }

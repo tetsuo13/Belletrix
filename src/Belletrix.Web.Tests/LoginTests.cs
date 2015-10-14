@@ -4,7 +4,7 @@ using OpenQA.Selenium;
 namespace Belletrix.Web.Tests
 {
     [TestClass]
-    public class LoginPageTests : RootWebDriver
+    public class LoginTests : RootWebDriver
     {
         [TestMethod]
         public void LoginFieldsExist()
@@ -56,11 +56,7 @@ namespace Belletrix.Web.Tests
         [TestMethod]
         public void LoginWithValidCredentials_GoToHomePage()
         {
-            WebDriver.FindElement(By.Id("UserName")).SendKeys(TestLoginUserName);
-            WebDriver.FindElement(By.Id("Password")).SendKeys(TestLoginPassword);
-            WebDriver.FindElement(By.XPath("/html/body/div/form/button")).Submit();
-
-            Assert.AreEqual(BaseUrl + "home/index", WebDriver.Url);
+            Login();
         }
     }
 }
