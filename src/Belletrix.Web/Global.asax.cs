@@ -66,6 +66,12 @@ namespace Belletrix.Web
             ViewEngines.Engines.Add(new RazorViewEngine());
         }
 
+        protected void Application_PreSendRequestHeaders()
+        {
+            Response.Headers.Remove("X-AspNetMvc-Version");
+            Response.Headers.Remove("X-AspNet-Version");
+        }
+
         protected void Application_Start()
         {
             // Disable the X-AspNetMvc-Version header.
