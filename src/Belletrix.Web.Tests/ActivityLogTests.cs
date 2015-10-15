@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
 using System;
 
 namespace Belletrix.Web.Tests
@@ -60,8 +59,11 @@ namespace Belletrix.Web.Tests
             WebDriver.FindElement(By.Id("StartDate")).SendKeys(DateTime.Now.ToString(DateTimeFormat));
             WebDriver.FindElement(By.Id("EndDate")).SendKeys(DateTime.Now.AddDays(3).ToString(DateTimeFormat));
 
-            SelectElement typesDropDown = new SelectElement(WebDriver.FindElement(By.Id("Types")));
-            typesDropDown.SelectByValue("3");
+            // Opens the "Types" multiselect dropdown.
+            WebDriver.FindElement(By.XPath("//button[@type='button'][@title='None selected']")).Click();
+
+            // Enable the first checkbox shown.
+            WebDriver.FindElement(By.XPath("//ul[contains(@class, 'multiselect-container')]/li/a/label/input")).Click();
 
             WebDriver.FindElement(By.XPath("//button[@type='submit'][text()='Add Activity']")).Submit();
 
