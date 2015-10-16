@@ -36,7 +36,7 @@
         /// activity, add the person and type to the activity form, and
         /// finally close the modal dialog.
         /// </summary>
-        /// <param name="modalDialog" type="Object">Modal dialog.</param>
+        /// <param name="modalDialog" type="jQuery.bootbox">Modal dialog.</param>
         /// <param name="addPersonIdUrl" type="String">URL to submit existing select person to.</param>
 
         var personSelect = $(_existingPersonSelectors.PersonSelectList),
@@ -64,7 +64,7 @@
 
                         } else if (result.Success === true) {
                             addParticipantRow($('option:selected', personSelect).text(), personSelect.val());
-                            $(_participantModalSelector).modal('hide');
+                            modalDialog.modal('hide');
 
                         } else {
                             // Show server-side error message under the full name
@@ -88,7 +88,7 @@
         /// via ajax, add the person and type to the activity form, and
         /// finally close the modal dialog.
         /// </summary>
-        /// <param name="modalDialog" type="Object">Modal dialog.</param>
+        /// <param name="modalDialog" type="jQuery.bootbox">Modal dialog.</param>
 
         var modalDialogForm = $('form', modalDialog);
 
@@ -109,7 +109,7 @@
 
                     } else if (result.Success === true) {
                         addParticipantRow($('#FullName', modalDialogForm).val(), result.Id);
-                        $(_participantModalSelector).modal('hide');
+                        modalDialog.modal('hide');
 
                     } else {
                         // Show server-side error message under the full name
@@ -233,6 +233,8 @@
         /// <param name="removePersonIdUrl" type="String">URL to remove existing select person from session.</param>
         /// <param name="sessionId" type="Guid">Current activity session ID.</param>
 
+        var addPersonModal;
+
         _removeExistingPersonIdUrl = removePersonIdUrl;
         _sessionId = sessionId;
 
@@ -240,19 +242,23 @@
         $('#StartDate, #EndDate').datepicker();
         Belletrix.initMultiselect(1);
 
-        // Autofocus the full name field when the person modal is shown.
-        $('#personModal').on('shown.bs.modal', function () {
-            $('#FullName').focus();
-        });
-
         $('#addPersonButton').click(function () {
-            $(_participantModalSelector).load(addPersonUrl, function () {
-                $(this).modal({
-                    show: true
-                });
+            $.ajax({
+                url: addPersonUrl,
+                success: function (data) {
+                    addPersonModal = bootbox.dialog({
+                        message: data,
+                        onEscape: true,
+                        backdrop: true,
+                        title: 'Create New Person'
+                    });
 
-                bindParticipantForm(this);
-                bindExistingParticipantForm(this, addPersonIdUrl);
+                    addPersonModal.on('shown.bs.modal', function () {
+                        bindParticipantForm(addPersonModal);
+                        bindExistingParticipantForm(addPersonModal, addPersonIdUrl);
+                        $('#FullName').focus();
+                    });
+                }
             });
         });
     };
