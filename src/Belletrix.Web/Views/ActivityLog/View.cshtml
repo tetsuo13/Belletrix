@@ -1,24 +1,24 @@
-﻿@using Belletrix.Entity.Model;
+﻿@using Belletrix.Entity.ViewModel;
 
-@model ActivityLogModel
+@model ActivityLogViewViewModel
 
 @{
-    ViewBag.Title = Model.Title + " Activity Log";
+    ViewBag.Title = Model.ActivityLog.Title + " Activity Log";
 }
 
 @section Body {
     <div class="row">
         <div class="col-lg-12 page-header">
             <h1>
-                @Model.Title
-                @if (!String.IsNullOrEmpty(Model.Title2))
+                @Model.ActivityLog.Title
+                @if (!String.IsNullOrEmpty(Model.ActivityLog.Title2))
                 {
-                    <small>@Model.Title2</small>
+                    <small>@Model.ActivityLog.Title2</small>
                 }
             </h1>
-            @if (!String.IsNullOrEmpty(Model.Title3))
+            @if (!String.IsNullOrEmpty(Model.ActivityLog.Title3))
             {
-                <h4><small>@Model.Title3</small></h4>
+                <h4><small>@Model.ActivityLog.Title3</small></h4>
             }
         </div>
     </div>

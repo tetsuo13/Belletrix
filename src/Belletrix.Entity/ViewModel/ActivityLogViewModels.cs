@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Belletrix.Entity.ViewModel
 {
@@ -69,5 +70,63 @@ namespace Belletrix.Entity.ViewModel
                 Notes = a.Notes
             };
         }
+    }
+
+    public class ActivityLogEditViewModel : ActivityLogCreateViewModel
+    {
+        [Required]
+        public int Id { get; set; }
+
+        public static explicit operator ActivityLogEditViewModel(ActivityLogModel a)
+        {
+            return new ActivityLogEditViewModel()
+            {
+                Id = a.Id,
+                Title = a.Title,
+                Title2 = a.Title2,
+                Title3 = a.Title3,
+                Organizers = a.Organizers,
+                Location = a.Location,
+                StartDate = a.StartDate,
+                EndDate = a.EndDate,
+                OnCampus = a.OnCampus,
+                WebSite = a.WebSite,
+                Notes = a.Notes,
+                Types = a.Types.Cast<int>()
+            };
+        }
+    }
+
+    public class ActivityLogPersonCreateViewModel
+    {
+        [Required]
+        [Display(Name = "Name")]
+        [MaxLength(128)]
+        public string FullName { get; set; }
+
+        public Guid SessionId { get; set; }
+
+        [MaxLength(256)]
+        [DataType(DataType.MultilineText)]
+        public string Description { get; set; }
+
+        [Display(Name = "Phone Number")]
+        [MaxLength(32)]
+        [Phone]
+        public string PhoneNumber { get; set; }
+
+        [MaxLength(128)]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Please select a type")]
+        public int Type { get; set; }
+    }
+
+    public class ActivityLogViewViewModel
+    {
+        public ActivityLogModel ActivityLog { get; set; }
+
+        public IEnumerable<ActivityLogParticipantModel> Participants { get; set; }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Belletrix.Core;
-using Belletrix.DAL;
+﻿using Belletrix.DAL;
 using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
 using System;
@@ -40,6 +39,21 @@ namespace Belletrix.Domain
         public async Task<ActivityLogModel> FindByid(int id)
         {
             return await ActivityLogRepository.GetActivityById(id);
+        }
+
+        public async Task<ActivityLogViewViewModel> FindAllInfoById(int id)
+        {
+            ActivityLogModel activityLogModel = await FindByid(id);
+
+            if (activityLogModel == null)
+            {
+                return null;
+            }
+
+            ActivityLogViewViewModel viewModel = new ActivityLogViewViewModel();
+            viewModel.ActivityLog = activityLogModel;
+
+            return viewModel;
         }
 
         public async Task<int> InsertActivity(ActivityLogCreateViewModel createModel, int userId)

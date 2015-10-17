@@ -27,7 +27,7 @@ namespace Belletrix.Web.Controllers
 
         public async Task<ActionResult> View(int id)
         {
-            var activity = await ActivityService.FindByid(id);
+            var activity = await ActivityService.FindAllInfoById(id);
 
             if (activity == null)
             {
