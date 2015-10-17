@@ -99,7 +99,7 @@ namespace Belletrix.Web.Controllers
 
         public async Task<ActionResult> Edit(int id)
         {
-            var activity = await ActivityService.FindByid(id);
+            var activity = await ActivityService.FindById(id);
 
             if (activity == null)
             {

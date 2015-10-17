@@ -14,7 +14,7 @@ namespace Belletrix.Domain
     public interface IActivityService
     {
         Task<IEnumerable<ActivityLogModel>> GetActivityLogs();
-        Task<ActivityLogModel> FindByid(int id);
+        Task<ActivityLogModel> FindById(int id);
         Task<ActivityLogViewViewModel> FindAllInfoById(int id);
         Task<int> InsertActivity(ActivityLogCreateViewModel createModel, int userId);
         Task UpdateActivity(ActivityLogEditViewModel saveModel);

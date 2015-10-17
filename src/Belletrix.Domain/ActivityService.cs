@@ -36,14 +36,14 @@ namespace Belletrix.Domain
             return await ActivityLogRepository.GetAllActivities();
         }
 
-        public async Task<ActivityLogModel> FindByid(int id)
+        public async Task<ActivityLogModel> FindById(int id)
         {
             return await ActivityLogRepository.GetActivityById(id);
         }
 
         public async Task<ActivityLogViewViewModel> FindAllInfoById(int id)
         {
-            ActivityLogModel activityLogModel = await FindByid(id);
+            ActivityLogModel activityLogModel = await FindById(id);
 
             if (activityLogModel == null)
             {
