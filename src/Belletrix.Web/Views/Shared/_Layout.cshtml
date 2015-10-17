@@ -4,6 +4,7 @@
 @{
     Layout = null;
     const string siteTitle = "Belletrix";
+    string pageTitle = (!String.IsNullOrEmpty(ViewBag.Title) ? ViewBag.Title + " | " : String.Empty) + siteTitle;
     UserModel user = Session["User"] as UserModel;
     const string sidebarLinkActiveClassName = "active";
 
@@ -30,7 +31,7 @@
         <meta charset="utf-8" />
         <meta name="robots" content="noindex,nofollow" />
         <meta name="viewport" content="width=device-width" />
-        <title>@siteTitle</title>
+        <title>@pageTitle</title>
         @Styles.Render("~/bundles/css")
         @RenderSection("HeaderStyle", false)
     </head>
