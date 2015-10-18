@@ -25,16 +25,10 @@ namespace Belletrix.DAL
         {
             const string sql = @"
                 INSERT INTO [dbo].[ActivityLogPerson]
-                (
-                    [FullName], [Description],
-                    [Phone], [Email]
-                )
+                ([FullName], [Description], [Phone], [Email])
                 OUTPUT INSERTED.Id
                 VALUES
-                (
-                    @FullName, @Description,
-                    @Phone, @Email
-                )";
+                (@FullName, @Description, @Phone, @Email)";
 
             int id;
 

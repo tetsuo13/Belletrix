@@ -1,25 +1,127 @@
-﻿@using Belletrix.Entity.ViewModel;
+﻿@using Belletrix.Entity.Enum;
+@using Belletrix.Entity.Model;
+@using Belletrix.Entity.ViewModel;
 
 @model ActivityLogViewViewModel
 
 @{
     ViewBag.Title = Model.ActivityLog.Title + " Activity Log";
+
+    IReadOnlyDictionary<int, string> labels = new Dictionary<int, string>()
+    {
+        { 1, "label-default" },
+        { 2, "label-primary" },
+        { 3, "label-success" },
+        { 4, "label-info" },
+        { 5, "label-warning" },
+        { 6, "label-danger" }
+    };
 }
 
 @section Body {
     <div class="row">
         <div class="col-lg-12 page-header">
-            <h1>
-                @Model.ActivityLog.Title
-                @if (!String.IsNullOrEmpty(Model.ActivityLog.Title2))
+            <h2>@Model.ActivityLog.Title</h2>
+
+            <p>
+                @foreach (ActivityLogTypes type in Model.ActivityLog.Types)
                 {
-                    <small>@Model.ActivityLog.Title2</small>
+                    int i = (int)type % labels.Count;
+                    string labelClassName = labels.ContainsKey(i) ? labels[i] : labels[0];
+                    <span class="label @labelClassName">@type</span>
                 }
-            </h1>
-            @if (!String.IsNullOrEmpty(Model.ActivityLog.Title3))
+            </p>
+
+            @if (!String.IsNullOrEmpty(Model.ActivityLog.Title2))
             {
-                <h4><small>@Model.ActivityLog.Title3</small></h4>
+                <p>
+                    <strong>@Model.ActivityLog.Title2</strong>
+
+                    @if (!String.IsNullOrEmpty(Model.ActivityLog.Title3))
+                    {
+                        <br />@Model.ActivityLog.Title3
+                    }
+                </p>
             }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="row">
+                <div class="col-lg-12">
+                    <span class="fa fa-clock-o"></span>
+                    Created
+                    @Model.ActivityLog.Created.ToShortDateString()
+                    @Model.ActivityLog.Created.ToShortTimeString()
+                    by
+                    @Model.CreatedBy.FirstName
+                    @Model.CreatedBy.LastName
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <h4>Organizers</h4>
+                    @Model.ActivityLog.Organizers
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <h4>People</h4>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">Participants</div>
+                <div class="panel-body">
+                    @if (Model.Participants != null && Model.Participants.Any())
+                    {
+                        <ul class="list-group">
+                            @foreach (ActivityLogParticipantModel particpant in Model.Participants)
+                            {
+                                <li class="list-group-item">
+                                    <span class="badge">@particpant.Type</span>
+                                    <h4 class="list-group-item-heading">@particpant.Person.FullName</h4>
+                                    <p>
+                                        @if (!String.IsNullOrEmpty(particpant.Person.Description))
+                                        {
+                                            @particpant.Person.Description
+                                            <br />
+                                        }
+
+                                        @if (!String.IsNullOrEmpty(particpant.Person.Email))
+                                        {
+                                            <span class="fa fa-envelope"></span>
+                                            <a href="mailto:@particpant.Person.Email">@particpant.Person.Email</a>
+                                            <br />
+                                        }
+
+                                        @if (!String.IsNullOrEmpty(particpant.Person.PhoneNumber))
+                                        {
+                                            <span class="fa fa-phone"></span>
+                                            if (Request.Browser.CanInitiateVoiceCall)
+                                            {
+                                                <a href="tel:@particpant.Person.PhoneNumber">@particpant.Person.PhoneNumber</a>
+                                            }
+                                            else
+                                            {
+                                                @particpant.Person.PhoneNumber
+                                            }
+                                        }
+                                    </p>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">Notes</div>
+                <div class="panel-body">
+                    @Model.ActivityLog.Notes
+                </div>
+            </div>
         </div>
     </div>
 }

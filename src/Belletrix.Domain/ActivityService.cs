@@ -23,12 +23,14 @@ namespace Belletrix.Domain
 
         private readonly IActivityLogRepository ActivityLogRepository;
         private readonly IActivityLogPersonRepository ActivityLogPersonRepository;
+        private readonly IUserRepository UserRepository;
 
         public ActivityService(IActivityLogRepository activityLogRepository,
-            IActivityLogPersonRepository activityLogPersonRepository)
+            IActivityLogPersonRepository activityLogPersonRepository, IUserRepository userRepository)
         {
             ActivityLogRepository = activityLogRepository;
             ActivityLogPersonRepository = activityLogPersonRepository;
+            UserRepository = userRepository;
         }
 
         public async Task<IEnumerable<ActivityLogModel>> GetActivityLogs()
@@ -52,6 +54,8 @@ namespace Belletrix.Domain
 
             ActivityLogViewViewModel viewModel = new ActivityLogViewViewModel();
             viewModel.ActivityLog = activityLogModel;
+            viewModel.Participants = await ActivityLogPersonRepository.FindActivityParticipants(id);
+            viewModel.CreatedBy = await UserRepository.GetUser(activityLogModel.CreatedBy);
 
             return viewModel;
         }

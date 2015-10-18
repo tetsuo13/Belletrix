@@ -69,7 +69,7 @@ namespace Belletrix.DAL
             return new ActivityLogModel()
             {
                 Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
-                Created = await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("Created")),
+                Created = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("Created"))),
                 CreatedBy = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("CreatedBy")),
                 Title = await reader.GetValueOrDefault<string>("Title"),
                 Title2 = await reader.GetValueOrDefault<string>("Title2"),
