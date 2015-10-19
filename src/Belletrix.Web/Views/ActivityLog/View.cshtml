@@ -21,6 +21,12 @@
 @section Body {
     <div class="row">
         <div class="col-lg-12 page-header">
+            <div class="btn-group pull-right">
+                <a href="@Url.Action("Edit", "ActivityLog", new { id = Model.ActivityLog.Id, guid = Guid.NewGuid() })"
+                   class="btn btn-xs btn-info" data-placement="top"
+                   title="Edit"><i class="fa fa-pencil fa-fw"></i> Edit</a>
+            </div>
+
             <h2>@Model.ActivityLog.Title</h2>
 
             <p>
@@ -83,13 +89,13 @@
                                 <li class="list-group-item">
                                     <span class="badge">@particpant.Type</span>
                                     <h4 class="list-group-item-heading">@particpant.Person.FullName</h4>
-                                    <p>
-                                        @if (!String.IsNullOrEmpty(particpant.Person.Description))
-                                        {
-                                            @particpant.Person.Description
-                                            <br />
-                                        }
 
+                                    @if (!String.IsNullOrEmpty(particpant.Person.Description))
+                                    {
+                                        <p>@particpant.Person.Description</p>
+                                    }
+
+                                    <p>
                                         @if (!String.IsNullOrEmpty(particpant.Person.Email))
                                         {
                                             <span class="fa fa-envelope"></span>
