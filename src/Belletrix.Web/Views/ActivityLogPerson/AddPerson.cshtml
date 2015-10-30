@@ -1,0 +1,87 @@
+﻿@using Belletrix.Entity.ViewModel;
+
+@model ActivityLogPersonCreateViewModel
+
+@{
+    HtmlHelper.ClientValidationEnabled = true;
+    HtmlHelper.UnobtrusiveJavaScriptEnabled = true;
+}
+
+<div class="container-fluid">
+    <p>Create a new person and add them to this activity log.</p>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.SessionId)
+
+        <div class="row">
+            <div class="col-md-8 has-error">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.FullName)
+                    @Html.TextBoxFor(x => x.FullName, new { @class = "form-control", autofocus = "autofocus" })
+                    @Html.ValidationMessageFor(x => x.FullName)
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Type)
+                    @Html.DropDownListFor(x => x.Type, (SelectList)ViewBag.TypesSelect, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(x => x.Type)
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.PhoneNumber)
+                    @Html.TextBoxFor(x => x.PhoneNumber, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(x => x.PhoneNumber)
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Email)
+                    @Html.TextBoxFor(x => x.Email, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(x => x.Email)
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Description)
+                    @Html.TextAreaFor(x => x.Description, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(x => x.Description)
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <input type="submit" class="btn btn-primary pull-right" value="Add person" />
+            </div>
+        </div>
+    }
+
+    @if (((SelectList)ViewBag.PeopleSelect).Count() > 0)
+    {
+        <h4>Choose Existing Person</h4>
+        <p>Choose a person that was entered from before.</p>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.Label("existingpersonselect", "Person")
+                    @Html.DropDownList("existingpersonselect", (SelectList)ViewBag.PeopleSelect, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.Label("existingpersontype", "Type")
+                    @Html.DropDownList("existingpersontype", (SelectList)ViewBag.TypesSelect, new { @class = "form-control" })
+                </div>
+            </div>
+        </div>
+        <input type="submit" class="btn btn-primary pull-right" value="Use selected" id="existingpersonsubmit" />
+    }
+</div>

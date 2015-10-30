@@ -1,0 +1,212 @@
+﻿@using Belletrix.Core;
+@using Belletrix.Entity.Enum;
+@using Belletrix.Entity.Model;
+
+@model StudentModel
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="panel panel-default">
+            <div class="panel-heading">Study Abroad Experiences</div>
+            <div class="panel-body">
+                @if ((ViewBag.StudyAbroad as IEnumerable<StudyAbroadModel>).Count() > 0)
+                {
+                    foreach (StudyAbroadModel studyAbroad in ViewBag.StudyAbroad)
+                    {
+                        string semesterName = studyAbroad.Semester.ToString();
+
+                        switch (studyAbroad.Semester)
+                        {
+                            case (int)StudentStudyAbroadPeriods.Fall:
+                                semesterName = "Fall";
+                                break;
+
+                            case (int)StudentStudyAbroadPeriods.Spring:
+                                semesterName = "Spring";
+                                break;
+
+                            case (int)StudentStudyAbroadPeriods.Summer:
+                                semesterName = "Summer";
+                                break;
+
+                            case (int)StudentStudyAbroadPeriods.Maymester:
+                                semesterName = "Maymester";
+                                break;
+
+                            case (int)StudentStudyAbroadPeriods.AcademicYear:
+                                semesterName = "Academic Year";
+                                break;
+                        }
+
+                        ICollection<string> programTypes = null;
+
+                        if (studyAbroad.ProgramTypes != null)
+                        {
+                            programTypes = new List<string>();
+
+                            foreach (int programType in studyAbroad.ProgramTypes)
+                            {
+                                programTypes.Add((ViewBag.Programs as IEnumerable<ProgramModel>).Where(p => p.Id == programType).First().Name);
+                            }
+                        }
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <strong class="h4">
+                                    @semesterName
+                                    @studyAbroad.Year:
+                                    @if (!String.IsNullOrEmpty(studyAbroad.City))
+                                    {
+                                        @studyAbroad.City@:,
+                                    }
+                                    @((ViewBag.Countries as List<CountryModel>).Where(c => c.Id == studyAbroad.CountryId).First().Name)
+                                </strong>
+
+                                @if (studyAbroad.CreditBearing)
+                                {
+                                    <span class="label label-success" style="vertical-align: top">Credit</span>
+                                }
+
+                                @if (studyAbroad.Internship)
+                                {
+                                    <span class="label label-info" style="vertical-align: top">Internship</span>
+                                }
+
+                                <div>
+                                    @if (studyAbroad.StartDate.HasValue)
+                                    {
+                                        @studyAbroad.StartDate.Value.ToShortDateString()
+                                    }
+                                    @if (studyAbroad.EndDate.HasValue)
+                                    {
+                                        <text>&ndash;</text>
+                                        @studyAbroad.EndDate.Value.ToShortDateString()
+                                    }
+                                </div>
+
+                                <div>
+                                    @((ViewBag.Programs as IEnumerable<ProgramModel>).Where(p => p.Id == studyAbroad.ProgramId).First().Name)
+                                </div>
+
+                                <div>
+                                    @if (programTypes != null && programTypes.Count > 0)
+                                    {
+                                        @String.Join(", ", programTypes)
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">Notes</div>
+            <div class="panel-body">
+                @foreach (NoteModel note in ViewBag.Notes)
+                {
+                    <p>
+                        @note.Note
+                        <br />
+                        <small class="text-muted">
+                            by
+                            @note.CreatedByFirstName @note.CreatedByLastName
+                            on
+                            @note.EntryDate.ToString("dddd, MMMM d, yyyy \\a\\t h:mm tt")
+                        </small>
+                    </p>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div>
+                    @if (Model.Classification.HasValue)
+                    {
+                        @((ViewBag.Classifications as SelectList).Where(c => c.Value == Model.Classification.Value.ToString()).First().Text)
+                        <br />
+                    }
+                    <strong class="h2">@Model.FirstName @Model.MiddleName @Model.LastName</strong>
+                    @if (!String.IsNullOrEmpty(Model.CampusEmail))
+                    {
+                        <br />
+                        <a href="mailto:@Model.CampusEmail">@Model.CampusEmail</a>
+                    }
+                    @if (!String.IsNullOrEmpty(Model.AlternateEmail))
+                    {
+                        <br />
+                        <a href="mailto:@Model.AlternateEmail">@Model.AlternateEmail</a>
+                    }
+                </div>
+
+                <br />
+
+                @if (!String.IsNullOrEmpty(Model.StreetAddress))
+                {
+                    string address = Model.StreetAddress;
+
+                    if (!String.IsNullOrEmpty(Model.StreetAddress2))
+                    {
+                        address += ", " + Model.StreetAddress2;
+                    }
+
+                    address += ", " + Model.City + ", " + Model.State + " " + Model.PostalCode;
+
+                    <address>
+                        <a href="https://maps.google.com/maps?q=@Url.Encode(address)" target="_blank">
+                            @Model.StreetAddress
+                        @if (!String.IsNullOrEmpty(Model.StreetAddress2))
+                        {
+                            <br />
+                            @Model.StreetAddress2
+                        }
+                        <br />
+                        @Model.City, @Model.State @Model.PostalCode
+                    </a>
+                </address>
+                }
+
+                @if (!String.IsNullOrEmpty(Model.PhoneNumber))
+                {
+                    <div>
+                        <abbr title="Phone">P:</abbr>
+                        @if (Request.Browser.CanInitiateVoiceCall)
+                        {
+                            <a href="tel:@Model.PhoneNumber">@Formatter.PhoneNumber(Model.PhoneNumber)</a>
+                        }
+                        else
+                        {
+                            @Formatter.PhoneNumber(Model.PhoneNumber)
+                        }
+                    </div>
+                }
+            </div>
+            <div class="panel-footer">
+                <ul class="list-inline" style="margin-bottom: 0">
+                    <li>
+                        <a href="@Url.Action("List", "Note", new { studentId = Model.Id })"
+                           data-toggle="modal" data-target="#noteModal"
+                           class="studentlisttooltop studentlistmodel" data-placement="top"
+                           title="Notes"><i class="fa fa-book fa-lg"></i></a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Edit", "Student", new { id = Model.Id })"
+                           class="studentlisttooltop" data-placement="top"
+                           title="Edit"><i class="fa fa-pencil fa-lg"></i></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="noteLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>

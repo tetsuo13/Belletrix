@@ -9,7 +9,7 @@ namespace Belletrix.DAL
         Task<int> CreatePerson(ActivityLogPersonModel model);
         Task AssociatePeopleWithActivity(int activityId, IEnumerable<ActivityLogParticipantModel> people);
         Task<IEnumerable<ActivityLogPersonModel>> FindAllPeople();
-        Task SaveChanges();
+        void SaveChanges();
         Task<ActivityLogPersonModel> FindPersonById(int id);
 
         /// <summary>
