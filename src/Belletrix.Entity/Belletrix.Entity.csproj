@@ -39,14 +39,31 @@
     </Compile>
     <Compile Include="Enum\ActivityLogParticipantTypes.cs" />
     <Compile Include="Enum\ActivityLogTypes.cs" />
+    <Compile Include="Enum\EventLogTypes.cs" />
+    <Compile Include="Enum\StudentStudyAbroadPeriods.cs" />
     <Compile Include="Model\ActivityLogSessionModel.cs" />
-    <Compile Include="ViewModel\ActivityLogCreateViewModel.cs" />
+    <Compile Include="Model\CountryModel.cs" />
+    <Compile Include="Model\EventLogModel.cs" />
+    <Compile Include="Model\LanguageModel.cs" />
+    <Compile Include="Model\MajorsModel.cs" />
+    <Compile Include="Model\MinorsModel.cs" />
+    <Compile Include="Model\NoteModel.cs" />
+    <Compile Include="Model\ProgramModel.cs" />
+    <Compile Include="Model\ProgramTypeModel.cs" />
+    <Compile Include="Model\PromoModel.cs" />
+    <Compile Include="Model\StudentClassificationModel.cs" />
+    <Compile Include="Model\StudentModels.cs" />
+    <Compile Include="Model\StudentPromoLog.cs" />
+    <Compile Include="Model\StudentStudyAbroadWishlistModel.cs" />
+    <Compile Include="Model\StudyAbroadModel.cs" />
+    <Compile Include="Model\UserModel.cs" />
     <Compile Include="Model\ActivityLogModel.cs" />
     <Compile Include="Model\ActivityLogParticipantModel.cs" />
     <Compile Include="Model\ActivityLogPersonModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModel\ActivityLogEditViewModel.cs" />
-    <Compile Include="ViewModel\ActivityLogPersonCreateViewModel.cs" />
+    <Compile Include="ViewModel\ActivityLogViewModels.cs" />
+    <Compile Include="ViewModel\LoginViewModel.cs" />
+    <Compile Include="ViewModel\StudentSearchViewModel.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

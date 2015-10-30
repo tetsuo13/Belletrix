@@ -1,0 +1,131 @@
+﻿@using Belletrix.Core;
+@using Belletrix.Entity.Enum;
+@using Belletrix.Entity.Model;
+@using System.Linq;
+
+@model IEnumerable<StudyAbroadModel>
+
+<div>
+    <br />
+    <table id="studyabroad" class="table table-bordered table-hover table-striped tablesorter">
+        <thead>
+            <tr>
+                <th>Year</th>
+                <th>Semester</th>
+                <th>Starting</th>
+                <th>Ending</th>
+                <th>Credit</th>
+                <th>Internship</th>
+                <th>Country</th>
+                <th>City</th>
+                <th>Program</th>
+                <th>Types</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (StudyAbroadModel study in Model)
+            {
+                string semesterName;
+
+                switch (study.Semester)
+                {
+                    case (int)StudentStudyAbroadPeriods.Fall:
+                        semesterName = "Fall";
+                        break;
+
+                    case (int)StudentStudyAbroadPeriods.Spring:
+                        semesterName = "Spring";
+                        break;
+
+                    case (int)StudentStudyAbroadPeriods.Summer:
+                        semesterName = "Summer";
+                        break;
+
+                    case (int)StudentStudyAbroadPeriods.Maymester:
+                        semesterName = "Maymester";
+                        break;
+
+                    case (int)StudentStudyAbroadPeriods.AcademicYear:
+                        semesterName = "Academic Year";
+                        break;
+
+                    default:
+                        semesterName = study.Semester.ToString();
+                        break;
+                }
+                
+                CountryModel selectedCountry = (ViewBag.Countries as List<CountryModel>).FirstOrDefault(c => c.Id == study.CountryId);
+                string countryName = String.Empty;
+                
+                if (selectedCountry != null)
+                {
+                    countryName = selectedCountry.Name;
+                }
+
+                ProgramModel selectedProgram = (ViewBag.Programs as List<ProgramModel>).FirstOrDefault(p => p.Id == study.ProgramId);
+                string programName = String.Empty;
+                
+                if (selectedProgram != null)
+                {
+                    programName = selectedProgram.Name;
+                }
+
+                List<string> programTypes = new List<string>();
+                
+                foreach (int type in study.ProgramTypes)
+                {
+                    ProgramTypeModel programType = (ViewBag.ProgramTypes as List<ProgramTypeModel>).FirstOrDefault(p => p.Id == type);
+                    
+                    if (programType != null)
+                    {
+                        programTypes.Add(programType.Name);
+                    }
+                }
+                
+                <tr>
+                    <td>@study.Year</td>
+                    <td>@semesterName</td>
+                    <td>
+                        @if (study.StartDate.HasValue)
+                        {
+                            @DateTimeFilter.UtcToLocal(study.StartDate.Value).ToShortDateString()
+                        }
+                    </td>
+                    <td>
+                        @if (study.EndDate.HasValue)
+                        {
+                            @DateTimeFilter.UtcToLocal(study.EndDate.Value).ToShortDateString()
+                        }
+                    </td>
+                    <td>
+                        @if (study.CreditBearing)
+                        {
+                            <i class="fa fa-check"></i>
+                        }
+                    </td>
+                    <td>
+                        @if (study.Internship)
+                        {
+                            <i class="fa fa-check"></i>
+                        }
+                    </td>
+                    <td>@countryName</td>
+                    <td>
+                        @if (!String.IsNullOrEmpty(study.City))
+                        {
+                            @study.City
+                        }
+                    </td>
+                    <td>@programName</td>
+                    <td>@String.Join(", ", programTypes)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <a href="@Url.Action("Add", "Experience", new { studentId = ViewBag.StudentId })" class="btn btn-default" role="button">Add New Experience</a>
+    </div>
+</div>

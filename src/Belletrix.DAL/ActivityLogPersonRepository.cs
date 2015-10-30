@@ -1,12 +1,14 @@
 ﻿using Belletrix.Core;
 using Belletrix.Entity.Enum;
 using Belletrix.Entity.Model;
+using StackExchange.Exceptional;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Belletrix.DAL
 {
@@ -23,16 +25,10 @@ namespace Belletrix.DAL
         {
             const string sql = @"
                 INSERT INTO [dbo].[ActivityLogPerson]
-                (
-                    [FullName], [Description],
-                    [Phone], [Email]
-                )
+                ([FullName], [Description], [Phone], [Email])
                 OUTPUT INSERTED.Id
                 VALUES
-                (
-                    @FullName, @Description,
-                    @Phone, @Email
-                )";
+                (@FullName, @Description, @Phone, @Email)";
 
             int id;
 
@@ -53,6 +49,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
 
@@ -97,6 +94,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
         }
@@ -140,13 +138,14 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
 
             return people;
         }
 
-        public async Task SaveChanges()
+        public void SaveChanges()
         {
             UnitOfWork.SaveChanges();
         }
@@ -197,6 +196,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
 
@@ -226,6 +226,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
         }
@@ -264,6 +265,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
         }

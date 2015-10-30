@@ -1,5 +1,4 @@
-﻿using Belletrix.Core;
-using Belletrix.DAL;
+﻿using Belletrix.DAL;
 using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
 using System;
@@ -24,12 +23,14 @@ namespace Belletrix.Domain
 
         private readonly IActivityLogRepository ActivityLogRepository;
         private readonly IActivityLogPersonRepository ActivityLogPersonRepository;
+        private readonly IUserRepository UserRepository;
 
         public ActivityService(IActivityLogRepository activityLogRepository,
-            IActivityLogPersonRepository activityLogPersonRepository)
+            IActivityLogPersonRepository activityLogPersonRepository, IUserRepository userRepository)
         {
             ActivityLogRepository = activityLogRepository;
             ActivityLogPersonRepository = activityLogPersonRepository;
+            UserRepository = userRepository;
         }
 
         public async Task<IEnumerable<ActivityLogModel>> GetActivityLogs()
@@ -37,9 +38,26 @@ namespace Belletrix.Domain
             return await ActivityLogRepository.GetAllActivities();
         }
 
-        public async Task<ActivityLogModel> FindByid(int id)
+        public async Task<ActivityLogModel> FindById(int id)
         {
             return await ActivityLogRepository.GetActivityById(id);
+        }
+
+        public async Task<ActivityLogViewViewModel> FindAllInfoById(int id)
+        {
+            ActivityLogModel activityLogModel = await FindById(id);
+
+            if (activityLogModel == null)
+            {
+                return null;
+            }
+
+            ActivityLogViewViewModel viewModel = new ActivityLogViewViewModel();
+            viewModel.ActivityLog = activityLogModel;
+            viewModel.Participants = await ActivityLogPersonRepository.FindActivityParticipants(id);
+            viewModel.CreatedBy = await UserRepository.GetUser(activityLogModel.CreatedBy);
+
+            return viewModel;
         }
 
         public async Task<int> InsertActivity(ActivityLogCreateViewModel createModel, int userId)
@@ -60,10 +78,10 @@ namespace Belletrix.Domain
             await ActivityLogRepository.MergeActivityTypes(model.Id, model.Types.Cast<int>());
         }
 
-        public async Task SaveChanges()
+        public void SaveChanges()
         {
-            await ActivityLogRepository.SaveChanges();
-            await ActivityLogPersonRepository.SaveChanges();
+            ActivityLogRepository.SaveChanges();
+            ActivityLogPersonRepository.SaveChanges();
         }
 
         /// <summary>

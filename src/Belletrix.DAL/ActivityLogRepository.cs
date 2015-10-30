@@ -1,12 +1,14 @@
 ﻿using Belletrix.Core;
 using Belletrix.Entity.Enum;
 using Belletrix.Entity.Model;
+using StackExchange.Exceptional;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Belletrix.DAL
 {
@@ -50,6 +52,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
 
@@ -66,7 +69,7 @@ namespace Belletrix.DAL
             return new ActivityLogModel()
             {
                 Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
-                Created = await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("Created")),
+                Created = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("Created"))),
                 CreatedBy = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("CreatedBy")),
                 Title = await reader.GetValueOrDefault<string>("Title"),
                 Title2 = await reader.GetValueOrDefault<string>("Title2"),
@@ -111,6 +114,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
 
@@ -155,6 +159,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
 
@@ -187,6 +192,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = deleteSql;
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
 
@@ -214,6 +220,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = insertSql;
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
         }
@@ -262,6 +269,7 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
 
@@ -308,11 +316,12 @@ namespace Belletrix.DAL
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
         }
 
-        public async Task SaveChanges()
+        public void SaveChanges()
         {
             UnitOfWork.SaveChanges();
         }

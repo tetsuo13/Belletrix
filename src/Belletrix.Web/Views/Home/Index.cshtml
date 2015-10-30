@@ -1,0 +1,71 @@
+﻿@using Belletrix.Core;
+@using Belletrix.Entity.Enum;
+@using Belletrix.Entity.Model;
+
+@{
+    ViewBag.Title = "Index";
+}
+
+@section Body {
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header"></h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="fa fa-clock-o"></i> Recent Activity</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="list-group">
+                        @foreach (EventLogModel eventLog in ViewBag.RecentActivity)
+                        {
+                            string action = String.Empty;
+                            string personName = eventLog.Student.FirstName + " " + eventLog.Student.LastName;
+                            bool modifiedByRealUser = eventLog.ModifiedById != default(int);
+                            string iconClass = String.Empty;
+                            
+                            switch (eventLog.Type)
+                            {
+                                case (int)EventLogTypes.AddStudent:
+                                    action = "added";
+                                    iconClass = modifiedByRealUser ? "fa fa-user-plus" : "fa fa-certificate";
+                                    break;
+                                    
+                                case (int)EventLogTypes.EditStudent:
+                                    action = "modified";
+                                    iconClass = "fa fa-pencil-square-o";
+                                    break;
+                                    
+                                case (int)EventLogTypes.AddStudentExperience:
+                                    action = "created experience for";
+                                    iconClass = "fa fa-plane";
+                                    break;
+                                    
+                                case (int)EventLogTypes.AddStudentNote:
+                                    action = "commented on";
+                                    iconClass = "fa fa-comment";
+                                    break;
+                            }
+
+                            string eventBy = !modifiedByRealUser ? "System" : eventLog.ModifiedByFirstName;
+                            
+                            <a href="#" class="list-group-item" title="@eventBy @action @personName">
+                                <i class="@iconClass fa-fw"></i> @personName
+                                <span class="pull-right text-muted small" title="@eventLog.EventDate.ToString("dddd, MMMM d, yyyy \\a\\t h:mm tt")"><em>@DateTimeFilter.CalculateRelativeDate(eventLog.EventDate)</em></span>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+        </div>
+
+        <div class="col-lg-4">
+        </div>
+    </div>
+}

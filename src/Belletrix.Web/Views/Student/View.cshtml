@@ -1,0 +1,19 @@
+﻿@using Belletrix.Entity.Model;
+
+@model StudentModel
+
+@{
+    ViewBag.Title = "View";
+}
+
+@section FooterScript {
+    <script>
+        $(function () {
+            Belletrix.Student.Note.initModal();
+        });
+    </script>
+}
+
+@section Body {
+    @Html.Partial("View.Partial", Model)
+}
