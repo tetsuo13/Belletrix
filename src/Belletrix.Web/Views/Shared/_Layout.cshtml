@@ -87,6 +87,8 @@
         <script>
             $(function () {
                 Belletrix.initPinger('@Url.Action("Ping", "Home")');
+                Belletrix.UserFirstName = '@user.FirstName';
+                Belletrix.UserLastName = '@user.LastName';
             });
         </script>
     </body>
