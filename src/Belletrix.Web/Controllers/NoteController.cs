@@ -35,11 +35,11 @@ namespace Belletrix.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public void Add(NoteModel model)
+        public async Task Add(NoteModel model)
         {
             if (ModelState.IsValid)
             {
-                StudentNoteService.InsertNote((Session["User"] as UserModel).Id, model);
+                await StudentNoteService.InsertNote((Session["User"] as UserModel).Id, model);
                 StudentNoteService.SaveChanges();
             }
         }

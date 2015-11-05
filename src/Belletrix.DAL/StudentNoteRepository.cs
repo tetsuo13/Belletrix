@@ -69,7 +69,7 @@ namespace Belletrix.DAL
             return notes;
         }
 
-        public void InsertNote(int userId, NoteModel model)
+        public async Task InsertNote(int userId, NoteModel model)
         {
             const string sql = @"
                 INSERT INTO [dbo].[StudentNotes]
@@ -88,12 +88,8 @@ namespace Belletrix.DAL
                     command.Parameters.Add("@EntryDate", SqlDbType.DateTime).Value = DateTime.Now.ToUniversalTime();
                     command.Parameters.Add("@Note", SqlDbType.NVarChar).Value = model.Note.Trim();
 
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync();
                 }
-
-                // TODO: Replace all references of EventLogModel
-                //EventLogModel eventLog = new EventLogModel();
-                //eventLog.AddStudentEvent(connection, transaction, userId, StudentId, EventLogModel.EventType.AddStudentNote);
             }
             catch (Exception e)
             {

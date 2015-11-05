@@ -7,7 +7,7 @@ namespace Belletrix.DAL
     public interface IStudentNoteRepository
     {
         Task<IEnumerable<NoteModel>> GetNotes(int studentId);
-        void InsertNote(int userId, NoteModel model);
+        Task InsertNote(int userId, NoteModel model);
         void SaveChanges();
     }
 }

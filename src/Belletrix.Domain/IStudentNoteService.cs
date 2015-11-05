@@ -7,7 +7,7 @@ namespace Belletrix.Domain
     public interface IStudentNoteService
     {
         Task<IEnumerable<NoteModel>> GetAllNotes(int studentId);
-        void InsertNote(int userId, NoteModel model);
+        Task InsertNote(int userId, NoteModel model);
         void SaveChanges();
     }
 }

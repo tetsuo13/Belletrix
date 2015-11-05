@@ -20,14 +20,14 @@ namespace Belletrix.Domain
             return await EventLogRepository.GetEvents();
         }
 
-        public async Task AddStudentEvent(EventLogModel model, int studentId, EventLogTypes eventType)
+        public async Task AddStudentEvent(int studentId, EventLogTypes eventType)
         {
-            await EventLogRepository.AddStudentEvent(model, studentId, eventType);
+            await EventLogRepository.AddStudentEvent(studentId, eventType);
         }
 
-        public async Task AddStudentEvent(EventLogModel model, int modifiedBy, int studentId, EventLogTypes eventType)
+        public async Task AddStudentEvent(int modifiedBy, int studentId, EventLogTypes eventType)
         {
-            await EventLogRepository.AddStudentEvent(model, modifiedBy, studentId, eventType);
+            await EventLogRepository.AddStudentEvent(modifiedBy, studentId, eventType);
         }
     }
 }
