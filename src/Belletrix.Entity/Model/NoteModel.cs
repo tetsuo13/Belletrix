@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace Belletrix.Entity.Model
 {
@@ -15,8 +14,6 @@ namespace Belletrix.Entity.Model
 
         public DateTime EntryDate { get; set; }
 
-        [Required]
-        [StringLength(16384)]
         public string Note { get; set; }
     }
 }

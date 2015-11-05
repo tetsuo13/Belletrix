@@ -1,6 +1,7 @@
 ﻿@using Belletrix.Entity.Model;
+@using Belletrix.Entity.ViewModel;
 
-@model IEnumerable<NoteModel>
+@model AddStudentNoteViewModel
 
 @{
     ViewBag.Title = "List";
@@ -15,16 +16,15 @@
         @using (Html.BeginForm("Add", "Note", FormMethod.Post, new { id = "newnote" }))
         {
             @Html.AntiForgeryToken()
-            <input type="hidden" name="StudentId" value="@ViewBag.Student.Id" />
-
-            @Html.TextArea("Note", new { @class = "form-control", rows = 5 })
+            @Html.HiddenFor(x => x.StudentId, new { value = ViewBag.Student.Id })
+            @Html.TextAreaFor(x => x.Note, new { @class = "form-control", rows = 5 })
         }
 
         <button type="button" class="btn btn-primary" id="newnotebutton">Add New Note</button>
     </div>
 </div>
 
-@foreach (NoteModel note in Model)
+@foreach (NoteModel note in ViewBag.Notes)
 {
     <div class="list-group">
         <a href="#" class="list-group-item">

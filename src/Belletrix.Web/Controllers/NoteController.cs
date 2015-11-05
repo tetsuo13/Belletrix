@@ -1,12 +1,14 @@
 ﻿using Belletrix.Core;
 using Belletrix.Domain;
 using Belletrix.Entity.Model;
+using Belletrix.Entity.ViewModel;
 using System;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace Belletrix.Web.Controllers
 {
+    [Authorize]
     public class NoteController : Controller
     {
         private readonly IStudentNoteService StudentNoteService;
@@ -30,12 +32,13 @@ namespace Belletrix.Web.Controllers
             }
 
             await Analytics.TrackPageView(Request, "Note List", (Session["User"] as UserModel).Login);
-            return View(await StudentNoteService.GetAllNotes(studentId));
+            ViewBag.Notes = await StudentNoteService.GetAllNotes(studentId);
+            return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task Add(NoteModel model)
+        public async Task Add(AddStudentNoteViewModel model)
         {
             if (ModelState.IsValid)
             {

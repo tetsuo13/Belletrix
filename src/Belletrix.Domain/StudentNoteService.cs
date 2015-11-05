@@ -1,6 +1,7 @@
 ﻿using Belletrix.DAL;
 using Belletrix.Entity.Enum;
 using Belletrix.Entity.Model;
+using Belletrix.Entity.ViewModel;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -23,7 +24,7 @@ namespace Belletrix.Domain
             return await StudentNoteRepository.GetNotes(studentId);
         }
 
-        public async Task InsertNote(int userId, NoteModel model)
+        public async Task InsertNote(int userId, AddStudentNoteViewModel model)
         {
             await StudentNoteRepository.InsertNote(userId, model);
 

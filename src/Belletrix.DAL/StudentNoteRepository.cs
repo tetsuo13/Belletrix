@@ -1,5 +1,6 @@
 ﻿using Belletrix.Core;
 using Belletrix.Entity.Model;
+using Belletrix.Entity.ViewModel;
 using StackExchange.Exceptional;
 using System;
 using System.Collections.Generic;
@@ -69,7 +70,7 @@ namespace Belletrix.DAL
             return notes;
         }
 
-        public async Task InsertNote(int userId, NoteModel model)
+        public async Task InsertNote(int userId, AddStudentNoteViewModel model)
         {
             const string sql = @"
                 INSERT INTO [dbo].[StudentNotes]
