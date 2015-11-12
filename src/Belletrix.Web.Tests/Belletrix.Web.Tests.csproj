@@ -76,6 +76,8 @@
     <Compile Include="LoginTests.cs" />
     <Compile Include="RootWebDriver.cs" />
     <Compile Include="ActivityLogTests.cs" />
+    <Compile Include="Student\StudentNoteTests.cs" />
+    <Compile Include="WebDriverExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
