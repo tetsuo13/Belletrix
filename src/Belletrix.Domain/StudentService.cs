@@ -211,15 +211,7 @@ namespace Belletrix.Domain
 
             model.Id = studentId;
 
-            EventLogModel eventLog = new EventLogModel()
-            {
-                Student = model,
-                ModifiedById = user.Id,
-                ModifiedByFirstName = user.FirstName,
-                ModifiedByLastName = user.LastName
-            };
-
-            await EventLogRepository.AddStudentEvent(eventLog, user.Id, studentId, EventLogTypes.AddStudent);
+            await EventLogRepository.AddStudentEvent(user.Id, studentId, EventLogTypes.AddStudent);
 
             StudentRepository.SaveChanges();
             EventLogRepository.SaveChanges();
@@ -232,17 +224,14 @@ namespace Belletrix.Domain
 
             await StudentPromoRepository.Save(model.Id, promoCode);
 
-            EventLogModel eventLog = new EventLogModel()
-            {
-                Student = model
-            };
-
             if (userId.HasValue)
             {
-                eventLog.ModifiedById = userId.Value;
+                await EventLogRepository.AddStudentEvent(userId.Value, model.Id, EventLogTypes.EditStudent);
             }
-
-            await EventLogRepository.AddStudentEvent(eventLog, model.Id, EventLogTypes.EditStudent);
+            else
+            {
+                await EventLogRepository.AddStudentEvent(model.Id, EventLogTypes.EditStudent);
+            }
 
             StudentRepository.SaveChanges();
             StudentPromoRepository.SaveChanges();
@@ -253,16 +242,7 @@ namespace Belletrix.Domain
         {
             await StudentRepository.UpdateStudent(model);
             await StudentPromoRepository.Save(model.Id, model.PromoIds);
-
-            EventLogModel eventLog = new EventLogModel()
-            {
-                Student = model,
-                ModifiedById = user.Id,
-                ModifiedByFirstName = user.FirstName,
-                ModifiedByLastName = user.LastName
-            };
-
-            await EventLogRepository.AddStudentEvent(eventLog, user.Id, model.Id, EventLogTypes.EditStudent);
+            await EventLogRepository.AddStudentEvent(user.Id, model.Id, EventLogTypes.EditStudent);
 
             StudentRepository.SaveChanges();
             StudentPromoRepository.SaveChanges();
