@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Data.Common;
-using System.Threading.Tasks;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Data.Common;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Belletrix.Core
 {

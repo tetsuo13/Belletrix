@@ -1,4 +1,5 @@
 ﻿using Belletrix.Entity.Model;
+using Belletrix.Entity.ViewModel;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,7 +8,7 @@ namespace Belletrix.Domain
     public interface IStudentNoteService
     {
         Task<IEnumerable<NoteModel>> GetAllNotes(int studentId);
-        void InsertNote(int userId, NoteModel model);
+        Task InsertNote(int userId, AddStudentNoteViewModel model);
         void SaveChanges();
     }
 }

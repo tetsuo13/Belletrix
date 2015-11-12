@@ -101,12 +101,12 @@ namespace Belletrix.DAL
             return events;
         }
 
-        public async Task AddStudentEvent(EventLogModel model, int studentId, EventLogTypes eventType)
+        public async Task AddStudentEvent(int studentId, EventLogTypes eventType)
         {
-            await AddStudentEvent(model, 0, studentId, eventType);
+            await AddStudentEvent(0, studentId, eventType);
         }
 
-        public async Task AddStudentEvent(EventLogModel model, int modifiedBy, int studentId, EventLogTypes eventType)
+        public async Task AddStudentEvent(int modifiedBy, int studentId, EventLogTypes eventType)
         {
             const string sql = @"
                 INSERT INTO [dbo].[EventLog]
@@ -123,15 +123,7 @@ namespace Belletrix.DAL
                     command.Parameters.Add("@Date", SqlDbType.DateTime).Value = DateTime.Now.ToUniversalTime();
                     command.Parameters.Add("@Type", SqlDbType.Int).Value = (int)eventType;
                     command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
-
-                    if (modifiedBy == 0)
-                    {
-                        command.Parameters.Add("@ModifiedBy", SqlDbType.Int).Value = DBNull.Value;
-                    }
-                    else
-                    {
-                        command.Parameters.Add("@ModifiedBy", SqlDbType.Int).Value = modifiedBy;
-                    }
+                    command.Parameters.Add("@ModifiedBy", SqlDbType.Int).Value = modifiedBy == 0 ? DBNull.Value : (object)modifiedBy;
 
                     await command.ExecuteNonQueryAsync();
                 }

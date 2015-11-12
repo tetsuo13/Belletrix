@@ -4,20 +4,43 @@ window.Belletrix.Student = window.Belletrix.Student || {};
 (function (Note, $, undefined) {
     'use strict';
 
-    Note.initModal = function () {
-        // Load cached modal content and then refetch remote content.
-        $(document.body).on('hidden.bs.modal', function () {
-            $('#noteModal').removeData('bs.modal');
+    Note.initLinks = function () {
+        $('a.studentnote').click(function (e) {
+            var anchor = $(this),
+                studentFullName = anchor.attr('data-bt-studentname');
+
+            e.preventDefault();
+
+            $.ajax({
+                url: anchor.attr('href'),
+                cache: false,
+                success: function (data) {
+                    var noteModal;
+                    
+                    noteModal = bootbox.dialog({
+                        message: data,
+                        onEscape: true,
+                        backdrop: true,
+                        title: 'Notes for ' + studentFullName
+                    });
+
+                    noteModal.on('shown.bs.modal', function () {
+                        $('#newnotebutton').click(function () {
+                            $('#newnote').submit();
+                        });
+
+                        handleNewNote('#newnote', 'textarea#Note');
+                        Belletrix.singleSubmit();
+                    });
+                }
+            });
         });
     };
 
-    Note.handleNewNote = function (formSelector, noteSelector,
-        userFirstName, userLastName) {
+    function handleNewNote(formSelector, noteSelector) {
         /// <summary></summary>
         /// <param name="formSelector" type="String"></param>
         /// <param name="noteSelector" type="String"></param>
-        /// <param name="userFirstName" type="String"></param>
-        /// <param name="userLastName" type="String"></param>
 
         $(formSelector).submit(function (event) {
             var noteElement = $(noteSelector),
@@ -34,7 +57,7 @@ window.Belletrix.Student = window.Belletrix.Student || {};
 
                     paraNote.text(noteValue);
 
-                    anchor.append('<h4 class="list-group-item-heading">' + userFirstName + ' ' + userLastName + '</h4>');
+                    anchor.append('<h4 class="list-group-item-heading">' + Belletrix.UserFirstName + ' ' + Belletrix.UserLastName + '</h4>');
                     anchor.append(paraNote);
 
                     listGroup.append(anchor);
@@ -47,5 +70,5 @@ window.Belletrix.Student = window.Belletrix.Student || {};
                 }
             );
         });
-    };
+    }
 })(window.Belletrix.Student.Note = window.Belletrix.Student.Note || {}, jQuery);

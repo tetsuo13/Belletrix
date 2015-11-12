@@ -6,6 +6,10 @@
     /// <var type="Number">Number of milliseconds between pinging the server</var>
     var idleKillerInterval = 1000 * 60 * 10;
 
+    Belletrix.UserFirstName = '';
+
+    Belletrix.UserLastName = '';
+
     Belletrix.singleSubmit = function () {
         /// <summary>Disable the form submit button after clicking it.</summary>
 

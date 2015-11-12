@@ -63,6 +63,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModel\ActivityLogViewModels.cs" />
     <Compile Include="ViewModel\LoginViewModel.cs" />
+    <Compile Include="ViewModel\StudentNotesViewModels.cs" />
     <Compile Include="ViewModel\StudentSearchViewModel.cs" />
   </ItemGroup>
   <ItemGroup />

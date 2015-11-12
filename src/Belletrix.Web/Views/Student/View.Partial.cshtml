@@ -189,8 +189,8 @@
                 <ul class="list-inline" style="margin-bottom: 0">
                     <li>
                         <a href="@Url.Action("List", "Note", new { studentId = Model.Id })"
-                           data-toggle="modal" data-target="#noteModal"
-                           class="studentlisttooltop studentlistmodel" data-placement="top"
+                           class="studentlisttooltop studentnote"
+                           data-bt-studentname="@Model.FirstName @Model.MiddleName @Model.LastName"
                            title="Notes"><i class="fa fa-book fa-lg"></i></a>
                     </li>
                     <li>
@@ -200,13 +200,6 @@
                     </li>
                 </ul>
             </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="noteLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
         </div>
     </div>
 </div>

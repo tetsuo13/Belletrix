@@ -115,10 +115,9 @@
         });
 
         $('a.studentlisttooltop').tooltip();
-        $('a.studentlistmodal').modal();
         $('.collapse').collapse();
 
-        Belletrix.Student.Note.initModal();
+        Belletrix.Student.Note.initLinks();
         Belletrix.initMultiselect(0, 300);
     };
 
