@@ -45,7 +45,9 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
+          <Private>False</Private>
+        </Reference>
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -54,9 +56,18 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="ActivityLog\ModelConversions.cs" />
+    <Compile Include="ActivityLog\TypeLabelTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Belletrix.DAL\Belletrix.DAL.csproj">
+      <Project>{5019f75e-e5e3-4e72-9704-8744edb57880}</Project>
+      <Name>Belletrix.DAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Belletrix.Domain\Belletrix.Domain.csproj">
+      <Project>{261fe036-e1ee-4944-b8ed-25b79f3ac065}</Project>
+      <Name>Belletrix.Domain</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Belletrix.Entity\Belletrix.Entity.csproj">
       <Project>{8c8cc40a-af9f-4c3c-be73-501963c92281}</Project>
       <Name>Belletrix.Entity</Name>

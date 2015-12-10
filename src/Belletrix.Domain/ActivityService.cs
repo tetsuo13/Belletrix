@@ -238,5 +238,26 @@ namespace Belletrix.Domain
 
             return await ActivityLogPersonRepository.CreatePerson(model);
         }
+
+        /// <summary>
+        /// A dictionary of
+        /// <see cref="Belletrix.Entity.Enum.ActivityLogTypes"/> values as
+        /// keys and associated Bootstrap label class names.
+        /// </summary>
+        /// <returns>Enum values and Bootstrap class names.</returns>
+        public Dictionary<int, string> GetActivityTypeLabels()
+        {
+            return new Dictionary<int, string>()
+            {
+                { 1, "label-default" },
+                { 2, "label-primary" },
+                { 3, "label-success" },
+                { 4, "label-info" },
+                { 5, "label-warning" },
+                { 6, "label-danger" },
+                { 7, "label-default" },
+                { 8, "label-primary" }
+            };
+        }
     }
 }
