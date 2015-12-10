@@ -56,5 +56,13 @@ namespace Belletrix.Domain
         /// </param>
         /// <returns>Nothing</returns>
         Task AssociatePeopleWithActivity(HttpSessionStateBase session, int activityId, Guid sessionId);
+
+        /// <summary>
+        /// A dictionary of
+        /// <see cref="Belletrix.Entity.Enum.ActivityLogTypes"/> values as
+        /// keys and associated Bootstrap label class names.
+        /// </summary>
+        /// <returns>Enum values and Bootstrap class names.</returns>
+        Dictionary<int, string> GetActivityTypeLabels();
     }
 }

@@ -4,8 +4,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Belletrix.Domain")]
-[assembly: AssemblyProduct("Belletrix.Domain")]
+[assembly: AssemblyTitle("Belletrix.Entity.Tests")]
+[assembly: AssemblyProduct("Belletrix.Entity.Tests")]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("b3c91231-fded-475a-b71a-e380aba8fe9d")]
+[assembly: Guid("becad3ea-c938-4a5e-9099-5d3ec12cf27c")]

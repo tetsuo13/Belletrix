@@ -4,7 +4,7 @@ using Belletrix.Entity.ViewModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 
-namespace Belletrix.Domain.Tests
+namespace Belletrix.Entity.Tests
 {
     [TestClass]
     public class ModelConversions

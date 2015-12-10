@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{05E23292-604D-4D32-A7FD-F8A59FE3D71E}</ProjectGuid>
+    <ProjectGuid>{BECAD3EA-C938-4A5E-9099-5D3EC12CF27C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Belletrix.Domain.Tests</RootNamespace>
-    <AssemblyName>Belletrix.Domain.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>Belletrix.Entity.Tests</RootNamespace>
+    <AssemblyName>Belletrix.Entity.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -45,9 +45,7 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
-          <Private>False</Private>
-        </Reference>
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -55,18 +53,10 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="ActivityLog\TypeLabelTests.cs" />
+    <Compile Include="ModelConversions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Belletrix.DAL\Belletrix.DAL.csproj">
-      <Project>{5019f75e-e5e3-4e72-9704-8744edb57880}</Project>
-      <Name>Belletrix.DAL</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Belletrix.Domain\Belletrix.Domain.csproj">
-      <Project>{261fe036-e1ee-4944-b8ed-25b79f3ac065}</Project>
-      <Name>Belletrix.Domain</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Belletrix.Entity\Belletrix.Entity.csproj">
       <Project>{8c8cc40a-af9f-4c3c-be73-501963c92281}</Project>
       <Name>Belletrix.Entity</Name>

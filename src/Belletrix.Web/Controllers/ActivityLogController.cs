@@ -36,6 +36,7 @@ namespace Belletrix.Web.Controllers
             }
 
             await Analytics.TrackPageView(Request, "Activity Log View", (Session["User"] as UserModel).Login);
+            ViewBag.TypeLabels = ActivityService.GetActivityTypeLabels();
 
             return View(activity);
         }
@@ -43,7 +44,8 @@ namespace Belletrix.Web.Controllers
         public async Task<ActionResult> List()
         {
             await Analytics.TrackPageView(Request, "Activity Log List", (Session["User"] as UserModel).Login);
-            var logs = await ActivityService.GetActivityLogs();
+            IEnumerable<ActivityLogModel> logs = await ActivityService.GetActivityLogs();
+            ViewBag.TypeLabels = ActivityService.GetActivityTypeLabels();
             return View(logs);
         }
 

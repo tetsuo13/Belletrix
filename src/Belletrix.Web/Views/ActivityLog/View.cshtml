@@ -6,16 +6,6 @@
 
 @{
     ViewBag.Title = Model.ActivityLog.Title + " Activity Log";
-
-    IReadOnlyDictionary<int, string> labels = new Dictionary<int, string>()
-    {
-        { 1, "label-default" },
-        { 2, "label-primary" },
-        { 3, "label-success" },
-        { 4, "label-info" },
-        { 5, "label-warning" },
-        { 6, "label-danger" }
-    };
 }
 
 @section Body {
@@ -32,8 +22,8 @@
             <p>
                 @foreach (ActivityLogTypes type in Model.ActivityLog.Types)
                 {
-                    int i = (int)type % labels.Count;
-                    string labelClassName = labels.ContainsKey(i) ? labels[i] : labels[0];
+                    int i = (int)type % ViewBag.TypeLabels.Count;
+                    string labelClassName = ViewBag.TypeLabels.ContainsKey(i) ? ViewBag.TypeLabels[i] : ViewBag.TypeLabels[0];
                     <span class="label @labelClassName">@type</span>
                 }
             </p>
