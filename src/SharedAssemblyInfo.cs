@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Andrei Nicholson")]
-[assembly: AssemblyCopyright("Copyright © Andrei Nicholson 2014-2015")]
+[assembly: AssemblyCopyright("Copyright © Andrei Nicholson 2014-2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -22,4 +22,4 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("5.1.1")]
+[assembly: AssemblyVersion("5.1.2")]
