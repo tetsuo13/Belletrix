@@ -23,7 +23,7 @@ namespace Belletrix.Web
 
         private void Application_Error(object sender, EventArgs e)
         {
-            Exception ex = Server.GetLastError();
+            Exception ex = Server.GetLastError().GetBaseException();
 
             if (ex is HttpAntiForgeryException)
             {
@@ -31,6 +31,20 @@ namespace Belletrix.Web
                 LogException(ex);
                 Server.ClearError();
                 Response.Redirect("/error/antiforgery", true);
+
+                // Don't let this fall into the "uncaught exception" code.
+                // Response.Redirect() doesn't exit the function.
+                return;
+            }
+
+            HttpException httpException = ex as HttpException;
+            bool notFoundException = httpException != null && httpException.GetHttpCode() == 404;
+
+            // Don't log every "/wp-admin" and other common exploit path under
+            // the sun by every random attacker.
+            if (!notFoundException)
+            {
+                LogException(ex);
             }
         }
 
