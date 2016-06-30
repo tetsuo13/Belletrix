@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 namespace Belletrix.Web.Tests.Student
 {
     [TestClass]
+    [Ignore]
     public class StudentNoteTests : RootWebDriver
     {
         private void GoToStudentList()
