@@ -55,7 +55,8 @@ namespace Belletrix.DAL
                 SELECT  [Id], [FirstName], [LastName],
                         [Created], [LastLogin], [Email],
                         [Admin], [Active], [Login],
-                        [PasswordIterations], [PasswordSalt], [PasswordHash]
+                        [PasswordIterations], [PasswordSalt], [PasswordHash],
+                        [Password]
                 FROM    [dbo].[Users] ";
 
             if (username != null)
@@ -90,7 +91,8 @@ namespace Belletrix.DAL
                                 IsActive = await reader.GetFieldValueAsync<bool>(reader.GetOrdinal("Active")),
                                 PasswordIterations = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("PasswordIterations")),
                                 PasswordSalt = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("PasswordSalt")),
-                                Password = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("PasswordHash"))
+                                Password = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("PasswordHash")),
+                                PasswordHash = await reader.GetValueOrDefault<string>("Password")
                             };
 
                             int ord = reader.GetOrdinal("LastLogin");
@@ -147,13 +149,13 @@ namespace Belletrix.DAL
                 UPDATE  [dbo].[Users]
                 SET     [FirstName] = @FirstName,
                         [LastName] = @LastName,
-                        [Email] = @Email ");
+                        [Email] = @Email,
+                        [PasswordSalt] = '',
+                        [PasswordHash] = '' ");
 
             if (updatePassword)
             {
-                sql.Append(", [PasswordIterations] = @PasswordIterations ");
-                sql.Append(", [PasswordSalt] = @PasswordSalt ");
-                sql.Append(", [PasswordHash] = @PasswordHash ");
+                sql.Append(", [Password] = @Password ");
             }
 
             if (isAdmin)
@@ -176,15 +178,7 @@ namespace Belletrix.DAL
 
                     if (updatePassword)
                     {
-                        string hash = PasswordHash.CreateHash(model.Password);
-                        string[] split = hash.Split(':');
-
-                        command.Parameters.Add("@PasswordIterations", SqlDbType.Int).Value =
-                            split[PasswordHash.ITERATION_INDEX];
-                        command.Parameters.Add("@PasswordSalt", SqlDbType.Char, 32).Value =
-                            split[PasswordHash.SALT_INDEX];
-                        command.Parameters.Add("@PasswordHash", SqlDbType.Char, 32).Value =
-                            split[PasswordHash.PBKDF2_INDEX];
+                        command.Parameters.Add("@Password", SqlDbType.VarChar).Value = model.PasswordHash;
                     }
 
                     if (isAdmin)
@@ -211,13 +205,13 @@ namespace Belletrix.DAL
                 (
                     [FirstName], [LastName], [Login],
                     [Created], [Email], [Admin], [Active],
-                    [PasswordIterations], [PasswordSalt], [PasswordHash]
+                    [PasswordIterations], [Password], [Password], [PasswordHash]
                 )
                 VALUES
                 (
                     @FirstName, @LastName, @Login,
                     @Created, @Email, @Admin, @Active,
-                    @PasswordIterations, @PasswordSalt, @PasswordHash
+                    0, '', '', @Password
                 )";
 
             try
@@ -233,16 +227,7 @@ namespace Belletrix.DAL
                     command.Parameters.Add("@Email", SqlDbType.VarChar, 128).Value = model.Email.Trim();
                     command.Parameters.Add("@Admin", SqlDbType.Bit).Value = model.IsAdmin;
                     command.Parameters.Add("@Active", SqlDbType.Bit).Value = model.IsActive;
-
-                    string hash = PasswordHash.CreateHash(model.Password);
-                    string[] split = hash.Split(':');
-
-                    command.Parameters.Add("@PasswordIterations", SqlDbType.Int).Value =
-                        split[PasswordHash.ITERATION_INDEX];
-                    command.Parameters.Add("@PasswordSalt", SqlDbType.Char, 32).Value =
-                        split[PasswordHash.SALT_INDEX];
-                    command.Parameters.Add("@PasswordHash", SqlDbType.Char, 32).Value =
-                        split[PasswordHash.PBKDF2_INDEX];
+                    command.Parameters.Add("@Password", SqlDbType.VarChar).Value = model.PasswordHash;
 
                     command.ExecuteNonQuery();
                 }

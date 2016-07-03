@@ -21,9 +21,17 @@ namespace Belletrix.Entity.Model
         [Editable(false)]
         public string Login { get; set; }
 
+        // TODO: Rename this to "Password" and remove the obsolete properties.
+        [DataType(DataType.Password)]
+        public string PasswordHash { get; set; }
+
+        [Obsolete("Use PasswordHash instead")]
         public int PasswordIterations { get; set; }
+
+        [Obsolete("Use PasswordHash instead")]
         public string PasswordSalt { get; set; }
 
+        [Obsolete("Use PasswordHash instead")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
