@@ -16,7 +16,7 @@
         <div class="col-lg-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title"><i class="fa fa-clock-o"></i> Recent Activity</h3>
+                    <h3 class="panel-title"><i class="glyphicon glyphicon-time"></i> Recent Activity</h3>
                 </div>
                 <div class="panel-body">
                     <div class="list-group">
@@ -31,29 +31,29 @@
                             {
                                 case (int)EventLogTypes.AddStudent:
                                     action = "added";
-                                    iconClass = modifiedByRealUser ? "fa fa-user-plus" : "fa fa-certificate";
+                                    iconClass = modifiedByRealUser ? "glyphicon-plus" : "glyphicon-certificate";
                                     break;
                                     
                                 case (int)EventLogTypes.EditStudent:
                                     action = "modified";
-                                    iconClass = "fa fa-pencil-square-o";
+                                    iconClass = "glyphicon-edit";
                                     break;
                                     
                                 case (int)EventLogTypes.AddStudentExperience:
                                     action = "created experience for";
-                                    iconClass = "fa fa-plane";
+                                    iconClass = "glyphicon-plane";
                                     break;
                                     
                                 case (int)EventLogTypes.AddStudentNote:
                                     action = "commented on";
-                                    iconClass = "fa fa-comment";
+                                    iconClass = "glyphicon-comment";
                                     break;
                             }
 
                             string eventBy = !modifiedByRealUser ? "System" : eventLog.ModifiedByFirstName;
                             
                             <a href="#" class="list-group-item" title="@eventBy @action @personName">
-                                <i class="@iconClass fa-fw"></i> @personName
+                                <i class="glyphicon @iconClass"></i> @personName
                                 <span class="pull-right text-muted small" title="@eventLog.EventDate.ToString("dddd, MMMM d, yyyy \\a\\t h:mm tt")"><em>@DateTimeFilter.CalculateRelativeDate(eventLog.EventDate)</em></span>
                             </a>
                         }

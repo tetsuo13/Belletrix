@@ -15,7 +15,7 @@
 
         var feedbackImage = $(resultImageSelector);
 
-        feedbackImage.removeClass('fa-check').show().addClass('fa-spinner fa-spin');
+        feedbackImage.removeClass('glyphicon-ok').show().addClass('glyphicon-refresh');
 
         $.ajax({
             url: uniqueNameCheckUrl,
@@ -33,7 +33,7 @@
                         if (!submitButton.hasClass('disabled')) {
                             submitButton.addClass('disabled');
                         }
-                        feedbackImage.removeClass('fa-check fa-spinner fa-spin').addClass('fa-times');
+                        feedbackImage.removeClass('glyphicon-ok glyphicon-refresh').addClass('glyphicon-remove');
                         break;
                 }
             },
@@ -77,7 +77,7 @@
             .addClass(rowId);
 
         anchor = $('<a href="" title="Remove destination row"></a>')
-            .html('<i class="fa fa-minus-circle"></i> Del')
+            .html('<i class="glyphicon glyphicon-minus-sign"></i> Del')
             .click(function (e) {
                 e.preventDefault();
                 $('.' + rowId).remove();

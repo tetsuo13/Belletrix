@@ -205,7 +205,7 @@
             .addClass(rowId);
 
         anchor = $('<a href="" title="Remove destination row"></a>')
-            .html('<i class="fa fa-minus-circle"></i>')
+            .html('<i class="glyphicon glyphicon-minus-sign"></i>')
             .click(function (e) {
                 e.preventDefault();
                 $('.' + rowId).remove();
