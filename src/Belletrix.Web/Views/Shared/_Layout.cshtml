@@ -56,7 +56,11 @@
                             <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu dropdown-user">
-                            <li><a href="@Url.Action("Profile", "User")"><i class="fa fa-user fa-fw"></i> Profile</a></li>
+                            <li><a href="@Url.Action("Edit", "User", new { id = user.Id })"><i class="fa fa-user fa-fw"></i> Edit Profile</a></li>
+                            @if (user.IsAdmin)
+                            {
+                                <li><a href="@Url.Action("List", "User")"><i class="fa fa-users fa-fw"></i> User List</a></li>
+                            }
                             <li class="divider"></li>
                             <li><a href="@Url.Action("Logoff", "User")"><i class="fa fa-power-off fa-fw"></i> Log Out</a></li>
                         </ul>

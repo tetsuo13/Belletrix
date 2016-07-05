@@ -10,7 +10,7 @@ namespace Belletrix.Domain
         Task<IEnumerable<UserModel>> GetUsers(string username = null);
         Task<UserModel> GetUser(string username);
         Task<UserModel> GetUser(int id);
-        void UpdateUser(UserModel model, bool isAdmin);
+        void Update(UserModel model);
         void InsertUser(UserModel model);
     }
 }

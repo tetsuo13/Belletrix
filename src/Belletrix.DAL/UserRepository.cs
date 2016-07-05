@@ -141,30 +141,20 @@ namespace Belletrix.DAL
             throw new Exception("User not found");
         }
 
-        public void UpdateUser(UserModel model, bool isAdmin)
+        public void Update(UserModel model)
         {
-            bool updatePassword = !String.IsNullOrEmpty(model.Password);
-
-            StringBuilder sql = new StringBuilder(@"
+            const string sql = @"
                 UPDATE  [dbo].[Users]
                 SET     [FirstName] = @FirstName,
                         [LastName] = @LastName,
                         [Email] = @Email,
+                        [PasswordIterations] = 0,
                         [PasswordSalt] = '',
-                        [PasswordHash] = '' ");
-
-            if (updatePassword)
-            {
-                sql.Append(", [Password] = @Password ");
-            }
-
-            if (isAdmin)
-            {
-                sql.Append(", [Admin] = @Admin");
-                sql.Append(", [Active] = @Active ");
-            }
-
-            sql.Append("WHERE [Id] = @Id");
+                        [PasswordHash] = '',
+                        [Password] = @Password,
+                        [Admin] = @Admin,
+                        [Active] = @Active
+                WHERE   [Id] = @Id";
 
             try
             {
@@ -174,18 +164,10 @@ namespace Belletrix.DAL
                     command.Parameters.Add("@FirstName", SqlDbType.NVarChar, 64).Value = model.FirstName.Trim();
                     command.Parameters.Add("@LastName", SqlDbType.NVarChar, 64).Value = model.LastName.Trim();
                     command.Parameters.Add("@Email", SqlDbType.VarChar, 128).Value = model.Email.Trim();
+                    command.Parameters.Add("@Password", SqlDbType.VarChar).Value = model.PasswordHash;
+                    command.Parameters.Add("@Admin", SqlDbType.Bit).Value = model.IsAdmin;
+                    command.Parameters.Add("@Active", SqlDbType.Bit).Value = model.IsActive;
                     command.Parameters.Add("@Id", SqlDbType.Int).Value = model.Id;
-
-                    if (updatePassword)
-                    {
-                        command.Parameters.Add("@Password", SqlDbType.VarChar).Value = model.PasswordHash;
-                    }
-
-                    if (isAdmin)
-                    {
-                        command.Parameters.Add("@Admin", SqlDbType.Bit).Value = model.IsAdmin;
-                        command.Parameters.Add("@Active", SqlDbType.Bit).Value = model.IsActive;
-                    }
 
                     command.ExecuteNonQuery();
                 }
@@ -205,7 +187,7 @@ namespace Belletrix.DAL
                 (
                     [FirstName], [LastName], [Login],
                     [Created], [Email], [Admin], [Active],
-                    [PasswordIterations], [Password], [Password], [PasswordHash]
+                    [PasswordIterations], [PasswordSalt], [PasswordHash], [Password]
                 )
                 VALUES
                 (

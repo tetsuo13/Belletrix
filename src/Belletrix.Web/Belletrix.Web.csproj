@@ -167,6 +167,7 @@
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\ExperienceController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\NoteController.cs" />
     <Compile Include="Controllers\PromoController.cs" />
     <Compile Include="Controllers\StudentController.cs" />
@@ -256,7 +257,6 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Student\List.cshtml" />
     <Content Include="Views\Student\Add.cshtml" />
-    <Content Include="Views\User\Profile.cshtml" />
     <Content Include="Views\User\List.cshtml" />
     <Content Include="Views\Note\List.cshtml" />
     <Content Include="Views\Student\View.cshtml" />
@@ -284,7 +284,9 @@
     <Content Include="Views\ActivityLog\EditFieldsPartial.cshtml" />
     <Content Include="Views\ActivityLogPerson\AddPerson.cshtml" />
     <Content Include="Views\Home\Sitemap.cshtml" />
-    <Content Include="Views\User\MigratePassword.cshtml" />
+    <Content Include="Views\Login\MigratePassword.cshtml" />
+    <Content Include="Views\User\Add.cshtml" />
+    <Content Include="Views\User\Edit.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -303,7 +305,7 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\User\Login.cshtml" />
+    <Content Include="Views\Login\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Belletrix.Core\Belletrix.Core.csproj">

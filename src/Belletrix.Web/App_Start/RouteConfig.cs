@@ -48,8 +48,8 @@ namespace Belletrix.Web
                 url: "{controller}/{action}/{id}",
                 defaults: new
                 {
-                    controller = "User",
-                    action = "Login",
+                    controller = "Login",
+                    action = "Index",
                     id = UrlParameter.Optional
                 }
             );
