@@ -4,6 +4,7 @@ using OpenQA.Selenium;
 namespace Belletrix.Web.Tests
 {
     [TestClass]
+    [Ignore]
     public class LoginTests : RootWebDriver
     {
         [TestMethod]

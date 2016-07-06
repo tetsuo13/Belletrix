@@ -34,9 +34,9 @@ namespace Belletrix.Domain
             return await UserRepository.GetUser(id);
         }
 
-        public void UpdateUser(UserModel model, bool isAdmin)
+        public void Update(UserModel model)
         {
-            UserRepository.UpdateUser(model, isAdmin);
+            UserRepository.Update(model);
             UserRepository.SaveChanges();
         }
 

@@ -21,7 +21,7 @@
             <h1>Students <small>@Model.Count().ToString("N0") total</small></h1>
         </div>
         <div class="col-lg-4 text-right">
-            <a href="@Url.Action("Add", "Student")"><i class="fa fa-plus-circle"></i> Add Student</a>
+            <a href="@Url.Action("Add", "Student")"><i class="glyphicon glyphicon-plus-sign"></i> Add Student</a>
         </div>
     </div>
 
@@ -79,7 +79,7 @@
                     @foreach (StudentModel student in Model)
                     {
                         string noteTooltip = "Add Notes";
-                        string noteIcon = "fa fa-book";
+                        string noteIcon = "glyphicon glyphicon-book";
 
                         if (student.NumberOfNotes > 0)
                         {
@@ -124,7 +124,7 @@
                                     <li>
                                         <a href="@Url.Action("Edit", "Student", new { id = student.Id })"
                                            class="studentlisttooltop" data-placement="top"
-                                           title="Edit"><i class="fa fa-pencil"></i></a>
+                                           title="Edit"><i class="glyphicon glyphicon-pencil"></i></a>
                                     </li>
                                 </ul>
                             </td>

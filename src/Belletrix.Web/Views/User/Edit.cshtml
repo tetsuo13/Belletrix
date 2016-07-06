@@ -1,21 +1,17 @@
-﻿@using Belletrix.Entity.Model;
+﻿@using Belletrix.Entity.ViewModel;
 
-@model UserModel
+@model EditUserViewModel
 
 @{
     HtmlHelper.ClientValidationEnabled = true;
     HtmlHelper.UnobtrusiveJavaScriptEnabled = true;
-    
-    bool addingUser = Model == null || Model.Id == default(int);
-    string submitButtonText = addingUser ? "Add Profile" : "Update Profile";
+
     ViewBag.Title = "Settings";
 }
 
 @section FooterScript {
     <script>
-        $(function () {
-            Belletrix.singleSubmit();
-        });
+        $(Belletrix.singleSubmit);
     </script>
 }
 
@@ -24,31 +20,21 @@
         <div class="col-lg-8">
             <h1>Profile</h1>
         </div>
-        @if (addingUser || Model.IsAdmin)
-        {
-            <div class="col-lg-4 text-right">
-                <a href="@Url.Action("List", "User")"><i class="fa fa-plus-circle"></i> User List</a>
-                <a href="@Url.Action("Add", "User")"><i class="fa fa-plus-circle"></i> Add User</a>
-            </div>
-        }
     </div>
 
-    @using (Html.BeginForm(ViewBag.Action as String, "User", FormMethod.Post, new { role = "form" }))
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { role = "form" }))
     {
         @Html.AntiForgeryToken()
         @Html.ValidationSummary()
 
-        if (!addingUser)
-        {
-            @Html.HiddenFor(s => s.Id)
-        }
+        @Html.HiddenFor(s => s.Id)
 
         <div class="row">
             <div class="col-lg-6">
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label>Full Name</label>
+                            @Html.LabelFor(s => s.FirstName)
                             @Html.TextBoxFor(s => s.FirstName, new { @class = "form-control", placeholder = "First" })
                         </div>
                     </div>
@@ -72,49 +58,43 @@
                 </div>
 
                 <div class="form-group">
-                    @Html.LabelFor(s => s.ConfirmPassword)
-                    @Html.PasswordFor(s => s.ConfirmPassword, new { @class = "form-control" })
+                    @Html.LabelFor(s => s.PasswordConfirm)
+                    @Html.PasswordFor(s => s.PasswordConfirm, new { @class = "form-control" })
                 </div>
             </div>
 
             <div class="col-lg-6">
                 <div class="form-group">
                     @Html.LabelFor(s => s.Login)
-
-                    @if (addingUser)
-                    {
-                        @Html.TextBoxFor(s => s.Login, new { @class = "form-control" })
-                    }
-                    else
-                    {
-                        @Html.TextBoxFor(s => s.Login, new { @class = "form-control", @readonly = "readonly" })
-                    }
+                    @Html.TextBoxFor(s => s.Login, new { @class = "form-control", @readonly = "readonly" })
                 </div>
 
-                @if (!addingUser)
-                {
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                @Html.LabelFor(s => s.Created)
-                                <p class="form-control-static">@Model.Created</p>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                @Html.LabelFor(s => s.LastLogin)
-                                <p class="form-control-static">
-                                    @if (Model.LastLogin != default(DateTime))
-                                    {
-                                        @Model.LastLogin
-                                    }
-                                </p>
-                            </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            @Html.LabelFor(s => s.Created)
+                            <p class="form-control-static">@Model.Created</p>
                         </div>
                     </div>
-                }
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            @Html.LabelFor(s => s.LastLogin)
+                            <p class="form-control-static">
+                                @if (Model.LastLogin != default(DateTime))
+                                {
+                                    @Model.LastLogin
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
-                @if (addingUser || Model.IsAdmin)
+                @if (!ViewBag.CurrentUserIsAdmin)
+                {
+                    @Html.HiddenFor(s => s.IsAdmin)
+                    @Html.HiddenFor(s => s.IsActive)
+                }
+                else
                 {
                     <div class="row">
                         <div class="col-lg-6">
@@ -144,6 +124,7 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-default">@submitButtonText</button>
+        <button type="submit" class="btn btn-default">Update Profile</button>
+        @Html.ActionLink("Cancel", "List")
     }
 }

@@ -6,7 +6,7 @@
     // http://support.appharbor.com/kb/tips-and-tricks/application-server-ips-ec2-configuration
     // https://www.siteloader.net/login
     // http://tidy.eideus.com/
-    
+
     Layout = null;
     HtmlHelper.ClientValidationEnabled = true;
     HtmlHelper.UnobtrusiveJavaScriptEnabled = true;
@@ -36,7 +36,7 @@
             <h2>@ViewBag.Title</h2>
         </div>
 
-        @using (Html.BeginForm("Login", "User",
+        @using (Html.BeginForm(null, null,
             new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post,
             new { @class = "form-signin", role = "form" }))
         {
