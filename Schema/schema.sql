@@ -490,6 +490,7 @@ CREATE TABLE [dbo].[Users] (
     [PasswordIterations]    [int] NOT NULL,
     [PasswordSalt]          [char](32) NOT NULL,
     [PasswordHash]          [char](32) NOT NULL,
+    [Password]              [varchar](160),
     [Created]               [datetime] NOT NULL,
     [LastLogin]             [datetime],
     [Email]                 [varchar](128) NOT NULL,
