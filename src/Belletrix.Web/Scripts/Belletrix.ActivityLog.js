@@ -167,7 +167,7 @@
             deleteIcon = $('<a href="" class="btn btn-xs btn-danger pull-right" title="Remove"></a>'),
             actionColumn;
 
-        deleteIcon.append('<i class="fa fa-remove fa-fw"></i>');
+        deleteIcon.append('<i class="glyphicon glyphicon-remove"></i>');
 
         deleteIcon.click(function (event) {
             event.preventDefault();

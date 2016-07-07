@@ -5,6 +5,7 @@ using System;
 namespace Belletrix.Web.Tests
 {
     [TestClass]
+    [Ignore]
     public class ActivityLogTests : RootWebDriver
     {
         private const string DateTimeFormat = "MM/dd/yyyy";
