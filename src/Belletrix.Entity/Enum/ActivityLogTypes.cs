@@ -7,6 +7,8 @@ namespace Belletrix.Entity.Enum
         [Display(Name = "Conference/Institute/Summit")]
         ConferenceInstituteSummit = 1,
         Grant,
+        [Display(Name = "International Travel")]
+        InternationalTravel,
         Community,
         Student,
 
