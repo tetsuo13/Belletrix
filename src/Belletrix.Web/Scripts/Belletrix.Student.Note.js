@@ -30,7 +30,7 @@ window.Belletrix.Student = window.Belletrix.Student || {};
                         });
 
                         handleNewNote('#newnote', 'textarea#Note');
-                        Belletrix.singleSubmit();
+                        Belletrix.Common.singleSubmit();
                     });
                 }
             });
