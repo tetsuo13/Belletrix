@@ -16,13 +16,13 @@
     $(function () {
         'use strict';
 
-        Belletrix.ActivityLog.init(
+        var activityLog = new Belletrix.ActivityLog(
             '@Url.Action("AddPerson", "ActivityLogPerson", new { guid = sessionId })',
             '@Url.Action("AddPersonId", "ActivityLogPerson")',
             '@Url.Action("RemovePersonId", "ActivityLogPerson")',
             '@sessionId');
 
-        Belletrix.ActivityLog.initSession(
+        activityLog.initSession(
             '@Url.Action("StartSession", "ActivityLogPerson", new { guid = sessionId })',
             '@Html.Raw(Url.Action("PopuplateSession", "ActivityLogPerson", new { guid = sessionId, activityId = Model.Id }))',
             '@Url.Action("ParticipantsInSession", "ActivityLogPerson", new { guid = sessionId })');

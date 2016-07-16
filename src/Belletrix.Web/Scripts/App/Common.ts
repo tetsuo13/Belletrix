@@ -10,22 +10,8 @@ module Belletrix {
         /** Number of milliseconds between pinging the server. */
         private static _idleKillerInterval: number = 1000 * 60 * 10;
 
-        private _userFirstName: string;
-        private _userLastName: string;
-
-        get userFirstName(): string {
-            return this._userFirstName
-        }
-        set userFirstName(name: string) {
-            this._userFirstName = name;
-        }
-
-        get userLastName(): string {
-            return this._userLastName
-        }
-        set userLastName(name: string) {
-            this._userLastName = name;
-        }
+        static UserFirstName: string;
+        static UserLastName: string;
 
         /**
          * Disable the form submit button after clicking it.

@@ -9,26 +9,6 @@ var Belletrix;
     var Common = (function () {
         function Common() {
         }
-        Object.defineProperty(Common.prototype, "userFirstName", {
-            get: function () {
-                return this._userFirstName;
-            },
-            set: function (name) {
-                this._userFirstName = name;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Common.prototype, "userLastName", {
-            get: function () {
-                return this._userLastName;
-            },
-            set: function (name) {
-                this._userLastName = name;
-            },
-            enumerable: true,
-            configurable: true
-        });
         /**
          * Disable the form submit button after clicking it.
          */
@@ -107,3 +87,4 @@ var Belletrix;
     }());
     Belletrix.Common = Common;
 })(Belletrix || (Belletrix = {}));
+//# sourceMappingURL=Common.js.map
