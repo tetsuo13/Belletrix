@@ -11,8 +11,9 @@
         $(function () {
             'use strict';
 
-            Belletrix.Student.initStudentAddEdit();
-            Belletrix.Student.addStudyAbroadRows(
+            var student = new Belletrix.Student();
+            student.initStudentAddEdit();
+            student.addStudyAbroadRows(
                 [@String.Join(",", Model.StudyAbroadCountry)],
                 [@String.Join(",", Model.StudyAbroadYear)],
                 [@String.Join(",", Model.StudyAbroadPeriod)]

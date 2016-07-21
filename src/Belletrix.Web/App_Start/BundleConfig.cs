@@ -18,9 +18,9 @@ namespace Belletrix.Web.App_Start
                 "~/Scripts/bootbox.min.js",
                 "~/Scripts/App/Common.js",
                 "~/Scripts/App/ActivityLog.js",
+                "~/Scripts/App/Student.js",
                 "~/Scripts/App/StudentNote.js",
-                "~/Scripts/Belletrix.Promo.js",
-                "~/Scripts/Belletrix.Student.js"));
+                "~/Scripts/App/Promo.js"));
 
             bundles.Add(new StyleBundle("~/bundles/css")
                 .Include("~/Content/bootstrap.css")
