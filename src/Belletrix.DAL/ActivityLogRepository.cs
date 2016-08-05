@@ -6,9 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using Dapper;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using System.Linq;
 
 namespace Belletrix.DAL
 {
@@ -35,6 +37,7 @@ namespace Belletrix.DAL
 
             try
             {
+                activity = (await UnitOfWork.Context().QueryAsync<ActivityLogModel>(sql, new { Id = id })).FirstOrDefault();
                 using (SqlCommand command = UnitOfWork.CreateCommand())
                 {
                     command.CommandText = sql;

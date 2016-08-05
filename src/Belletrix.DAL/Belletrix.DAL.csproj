@@ -34,6 +34,7 @@
       <HintPath>..\packages\Dapper.1.42\lib\net45\Dapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="StackExchange.Exceptional, Version=1.0.0.122, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\StackExchange.Exceptional.1.0.122\lib\StackExchange.Exceptional.dll</HintPath>
       <Private>True</Private>

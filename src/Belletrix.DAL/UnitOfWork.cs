@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Data.SqlClient;
 
 namespace Belletrix.DAL
@@ -24,7 +25,7 @@ namespace Belletrix.DAL
     /// </remarks>
     public class UnitOfWork : IUnitOfWork
     {
-        private SqlConnection context;
+        private IDbConnection context;
 
         public UnitOfWork(string connectionString)
         {
@@ -32,10 +33,9 @@ namespace Belletrix.DAL
             context.Open();
         }
 
-        public SqlCommand CreateCommand()
+        public IDbConnection Context()
         {
-            SqlCommand command = context.CreateCommand();
-            return command;
+            return context;
         }
 
         public void Dispose(bool disposing)

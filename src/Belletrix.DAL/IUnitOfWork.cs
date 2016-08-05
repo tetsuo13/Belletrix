@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Data.SqlClient;
+using System.Data;
 
 namespace Belletrix.DAL
 {
     public interface IUnitOfWork : IDisposable
     {
-        SqlCommand CreateCommand();
+        IDbConnection Context();
     }
 }

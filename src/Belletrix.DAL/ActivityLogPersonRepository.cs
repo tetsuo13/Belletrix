@@ -1,10 +1,10 @@
 ﻿using Belletrix.Core;
 using Belletrix.Entity.Enum;
 using Belletrix.Entity.Model;
+using Dapper;
 using StackExchange.Exceptional;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,23 +28,11 @@ namespace Belletrix.DAL
                 ([FullName], [Description], [Phone], [Email])
                 OUTPUT INSERTED.Id
                 VALUES
-                (@FullName, @Description, @Phone, @Email)";
-
-            int id;
+                (@FullName, @Description, @PhoneNumber, @Email)";
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
-
-                    command.Parameters.Add("@FullName", SqlDbType.VarChar, 128).Value = model.FullName;
-                    command.Parameters.Add("@Description", SqlDbType.VarChar, 256).Value = !String.IsNullOrEmpty(model.Description) ? (object)model.Description : DBNull.Value;
-                    command.Parameters.Add("@Phone", SqlDbType.VarChar, 32).Value = !String.IsNullOrEmpty(model.PhoneNumber) ? (object)model.PhoneNumber : DBNull.Value;
-                    command.Parameters.Add("@Email", SqlDbType.VarChar, 128).Value = !String.IsNullOrEmpty(model.Email) ? (object)model.Email : DBNull.Value;
-
-                    id = (int)await command.ExecuteScalarAsync();
-                }
+                return await UnitOfWork.Context().ExecuteAsync(sql, model);
             }
             catch (Exception e)
             {
@@ -52,8 +40,6 @@ namespace Belletrix.DAL
                 ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
-
-            return id;
         }
 
         public async Task AssociatePeopleWithActivity(int activityId, IEnumerable<ActivityLogParticipantModel> people)
@@ -66,29 +52,15 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
+                foreach (ActivityLogParticipantModel person in people)
                 {
-                    command.CommandText = sql;
-
-                    SqlParameter eventIdParam = new SqlParameter("@EventId", SqlDbType.Int);
-                    eventIdParam.Value = activityId;
-
-                    SqlParameter personIdParam = new SqlParameter("@PersonId", SqlDbType.Int);
-                    SqlParameter typeParam = new SqlParameter("@Type", SqlDbType.Int);
-
-                    command.Parameters.Add(eventIdParam);
-                    command.Parameters.Add(personIdParam);
-                    command.Parameters.Add(typeParam);
-
-                    command.Prepare();
-
-                    foreach (ActivityLogParticipantModel person in people)
-                    {
-                        personIdParam.Value = person.Person.Id;
-                        typeParam.Value = person.Type;
-
-                        await command.ExecuteNonQueryAsync();
-                    }
+                    await UnitOfWork.Context().ExecuteAsync(sql,
+                        new
+                        {
+                            EventId = activityId,
+                            PersonId = person.Person.Id,
+                            Type = person.Type
+                        });
                 }
             }
             catch (Exception e)
@@ -97,43 +69,18 @@ namespace Belletrix.DAL
                 ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
-        }
-
-        private async Task<ActivityLogPersonModel> ReadPerson(SqlDataReader reader)
-        {
-            return new ActivityLogPersonModel()
-            {
-                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
-                FullName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("FullName")),
-                Description = await reader.GetValueOrDefault<string>("Description"),
-                PhoneNumber = await reader.GetValueOrDefault<string>("Phone"),
-                Email = await reader.GetValueOrDefault<string>("Email")
-            };
         }
 
         public async Task<IEnumerable<ActivityLogPersonModel>> FindAllPeople()
         {
             const string sql = @"
-                SELECT      [Id], [FullName], [Description], [Phone], [Email]
+                SELECT      [Id], [FullName], [Description], [Phone] AS PhoneNumber, [Email]
                 FROM        [dbo].[ActivityLogPerson]
                 ORDER BY    [FullName]";
 
-            ICollection<ActivityLogPersonModel> people = new List<ActivityLogPersonModel>();
-
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
-
-                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            people.Add(await ReadPerson(reader));
-                        }
-                    }
-                }
+                return await UnitOfWork.Context().QueryAsync<ActivityLogPersonModel>(sql);
             }
             catch (Exception e)
             {
@@ -141,8 +88,6 @@ namespace Belletrix.DAL
                 ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
-
-            return people;
         }
 
         public async Task<ActivityLogPersonModel> FindPersonById(int id)
@@ -159,7 +104,7 @@ namespace Belletrix.DAL
         public async Task<IEnumerable<ActivityLogParticipantModel>> FindActivityParticipants(int activityId)
         {
             const string sql = @"
-                SELECT      [Id], [FullName], [Description], [Phone], [Email], [ParticipantType]
+                SELECT      [Id], [FullName], [Description], [Phone] AS PhoneNumber, [Email], [ParticipantType]
                 FROM        [dbo].[ActivityLogPerson]
                 INNER JOIN  [dbo].[ActivityLogParticipant] ON
                             [PersonId] = id
@@ -169,23 +114,24 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
-                    command.Parameters.Add("@ActivityId", SqlDbType.Int).Value = activityId;
+                IEnumerable<dynamic> rows = await UnitOfWork.Context().QueryAsync<ActivityLogParticipantModel>(sql,
+                    new { ActivityId = activityId });
 
-                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                foreach (IDictionary<string, object> row in rows)
+                {
+                    people.Add(new ActivityLogParticipantModel()
                     {
-                        while (await reader.ReadAsync())
+                        Event = new ActivityLogModel { Id = activityId },
+                        Person = new ActivityLogPersonModel()
                         {
-                            people.Add(new ActivityLogParticipantModel()
-                            {
-                                Event = new ActivityLogModel { Id = activityId },
-                                Person = await ReadPerson(reader),
-                                Type = await reader.GetFieldValueAsync<ActivityLogParticipantTypes>(reader.GetOrdinal("ParticipantType"))
-                            });
-                        }
-                    }
+                            Id = (int)row["Id"],
+                            FullName = (string)row["FullName"],
+                            Description = row["Description"] as string,
+                            PhoneNumber = row["PhoneNumber"] as string,
+                            Email = row["Email"] as string
+                        },
+                        Type = (ActivityLogParticipantTypes)(int)row["ParticipantType"]
+                    });
                 }
             }
             catch (Exception e)
@@ -211,12 +157,7 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
-                    command.Parameters.Add("@ActivityId", SqlDbType.Int).Value = activityId;
-                    await command.ExecuteNonQueryAsync();
-                }
+                await UnitOfWork.Context().ExecuteAsync(sql, new { ActivityId = activityId });
             }
             catch (Exception e)
             {
@@ -237,25 +178,16 @@ namespace Belletrix.DAL
             string sql = @"
                 DELETE FROM [dbo].[ActivityLogParticipant]
                 WHERE       [EventId] = @ActivityId AND
-                            [PersonId] IN ({0})";
-
-            string[] paramNames = people.Select((s, i) => "@param" + i.ToString()).ToArray();
+                            [PersonId] IN (@PersonIds)";
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = String.Format(sql, String.Join(",", paramNames));
-
-                    command.Parameters.Add("@ActivityId", SqlDbType.Int).Value = activityId;
-
-                    for (int i = 0; i < paramNames.Length; i++)
+                await UnitOfWork.Context().ExecuteAsync(sql,
+                    new
                     {
-                        command.Parameters.AddWithValue(paramNames[i], people.ElementAt(i));
-                    }
-
-                    await command.ExecuteNonQueryAsync();
-                }
+                        ActivityId = activityId,
+                        PersonIds = people.Select(x => x.Person.Id)
+                    });
             }
             catch (Exception e)
             {
