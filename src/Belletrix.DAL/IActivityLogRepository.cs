@@ -12,7 +12,6 @@ namespace Belletrix.DAL
         
         Task<int> InsertActivity(ActivityLogModel model, int userId);
         Task UpdateActivity(ActivityLogModel model);
-        void SaveChanges();
 
         /// <summary>
         /// Associates a collection of activity log types with an activity

@@ -4,6 +4,7 @@ using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace Belletrix.Domain
 {
@@ -26,15 +27,13 @@ namespace Belletrix.Domain
 
         public async Task InsertNote(int userId, AddStudentNoteViewModel model)
         {
-            await StudentNoteRepository.InsertNote(userId, model);
+            using (TransactionScope scope = new TransactionScope())
+            {
+                await StudentNoteRepository.InsertNote(userId, model);
+                await EventLogRepository.AddStudentEvent(userId, model.StudentId, EventLogTypes.AddStudentNote);
 
-            await EventLogRepository.AddStudentEvent(userId, model.StudentId, EventLogTypes.AddStudentNote);
-            EventLogRepository.SaveChanges();
-        }
-
-        public void SaveChanges()
-        {
-            StudentNoteRepository.SaveChanges();
+                scope.Complete();
+            }
         }
     }
 }

@@ -145,11 +145,6 @@ namespace Belletrix.DAL
             return people;
         }
 
-        public void SaveChanges()
-        {
-            UnitOfWork.SaveChanges();
-        }
-
         public async Task<ActivityLogPersonModel> FindPersonById(int id)
         {
             IEnumerable<ActivityLogPersonModel> people = await FindAllPeople();

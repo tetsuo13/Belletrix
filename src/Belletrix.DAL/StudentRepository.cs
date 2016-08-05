@@ -847,10 +847,5 @@ namespace Belletrix.DAL
                 }
             }
         }
-
-        public void SaveChanges()
-        {
-            UnitOfWork.SaveChanges();
-        }
     }
 }

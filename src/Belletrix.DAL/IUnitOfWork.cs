@@ -6,6 +6,5 @@ namespace Belletrix.DAL
     public interface IUnitOfWork : IDisposable
     {
         SqlCommand CreateCommand();
-        void SaveChanges();
     }
 }

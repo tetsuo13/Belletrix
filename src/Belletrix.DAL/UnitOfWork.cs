@@ -25,43 +25,23 @@ namespace Belletrix.DAL
     public class UnitOfWork : IUnitOfWork
     {
         private SqlConnection context;
-        private SqlTransaction transaction;
 
         public UnitOfWork(string connectionString)
         {
             context = new SqlConnection(connectionString);
             context.Open();
-            transaction = context.BeginTransaction();
         }
 
         public SqlCommand CreateCommand()
         {
             SqlCommand command = context.CreateCommand();
-            command.Transaction = transaction;
             return command;
-        }
-
-        public void SaveChanges()
-        {
-            if (transaction != null)
-            {
-                transaction.Commit();
-                transaction.Dispose();
-                transaction = null;
-            }
         }
 
         public void Dispose(bool disposing)
         {
             if (disposing)
             {
-                if (transaction != null)
-                {
-                    transaction.Rollback();
-                    transaction.Dispose();
-                    transaction = null;
-                }
-
                 if (context != null)
                 {
                     context.Close();

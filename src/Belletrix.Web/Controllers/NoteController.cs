@@ -43,7 +43,6 @@ namespace Belletrix.Web.Controllers
             if (ModelState.IsValid)
             {
                 await StudentNoteService.InsertNote((Session["User"] as UserModel).Id, model);
-                StudentNoteService.SaveChanges();
             }
         }
     }
