@@ -632,7 +632,9 @@ VALUES
 (N'Semester', 0),
 (N'Summer', 1),
 (N'Other', 1),
-(N'Academic Year', 0);
+(N'Academic Year', 0),
+(N'Service-learning', 0),
+(N'Volunteer', 0);
 
 
 CREATE TABLE [dbo].[StudyAbroad] (
