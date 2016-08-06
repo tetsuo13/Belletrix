@@ -52,7 +52,7 @@ namespace Belletrix.Web.Controllers
                         }
                         else if (new PasswordHasher().VerifyHashedPassword(user.PasswordHash, model.Password) != PasswordVerificationResult.Failed)
                         {
-                            UserService.UpdateLastLogin(model.UserName);
+                            await UserService.UpdateLastLogin(model.UserName);
                             FormsAuthentication.SetAuthCookie(model.UserName, true);
                             Session["User"] = await UserService.GetUser(model.UserName);
 
@@ -107,7 +107,7 @@ namespace Belletrix.Web.Controllers
                     else
                     {
                         user.PasswordHash = new PasswordHasher().HashPassword(model.NewPassword);
-                        UserService.Update(user);
+                        await UserService.Update(user);
                         return RedirectToAction("Index");
                     }
                 }

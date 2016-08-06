@@ -117,7 +117,7 @@ namespace Belletrix.DAL
                 IEnumerable<dynamic> rows = await UnitOfWork.Context().QueryAsync<ActivityLogParticipantModel>(sql,
                     new { ActivityId = activityId });
 
-                foreach (IDictionary<string, object> row in rows)
+                foreach (IReadOnlyDictionary<string, object> row in rows)
                 {
                     people.Add(new ActivityLogParticipantModel()
                     {

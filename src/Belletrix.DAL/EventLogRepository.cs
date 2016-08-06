@@ -1,11 +1,10 @@
 ﻿using Belletrix.Core;
 using Belletrix.Entity.Enum;
 using Belletrix.Entity.Model;
+using Dapper;
 using StackExchange.Exceptional;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -43,52 +42,45 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
+                IEnumerable<dynamic> rows = await UnitOfWork.Context().QueryAsync<dynamic>(sql);
+
+                foreach (IReadOnlyDictionary<string, object> row in rows)
                 {
-                    command.CommandText = sql;
+                    StudentModel student = null;
 
-                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    // TODO: Check for key or does key always exist and value is null?
+                    if (row.ContainsKey("StudentId") && row["StudentId"] != null)
                     {
-                        while (await reader.ReadAsync())
+                        student = new StudentModel()
                         {
-                            StudentModel student = null;
-                            int ord = reader.GetOrdinal("StudentId");
-                            if (!reader.IsDBNull(ord))
-                            {
-                                student = new StudentModel()
-                                {
-                                    Id = await reader.GetFieldValueAsync<int>(ord),
-                                    FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("StudentFirstName")),
-                                    LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("StudentLastName"))
-                                };
-                            }
-
-                            EventLogModel eventLog = new EventLogModel()
-                            {
-                                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
-                                EventDate = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("Date"))),
-                                ModifiedById = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("ModifiedBy")),
-                                ModifiedByFirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("FirstName")),
-                                ModifiedByLastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("LastName")),
-                                Student = student,
-                                Type = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Type")),
-                                Action = await reader.GetValueOrDefault<string>("Action")
-                            };
-
-                            ord = reader.GetOrdinal("UserId");
-
-                            if (!reader.IsDBNull(ord))
-                            {
-                                eventLog.UserId = await reader.GetFieldValueAsync<int>(ord);
-                                eventLog.UserFirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("UserFirstName"));
-                                eventLog.UserLastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("UserLastName"));
-                            }
-
-                            eventLog.RelativeDate = DateTimeFilter.CalculateRelativeDate(eventLog.EventDate.ToUniversalTime());
-
-                            events.Add(eventLog);
-                        }
+                            Id = (int)row["StudentId"],
+                            FirstName = (string)row["StudentFirstName"],
+                            LastName = (string)row["StudentLastName"]
+                        };
                     }
+
+                    EventLogModel eventLog = new EventLogModel()
+                    {
+                        Id = (int)row["Id"],
+                        EventDate = DateTimeFilter.UtcToLocal((DateTime)row["Date"]),
+                        ModifiedById = (int)row["ModifiedBy"],
+                        ModifiedByFirstName = (string)row["FirstName"],
+                        ModifiedByLastName = (string)row["LastName"],
+                        Student = student,
+                        Type = (int)row["Type"],
+                        Action = (string)row["Action"]
+                    };
+
+                    if (row.ContainsKey("UserId") && row["UserId"] != null)
+                    {
+                        eventLog.UserId = (int)row["UserId"];
+                        eventLog.UserFirstName = (string)row["UserFirstName"];
+                        eventLog.UserLastName = (string)row["UserLastName"];
+                    }
+
+                    eventLog.RelativeDate = DateTimeFilter.CalculateRelativeDate(eventLog.EventDate.ToUniversalTime());
+
+                    events.Add(eventLog);
                 }
             }
             catch (Exception e)
@@ -116,17 +108,14 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
-
-                    command.Parameters.Add("@Date", SqlDbType.DateTime).Value = DateTime.Now.ToUniversalTime();
-                    command.Parameters.Add("@Type", SqlDbType.Int).Value = (int)eventType;
-                    command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
-                    command.Parameters.Add("@ModifiedBy", SqlDbType.Int).Value = modifiedBy == 0 ? DBNull.Value : (object)modifiedBy;
-
-                    await command.ExecuteNonQueryAsync();
-                }
+                await UnitOfWork.Context().ExecuteAsync(sql,
+                    new
+                    {
+                        Date = DateTime.Now.ToUniversalTime(),
+                        ModifiedBy = modifiedBy == 0 ? null : (object)modifiedBy,
+                        StudentId = studentId,
+                        Type = (int)eventType
+                    });
             }
             catch (Exception e)
             {

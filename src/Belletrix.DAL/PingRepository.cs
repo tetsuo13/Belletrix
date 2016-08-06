@@ -1,6 +1,6 @@
-﻿using StackExchange.Exceptional;
+﻿using Dapper;
+using StackExchange.Exceptional;
 using System;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -17,16 +17,11 @@ namespace Belletrix.DAL
 
         public async Task<string> Ping()
         {
-            const string sql = "SELECT @@version";
-            string result = String.Empty;
+            const string sql = "SELECT @@version AS Version";
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
-                    result = await command.ExecuteScalarAsync() as String;
-                }
+                return await UnitOfWork.Context().ExecuteScalarAsync<string>(sql);
             }
             catch (Exception e)
             {
@@ -34,7 +29,7 @@ namespace Belletrix.DAL
                 ErrorStore.LogException(e, HttpContext.Current);
             }
 
-            return result;
+            return string.Empty;
         }
     }
 }

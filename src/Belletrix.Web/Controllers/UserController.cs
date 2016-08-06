@@ -70,7 +70,7 @@ namespace Belletrix.Web.Controllers
                     IsActive = model.IsActive
                 };
 
-                UserService.InsertUser(user);
+                await UserService.InsertUser(user);
                 return RedirectToAction("List");
             }
 
@@ -140,7 +140,7 @@ namespace Belletrix.Web.Controllers
                         user.PasswordHash = new PasswordHasher().HashPassword(model.Password);
                     }
 
-                    UserService.Update(user);
+                    await UserService.Update(user);
                     return RedirectToAction("List");
                 }
             }

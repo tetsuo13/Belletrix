@@ -1,4 +1,5 @@
-﻿using Belletrix.DAL;
+﻿using Belletrix.Core;
+using Belletrix.DAL;
 using Belletrix.Entity.Enum;
 using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
@@ -245,6 +246,41 @@ namespace Belletrix.Domain
         {
             using (TransactionScope scope = new TransactionScope())
             {
+                if (model.InitialMeeting.HasValue)
+                {
+                    model.InitialMeeting = model.InitialMeeting.Value.ToUniversalTime();
+                }
+
+                if (!string.IsNullOrEmpty(model.MiddleName))
+                {
+                    model.MiddleName = model.MiddleName.CapitalizeFirstLetter();
+                }
+
+                if (!string.IsNullOrEmpty(model.PhoneNumber))
+                {
+                    model.PhoneNumber = model.PhoneNumber.Trim();
+                }
+
+                if (!string.IsNullOrEmpty(model.StudentId))
+                {
+                    model.StudentId = model.StudentId.Trim();
+                }
+
+                if (model.DateOfBirth.HasValue)
+                {
+                    model.DateOfBirth = model.DateOfBirth.Value.ToUniversalTime();
+                }
+
+                if (!string.IsNullOrEmpty(model.CampusEmail))
+                {
+                    model.CampusEmail = model.CampusEmail.Trim();
+                }
+
+                if (!string.IsNullOrEmpty(model.AlternateEmail))
+                {
+                    model.AlternateEmail = model.AlternateEmail.Trim();
+                }
+
                 await StudentRepository.UpdateStudent(model);
                 await StudentPromoRepository.Save(model.Id, model.PromoIds);
                 await EventLogRepository.AddStudentEvent(user.Id, model.Id, EventLogTypes.EditStudent);

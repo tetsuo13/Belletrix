@@ -14,9 +14,9 @@ namespace Belletrix.Domain
             UserRepository = userRepository;
         }
 
-        public void UpdateLastLogin(string username)
+        public async Task UpdateLastLogin(string username)
         {
-            UserRepository.UpdateLastLogin(username);
+            await UserRepository.UpdateLastLogin(username);
         }
 
         public async Task<IEnumerable<UserModel>> GetUsers(string username = null)
@@ -34,14 +34,14 @@ namespace Belletrix.Domain
             return await UserRepository.GetUser(id);
         }
 
-        public void Update(UserModel model)
+        public async Task Update(UserModel model)
         {
-            UserRepository.Update(model);
+            await UserRepository.Update(model);
         }
 
-        public void InsertUser(UserModel model)
+        public async Task InsertUser(UserModel model)
         {
-            UserRepository.InsertUser(model);
+            await UserRepository.InsertUser(model);
         }
     }
 }

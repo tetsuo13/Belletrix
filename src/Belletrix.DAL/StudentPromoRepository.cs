@@ -1,9 +1,8 @@
 ﻿using Belletrix.Entity.Model;
+using Dapper;
 using StackExchange.Exceptional;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -21,31 +20,13 @@ namespace Belletrix.DAL
 
         public async Task<IEnumerable<StudentPromoLog>> Get()
         {
-            ICollection<StudentPromoLog> logs = new List<StudentPromoLog>();
-
             const string sql = @"
                 SELECT  [PromoId], [StudentId], [Created]
                 FROM    [StudentPromoLog]";
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
-
-                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            logs.Add(new StudentPromoLog()
-                            {
-                                PromoId = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("PromoId")),
-                                StudentId = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("StudentId")),
-                                Created = await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("Created"))
-                            });
-                        }
-                    }
-                }
+                return await UnitOfWork.Context().QueryAsync<StudentPromoLog>(sql);
             }
             catch (Exception e)
             {
@@ -53,7 +34,7 @@ namespace Belletrix.DAL
                 ErrorStore.LogException(e, HttpContext.Current);
             }
 
-            return logs;
+            return new List<StudentPromoLog>();
         }
 
         public async Task Save(int studentId, IEnumerable<int> promoIds)
@@ -62,8 +43,6 @@ namespace Belletrix.DAL
 
             if (promoIds != null && promoIds.Any())
             {
-                ICollection<StudentPromoLog> logs = new List<StudentPromoLog>();
-
                 const string sql = @"
                     INSERT INTO [dbo].[StudentPromoLog]
                     ([PromoId], [StudentId], [Created])
@@ -72,33 +51,15 @@ namespace Belletrix.DAL
 
                 try
                 {
-                    using (SqlCommand command = UnitOfWork.CreateCommand())
-                    {
-                        DateTime created = DateTime.Now.ToUniversalTime();
+                    DateTime created = DateTime.Now.ToUniversalTime();
 
-                        command.CommandText = sql;
-
-                        command.Parameters.Add("@PromoId", SqlDbType.Int);
-                        command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
-                        command.Parameters.Add("@Created", SqlDbType.DateTime).Value = created;
-
-                        command.Prepare();
-
-                        foreach (int promoId in promoIds)
+                    await UnitOfWork.Context().ExecuteAsync(sql,
+                        new
                         {
-                            StudentPromoLog log = new StudentPromoLog()
-                            {
-                                PromoId = promoId,
-                                StudentId = studentId,
-                                Created = created
-                            };
-
-                            command.Parameters[0].Value = promoId;
-                            await command.ExecuteNonQueryAsync();
-
-                            logs.Add(log);
-                        }
-                    }
+                            PromoId = promoIds,
+                            StudentId = studentId,
+                            Created = created
+                        });
                 }
                 catch (Exception e)
                 {
@@ -117,12 +78,9 @@ namespace Belletrix.DAL
 
         public async Task Save(int studentId, string promoCode)
         {
-            ICollection<StudentPromoLog> logs = new List<StudentPromoLog>();
-
             const string sql = @"
                 INSERT INTO [dbo].[StudentPromoLog]
                 ([PromoId], [StudentId], [Created])
-                OUTPUT INSERTED.PromoId
                 VALUES
                 (
                     (SELECT [Id] FROM [dbo].[UserPromo] WHERE [Code] = @PromoCode), @StudentId, @Created
@@ -130,25 +88,13 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    DateTime created = DateTime.Now.ToUniversalTime();
-
-                    command.CommandText = sql;
-
-                    command.Parameters.Add("@PromoCode", SqlDbType.VarChar, 32).Value = promoCode.ToLower();
-                    command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
-                    command.Parameters.Add("@Created", SqlDbType.DateTime).Value = created;
-
-                    int promoId = Convert.ToInt32(await command.ExecuteScalarAsync());
-
-                    logs.Add(new StudentPromoLog()
+                await UnitOfWork.Context().ExecuteAsync(sql,
+                    new
                     {
-                        PromoId = promoId,
+                        PromoCode = promoCode.ToLower(),
                         StudentId = studentId,
-                        Created = created
+                        Created = DateTime.Now.ToUniversalTime()
                     });
-                }
             }
             catch (Exception e)
             {
@@ -170,12 +116,7 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
-                    command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
-                    await command.ExecuteNonQueryAsync();
-                }
+                await UnitOfWork.Context().ExecuteAsync(sql, new { StudentId = studentId });
             }
             catch (Exception e)
             {
