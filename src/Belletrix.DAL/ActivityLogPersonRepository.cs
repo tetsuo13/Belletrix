@@ -1,11 +1,9 @@
-﻿using Belletrix.Core;
-using Belletrix.Entity.Enum;
+﻿using Belletrix.Entity.Enum;
 using Belletrix.Entity.Model;
 using Dapper;
 using StackExchange.Exceptional;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
