@@ -50,7 +50,7 @@ namespace Belletrix.DAL
             string sql = @"
                 SELECT  [Id], [FirstName], [LastName],
                         [Created], [LastLogin], [Email],
-                        [Admin], [Active], [Login],
+                        [Admin] AS IsAdmin, [Active] AS IsActive, [Login],
                         [PasswordIterations], [PasswordSalt], [PasswordHash],
                         [Password]
                 FROM    [dbo].[Users] ";

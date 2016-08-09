@@ -56,7 +56,7 @@ namespace Belletrix.DAL
                     rows = await UnitOfWork.Context().QueryAsync<dynamic>(sql);
                 }
 
-                foreach (IReadOnlyDictionary<string, object> row in rows)
+                foreach (IDictionary<string, object> row in rows)
                 {
                     StudyAbroadModel study = new StudyAbroadModel()
                     {

@@ -34,10 +34,10 @@ namespace Belletrix.DAL
 
             try
             {
-                IEnumerable<dynamic> rows = await UnitOfWork.Context().QueryAsync<ActivityLogModel>(sql,
+                IEnumerable<dynamic> rows = await UnitOfWork.Context().QueryAsync<dynamic>(sql,
                     new { Id = id });
 
-                activity = ProcessRow(rows.First());
+                activity = ProcessRows(rows).SingleOrDefault();
             }
             catch (Exception e)
             {
@@ -54,24 +54,31 @@ namespace Belletrix.DAL
             return activity;
         }
 
-        private ActivityLogModel ProcessRow(IReadOnlyDictionary<string, object> row)
+        private IEnumerable<ActivityLogModel> ProcessRows(IEnumerable<dynamic> rows)
         {
-            return new ActivityLogModel()
+            ICollection<ActivityLogModel> logs = new List<ActivityLogModel>();
+
+            foreach (IDictionary<string, object> row in rows)
             {
-                Id = (int)row["Id"],
-                Created = DateTimeFilter.UtcToLocal((DateTime)row["Created"]),
-                CreatedBy = (int)row["CreatedBy"],
-                Title = row["Title"] as string,
-                Title2 = row["Title2"] as string,
-                Title3 = row["Title3"] as string,
-                Location = row["Location"] as string,
-                StartDate = DateTimeFilter.UtcToLocal((DateTime)row["StartDate"]),
-                EndDate = DateTimeFilter.UtcToLocal((DateTime)row["EndDate"]),
-                Organizers = row["Organizers"] as string,
-                OnCampus = row["OnCampus"] as bool?,
-                WebSite = row["WebSite"] as string,
-                Notes = row["Notes"] as string
-            };
+                logs.Add(new ActivityLogModel()
+                {
+                    Id = (int)row["Id"],
+                    Created = DateTimeFilter.UtcToLocal((DateTime)row["Created"]),
+                    CreatedBy = (int)row["CreatedBy"],
+                    Title = row["Title"] as string,
+                    Title2 = row["Title2"] as string,
+                    Title3 = row["Title3"] as string,
+                    Location = row["Location"] as string,
+                    StartDate = DateTimeFilter.UtcToLocal((DateTime)row["StartDate"]),
+                    EndDate = DateTimeFilter.UtcToLocal((DateTime)row["EndDate"]),
+                    Organizers = row["Organizers"] as string,
+                    OnCampus = row["OnCampus"] as bool?,
+                    WebSite = row["WebSite"] as string,
+                    Notes = row["Notes"] as string
+                });
+            }
+
+            return logs;
         }
 
         public async Task<IEnumerable<ActivityLogModel>> GetAllActivities()
@@ -84,16 +91,12 @@ namespace Belletrix.DAL
                 FROM        [dbo].[ActivityLog]
                 ORDER BY    [CreatedBy] DESC";
 
-            ICollection<ActivityLogModel> activities = new List<ActivityLogModel>();
+            List<ActivityLogModel> activities = new List<ActivityLogModel>();
 
             try
             {
                 IEnumerable<dynamic> rows = await UnitOfWork.Context().QueryAsync<dynamic>(sql);
-
-                foreach (IReadOnlyDictionary<string, object> row in rows)
-                {
-                    activities.Add(ProcessRow(row));
-                }
+                activities = ProcessRows(rows).ToList();
             }
             catch (Exception e)
             {
@@ -129,7 +132,7 @@ namespace Belletrix.DAL
                 IEnumerable<dynamic> rows = await UnitOfWork.Context().QueryAsync<dynamic>(sql,
                     new { EventId = activityId });
 
-                foreach (IReadOnlyDictionary<string, object> row in rows)
+                foreach (IDictionary<string, object> row in rows)
                 {
                     types.Add((ActivityLogTypes)(int)row["TypeId"]);
                 }

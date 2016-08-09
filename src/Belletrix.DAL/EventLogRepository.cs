@@ -44,7 +44,7 @@ namespace Belletrix.DAL
             {
                 IEnumerable<dynamic> rows = await UnitOfWork.Context().QueryAsync<dynamic>(sql);
 
-                foreach (IReadOnlyDictionary<string, object> row in rows)
+                foreach (IDictionary<string, object> row in rows)
                 {
                     StudentModel student = null;
 
