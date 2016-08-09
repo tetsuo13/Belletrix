@@ -27,7 +27,7 @@ namespace Belletrix.Domain
 
         public async Task InsertNote(int userId, AddStudentNoteViewModel model)
         {
-            using (TransactionScope scope = new TransactionScope())
+            using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 await StudentNoteRepository.InsertNote(userId, model);
                 await EventLogRepository.AddStudentEvent(userId, model.StudentId, EventLogTypes.AddStudentNote);

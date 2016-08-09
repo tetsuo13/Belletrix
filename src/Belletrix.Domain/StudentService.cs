@@ -208,7 +208,7 @@ namespace Belletrix.Domain
 
         public async Task InsertStudent(StudentModel model, UserModel user)
         {
-            using (TransactionScope scope = new TransactionScope())
+            using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 int studentId = await StudentRepository.InsertStudent(model);
 
@@ -222,7 +222,7 @@ namespace Belletrix.Domain
 
         public async Task InsertStudent(StudentPromoModel model, int? userId, string promoCode)
         {
-            using (TransactionScope scope = new TransactionScope())
+            using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 int studentId = await StudentRepository.InsertStudent(model);
                 model.Id = studentId;
@@ -244,7 +244,7 @@ namespace Belletrix.Domain
 
         public async Task UpdateStudent(StudentModel model, UserModel user)
         {
-            using (TransactionScope scope = new TransactionScope())
+            using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 if (model.InitialMeeting.HasValue)
                 {

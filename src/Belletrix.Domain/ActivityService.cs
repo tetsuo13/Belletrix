@@ -258,7 +258,7 @@ namespace Belletrix.Domain
 
         public async Task InsertActivityBlock(HttpSessionStateBase session, ActivityLogCreateViewModel model)
         {
-            using (TransactionScope scope = new TransactionScope())
+            using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 int activityId = await InsertActivity(model, (session["User"] as UserModel).Id);
                 await AssociatePeopleWithActivity(session, activityId, model.SessionId);
@@ -270,7 +270,7 @@ namespace Belletrix.Domain
 
         public async Task UpdateActivityBlock(HttpSessionStateBase session, ActivityLogEditViewModel model)
         {
-            using (TransactionScope scope = new TransactionScope())
+            using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 await UpdateActivity(model);
                 await AssociatePeopleWithActivity(session, model.Id, model.SessionId);
