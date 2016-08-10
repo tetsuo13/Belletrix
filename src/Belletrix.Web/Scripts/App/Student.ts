@@ -1,6 +1,4 @@
-﻿/// <reference path="..\typings\jquery.dataTables\jquery.dataTables.d.ts" />
-
-module Belletrix {
+﻿module Belletrix {
     export class Student {
         private ajaxUrls = {
             nameCheck: ""

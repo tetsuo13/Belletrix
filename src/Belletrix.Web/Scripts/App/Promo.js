@@ -1,6 +1,5 @@
 /// <reference path="Common.ts" />
 /// <reference path="..\typings\jquery\jquery.d.ts" />
-/// <reference path="..\typings\jquery.dataTables\jquery.dataTables.d.ts" />
 'use strict';
 var Belletrix;
 (function (Belletrix) {
@@ -119,3 +118,4 @@ var Belletrix;
     }());
     Belletrix.Promo = Promo;
 })(Belletrix || (Belletrix = {}));
+//# sourceMappingURL=Promo.js.map

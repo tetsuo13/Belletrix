@@ -324,6 +324,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\App\ActivityLog.ts" />
     <TypeScriptCompile Include="Scripts\App\Common.ts" />
+    <TypeScriptCompile Include="Scripts\App\JQuery.DataTables.d.ts" />
     <TypeScriptCompile Include="Scripts\App\Promo.ts" />
     <TypeScriptCompile Include="Scripts\App\Student.ts" />
     <TypeScriptCompile Include="Scripts\App\StudentNote.ts" />
@@ -332,8 +333,6 @@
     <TypeScriptCompile Include="Scripts\typings\bootstrap.multiselect\bootstrap.multiselect.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap\bootstrap.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery-validation-unobtrusive\jquery-validation-unobtrusive.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jquery.dataTables\jquery.dataTables-1.9.4.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jquery.dataTables\jquery.dataTables.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.validation\jquery.validation.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
   </ItemGroup>

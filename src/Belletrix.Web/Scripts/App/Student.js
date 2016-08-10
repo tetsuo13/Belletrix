@@ -1,4 +1,3 @@
-/// <reference path="..\typings\jquery.dataTables\jquery.dataTables.d.ts" />
 var Belletrix;
 (function (Belletrix) {
     var Student = (function () {
@@ -200,3 +199,4 @@ var Belletrix;
     }());
     Belletrix.Student = Student;
 })(Belletrix || (Belletrix = {}));
+//# sourceMappingURL=Student.js.map
