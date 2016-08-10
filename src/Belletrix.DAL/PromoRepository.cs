@@ -1,10 +1,9 @@
 ﻿using Belletrix.Core;
 using Belletrix.Entity.Model;
+using Dapper;
 using StackExchange.Exceptional;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -22,7 +21,7 @@ namespace Belletrix.DAL
 
         public async Task<IEnumerable<PromoModel>> GetPromos()
         {
-            ICollection<PromoModel> promos = new List<PromoModel>();
+            List<PromoModel> promos = new List<PromoModel>();
             const string sql = @"
                 SELECT      p.Id AS PromoId, [Description], [CreatedBy], p.Created, [Code], p.Active,
                             u.FirstName, u.LastName,
@@ -34,31 +33,8 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
-
-                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            PromoModel promo = new PromoModel()
-                            {
-                                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("PromoId")),
-                                Description = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("Description")),
-                                Created = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("Created"))),
-                                Code = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("Code")),
-                                IsActive = await reader.GetFieldValueAsync<bool>(reader.GetOrdinal("Active")),
-                                CreatedById = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("CreatedBy")),
-                                CreatedByFirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("FirstName")),
-                                CreatedByLastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("LastName")),
-                                Stuents = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("NumStudents"))
-                            };
-
-                            promos.Add(promo);
-                        }
-                    }
-                }
+                promos = (await UnitOfWork.Context().QueryAsync<PromoModel>(sql)).ToList();
+                promos.ForEach(x => x.Created = DateTimeFilter.UtcToLocal(x.Created));
             }
             catch (Exception e)
             {
@@ -84,26 +60,20 @@ namespace Belletrix.DAL
             const string sql = @"
                 INSERT INTO [dbo].[UserPromo]
                 ([Description], [CreatedBy], [Created], [Code], [Active])
-                OUTPUT INSERTED.Id
                 VALUES
                 (@Description, @CreatedBy, @Created, @Code, @Active)";
 
-            DateTime created = DateTime.Now.ToUniversalTime();
-
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
-
-                    command.Parameters.Add("@Description", SqlDbType.VarChar, 256).Value = model.Description;
-                    command.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = userId;
-                    command.Parameters.Add("@Created", SqlDbType.DateTime).Value = created;
-                    command.Parameters.Add("@Code", SqlDbType.VarChar, 32).Value = model.Code.ToLower();
-                    command.Parameters.Add("@Active", SqlDbType.Bit).Value = true;
-
-                    await command.ExecuteNonQueryAsync();
-                }
+                await UnitOfWork.Context().ExecuteAsync(sql,
+                    new
+                    {
+                        Description = model.Description,
+                        CreatedBy = userId,
+                        Created = DateTime.Now.ToUniversalTime(),
+                        Code = model.Code.ToLower(),
+                        Active = true
+                    });
             }
             catch (Exception e)
             {
@@ -115,30 +85,19 @@ namespace Belletrix.DAL
 
         public async Task<bool> CheckNameForUniqueness(string name)
         {
-            bool result = false;
-
-            if (String.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(name))
             {
-                return result;
+                return false;
             }
 
             const string sql = @"
-                SELECT  [Id]
+                SELECT  COUNT([Id]) AS Count
                 FROM    [UserPromo]
                 WHERE   LOWER([Code]) = @Code";
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
-                    command.Parameters.Add("@Code", SqlDbType.VarChar, 32).Value = name.ToLower();
-
-                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
-                    {
-                        result = !reader.HasRows;
-                    }
-                }
+                return (await UnitOfWork.Context().ExecuteScalarAsync<int>(sql, new { Code = name.ToLower() })) > 0;
             }
             catch (Exception e)
             {
@@ -146,12 +105,11 @@ namespace Belletrix.DAL
                 ErrorStore.LogException(e, HttpContext.Current);
             }
 
-            return result;
+            return false;
         }
 
         public async Task<IEnumerable<PromoModel>> AsSources()
         {
-            ICollection<PromoModel> promos = new List<PromoModel>();
             const string sql = @"
                 SELECT      [Id], [Code], [Description]
                 FROM        [UserPromo]
@@ -159,23 +117,7 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
-
-                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            promos.Add(new PromoModel()
-                            {
-                                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
-                                Code = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("Code")),
-                                Description = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("Description"))
-                            });
-                        }
-                    }
-                }
+                return await UnitOfWork.Context().QueryAsync<PromoModel>(sql);
             }
             catch (Exception e)
             {
@@ -183,7 +125,7 @@ namespace Belletrix.DAL
                 ErrorStore.LogException(e, HttpContext.Current);
             }
 
-            return promos;
+            return new List<PromoModel>();
         }
     }
 }

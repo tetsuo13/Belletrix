@@ -1,12 +1,13 @@
-﻿using Belletrix.DAL;
+﻿using Belletrix.Core;
+using Belletrix.DAL;
 using Belletrix.Entity.Enum;
 using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace Belletrix.Domain
 {
@@ -207,46 +208,85 @@ namespace Belletrix.Domain
 
         public async Task InsertStudent(StudentModel model, UserModel user)
         {
-            int studentId = await StudentRepository.InsertStudent(model);
+            using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                int studentId = await StudentRepository.InsertStudent(model);
 
-            model.Id = studentId;
+                model.Id = studentId;
 
-            await EventLogRepository.AddStudentEvent(user.Id, studentId, EventLogTypes.AddStudent);
+                await EventLogRepository.AddStudentEvent(user.Id, studentId, EventLogTypes.AddStudent);
 
-            StudentRepository.SaveChanges();
-            EventLogRepository.SaveChanges();
+                scope.Complete();
+            }
         }
 
         public async Task InsertStudent(StudentPromoModel model, int? userId, string promoCode)
         {
-            int studentId = await StudentRepository.InsertStudent(model);
-            model.Id = studentId;
-
-            await StudentPromoRepository.Save(model.Id, promoCode);
-
-            if (userId.HasValue)
+            using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                await EventLogRepository.AddStudentEvent(userId.Value, model.Id, EventLogTypes.EditStudent);
-            }
-            else
-            {
-                await EventLogRepository.AddStudentEvent(model.Id, EventLogTypes.EditStudent);
-            }
+                int studentId = await StudentRepository.InsertStudent(model);
+                model.Id = studentId;
 
-            StudentRepository.SaveChanges();
-            StudentPromoRepository.SaveChanges();
-            EventLogRepository.SaveChanges();
+                await StudentPromoRepository.Save(model.Id, promoCode);
+
+                if (userId.HasValue)
+                {
+                    await EventLogRepository.AddStudentEvent(userId.Value, model.Id, EventLogTypes.EditStudent);
+                }
+                else
+                {
+                    await EventLogRepository.AddStudentEvent(model.Id, EventLogTypes.EditStudent);
+                }
+
+                scope.Complete();
+            }
         }
 
         public async Task UpdateStudent(StudentModel model, UserModel user)
         {
-            await StudentRepository.UpdateStudent(model);
-            await StudentPromoRepository.Save(model.Id, model.PromoIds);
-            await EventLogRepository.AddStudentEvent(user.Id, model.Id, EventLogTypes.EditStudent);
+            using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                if (model.InitialMeeting.HasValue)
+                {
+                    model.InitialMeeting = model.InitialMeeting.Value.ToUniversalTime();
+                }
 
-            StudentRepository.SaveChanges();
-            StudentPromoRepository.SaveChanges();
-            EventLogRepository.SaveChanges();
+                if (!string.IsNullOrEmpty(model.MiddleName))
+                {
+                    model.MiddleName = model.MiddleName.CapitalizeFirstLetter();
+                }
+
+                if (!string.IsNullOrEmpty(model.PhoneNumber))
+                {
+                    model.PhoneNumber = model.PhoneNumber.Trim();
+                }
+
+                if (!string.IsNullOrEmpty(model.StudentId))
+                {
+                    model.StudentId = model.StudentId.Trim();
+                }
+
+                if (model.DateOfBirth.HasValue)
+                {
+                    model.DateOfBirth = model.DateOfBirth.Value.ToUniversalTime();
+                }
+
+                if (!string.IsNullOrEmpty(model.CampusEmail))
+                {
+                    model.CampusEmail = model.CampusEmail.Trim();
+                }
+
+                if (!string.IsNullOrEmpty(model.AlternateEmail))
+                {
+                    model.AlternateEmail = model.AlternateEmail.Trim();
+                }
+
+                await StudentRepository.UpdateStudent(model);
+                await StudentPromoRepository.Save(model.Id, model.PromoIds);
+                await EventLogRepository.AddStudentEvent(user.Id, model.Id, EventLogTypes.EditStudent);
+
+                scope.Complete();
+            }
         }
     }
 }

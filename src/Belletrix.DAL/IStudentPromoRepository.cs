@@ -11,6 +11,5 @@ namespace Belletrix.DAL
         Task Save(int studentId, string promoCode);
         Task<IEnumerable<int>> GetPromoIdsForStudent(int studentId);
         Task<IEnumerable<StudentPromoLog>> GetLogsForPromo(int id);
-        void SaveChanges();
     }
 }

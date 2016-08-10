@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Data.SqlClient;
 
 namespace Belletrix.DAL
@@ -24,44 +25,23 @@ namespace Belletrix.DAL
     /// </remarks>
     public class UnitOfWork : IUnitOfWork
     {
-        private SqlConnection context;
-        private SqlTransaction transaction;
+        private IDbConnection context;
 
         public UnitOfWork(string connectionString)
         {
             context = new SqlConnection(connectionString);
             context.Open();
-            transaction = context.BeginTransaction();
         }
 
-        public SqlCommand CreateCommand()
+        public IDbConnection Context()
         {
-            SqlCommand command = context.CreateCommand();
-            command.Transaction = transaction;
-            return command;
-        }
-
-        public void SaveChanges()
-        {
-            if (transaction != null)
-            {
-                transaction.Commit();
-                transaction.Dispose();
-                transaction = null;
-            }
+            return context;
         }
 
         public void Dispose(bool disposing)
         {
             if (disposing)
             {
-                if (transaction != null)
-                {
-                    transaction.Rollback();
-                    transaction.Dispose();
-                    transaction = null;
-                }
-
                 if (context != null)
                 {
                     context.Close();

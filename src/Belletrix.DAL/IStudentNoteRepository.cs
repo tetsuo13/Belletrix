@@ -9,6 +9,5 @@ namespace Belletrix.DAL
     {
         Task<IEnumerable<NoteModel>> GetNotes(int studentId);
         Task InsertNote(int userId, AddStudentNoteViewModel model);
-        void SaveChanges();
     }
 }

@@ -9,6 +9,5 @@ namespace Belletrix.Domain
     {
         Task<IEnumerable<NoteModel>> GetAllNotes(int studentId);
         Task InsertNote(int userId, AddStudentNoteViewModel model);
-        void SaveChanges();
     }
 }
