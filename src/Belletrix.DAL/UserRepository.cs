@@ -1,12 +1,10 @@
 ﻿using Belletrix.Core;
 using Belletrix.Entity.Model;
+using Dapper;
 using StackExchange.Exceptional;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -21,7 +19,7 @@ namespace Belletrix.DAL
             UnitOfWork = unitOfWork;
         }
 
-        public void UpdateLastLogin(string username)
+        public async Task UpdateLastLogin(string username)
         {
             const string sql = @"
                 UPDATE  [dbo].[Users]
@@ -30,14 +28,12 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
-                    command.Parameters.Add("@LastLogin", SqlDbType.DateTime).Value = DateTime.Now.ToUniversalTime();
-                    command.Parameters.Add("@Username", SqlDbType.VarChar, 24).Value = username;
-
-                    command.ExecuteNonQuery();
-                }
+                await UnitOfWork.Context().ExecuteAsync(sql,
+                    new
+                    {
+                        LastLogin = DateTime.Now.ToUniversalTime(),
+                        Username = username
+                    });
             }
             catch (Exception e)
             {
@@ -49,12 +45,12 @@ namespace Belletrix.DAL
 
         public async Task<IEnumerable<UserModel>> GetUsers(string username = null)
         {
-            ICollection<UserModel> users = new List<UserModel>();
+            List<UserModel> users = new List<UserModel>();
 
             string sql = @"
                 SELECT  [Id], [FirstName], [LastName],
                         [Created], [LastLogin], [Email],
-                        [Admin], [Active], [Login],
+                        [Admin] AS IsAdmin, [Active] AS IsActive, [Login],
                         [PasswordIterations], [PasswordSalt], [PasswordHash],
                         [Password]
                 FROM    [dbo].[Users] ";
@@ -66,46 +62,18 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
+                if (username != null)
                 {
-                    command.CommandText = sql;
-
-                    if (username != null)
-                    {
-                        command.Parameters.Add("@Username", SqlDbType.VarChar, 24).Value = username;
-                    }
-
-                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            UserModel user = new UserModel()
-                            {
-                                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
-                                FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("FirstName")),
-                                LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("LastName")),
-                                Login = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("Login")),
-                                Created = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("Created"))),
-                                Email = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("Email")),
-                                IsAdmin = await reader.GetFieldValueAsync<bool>(reader.GetOrdinal("Admin")),
-                                IsActive = await reader.GetFieldValueAsync<bool>(reader.GetOrdinal("Active")),
-                                PasswordIterations = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("PasswordIterations")),
-                                PasswordSalt = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("PasswordSalt")),
-                                Password = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("PasswordHash")),
-                                PasswordHash = await reader.GetValueOrDefault<string>("Password")
-                            };
-
-                            int ord = reader.GetOrdinal("LastLogin");
-
-                            if (!reader.IsDBNull(ord))
-                            {
-                                user.LastLogin = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(ord));
-                            }
-
-                            users.Add(user);
-                        }
-                    }
+                    users = (await UnitOfWork.Context().QueryAsync<UserModel>(sql, new { Username = username })).ToList();
                 }
+                else
+                {
+                    users = (await UnitOfWork.Context().QueryAsync<UserModel>(sql)).ToList();
+                }
+
+                users.ForEach(x => DateTimeFilter.UtcToLocal(x.Created));
+
+                // TODO: LastLogin may need to be changed to a nullable type.
             }
             catch (Exception e)
             {
@@ -141,7 +109,7 @@ namespace Belletrix.DAL
             throw new Exception("User not found");
         }
 
-        public void Update(UserModel model)
+        public async Task Update(UserModel model)
         {
             const string sql = @"
                 UPDATE  [dbo].[Users]
@@ -158,19 +126,17 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql.ToString();
-                    command.Parameters.Add("@FirstName", SqlDbType.NVarChar, 64).Value = model.FirstName.Trim();
-                    command.Parameters.Add("@LastName", SqlDbType.NVarChar, 64).Value = model.LastName.Trim();
-                    command.Parameters.Add("@Email", SqlDbType.VarChar, 128).Value = model.Email.Trim();
-                    command.Parameters.Add("@Password", SqlDbType.VarChar).Value = model.PasswordHash;
-                    command.Parameters.Add("@Admin", SqlDbType.Bit).Value = model.IsAdmin;
-                    command.Parameters.Add("@Active", SqlDbType.Bit).Value = model.IsActive;
-                    command.Parameters.Add("@Id", SqlDbType.Int).Value = model.Id;
-
-                    command.ExecuteNonQuery();
-                }
+                await UnitOfWork.Context().ExecuteAsync(sql,
+                    new
+                    {
+                        FirstName = model.FirstName.Trim(),
+                        LastName = model.LastName.Trim(),
+                        Email = model.Email.Trim(),
+                        Password = model.PasswordHash,
+                        Admin = model.IsAdmin,
+                        Active = model.IsActive,
+                        Id = model.Id
+                    });
             }
             catch (Exception e)
             {
@@ -180,7 +146,7 @@ namespace Belletrix.DAL
             }
         }
 
-        public void InsertUser(UserModel model)
+        public async Task InsertUser(UserModel model)
         {
             const string sql = @"
                 INSERT INTO [dbo].[Users]
@@ -198,21 +164,18 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
-
-                    command.Parameters.Add("@FirstName", SqlDbType.NVarChar, 64).Value = model.FirstName.Trim();
-                    command.Parameters.Add("@LastName", SqlDbType.NVarChar, 64).Value = model.LastName.Trim();
-                    command.Parameters.Add("@Login", SqlDbType.VarChar, 24).Value = model.Login.Trim();
-                    command.Parameters.Add("@Created", SqlDbType.DateTime).Value = DateTime.Now.ToUniversalTime();
-                    command.Parameters.Add("@Email", SqlDbType.VarChar, 128).Value = model.Email.Trim();
-                    command.Parameters.Add("@Admin", SqlDbType.Bit).Value = model.IsAdmin;
-                    command.Parameters.Add("@Active", SqlDbType.Bit).Value = model.IsActive;
-                    command.Parameters.Add("@Password", SqlDbType.VarChar).Value = model.PasswordHash;
-
-                    command.ExecuteNonQuery();
-                }
+                await UnitOfWork.Context().ExecuteAsync(sql,
+                    new
+                    {
+                        FirstName = model.FirstName.Trim(),
+                        LastName = model.LastName.Trim(),
+                        Login = model.Login.Trim(),
+                        Created = DateTime.Now.ToUniversalTime(),
+                        Email = model.Email.Trim().ToLower(),
+                        Admin = model.IsAdmin,
+                        Active = model.IsActive,
+                        Password = model.PasswordHash
+                    });
             }
             catch (Exception e)
             {
@@ -220,11 +183,6 @@ namespace Belletrix.DAL
                 ErrorStore.LogException(e, HttpContext.Current);
                 throw;
             }
-        }
-
-        public void SaveChanges()
-        {
-            UnitOfWork.SaveChanges();
         }
     }
 }

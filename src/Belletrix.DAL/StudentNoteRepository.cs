@@ -1,11 +1,11 @@
 ﻿using Belletrix.Core;
 using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
+using Dapper;
 using StackExchange.Exceptional;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -23,7 +23,7 @@ namespace Belletrix.DAL
         public async Task<IEnumerable<NoteModel>> GetNotes(int studentId)
         {
             const string sql = @"
-                SELECT      n.Id, u.Id, u.FirstName,
+                SELECT      n.Id AS StudentId, u.Id AS Id, u.FirstName,
                             u.LastName, [EntryDate], [Note],
                             u.Id AS UserId
                 FROM        [dbo].[StudentNotes] n
@@ -32,34 +32,12 @@ namespace Belletrix.DAL
                 WHERE       n.StudentId = @StudentId
                 ORDER BY    [EntryDate] DESC";
 
-            ICollection<NoteModel> notes = new List<NoteModel>();
+            List<NoteModel> notes = new List<NoteModel>();
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
-                    command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId;
-
-                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            NoteModel note = new NoteModel()
-                            {
-                                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
-                                StudentId = studentId,
-                                EntryDate = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("EntryDate"))),
-                                Note = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("Note")),
-                                CreatedById = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("UserId")),
-                                CreatedByFirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("FirstName")),
-                                CreatedByLastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("LastName"))
-                            };
-
-                            notes.Add(note);
-                        }
-                    }
-                }
+                notes = (await UnitOfWork.Context().QueryAsync<NoteModel>(sql, new { StudentId = studentId })).ToList();
+                notes.ForEach(x => DateTimeFilter.UtcToLocal(x.EntryDate));
             }
             catch (Exception e)
             {
@@ -80,17 +58,14 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
-
-                    command.Parameters.Add("@StudentId", SqlDbType.Int).Value = model.StudentId;
-                    command.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = userId;
-                    command.Parameters.Add("@EntryDate", SqlDbType.DateTime).Value = DateTime.Now.ToUniversalTime();
-                    command.Parameters.Add("@Note", SqlDbType.NVarChar).Value = model.Note.Trim();
-
-                    await command.ExecuteNonQueryAsync();
-                }
+                await UnitOfWork.Context().ExecuteAsync(sql,
+                    new
+                    {
+                        StudentId = model.StudentId,
+                        CreatedBy = userId,
+                        EntryDate = DateTime.Now.ToUniversalTime(),
+                        Note = model.Note.Trim()
+                    });
             }
             catch (Exception e)
             {
@@ -98,11 +73,6 @@ namespace Belletrix.DAL
                 ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
-        }
-
-        public void SaveChanges()
-        {
-            UnitOfWork.SaveChanges();
         }
     }
 }

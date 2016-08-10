@@ -19,7 +19,6 @@ namespace Belletrix.Domain
         Task<int> InsertActivity(ActivityLogCreateViewModel createModel, int userId);
         Task UpdateActivity(ActivityLogEditViewModel saveModel);
 
-        void SaveChanges();
         Task PopulateSession(HttpSessionStateBase session, Guid sessionId, int activityId);
 
         IEnumerable<ActivityLogParticipantModel> ParticipantsInSession(HttpSessionStateBase session, Guid sessionId);
@@ -35,6 +34,9 @@ namespace Belletrix.Domain
 
         Task<int> CreatePerson(ActivityLogPersonCreateViewModel createModel);
         Task<IEnumerable<ActivityLogPersonModel>> FindAllPeople();
+
+        Task InsertActivityBlock(HttpSessionStateBase session, ActivityLogCreateViewModel model);
+        Task UpdateActivityBlock(HttpSessionStateBase session, ActivityLogEditViewModel model);
 
         /// <summary>
         /// Find an existing person by their unique ID.

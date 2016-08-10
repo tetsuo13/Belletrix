@@ -1,11 +1,10 @@
 ﻿using Belletrix.Core;
 using Belletrix.Entity.Enum;
 using Belletrix.Entity.Model;
+using Dapper;
 using StackExchange.Exceptional;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -35,19 +34,10 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
-                    command.Parameters.Add("@Id", SqlDbType.Int).Value = id;
+                IEnumerable<dynamic> rows = await UnitOfWork.Context().QueryAsync<dynamic>(sql,
+                    new { Id = id });
 
-                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            activity = await ProcessRow(reader);
-                        }
-                    }
-                }
+                activity = ProcessRows(rows).SingleOrDefault();
             }
             catch (Exception e)
             {
@@ -64,24 +54,31 @@ namespace Belletrix.DAL
             return activity;
         }
 
-        private async Task<ActivityLogModel> ProcessRow(SqlDataReader reader)
+        private IEnumerable<ActivityLogModel> ProcessRows(IEnumerable<dynamic> rows)
         {
-            return new ActivityLogModel()
+            ICollection<ActivityLogModel> logs = new List<ActivityLogModel>();
+
+            foreach (IDictionary<string, object> row in rows)
             {
-                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
-                Created = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("Created"))),
-                CreatedBy = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("CreatedBy")),
-                Title = await reader.GetValueOrDefault<string>("Title"),
-                Title2 = await reader.GetValueOrDefault<string>("Title2"),
-                Title3 = await reader.GetValueOrDefault<string>("Title3"),
-                Location = await reader.GetValueOrDefault<string>("Location"),
-                StartDate = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("StartDate"))),
-                EndDate = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("EndDate"))),
-                Organizers = await reader.GetValueOrDefault<string>("Organizers"),
-                OnCampus = await reader.GetValueOrDefault<bool?>("OnCampus"),
-                WebSite = await reader.GetValueOrDefault<string>("WebSite"),
-                Notes = await reader.GetValueOrDefault<string>("Notes")
-            };
+                logs.Add(new ActivityLogModel()
+                {
+                    Id = (int)row["Id"],
+                    Created = DateTimeFilter.UtcToLocal((DateTime)row["Created"]),
+                    CreatedBy = (int)row["CreatedBy"],
+                    Title = row["Title"] as string,
+                    Title2 = row["Title2"] as string,
+                    Title3 = row["Title3"] as string,
+                    Location = row["Location"] as string,
+                    StartDate = DateTimeFilter.UtcToLocal((DateTime)row["StartDate"]),
+                    EndDate = DateTimeFilter.UtcToLocal((DateTime)row["EndDate"]),
+                    Organizers = row["Organizers"] as string,
+                    OnCampus = row["OnCampus"] as bool?,
+                    WebSite = row["WebSite"] as string,
+                    Notes = row["Notes"] as string
+                });
+            }
+
+            return logs;
         }
 
         public async Task<IEnumerable<ActivityLogModel>> GetAllActivities()
@@ -94,22 +91,12 @@ namespace Belletrix.DAL
                 FROM        [dbo].[ActivityLog]
                 ORDER BY    [CreatedBy] DESC";
 
-            ICollection<ActivityLogModel> activities = new List<ActivityLogModel>();
+            List<ActivityLogModel> activities = new List<ActivityLogModel>();
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
-
-                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            activities.Add(await ProcessRow(reader));
-                        }
-                    }
-                }
+                IEnumerable<dynamic> rows = await UnitOfWork.Context().QueryAsync<dynamic>(sql);
+                activities = ProcessRows(rows).ToList();
             }
             catch (Exception e)
             {
@@ -138,22 +125,16 @@ namespace Belletrix.DAL
                 FROM    [dbo].[ActivityLogTypes]
                 WHERE   [EventId] = @EventId";
 
-            ICollection<int> types = new List<int>();
+            ICollection<ActivityLogTypes> types = new List<ActivityLogTypes>();
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
-                    command.Parameters.Add("@EventId", SqlDbType.Int).Value = activityId;
+                IEnumerable<dynamic> rows = await UnitOfWork.Context().QueryAsync<dynamic>(sql,
+                    new { EventId = activityId });
 
-                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            types.Add(await reader.GetFieldValueAsync<int>(reader.GetOrdinal("TypeId")));
-                        }
-                    }
+                foreach (IDictionary<string, object> row in rows)
+                {
+                    types.Add((ActivityLogTypes)(int)row["TypeId"]);
                 }
             }
             catch (Exception e)
@@ -163,7 +144,8 @@ namespace Belletrix.DAL
                 throw e;
             }
 
-            return types.Cast<ActivityLogTypes>().ToArray();
+            // TODO: Can we refactor this to return an ICollection or something rather than an array?
+            return types.ToArray();
         }
 
         /// <summary>
@@ -182,12 +164,7 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = deleteSql;
-                    command.Parameters.Add("@EventId", SqlDbType.Int).Value = activityId;
-                    await command.ExecuteNonQueryAsync();
-                }
+                await UnitOfWork.Context().ExecuteAsync(deleteSql, new { EventId = activityId });
             }
             catch (Exception e)
             {
@@ -204,17 +181,14 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
+                foreach (int typeId in types)
                 {
-                    command.CommandText = insertSql;
-                    command.Parameters.Add("@EventId", SqlDbType.Int).Value = activityId;
-                    command.Parameters.Add("@TypeId", SqlDbType.Int);
-
-                    foreach (int type in types)
-                    {
-                        command.Parameters["@TypeId"].Value = type;
-                        await command.ExecuteNonQueryAsync();
-                    }
+                    await UnitOfWork.Context().ExecuteAsync(insertSql,
+                        new
+                        {
+                            EventId = activityId,
+                            TypeId = typeId
+                        });
                 }
             }
             catch (Exception e)
@@ -242,29 +216,14 @@ namespace Belletrix.DAL
                     @WebSite, @Notes, @Created, @CreatedBy
                 )";
 
-            int id;
-
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
+                model.StartDate = model.StartDate.ToUniversalTime();
+                model.EndDate = model.EndDate.ToUniversalTime();
+                model.Created = DateTime.Now.ToUniversalTime();
+                model.CreatedBy = userId;
 
-                    command.Parameters.Add("@Title", SqlDbType.VarChar, 256).Value = model.Title;
-                    command.Parameters.Add("@Title2", SqlDbType.VarChar, 256).Value = !String.IsNullOrEmpty(model.Title2) ? (object)model.Title2 : DBNull.Value;
-                    command.Parameters.Add("@Title3", SqlDbType.VarChar, 256).Value = !String.IsNullOrEmpty(model.Title3) ? (object)model.Title3 : DBNull.Value;
-                    command.Parameters.Add("@Organizers", SqlDbType.VarChar, 256).Value = !String.IsNullOrEmpty(model.Organizers) ? (object)model.Organizers : DBNull.Value;
-                    command.Parameters.Add("@Location", SqlDbType.VarChar, 512).Value = !String.IsNullOrEmpty(model.Location) ? (object)model.Location : DBNull.Value;
-                    command.Parameters.Add("@StartDate", SqlDbType.Date).Value = model.StartDate.ToUniversalTime();
-                    command.Parameters.Add("@EndDate", SqlDbType.Date).Value = model.EndDate.ToUniversalTime();
-                    command.Parameters.Add("@OnCampus", SqlDbType.Bit).Value = model.OnCampus.HasValue ? (object)model.OnCampus.Value : DBNull.Value;
-                    command.Parameters.Add("@WebSite", SqlDbType.VarChar, 2048).Value = !String.IsNullOrEmpty(model.WebSite) ? (object)model.WebSite : DBNull.Value;
-                    command.Parameters.Add("@Notes", SqlDbType.VarChar, 4096).Value = !String.IsNullOrEmpty(model.Notes) ? (object)model.Notes : DBNull.Value;
-                    command.Parameters.Add("@Created", SqlDbType.DateTime).Value = DateTime.Now.ToUniversalTime();
-                    command.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = userId;
-
-                    id = (int)await command.ExecuteScalarAsync();
-                }
+                return await UnitOfWork.Context().ExecuteAsync(sql, model);
             }
             catch (Exception e)
             {
@@ -272,8 +231,6 @@ namespace Belletrix.DAL
                 ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
-
-            return id;
         }
 
         public async Task UpdateActivity(ActivityLogModel model)
@@ -294,24 +251,10 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql;
+                model.StartDate = model.StartDate.ToUniversalTime();
+                model.EndDate = model.EndDate.ToUniversalTime();
 
-                    command.Parameters.Add("@Title", SqlDbType.VarChar, 256).Value = model.Title;
-                    command.Parameters.Add("@Title2", SqlDbType.VarChar, 256).Value = !String.IsNullOrEmpty(model.Title2) ? (object)model.Title2 : DBNull.Value;
-                    command.Parameters.Add("@Title3", SqlDbType.VarChar, 256).Value = !String.IsNullOrEmpty(model.Title3) ? (object)model.Title3 : DBNull.Value;
-                    command.Parameters.Add("@Organizers", SqlDbType.VarChar, 256).Value = !String.IsNullOrEmpty(model.Organizers) ? (object)model.Organizers : DBNull.Value;
-                    command.Parameters.Add("@Location", SqlDbType.VarChar, 512).Value = !String.IsNullOrEmpty(model.Location) ? (object)model.Location : DBNull.Value;
-                    command.Parameters.Add("@StartDate", SqlDbType.Date).Value = model.StartDate.ToUniversalTime();
-                    command.Parameters.Add("@EndDate", SqlDbType.Date).Value = model.EndDate.ToUniversalTime();
-                    command.Parameters.Add("@OnCampus", SqlDbType.Bit).Value = model.OnCampus.HasValue ? (object)model.OnCampus.Value : DBNull.Value;
-                    command.Parameters.Add("@WebSite", SqlDbType.VarChar, 2048).Value = !String.IsNullOrEmpty(model.WebSite) ? (object)model.WebSite : DBNull.Value;
-                    command.Parameters.Add("@Notes", SqlDbType.VarChar, 4096).Value = !String.IsNullOrEmpty(model.Notes) ? (object)model.Notes : DBNull.Value;
-                    command.Parameters.Add("@Id", SqlDbType.Int).Value = model.Id;
-
-                    await command.ExecuteNonQueryAsync();
-                }
+                await UnitOfWork.Context().ExecuteAsync(sql, model);
             }
             catch (Exception e)
             {
@@ -319,11 +262,6 @@ namespace Belletrix.DAL
                 ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
-        }
-
-        public void SaveChanges()
-        {
-            UnitOfWork.SaveChanges();
         }
     }
 }

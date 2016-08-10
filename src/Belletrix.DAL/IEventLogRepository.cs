@@ -10,6 +10,5 @@ namespace Belletrix.DAL
         Task<IEnumerable<EventLogModel>> GetEvents();
         Task AddStudentEvent(int studentId, EventLogTypes eventType);
         Task AddStudentEvent(int modifiedBy, int studentId, EventLogTypes eventType);
-        void SaveChanges();
     }
 }

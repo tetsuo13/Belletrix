@@ -76,14 +76,7 @@ namespace Belletrix.Web.Controllers
             {
                 try
                 {
-                    int activityId = await ActivityService.InsertActivity(model, (Session["User"] as UserModel).Id);
-
-                    await ActivityService.AssociatePeopleWithActivity(Session, activityId, model.SessionId);
-
-                    ActivityService.ClearSession(Session, model.SessionId);
-
-                    ActivityService.SaveChanges();
-
+                    await ActivityService.InsertActivityBlock(Session, model);
                     return RedirectToAction("List");
                 }
                 catch (Exception e)
@@ -125,14 +118,7 @@ namespace Belletrix.Web.Controllers
             {
                 try
                 {
-                    await ActivityService.UpdateActivity(model);
-
-                    await ActivityService.AssociatePeopleWithActivity(Session, model.Id, model.SessionId);
-
-                    ActivityService.ClearSession(Session, model.SessionId);
-
-                    ActivityService.SaveChanges();
-
+                    await ActivityService.UpdateActivityBlock(Session, model);
                     return RedirectToAction("List");
                 }
                 catch (Exception e)
