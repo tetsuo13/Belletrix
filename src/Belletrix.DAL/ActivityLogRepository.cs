@@ -181,12 +181,15 @@ namespace Belletrix.DAL
 
             try
             {
-                await UnitOfWork.Context().ExecuteAsync(insertSql,
-                    new
-                    {
-                        EventId = activityId,
-                        TypeId = types
-                    });
+                foreach (int typeId in types)
+                {
+                    await UnitOfWork.Context().ExecuteAsync(insertSql,
+                        new
+                        {
+                            EventId = activityId,
+                            TypeId = typeId
+                        });
+                }
             }
             catch (Exception e)
             {

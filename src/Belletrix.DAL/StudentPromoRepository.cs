@@ -53,13 +53,16 @@ namespace Belletrix.DAL
                 {
                     DateTime created = DateTime.Now.ToUniversalTime();
 
-                    await UnitOfWork.Context().ExecuteAsync(sql,
-                        new
-                        {
-                            PromoId = promoIds,
-                            StudentId = studentId,
-                            Created = created
-                        });
+                    foreach (int promoId in promoIds)
+                    {
+                        await UnitOfWork.Context().ExecuteAsync(sql,
+                            new
+                            {
+                                PromoId = promoId,
+                                StudentId = studentId,
+                                Created = created
+                            });
+                    }
                 }
                 catch (Exception e)
                 {

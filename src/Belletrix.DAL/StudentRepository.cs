@@ -554,12 +554,15 @@ namespace Belletrix.DAL
 
                 try
                 {
-                    await UnitOfWork.Context().ExecuteAsync(insertSql,
-                        new
-                        {
-                            StudentId = studentId,
-                            LanguageId = languages
-                        });
+                    foreach (int languageId in languages)
+                    {
+                        await UnitOfWork.Context().ExecuteAsync(insertSql,
+                            new
+                            {
+                                StudentId = studentId,
+                                LanguageId = languageId
+                            });
+                    }
                 }
                 catch (Exception e)
                 {
@@ -617,14 +620,17 @@ namespace Belletrix.DAL
 
             try
             {
-                await UnitOfWork.Context().ExecuteAsync(insertSql,
-                    new
-                    {
-                        StudentId = studentId,
-                        CountryId = countries,
-                        Year = years,
-                        Period = periods
-                    });
+                for (int i = 0; i < countries.Count(); i++)
+                {
+                    await UnitOfWork.Context().ExecuteAsync(insertSql,
+                        new
+                        {
+                            StudentId = studentId,
+                            CountryId = countries.ElementAt(i),
+                            Year = years.ElementAt(i),
+                            Period = periods.ElementAt(i)
+                        });
+                }
             }
             catch (Exception e)
             {
@@ -667,13 +673,16 @@ namespace Belletrix.DAL
 
                 try
                 {
-                    await UnitOfWork.Context().ExecuteAsync(insertSql,
-                        new
-                        {
-                            StudentId = studentId,
-                            MajorId = majors,
-                            IsMajor = isMajor
-                        });
+                    foreach (int majorId in majors)
+                    {
+                        await UnitOfWork.Context().ExecuteAsync(insertSql,
+                            new
+                            {
+                                StudentId = studentId,
+                                MajorId = majorId,
+                                IsMajor = isMajor
+                            });
+                    }
                 }
                 catch (Exception e)
                 {

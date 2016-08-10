@@ -197,12 +197,15 @@ namespace Belletrix.DAL
 
                     try
                     {
-                        await UnitOfWork.Context().ExecuteAsync(insertSql,
-                            new
-                            {
-                                StudyAbroadId = studyAbroadId,
-                                ProgramTypeId = model.ProgramTypes
-                            });
+                        foreach (int programTypeId in model.ProgramTypes)
+                        {
+                            await UnitOfWork.Context().ExecuteAsync(insertSql,
+                                new
+                                {
+                                    StudyAbroadId = studyAbroadId,
+                                    ProgramTypeId = programTypeId
+                                });
+                        }
                     }
                     catch (Exception e)
                     {
