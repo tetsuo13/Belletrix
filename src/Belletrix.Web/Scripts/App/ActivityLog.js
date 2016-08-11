@@ -27,6 +27,7 @@ var Belletrix;
             this._sessionId = "";
             this._removeExistingPersonIdUrl = removePersonIdUrl;
             this._sessionId = sessionId;
+            var self = this;
             Belletrix.Common.handleMvcEditor();
             $("#StartDate, #EndDate").datepicker();
             Belletrix.Common.initMultiselect(1);
@@ -41,8 +42,8 @@ var Belletrix;
                             title: "Create New Person"
                         });
                         addPersonModal.on('shown.bs.modal', function () {
-                            this.bindParticipantForm(addPersonModal);
-                            this.bindExistingParticipantForm(addPersonModal, addPersonIdUrl);
+                            self.bindParticipantForm(addPersonModal);
+                            self.bindExistingParticipantForm(addPersonModal, addPersonIdUrl);
                             $("#FullName").focus();
                         });
                     }
@@ -62,6 +63,7 @@ var Belletrix;
                 cache: false
             });
             if (populateSessionUrl) {
+                var self_1 = this;
                 // TODO: Could these actions someday be consolidated into one server-side action perhaps? Hmmm...
                 // Get the server-side to populate session.
                 $.ajax({
@@ -76,7 +78,7 @@ var Belletrix;
                             cache: false,
                             success: function (data, textStatus, jqXHR) {
                                 $.each(data, function (index, value) {
-                                    this.addParticipantRow(value.Person.FullName, value.Person.Id);
+                                    self_1.addParticipantRow(value.Person.FullName, value.Person.Id);
                                 });
                             }
                         });
@@ -101,6 +103,7 @@ var Belletrix;
             // The modal dialog will only show the existing people fields if
             // there are existing people to begin with.
             if (personSelect.length) {
+                var self_2 = this;
                 submitButton.click(function (event) {
                     event.preventDefault();
                     $.ajax({
@@ -109,7 +112,7 @@ var Belletrix;
                         data: {
                             id: personSelect.val(),
                             type: typeSelect.val(),
-                            sessionId: this._sessionId
+                            sessionId: self_2._sessionId
                         },
                         success: function (result) {
                             if (!result.hasOwnProperty("Success") ||
@@ -117,7 +120,7 @@ var Belletrix;
                                 Belletrix.Common.errorMessage("Unexpected result. Try again?\n" + result);
                             }
                             else if (result.Success === true) {
-                                this.addParticipantRow($("option:selected", personSelect).text(), personSelect.val());
+                                self_2.addParticipantRow($("option:selected", personSelect).text(), personSelect.val());
                                 modalDialog.modal("hide");
                             }
                             else {
@@ -141,6 +144,7 @@ var Belletrix;
          * @param modalDialog Modal dialog.
          */
         ActivityLog.prototype.bindParticipantForm = function (modalDialog) {
+            var self = this;
             var modalDialogForm = $("form", modalDialog);
             $.validator.unobtrusive.parse(modalDialogForm);
             modalDialogForm.submit(function (event) {
@@ -156,7 +160,7 @@ var Belletrix;
                             Belletrix.Common.errorMessage("Unexpected result. Try again?\n" + result);
                         }
                         else if (result.Success === true) {
-                            this.addParticipantRow($("#FullName", modalDialogForm).val(), result.Id);
+                            self.addParticipantRow($("#FullName", modalDialogForm).val(), result.Id);
                             modalDialog.modal("hide");
                         }
                         else {
@@ -177,12 +181,13 @@ var Belletrix;
          * @param id Participant ID.
          */
         ActivityLog.prototype.deleteParticipant = function (id) {
+            var self = this;
             $.ajax({
-                url: this._removeExistingPersonIdUrl,
+                url: self._removeExistingPersonIdUrl,
                 type: "DELETE",
                 data: {
                     id: id,
-                    sessionId: this._sessionId
+                    sessionId: self._sessionId
                 },
                 success: function (result) {
                     if (!result.hasOwnProperty("Success") ||
@@ -206,13 +211,14 @@ var Belletrix;
          * @param id Internal unique identifier.
          */
         ActivityLog.prototype.addParticipantRow = function (fullName, id) {
+            var _this = this;
             var row = $('<div class="row" id="participant-' + id + '"></div>');
             var deleteIcon = $('<a href="" class="btn btn-xs btn-danger pull-right" title="Remove"></a>');
             var actionColumn;
             deleteIcon.append('<i class="glyphicon glyphicon-remove"></i>');
             deleteIcon.click(function (event) {
                 event.preventDefault();
-                this.deleteParticipant(id);
+                _this.deleteParticipant(id);
             });
             row.append('<div class="col-lg-10"><div class="form-group">' + fullName + '</div></div>');
             actionColumn = $('<div class="form-group"></div>')
@@ -226,4 +232,3 @@ var Belletrix;
     }());
     Belletrix.ActivityLog = ActivityLog;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=ActivityLog.js.map

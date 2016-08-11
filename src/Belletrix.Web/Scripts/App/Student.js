@@ -11,13 +11,14 @@ var Belletrix;
          * @param nameCheckUrl URL for unique name check.
          */
         Student.prototype.initStudentAddEdit = function (nameCheckUrl) {
+            var _this = this;
             this.ajaxUrls.nameCheck = nameCheckUrl;
             Belletrix.Common.initMultiselect(1);
             Belletrix.Common.handleMvcEditor();
             $("#DateOfBirth, #InitialMeeting").datepicker();
             $("a#studyAbroadDestinations").click(function (e) {
                 e.preventDefault();
-                this.addStudyAbroadRows();
+                _this.addStudyAbroadRows();
             });
             this.prepareForm();
         };
@@ -35,6 +36,7 @@ var Belletrix;
          * enter that information first.
          */
         Student.prototype.prepareForm = function () {
+            var _this = this;
             // https://stackoverflow.com/a/1909508
             var delay = (function () {
                 var timer = 0;
@@ -47,7 +49,7 @@ var Belletrix;
             $("#FirstName, #LastName").prop("disabled", false);
             $("#FirstName, #LastName").keyup(function () {
                 delay(function () {
-                    this.checkNameUniqueness($("#FirstName").val(), $("#LastName").val());
+                    _this.checkNameUniqueness($("#FirstName").val(), $("#LastName").val());
                 }, 500);
             });
         };
@@ -62,6 +64,7 @@ var Belletrix;
             if (firstName.length == 0 || lastName.length == 0) {
                 return;
             }
+            var self = this;
             $.ajax({
                 url: this.ajaxUrls.nameCheck,
                 data: {
@@ -73,13 +76,13 @@ var Belletrix;
                 success: function (result) {
                     var uniqueNameContainer = $("#unique-name").empty();
                     if (result.trim().length > 0) {
-                        this.toggleAllFormFields(true);
+                        self.toggleAllFormFields(true);
                         $("#FirstName, #LastName").prop("disabled", false);
-                        this.uniqueNameContainer.html(result);
+                        uniqueNameContainer.html(result);
                     }
                     else {
                         // No duplicates found. Enable all form fields and move on.
-                        this.toggleAllFormFields(false);
+                        self.toggleAllFormFields(false);
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -93,20 +96,8 @@ var Belletrix;
          * Initialize the student list page.
          */
         Student.prototype.initStudentList = function () {
-            /*$("#studentlist").dataTable({
-                orderClasses: false,
-                columnDefs: [{
-                    targets: -1,
-                    orderable: false
-                }]
-            });*/
-            //$("#studentlist").dataTable({
-            //    aoColumnDefs: [{
-            //        aTargets: -1,
-            //        bSortable: false
-            //    }]
-            //});
             $('#studentlist').DataTable({
+                orderClasses: false,
                 columnDefs: [{
                         targets: -1,
                         orderable: false
@@ -199,4 +190,3 @@ var Belletrix;
     }());
     Belletrix.Student = Student;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=Student.js.map

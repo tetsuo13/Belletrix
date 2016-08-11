@@ -3,6 +3,7 @@ var Belletrix;
 (function (Belletrix) {
     var StudentNote = (function () {
         function StudentNote() {
+            var self = this;
             $("a.studentnote").click(function (e) {
                 var anchor = $(this);
                 var studentFullName = anchor.attr("data-bt-studentname");
@@ -21,7 +22,7 @@ var Belletrix;
                             $("#newnotebutton").click(function () {
                                 $("#newnote").submit();
                             });
-                            this.handleNewNote("#newnote", "textarea#Note");
+                            self.handleNewNote("#newnote", "textarea#Note");
                             Belletrix.Common.singleSubmit();
                         });
                     }
@@ -54,4 +55,3 @@ var Belletrix;
     }());
     Belletrix.StudentNote = StudentNote;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=StudentNote.js.map

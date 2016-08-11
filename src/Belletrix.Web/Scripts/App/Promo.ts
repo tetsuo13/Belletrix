@@ -12,6 +12,8 @@ module Belletrix {
          * @param resultImageSelector Selector for inline image for results.
          */
         constructor(uniqueNameCheckUrl: string, nameSelector: string, resultImageSelector: string) {
+            let self = this;
+
             $(resultImageSelector).hide();
 
             // Add a delay when checking the name to give the user a chance to
@@ -25,7 +27,7 @@ module Belletrix {
                     clearTimeout(element.data("timeout"));
 
                     element.data("timeout", setTimeout(function (): void {
-                        this.checkNameForUniqueness(uniqueNameCheckUrl, nameSelector, resultImageSelector);
+                        self.checkNameForUniqueness(uniqueNameCheckUrl, nameSelector, resultImageSelector);
                     }, 500));
                 });
         }
@@ -77,7 +79,7 @@ module Belletrix {
             Belletrix.Common.handleMvcEditor();
             $("#DateOfBirth").datepicker();
 
-            $("a#studyAbroadDestinations").click(function (e) {
+            $("a#studyAbroadDestinations").click((e): void => {
                 e.preventDefault();
                 this.addStudyAbroadRows();
             })

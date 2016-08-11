@@ -11,6 +11,7 @@ var Belletrix;
          * @param resultImageSelector Selector for inline image for results.
          */
         function Promo(uniqueNameCheckUrl, nameSelector, resultImageSelector) {
+            var self = this;
             $(resultImageSelector).hide();
             // Add a delay when checking the name to give the user a chance to
             // complete their typing. Otherwise, a straight "onkeyup" event would
@@ -21,7 +22,7 @@ var Belletrix;
                 var element = $(this);
                 clearTimeout(element.data("timeout"));
                 element.data("timeout", setTimeout(function () {
-                    this.checkNameForUniqueness(uniqueNameCheckUrl, nameSelector, resultImageSelector);
+                    self.checkNameForUniqueness(uniqueNameCheckUrl, nameSelector, resultImageSelector);
                 }, 500));
             });
         }
@@ -62,13 +63,14 @@ var Belletrix;
          * @param pingerUrl
          */
         Promo.prototype.initForm = function (pingerUrl) {
+            var _this = this;
             Belletrix.Common.initPinger(pingerUrl);
             Belletrix.Common.initMultiselect(0, 300);
             Belletrix.Common.handleMvcEditor();
             $("#DateOfBirth").datepicker();
             $("a#studyAbroadDestinations").click(function (e) {
                 e.preventDefault();
-                this.addStudyAbroadRows();
+                _this.addStudyAbroadRows();
             });
         };
         ;
@@ -118,4 +120,3 @@ var Belletrix;
     }());
     Belletrix.Promo = Promo;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=Promo.js.map

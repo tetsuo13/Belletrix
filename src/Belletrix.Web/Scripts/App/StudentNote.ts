@@ -3,6 +3,8 @@
 module Belletrix {
     export class StudentNote {
         constructor() {
+            let self = this;
+
             $("a.studentnote").click(function (e) {
                 let anchor: JQuery = $(this);
                 let studentFullName: string = anchor.attr("data-bt-studentname");
@@ -25,7 +27,7 @@ module Belletrix {
                                 $("#newnote").submit();
                             });
 
-                            this.handleNewNote("#newnote", "textarea#Note");
+                            self.handleNewNote("#newnote", "textarea#Note");
                             Belletrix.Common.singleSubmit();
                         });
                     }

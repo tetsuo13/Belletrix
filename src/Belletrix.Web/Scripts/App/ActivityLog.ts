@@ -34,6 +34,8 @@
             this._removeExistingPersonIdUrl = removePersonIdUrl;
             this._sessionId = sessionId;
 
+            let self = this;
+
             Belletrix.Common.handleMvcEditor();
             $("#StartDate, #EndDate").datepicker();
             Belletrix.Common.initMultiselect(1);
@@ -50,8 +52,8 @@
                         });
 
                         addPersonModal.on('shown.bs.modal', function () {
-                            this.bindParticipantForm(addPersonModal);
-                            this.bindExistingParticipantForm(addPersonModal, addPersonIdUrl);
+                            self.bindParticipantForm(addPersonModal);
+                            self.bindExistingParticipantForm(addPersonModal, addPersonIdUrl);
                             $("#FullName").focus();
                         });
                     }
@@ -72,6 +74,7 @@
             });
 
             if (populateSessionUrl) {
+                let self = this;
                 // TODO: Could these actions someday be consolidated into one server-side action perhaps? Hmmm...
 
                 // Get the server-side to populate session.
@@ -87,7 +90,7 @@
                             cache: false,
                             success: function (data, textStatus, jqXHR) {
                                 $.each(data, function (index, value) {
-                                    this.addParticipantRow(value.Person.FullName, value.Person.Id);
+                                    self.addParticipantRow(value.Person.FullName, value.Person.Id);
                                 });
                             }
                         });
@@ -113,6 +116,8 @@
             // The modal dialog will only show the existing people fields if
             // there are existing people to begin with.
             if (personSelect.length) {
+                let self = this;
+
                 submitButton.click(function (event: JQueryEventObject) {
                     event.preventDefault();
 
@@ -122,7 +127,7 @@
                         data: {
                             id: personSelect.val(),
                             type: typeSelect.val(),
-                            sessionId: this._sessionId
+                            sessionId: self._sessionId
                         },
                         success: function (result: any) {
                             if (!result.hasOwnProperty("Success") ||
@@ -130,7 +135,7 @@
                                 Belletrix.Common.errorMessage("Unexpected result. Try again?\n" + result);
 
                             } else if (result.Success === true) {
-                                this.addParticipantRow($("option:selected", personSelect).text(), personSelect.val());
+                                self.addParticipantRow($("option:selected", personSelect).text(), personSelect.val());
                                 modalDialog.modal("hide");
 
                             } else {
@@ -156,6 +161,7 @@
          * @param modalDialog Modal dialog.
          */
         private bindParticipantForm(modalDialog: JQuery): void {
+            let self = this;
             let modalDialogForm: JQuery = $("form", modalDialog);
 
             $.validator.unobtrusive.parse(modalDialogForm);
@@ -174,7 +180,7 @@
                             Belletrix.Common.errorMessage("Unexpected result. Try again?\n" + result);
 
                         } else if (result.Success === true) {
-                            this.addParticipantRow($("#FullName", modalDialogForm).val(), result.Id);
+                            self.addParticipantRow($("#FullName", modalDialogForm).val(), result.Id);
                             modalDialog.modal("hide");
 
                         } else {
@@ -198,12 +204,14 @@
          * @param id Participant ID.
          */
         private deleteParticipant(id: number): void {
+            let self = this;
+
             $.ajax({
-                url: this._removeExistingPersonIdUrl,
+                url: self._removeExistingPersonIdUrl,
                 type: "DELETE",
                 data: {
                     id: id,
-                    sessionId: this._sessionId
+                    sessionId: self._sessionId
                 },
                 success: function (result: any) {
                     if (!result.hasOwnProperty("Success") ||
@@ -234,7 +242,7 @@
 
             deleteIcon.append('<i class="glyphicon glyphicon-remove"></i>');
 
-            deleteIcon.click(function (event: JQueryEventObject) {
+            deleteIcon.click((event: JQueryEventObject): void => {
                 event.preventDefault();
                 this.deleteParticipant(id);
             });

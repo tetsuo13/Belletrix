@@ -8,14 +8,14 @@
          * Initialize student add/edit page.
          * @param nameCheckUrl URL for unique name check.
          */
-        initStudentAddEdit(nameCheckUrl: string): void {
+        public initStudentAddEdit(nameCheckUrl: string): void {
             this.ajaxUrls.nameCheck = nameCheckUrl;
 
             Belletrix.Common.initMultiselect(1);
             Belletrix.Common.handleMvcEditor();
             $("#DateOfBirth, #InitialMeeting").datepicker();
 
-            $("a#studyAbroadDestinations").click(function (e: JQueryEventObject): void {
+            $("a#studyAbroadDestinations").click((e: JQueryEventObject): void => {
                 e.preventDefault();
                 this.addStudyAbroadRows();
             })
@@ -50,8 +50,8 @@
             this.toggleAllFormFields(true);
             $("#FirstName, #LastName").prop("disabled", false);
 
-            $("#FirstName, #LastName").keyup(function () {
-                delay(function () {
+            $("#FirstName, #LastName").keyup(() => {
+                delay(() => {
                     this.checkNameUniqueness($("#FirstName").val(), $("#LastName").val())
                 }, 500);
             });
@@ -69,6 +69,8 @@
                 return;
             }
 
+            let self = this;
+
             $.ajax({
                 url: this.ajaxUrls.nameCheck,
                 data: {
@@ -81,12 +83,12 @@
                     let uniqueNameContainer: JQuery = $("#unique-name").empty();
 
                     if (result.trim().length > 0) {
-                        this.toggleAllFormFields(true);
+                        self.toggleAllFormFields(true);
                         $("#FirstName, #LastName").prop("disabled", false);
-                        this.uniqueNameContainer.html(result);
+                        uniqueNameContainer.html(result);
                     } else {
                         // No duplicates found. Enable all form fields and move on.
-                        this.toggleAllFormFields(false);
+                        self.toggleAllFormFields(false);
                     }
                 },
                 error: function (jqXHR: JQueryXHR, textStatus: any, errorThrown: any): void {
@@ -100,21 +102,9 @@
         /**
          * Initialize the student list page.
          */
-        initStudentList(): void {
-            /*$("#studentlist").dataTable({
-                orderClasses: false,
-                columnDefs: [{
-                    targets: -1,
-                    orderable: false
-                }]
-            });*/
-            //$("#studentlist").dataTable({
-            //    aoColumnDefs: [{
-            //        aTargets: -1,
-            //        bSortable: false
-            //    }]
-            //});
+        public initStudentList(): void {
             $('#studentlist').DataTable({
+                orderClasses: false,
                 columnDefs: [{
                     targets: -1,
                     orderable: false
@@ -137,7 +127,7 @@
          * @param years
          * @param periods
          */
-        addStudyAbroadRows(countries?: Array<number>, years?: Array<number>, periods?: Array<number>): void {
+        public addStudyAbroadRows(countries?: Array<number>, years?: Array<number>, periods?: Array<number>): void {
             let destinationFieldNames = {
                 "StudyAbroadCountry": countries,
                 "StudyAbroadYear": years,
