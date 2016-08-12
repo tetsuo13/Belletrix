@@ -172,7 +172,7 @@ namespace Belletrix.DAL
 
             try
             {
-                int studyAbroadId = await UnitOfWork.Context().ExecuteAsync(sql,
+                int studyAbroadId = (await UnitOfWork.Context().QueryAsync<int>(sql,
                     new
                     {
                         StudentId = model.StudentId,
@@ -185,7 +185,7 @@ namespace Belletrix.DAL
                         StartDate = model.StartDate,
                         EndDate = model.EndDate,
                         City = model.City
-                    });
+                    })).Single();
 
                 if (model.ProgramTypes != null && model.ProgramTypes.Any())
                 {
