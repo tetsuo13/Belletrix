@@ -239,12 +239,13 @@
             let row: JQuery = $('<div class="row" id="participant-' + id + '"></div>');
             let deleteIcon: JQuery = $('<a href="" class="btn btn-xs btn-danger pull-right" title="Remove"></a>');
             let actionColumn: JQuery;
+            let self = this;
 
             deleteIcon.append('<i class="glyphicon glyphicon-remove"></i>');
 
             deleteIcon.click((event: JQueryEventObject): void => {
                 event.preventDefault();
-                this.deleteParticipant(id);
+                self.deleteParticipant(id);
             });
 
             row.append('<div class="col-lg-10"><div class="form-group">' + fullName + '</div></div>');

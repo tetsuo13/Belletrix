@@ -211,14 +211,14 @@ var Belletrix;
          * @param id Internal unique identifier.
          */
         ActivityLog.prototype.addParticipantRow = function (fullName, id) {
-            var _this = this;
             var row = $('<div class="row" id="participant-' + id + '"></div>');
             var deleteIcon = $('<a href="" class="btn btn-xs btn-danger pull-right" title="Remove"></a>');
             var actionColumn;
+            var self = this;
             deleteIcon.append('<i class="glyphicon glyphicon-remove"></i>');
             deleteIcon.click(function (event) {
                 event.preventDefault();
-                _this.deleteParticipant(id);
+                self.deleteParticipant(id);
             });
             row.append('<div class="col-lg-10"><div class="form-group">' + fullName + '</div></div>');
             actionColumn = $('<div class="form-group"></div>')
@@ -232,3 +232,4 @@ var Belletrix;
     }());
     Belletrix.ActivityLog = ActivityLog;
 })(Belletrix || (Belletrix = {}));
+//# sourceMappingURL=ActivityLog.js.map

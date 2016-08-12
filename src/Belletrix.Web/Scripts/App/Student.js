@@ -190,3 +190,4 @@ var Belletrix;
     }());
     Belletrix.Student = Student;
 })(Belletrix || (Belletrix = {}));
+//# sourceMappingURL=Student.js.map
