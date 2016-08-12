@@ -37,7 +37,7 @@ namespace Belletrix.DAL
             try
             {
                 notes = (await UnitOfWork.Context().QueryAsync<NoteModel>(sql, new { StudentId = studentId })).ToList();
-                notes.ForEach(x => DateTimeFilter.UtcToLocal(x.EntryDate));
+                notes.ForEach(x => x.EntryDate = DateTimeFilter.UtcToLocal(x.EntryDate));
             }
             catch (Exception e)
             {
