@@ -23,9 +23,9 @@ namespace Belletrix.DAL
         {
             List<PromoModel> promos = new List<PromoModel>();
             const string sql = @"
-                SELECT      p.Id AS PromoId, [Description], [CreatedBy], p.Created, [Code], p.Active,
-                            u.FirstName, u.LastName,
-                            (SELECT COUNT(*) FROM [StudentPromoLog] WHERE [PromoId] = p.Id) AS NumStudents
+                SELECT      p.Id AS Id, [Description], [CreatedBy] AS CreatedById, p.Created, [Code], p.Active,
+                            u.FirstName AS CreatedByFirstName, u.LastName AS CreatedByLastName,
+                            (SELECT COUNT(*) FROM [StudentPromoLog] WHERE [PromoId] = p.Id) AS Students
                 FROM        [dbo].[UserPromo] p
                 INNER JOIN  [dbo].[Users] u ON
                             [CreatedBy] = u.id
@@ -97,7 +97,7 @@ namespace Belletrix.DAL
 
             try
             {
-                return (await UnitOfWork.Context().ExecuteScalarAsync<int>(sql, new { Code = name.ToLower() })) > 0;
+                return (await UnitOfWork.Context().ExecuteScalarAsync<int>(sql, new { Code = name.ToLower() })) == 0;
             }
             catch (Exception e)
             {
