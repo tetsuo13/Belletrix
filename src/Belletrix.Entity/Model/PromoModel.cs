@@ -28,6 +28,6 @@ namespace Belletrix.Entity.Model
 
         // TODO: Not needed?
         public IEnumerable<StudentPromoLog> Logs { get; set; }
-        public int Stuents { get; set; }
+        public int Students { get; set; }
     }
 }

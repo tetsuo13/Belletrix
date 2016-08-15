@@ -223,7 +223,7 @@ namespace Belletrix.DAL
                 model.Created = DateTime.Now.ToUniversalTime();
                 model.CreatedBy = userId;
 
-                return await UnitOfWork.Context().ExecuteAsync(sql, model);
+                return (await UnitOfWork.Context().QueryAsync<int>(sql, model)).Single();
             }
             catch (Exception e)
             {

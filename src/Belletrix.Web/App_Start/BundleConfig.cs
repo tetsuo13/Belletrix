@@ -16,11 +16,11 @@ namespace Belletrix.Web.App_Start
                 "~/Scripts/jquery.validate.min.js",
                 "~/Scripts/jquery.validate.unobtrusive.min.js",
                 "~/Scripts/bootbox.min.js",
-                "~/Scripts/Belletrix.js",
-                "~/Scripts/Belletrix.ActivityLog.js",
-                "~/Scripts/Belletrix.Promo.js",
-                "~/Scripts/Belletrix.Student.js",
-                "~/Scripts/Belletrix.Student.Note.js"));
+                "~/Scripts/App/Common.js",
+                "~/Scripts/App/ActivityLog.js",
+                "~/Scripts/App/Student.js",
+                "~/Scripts/App/StudentNote.js",
+                "~/Scripts/App/Promo.js"));
 
             bundles.Add(new StyleBundle("~/bundles/css")
                 .Include("~/Content/bootstrap.css")

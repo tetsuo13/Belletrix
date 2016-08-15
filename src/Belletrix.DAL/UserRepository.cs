@@ -71,7 +71,11 @@ namespace Belletrix.DAL
                     users = (await UnitOfWork.Context().QueryAsync<UserModel>(sql)).ToList();
                 }
 
-                users.ForEach(x => DateTimeFilter.UtcToLocal(x.Created));
+                users.ForEach(x =>
+                {
+                    x.Created = DateTimeFilter.UtcToLocal(x.Created);
+                    x.LastLogin = DateTimeFilter.UtcToLocal(x.LastLogin);
+                });
 
                 // TODO: LastLogin may need to be changed to a nullable type.
             }

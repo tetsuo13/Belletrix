@@ -30,7 +30,7 @@ namespace Belletrix.DAL
 
             try
             {
-                return await UnitOfWork.Context().ExecuteAsync(sql, model);
+                return (await UnitOfWork.Context().QueryAsync<int>(sql, model)).Single();
             }
             catch (Exception e)
             {

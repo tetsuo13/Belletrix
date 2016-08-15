@@ -389,7 +389,7 @@ namespace Belletrix.DAL
                     phiBetaDeltaMember = (model as StudentModel).PhiBetaDeltaMember;
                 }
 
-                studentId = await UnitOfWork.Context().ExecuteAsync(sql,
+                studentId = (await UnitOfWork.Context().QueryAsync<int>(sql,
                     new
                     {
                         Created = DateTime.Now.ToUniversalTime(),
@@ -417,7 +417,7 @@ namespace Belletrix.DAL
                         AlternateEmail = baseModel.AlternateEmail,
                         PhiBetaDeltaMember = phiBetaDeltaMember,
                         Gpa = baseModel.Gpa
-                    });
+                    })).Single();
 
                 await SaveAssociatedTables(studentId, baseModel.SelectedMajors, baseModel.SelectedMinors,
                     baseModel.StudyAbroadCountry, baseModel.StudyAbroadYear, baseModel.StudyAbroadPeriod,

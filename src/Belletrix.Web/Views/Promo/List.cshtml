@@ -10,8 +10,6 @@
 @section FooterScript {
     <script>
         $(function () {
-            'use strict';
-
             $('#promolist').dataTable();
         });
     </script>
@@ -60,9 +58,9 @@
                             <td>@DateTimeFilter.UtcToLocal(promo.Created)</td>
                             <td>@promo.Description</td>
                             <td>
-                                @if (promo.Stuents > 0)
+                                @if (promo.Students > 0)
                                 {
-                                    @Html.ActionLink(promo.Stuents.ToString("N0"), "Students", new { id = promo.Id })
+                                    @Html.ActionLink(promo.Students.ToString("N0"), "Students", new { id = promo.Id })
                                 }
                             </td>
                             <td>

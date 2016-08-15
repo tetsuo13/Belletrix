@@ -80,16 +80,21 @@ namespace Belletrix.Domain
 
             if (filterByGraduatingYears)
             {
-                students = students
-                    .Where(x => x.GraduatingYear.HasValue)
-                    .Where(x => search.SelectedGraduatingYears.Any(y => y == x.GraduatingYear.Value));
+                students = students.Where(x =>
+                {
+                    return x.GraduatingYear.HasValue &&
+                        search.SelectedGraduatingYears.Any(y => y == x.GraduatingYear.Value);
+                });
             }
 
             if (filterByMajors)
             {
-                students = students
-                    .Where(x => x.SelectedMajors.Count<int>() > 0)
-                    .Where(x => x.SelectedMajors.Intersect(search.SelectedMajors).Count<int>() > 0);
+                students = students.Where(x =>
+                {
+                    return x.SelectedMajors != null &&
+                        x.SelectedMajors.Count() > 0 &&
+                        x.SelectedMajors.Intersect(search.SelectedMajors).Count() > 0;
+                });
             }
 
             if (filterByCountries)

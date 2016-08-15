@@ -9,8 +9,8 @@
 @section FooterScript {
     <script>
         $(function () {
-            Belletrix.Promo.init('@Url.Action("CheckUniqueName")', '#Code', '#codecheckresult');
-            Belletrix.singleSubmit();
+            new Belletrix.Promo('@Url.Action("CheckUniqueName")', '#Code', '#codecheckresult');
+            Belletrix.Common.singleSubmit();
         });
     </script>
 }
