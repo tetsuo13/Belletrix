@@ -41,18 +41,20 @@ namespace Belletrix.Web.Controllers
 
                     if (user.IsActive)
                     {
-                        if (string.IsNullOrEmpty(user.PasswordHash))
+                        // Column for hash is a CHAR so even if the user has
+                        // migrated they'll have spaces.
+                        if (!string.IsNullOrWhiteSpace(user.PasswordHash))
                         {
-                            string correctHash = user.PasswordIterations + ":" + user.PasswordSalt + ":" + user.Password;
+                            string correctHash = user.PasswordIterations + ":" + user.PasswordSalt + ":" + user.PasswordHash;
 
                             if (PasswordHash.ValidatePassword(model.Password, correctHash))
                             {
                                 return RedirectToAction("MigratePassword", new { id = user.Id });
                             }
                         }
-                        else if (new PasswordHasher().VerifyHashedPassword(user.PasswordHash, model.Password) != PasswordVerificationResult.Failed)
+                        else if (new PasswordHasher().VerifyHashedPassword(user.Password, model.Password) != PasswordVerificationResult.Failed)
                         {
-                            UserService.UpdateLastLogin(model.UserName);
+                            await UserService.UpdateLastLogin(model.UserName);
                             FormsAuthentication.SetAuthCookie(model.UserName, true);
                             Session["User"] = await UserService.GetUser(model.UserName);
 
@@ -107,7 +109,7 @@ namespace Belletrix.Web.Controllers
                     else
                     {
                         user.PasswordHash = new PasswordHasher().HashPassword(model.NewPassword);
-                        UserService.Update(user);
+                        await UserService.Update(user);
                         return RedirectToAction("Index");
                     }
                 }

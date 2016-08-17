@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Transactions;
 using System.Web;
 
 namespace Belletrix.Domain
@@ -76,12 +77,6 @@ namespace Belletrix.Domain
             ActivityLogModel model = (ActivityLogModel)saveModel;
             await ActivityLogRepository.UpdateActivity(model);
             await ActivityLogRepository.MergeActivityTypes(model.Id, model.Types.Cast<int>());
-        }
-
-        public void SaveChanges()
-        {
-            ActivityLogRepository.SaveChanges();
-            ActivityLogPersonRepository.SaveChanges();
         }
 
         /// <summary>
@@ -259,6 +254,30 @@ namespace Belletrix.Domain
                 { 8, "label-primary" },
                 { 9, "label-success" }
             };
+        }
+
+        public async Task InsertActivityBlock(HttpSessionStateBase session, ActivityLogCreateViewModel model)
+        {
+            using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                int activityId = await InsertActivity(model, (session["User"] as UserModel).Id);
+                await AssociatePeopleWithActivity(session, activityId, model.SessionId);
+                ClearSession(session, model.SessionId);
+
+                scope.Complete();
+            }
+        }
+
+        public async Task UpdateActivityBlock(HttpSessionStateBase session, ActivityLogEditViewModel model)
+        {
+            using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                await UpdateActivity(model);
+                await AssociatePeopleWithActivity(session, model.Id, model.SessionId);
+                ClearSession(session, model.SessionId);
+
+                scope.Complete();
+            }
         }
     }
 }

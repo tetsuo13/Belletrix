@@ -22,6 +22,5 @@ namespace Belletrix.DAL
 
         Task<int> InsertStudent(object model);
         Task UpdateStudent(StudentModel model);
-        void SaveChanges();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Belletrix.Core;
 using Belletrix.Entity.Model;
+using Dapper;
 using StackExchange.Exceptional;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace Belletrix.DAL
         {
             List<StudyAbroadModel> studyAbroad = new List<StudyAbroadModel>();
 
-            StringBuilder sql = new StringBuilder(@"
+            string sql = @"
                 SELECT      a.[Id], a.[StudentId], [Semester],
                             [Year], [StartDate], [EndDate],
                             [CreditBearing], [Internship], [CountryId],
@@ -33,72 +34,68 @@ namespace Belletrix.DAL
                             [FirstName], [MiddleName], [LastName]
                 FROM        [dbo].[StudyAbroad] a
                 INNER JOIN  [dbo].[Students] s ON
-                            a.[StudentId] = s.[Id]");
+                            a.[StudentId] = s.[Id] ";
 
             if (studentId.HasValue)
             {
-                sql.Append("WHERE a.[StudentId] = @StudentId ");
+                sql += "WHERE a.[StudentId] = @StudentId ";
             }
 
-            sql.Append("ORDER BY [Year] DESC, [Semester] DESC");
+            sql += "ORDER BY [Year] DESC, [Semester] DESC";
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
+                IEnumerable<dynamic> rows;
+
+                if (studentId.HasValue)
                 {
-                    command.CommandText = sql.ToString();
+                    rows = await UnitOfWork.Context().QueryAsync<dynamic>(sql, new { StudentId = studentId.Value });
+                }
+                else
+                {
+                    rows = await UnitOfWork.Context().QueryAsync<dynamic>(sql);
+                }
 
-                    if (studentId.HasValue)
+                foreach (IDictionary<string, object> row in rows)
+                {
+                    StudyAbroadModel study = new StudyAbroadModel()
                     {
-                        command.Parameters.Add("@StudentId", SqlDbType.Int).Value = studentId.Value;
+                        Id = (int)row["Id"],
+                        StudentId = (int)row["StudentId"],
+                        Semester = (int)row["Semester"],
+                        Year = (int)row["Year"],
+                        CreditBearing = (bool)row["CreditBearing"],
+                        Internship = (bool)row["Internship"],
+                        CountryId = (int)row["CountryId"],
+                        ProgramId = (int)row["ProgramId"],
+                        City = row["City"] as string
+                    };
+
+                    if (row.ContainsKey("StartDate") && row["StartDate"] != null)
+                    {
+                        study.StartDate = DateTimeFilter.UtcToLocal((DateTime)row["StartDate"]);
                     }
 
-                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    if (row.ContainsKey("EndDate") && row["EndDate"] != null)
                     {
-                        while (await reader.ReadAsync())
-                        {
-                            StudyAbroadModel study = new StudyAbroadModel()
-                            {
-                                Id = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Id")),
-                                StudentId = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("StudentId")),
-                                Semester = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Semester")),
-                                Year = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("Year")),
-                                CreditBearing = await reader.GetFieldValueAsync<bool>(reader.GetOrdinal("CreditBearing")),
-                                Internship = await reader.GetFieldValueAsync<bool>(reader.GetOrdinal("Internship")),
-                                CountryId = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("CountryId")),
-                                ProgramId = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("ProgramId")),
-                                City = await reader.GetValueOrDefault<string>("City")
-                            };
-
-                            int ord = reader.GetOrdinal("StartDate");
-                            if (!reader.IsDBNull(ord))
-                            {
-                                study.StartDate = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(ord));
-                            }
-
-                            ord = reader.GetOrdinal("EndDate");
-                            if (!reader.IsDBNull(ord))
-                            {
-                                study.EndDate = DateTimeFilter.UtcToLocal(await reader.GetFieldValueAsync<DateTime>(ord));
-                            }
-
-                            study.Student = new StudentModel()
-                            {
-                                FirstName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("FirstName")),
-                                MiddleName = await reader.GetValueOrDefault<string>("MiddleName"),
-                                LastName = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("LastName"))
-                            };
-
-                            studyAbroad.Add(study);
-                        }
+                        study.EndDate = DateTimeFilter.UtcToLocal((DateTime)row["EndDate"]);
                     }
+
+                    study.Student = new StudentModel()
+                    {
+                        FirstName = (string)row["FirstName"],
+                        MiddleName = row["MiddleName"] as string,
+                        LastName = (string)row["LastName"]
+                    };
+
+                    studyAbroad.Add(study);
                 }
 
                 studyAbroad = await PopulateProgramTypes(studyAbroad);
             }
             catch (Exception e)
             {
-                e.Data["SQL"] = sql.ToString();
+                e.Data["SQL"] = sql;
                 ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
@@ -116,27 +113,10 @@ namespace Belletrix.DAL
 
             try
             {
-                using (SqlCommand command = UnitOfWork.CreateCommand())
+                for (int i = 0; i < updated.Count; i++)
                 {
-                    command.CommandText = sql;
-                    command.Parameters.Add("@StudyAbroadId", SqlDbType.Int);
-                    command.Prepare();
-
-                    for (int i = 0; i < updated.Count; i++)
-                    {
-                        ICollection<int> programs = new List<int>();
-                        command.Parameters[0].Value = updated[i].Id;
-
-                        using (SqlDataReader reader = await command.ExecuteReaderAsync())
-                        {
-                            while (await reader.ReadAsync())
-                            {
-                                programs.Add(await reader.GetFieldValueAsync<int>(reader.GetOrdinal("ProgramTypeId")));
-                            }
-                        }
-
-                        updated[i].ProgramTypes = programs;
-                    }
+                    updated[i].ProgramTypes = await UnitOfWork.Context().QueryAsync<int>(sql,
+                        new { StudyAbroadId = updated[i].Id });
                 }
             }
             catch (Exception e)
@@ -167,68 +147,64 @@ namespace Belletrix.DAL
 
         public async Task Save(StudyAbroadModel model, int userId)
         {
-            StringBuilder sql = new StringBuilder(@"INSERT INTO [dbo].[StudyAbroad] (");
-            Dictionary<string, string> columns = new Dictionary<string, string>();
-            List<SqlParameter> parameters = new List<SqlParameter>();
-
-            AddParameter(ref columns, ref parameters, sql, "StudentId", SqlDbType.Int, model.StudentId, 0);
-            AddParameter(ref columns, ref parameters, sql, "Year", SqlDbType.Int, model.Year, 0);
-            AddParameter(ref columns, ref parameters, sql, "Semester", SqlDbType.Int, model.Semester, 0);
-            AddParameter(ref columns, ref parameters, sql, "CreditBearing", SqlDbType.Bit, model.CreditBearing, 0);
-            AddParameter(ref columns, ref parameters, sql, "Internship", SqlDbType.Bit, model.Internship, 0);
-            AddParameter(ref columns, ref parameters, sql, "CountryId", SqlDbType.Int, model.CountryId, 0);
-            AddParameter(ref columns, ref parameters, sql, "ProgramId", SqlDbType.Int, model.ProgramId, 0);
+            const string sql = @"
+                INSERT INTO [dbo].[StudyAbroad]
+                (
+                    StudentId, Year, Semester, CreditBearing, Internship,
+                    CountryId, ProgramId, StartDate, EndDate, City
+                )
+                OUTPUT INSERTED.Id
+                VALUES
+                (
+                    @StudentId, @Year, @Semester, @CreditBearing, @Internship,
+                    @CountryId, @ProgramId, @StartDate, @EndDate, @City
+                )";
 
             if (model.StartDate.HasValue)
             {
-                AddParameter(ref columns, ref parameters, sql, "StartDate", SqlDbType.Date, model.StartDate.Value.ToUniversalTime(), 0);
+                model.StartDate = model.StartDate.Value.ToUniversalTime();
             }
 
             if (model.EndDate.HasValue)
             {
-                AddParameter(ref columns, ref parameters, sql, "EndDate", SqlDbType.Date, model.EndDate.Value.ToUniversalTime(), 0);
+                model.EndDate = model.EndDate.Value.ToUniversalTime();
             }
-
-            if (!String.IsNullOrEmpty(model.City))
-            {
-                AddParameter(ref columns, ref parameters, sql, "City", SqlDbType.NVarChar, model.City, 64);
-            }
-
-            sql.Append(String.Join(", ", columns.Select(x => x.Key)));
-            sql.Append(") OUTPUT INSERTED.Id VALUES (");
-            sql.Append(String.Join(", ", columns.Select(x => x.Value)));
-            sql.Append(")");
 
             try
             {
-                int studyAbroadId;
-
-                using (SqlCommand command = UnitOfWork.CreateCommand())
-                {
-                    command.CommandText = sql.ToString();
-                    command.Parameters.AddRange(parameters.ToArray());
-                    studyAbroadId = (int)(await command.ExecuteScalarAsync());
-                }
+                int studyAbroadId = (await UnitOfWork.Context().QueryAsync<int>(sql,
+                    new
+                    {
+                        StudentId = model.StudentId,
+                        Year = model.Year,
+                        Semester = model.Semester,
+                        CreditBearing = model.CreditBearing,
+                        Internship = model.Internship,
+                        CountryId = model.CountryId,
+                        ProgramId = model.ProgramId,
+                        StartDate = model.StartDate,
+                        EndDate = model.EndDate,
+                        City = model.City
+                    })).Single();
 
                 if (model.ProgramTypes != null && model.ProgramTypes.Any())
                 {
-                    ICollection<string> values = new List<string>();
-
-                    foreach (int programTypeId in model.ProgramTypes)
-                    {
-                        values.Add(String.Format("({0}, {1})", studyAbroadId, programTypeId));
-                    }
-
-                    StringBuilder insertSql = new StringBuilder();
-                    insertSql.Append("INSERT INTO [dbo].[StudyAbroadProgramTypes] ([StudyAbroadId], [ProgramTypeId]) VALUES ");
-                    insertSql.Append(String.Join(",", values));
+                    const string insertSql = @"
+                        INSERT INTO [dbo].[StudyAbroadProgramTypes]
+                        ([StudyAbroadId], [ProgramTypeId])
+                        VALUES
+                        (@StudyAbroadId, @ProgramTypeId)";
 
                     try
                     {
-                        using (SqlCommand command = UnitOfWork.CreateCommand())
+                        foreach (int programTypeId in model.ProgramTypes)
                         {
-                            command.CommandText = insertSql.ToString();
-                            await command.ExecuteNonQueryAsync();
+                            await UnitOfWork.Context().ExecuteAsync(insertSql,
+                                new
+                                {
+                                    StudyAbroadId = studyAbroadId,
+                                    ProgramTypeId = programTypeId
+                                });
                         }
                     }
                     catch (Exception e)

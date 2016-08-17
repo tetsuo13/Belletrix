@@ -90,9 +90,9 @@
 
         <script>
             $(function () {
-                Belletrix.initPinger('@Url.Action("Ping", "Home")');
-                Belletrix.UserFirstName = '@user.FirstName';
-                Belletrix.UserLastName = '@user.LastName';
+                Belletrix.Common.initPinger('@Url.Action("Ping", "Home")');
+                Belletrix.Common.UserFirstName = '@user.FirstName';
+                Belletrix.Common.UserLastName = '@user.LastName';
             });
         </script>
     </body>
