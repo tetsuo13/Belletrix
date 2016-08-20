@@ -31,7 +31,7 @@ namespace Belletrix.Web.Controllers
                 return HttpNotFound();
             }
 
-            await Analytics.TrackPageView(Request, "Note List", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "Note List", (Session["User"] as UserModel).Login);
             ViewBag.Notes = await StudentNoteService.GetAllNotes(studentId);
             return View();
         }

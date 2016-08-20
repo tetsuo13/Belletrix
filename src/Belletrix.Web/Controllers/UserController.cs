@@ -41,7 +41,7 @@ namespace Belletrix.Web.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            await Analytics.TrackPageView(Request, "Add User", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "Add User", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Add";
             return View();
         }
@@ -74,7 +74,7 @@ namespace Belletrix.Web.Controllers
                 return RedirectToAction("List");
             }
 
-            await Analytics.TrackPageView(Request, "Add User", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "Add User", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Add";
             return View(model);
         }
@@ -104,7 +104,7 @@ namespace Belletrix.Web.Controllers
                 IsActive = user.IsActive
             };
 
-            await Analytics.TrackPageView(Request, "Edit User", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "Edit User", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Edit";
             return View(model);
         }
@@ -147,7 +147,7 @@ namespace Belletrix.Web.Controllers
 
             ViewBag.CurrentUserIsAdmin = currentUser.IsAdmin;
 
-            await Analytics.TrackPageView(Request, "Edit User", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "Edit User", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Edit";
             return View(model);
         }
@@ -161,7 +161,7 @@ namespace Belletrix.Web.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            await Analytics.TrackPageView(Request, "User List", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "User List", (Session["User"] as UserModel).Login);
             return View(await UserService.GetUsers());
         }
     }

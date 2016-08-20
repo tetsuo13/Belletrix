@@ -26,7 +26,7 @@ namespace Belletrix.Web.Controllers
 
         public async Task<ActionResult> List()
         {
-            await Analytics.TrackPageView(Request, "Active Experiences", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "Active Experiences", (Session["User"] as UserModel).Login);
 
             ViewBag.Countries = await StudentService.GetCountries();
             ViewBag.Semesters = StudentService.GetStudyAbroadWishlistPeriods();
@@ -38,7 +38,7 @@ namespace Belletrix.Web.Controllers
 
         public async Task<ActionResult> Add(int studentId)
         {
-            await Analytics.TrackPageView(Request, "Add Experience", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "Add Experience", (Session["User"] as UserModel).Login);
 
             try
             {
@@ -74,7 +74,7 @@ namespace Belletrix.Web.Controllers
             }
 
             await PrepareDropDowns();
-            await Analytics.TrackPageView(Request, "Add Experience", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "Add Experience", (Session["User"] as UserModel).Login);
 
             return View(model);
         }

@@ -34,7 +34,7 @@ namespace Belletrix.Web.Controllers
 
         public async Task<ActionResult> List()
         {
-            await Analytics.TrackPageView(Request, "Student List", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "Student List", (Session["User"] as UserModel).Login);
             await PrepareDropDowns();
 
             return View(await StudentService.GetStudents());
@@ -47,7 +47,7 @@ namespace Belletrix.Web.Controllers
             if (ModelState.IsValid)
             {
                 await PrepareDropDowns();
-                await Analytics.TrackPageView(Request, "Student List", (Session["User"] as UserModel).Login);
+                Analytics.TrackPageView(Request, "Student List", (Session["User"] as UserModel).Login);
 
                 return View("List", await StudentService.Search(model));
             }
@@ -77,7 +77,7 @@ namespace Belletrix.Web.Controllers
             ViewBag.Notes = await StudentNoteService.GetAllNotes(id);
             await PrepareDropDowns();
             await PrepareStudyAbroadDropDowns();
-            await Analytics.TrackPageView(Request, "Student", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "Student", (Session["User"] as UserModel).Login);
 
             return View(student);
         }
@@ -132,7 +132,7 @@ namespace Belletrix.Web.Controllers
             }
 
             await PrepareDropDowns();
-            await Analytics.TrackPageView(Request, "Student Edit", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "Student Edit", (Session["User"] as UserModel).Login);
 
             return View(student);
         }
@@ -147,7 +147,7 @@ namespace Belletrix.Web.Controllers
                 return RedirectToAction("List");
             }
 
-            await Analytics.TrackPageView(Request, "Student Edit", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "Student Edit", (Session["User"] as UserModel).Login);
             await PrepareDropDowns();
 
             return View(model);
@@ -156,7 +156,7 @@ namespace Belletrix.Web.Controllers
         public async Task<ActionResult> Add()
         {
             await PrepareDropDowns();
-            await Analytics.TrackPageView(Request, "Student Add", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "Student Add", (Session["User"] as UserModel).Login);
 
             return View();
         }
@@ -171,7 +171,7 @@ namespace Belletrix.Web.Controllers
                 return RedirectToAction("List");
             }
 
-            await Analytics.TrackPageView(Request, "Student Add", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "Student Add", (Session["User"] as UserModel).Login);
             await PrepareDropDowns();
 
             return View(model);

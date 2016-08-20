@@ -23,7 +23,7 @@ namespace Belletrix.Web.Controllers
 
         public async Task<ActionResult> Index()
         {
-            await Analytics.TrackPageView(Request, "Dashboard", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "Dashboard", (Session["User"] as UserModel).Login)
             ViewBag.ActivePage = ActivePageName;
             ViewBag.RecentActivity = await EventLogService.GetEvents();
             return View();

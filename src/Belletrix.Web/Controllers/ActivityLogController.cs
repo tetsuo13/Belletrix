@@ -31,11 +31,11 @@ namespace Belletrix.Web.Controllers
 
             if (activity == null)
             {
-                await Analytics.TrackPageView(Request, "Activity Log Error", (Session["User"] as UserModel).Login);
+                Analytics.TrackPageView(Request, "Activity Log Error", (Session["User"] as UserModel).Login);
                 return HttpNotFound();
             }
 
-            await Analytics.TrackPageView(Request, "Activity Log View", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "Activity Log View", (Session["User"] as UserModel).Login);
             ViewBag.TypeLabels = ActivityService.GetActivityTypeLabels();
 
             return View(activity);
@@ -43,7 +43,7 @@ namespace Belletrix.Web.Controllers
 
         public async Task<ActionResult> List()
         {
-            await Analytics.TrackPageView(Request, "Activity Log List", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "Activity Log List", (Session["User"] as UserModel).Login);
             IEnumerable<ActivityLogModel> logs = await ActivityService.GetActivityLogs();
             ViewBag.TypeLabels = ActivityService.GetActivityTypeLabels();
             return View(logs);
@@ -98,11 +98,11 @@ namespace Belletrix.Web.Controllers
 
             if (activity == null)
             {
-                await Analytics.TrackPageView(Request, "Activity Log Error", (Session["User"] as UserModel).Login);
+                Analytics.TrackPageView(Request, "Activity Log Error", (Session["User"] as UserModel).Login);
                 return HttpNotFound();
             }
 
-            await Analytics.TrackPageView(Request, "Activity Log Edit", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "Activity Log Edit", (Session["User"] as UserModel).Login);
 
             ActivityLogEditViewModel model = (ActivityLogEditViewModel)activity;
             PrepareViewBag(model);

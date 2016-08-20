@@ -22,7 +22,7 @@ namespace Belletrix.Web.Controllers
 
         public async Task<ActionResult> Index(string returnUrl)
         {
-            await Analytics.TrackPageView(Request, "Belletrix", null);
+            Analytics.TrackPageView(Request, "Belletrix", null);
             ViewBag.ReturnUrl = returnUrl;
             return View();
         }
@@ -78,7 +78,7 @@ namespace Belletrix.Web.Controllers
                 }
             }
 
-            await Analytics.TrackPageView(Request, "Belletrix", null);
+            Analytics.TrackPageView(Request, "Belletrix", null);
             ModelState.AddModelError("", mainError);
             return View(model);
         }
@@ -115,7 +115,7 @@ namespace Belletrix.Web.Controllers
                 }
             }
 
-            await Analytics.TrackPageView(Request, "Belletrix", null);
+            Analytics.TrackPageView(Request, "Belletrix", null);
             ModelState.AddModelError("", errorMessage);
             return View(model);
         }

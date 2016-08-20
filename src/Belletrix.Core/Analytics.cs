@@ -12,15 +12,12 @@ namespace Belletrix.Core
     /// </summary>
     public class Analytics
     {
-        public static Task TrackPageView(HttpRequestBase request, string pageTitle, string username = null)
+        public static void TrackPageView(HttpRequestBase request, string pageTitle, string username = null)
         {
-            if (new DebuggingService().RunningInDebugMode())
+            if (!new DebuggingService().RunningInDebugMode())
             {
-                // no-op
-                return Task.FromResult<object>(null);
+                Task.Factory.StartNew(() => SendRequest(request, pageTitle, username));
             }
-
-            return Task.Run(() => SendRequest(request, pageTitle, username));
         }
 
         private static void SendRequest(HttpRequestBase request, string pageTitle, string username)
