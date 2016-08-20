@@ -20,7 +20,7 @@ namespace Belletrix.Web.Controllers
             UserService = userService;
         }
 
-        public async Task<ActionResult> Index(string returnUrl)
+        public ActionResult Index(string returnUrl)
         {
             Analytics.TrackPageView(Request, "Belletrix", null);
             ViewBag.ReturnUrl = returnUrl;

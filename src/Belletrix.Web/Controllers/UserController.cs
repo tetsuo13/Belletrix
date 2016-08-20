@@ -32,7 +32,7 @@ namespace Belletrix.Web.Controllers
             return RedirectToAction("Index", "Login");
         }
 
-        public async Task<ActionResult> Add()
+        public ActionResult Add()
         {
             UserModel currentUser = Session["User"] as UserModel;
 
