@@ -1,5 +1,7 @@
 ﻿using Belletrix.Web.App_Start;
+using System.Linq;
 using StackExchange.Exceptional;
+using StackExchange.Profiling;
 using System;
 using System.Web;
 using System.Web.Helpers;
@@ -7,6 +9,8 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using StackExchange.Profiling.Mvc;
+using System.Collections.Generic;
 
 namespace Belletrix.Web
 {
@@ -86,6 +90,24 @@ namespace Belletrix.Web
             Response.Headers.Remove("X-AspNet-Version");
         }
 
+        protected void Application_BeginRequest()
+        {
+            MiniProfiler.Start();
+        }
+
+        protected void Application_PostAuthorizeRequest(object sender, EventArgs e)
+        {
+            if (Context.User.Identity.Name != "anicholson")
+            {
+                MiniProfiler.Stop(true);
+            }
+        }
+
+        protected void Application_EndRequest()
+        {
+            MiniProfiler.Stop();
+        }
+
         protected void Application_Start()
         {
             // Disable the X-AspNetMvc-Version header.
@@ -101,6 +123,13 @@ namespace Belletrix.Web
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             GlobalConfiguration.Configuration.Filters.Add(new System.Web.Http.AuthorizeAttribute());
+
+            IEnumerable<IViewEngine> copy = ViewEngines.Engines.ToList();
+            ViewEngines.Engines.Clear();
+            foreach (IViewEngine item in copy)
+            {
+                ViewEngines.Engines.Add(new ProfilingViewEngine(item));
+            }
         }
     }
 }

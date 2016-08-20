@@ -1,4 +1,5 @@
 ﻿using Piwik.Tracker;
+using StackExchange.Profiling;
 using System;
 using System.Configuration;
 using System.Threading.Tasks;
@@ -16,7 +17,12 @@ namespace Belletrix.Core
         {
             if (!new DebuggingService().RunningInDebugMode())
             {
-                Task.Factory.StartNew(() => SendRequest(request, pageTitle, username));
+                MiniProfiler profiler = MiniProfiler.Current;
+
+                using (profiler.Step("Log request in analytics"))
+                {
+                    Task.Factory.StartNew(() => SendRequest(request, pageTitle, username));
+                }
             }
         }
 

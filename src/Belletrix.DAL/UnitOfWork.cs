@@ -1,20 +1,24 @@
-﻿using System;
-using System.Data;
+﻿using Belletrix.Core;
+using StackExchange.Profiling;
+using StackExchange.Profiling.Data;
+using System;
+using System.Data.Common;
 using System.Data.SqlClient;
 
 namespace Belletrix.DAL
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private IDbConnection context;
+        private DbConnection context;
 
         public UnitOfWork(string connectionString)
         {
-            context = new SqlConnection(connectionString);
-            context.Open();
+            SqlConnection connection = new SqlConnection(Connections.Database.Dsn);
+            connection.Open();
+            context = new ProfiledDbConnection(connection, MiniProfiler.Current);
         }
 
-        public IDbConnection Context()
+        public DbConnection Context()
         {
             return context;
         }

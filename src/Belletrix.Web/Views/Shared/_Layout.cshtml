@@ -1,5 +1,6 @@
 ﻿@using Belletrix.Web.Controllers;
 @using Belletrix.Entity.Model;
+@using StackExchange.Profiling;
 
 @{
     Layout = null;
@@ -95,5 +96,6 @@
                 Belletrix.Common.UserLastName = '@user.LastName';
             });
         </script>
+        @MiniProfiler.RenderIncludes()
     </body>
 </html>

@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Data;
+using System.Data.Common;
 
 namespace Belletrix.DAL
 {
     public interface IUnitOfWork : IDisposable
     {
-        IDbConnection Context();
+        DbConnection Context();
     }
 }

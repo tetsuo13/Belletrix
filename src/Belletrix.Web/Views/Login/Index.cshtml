@@ -1,4 +1,5 @@
 ﻿@using Belletrix.Entity.ViewModel;
+@using StackExchange.Profiling;
 
 @model LoginViewModel
 
@@ -61,5 +62,6 @@
     <script>
         $(Belletrix.Common.singleSubmit);
     </script>
+    @MiniProfiler.RenderIncludes()
 </body>
 </html>

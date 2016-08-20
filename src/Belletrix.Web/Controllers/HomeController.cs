@@ -2,6 +2,7 @@
 using Belletrix.Domain;
 using Belletrix.Entity.Model;
 using StackExchange.Exceptional;
+using StackExchange.Profiling;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
@@ -23,9 +24,16 @@ namespace Belletrix.Web.Controllers
 
         public async Task<ActionResult> Index()
         {
-            Analytics.TrackPageView(Request, "Dashboard", (Session["User"] as UserModel).Login)
+            Analytics.TrackPageView(Request, "Dashboard", (Session["User"] as UserModel).Login);
             ViewBag.ActivePage = ActivePageName;
-            ViewBag.RecentActivity = await EventLogService.GetEvents();
+
+            MiniProfiler profiler = MiniProfiler.Current;
+
+            using (profiler.Step("Get events"))
+            {
+                ViewBag.RecentActivity = await EventLogService.GetEvents();
+            }
+
             return View();
         }
 
@@ -37,7 +45,12 @@ namespace Belletrix.Web.Controllers
         [AllowAnonymous]
         public async Task<string> Ping()
         {
-            return await PingService.Ping();
+            MiniProfiler profiler = MiniProfiler.Current;
+
+            using (profiler.Step("Ping"))
+            {
+                return await PingService.Ping();
+            }
         }
 
         [AllowAnonymous]

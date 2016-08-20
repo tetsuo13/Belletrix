@@ -3,6 +3,7 @@ using Belletrix.Domain;
 using Belletrix.Entity.Enum;
 using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
+using StackExchange.Profiling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,13 @@ namespace Belletrix.Web.Controllers
 
         public async Task<ActionResult> View(int id)
         {
-            var activity = await ActivityService.FindAllInfoById(id);
+            MiniProfiler profiler = MiniProfiler.Current;
+            ActivityLogViewViewModel activity = null;
+
+            using (profiler.Step("Get all activities"))
+            {
+                activity = await ActivityService.FindAllInfoById(id);
+            }
 
             if (activity == null)
             {
@@ -36,7 +43,11 @@ namespace Belletrix.Web.Controllers
             }
 
             Analytics.TrackPageView(Request, "Activity Log View", (Session["User"] as UserModel).Login);
-            ViewBag.TypeLabels = ActivityService.GetActivityTypeLabels();
+
+            using (profiler.Step("Get all label types"))
+            {
+                ViewBag.TypeLabels = ActivityService.GetActivityTypeLabels();
+            }
 
             return View(activity);
         }
@@ -44,8 +55,21 @@ namespace Belletrix.Web.Controllers
         public async Task<ActionResult> List()
         {
             Analytics.TrackPageView(Request, "Activity Log List", (Session["User"] as UserModel).Login);
-            IEnumerable<ActivityLogModel> logs = await ActivityService.GetActivityLogs();
-            ViewBag.TypeLabels = ActivityService.GetActivityTypeLabels();
+            MiniProfiler profiler = MiniProfiler.Current;
+            IEnumerable<ActivityLogModel> logs;
+
+            using (profiler.Step("Get activity list"))
+            {
+                using (profiler.Step("Get all activities"))
+                {
+                    logs = await ActivityService.GetActivityLogs();
+                }
+                using (profiler.Step("Get all label types"))
+                {
+                    ViewBag.TypeLabels = ActivityService.GetActivityTypeLabels();
+                }
+            }
+
             return View(logs);
         }
 
