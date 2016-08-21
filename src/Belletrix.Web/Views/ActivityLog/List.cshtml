@@ -76,7 +76,7 @@
                                 @foreach (ActivityLogTypes type in activity.Types)
                                 {
                                     int i = (int)type % ViewBag.TypeLabels.Count;
-                                    string labelClassName = ViewBag.TypeLabels.ContainsKey(i) ? ViewBag.TypeLabels[i] : ViewBag.TypeLabels[0];
+                                    string labelClassName = ViewBag.TypeLabels.ContainsKey(i) ? ViewBag.TypeLabels[i] : ViewBag.TypeLabels[1];
                                     <span class="label @labelClassName">@type.GetDisplayName()</span>
                                 }
                             </td>
