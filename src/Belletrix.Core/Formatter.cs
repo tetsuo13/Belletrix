@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Belletrix.Entity.Enum;
+using System;
+using System.Collections.Generic;
 
 namespace Belletrix.Core
 {
@@ -23,6 +25,21 @@ namespace Belletrix.Core
                 return number;
             }
             return String.Format("{0:(###) ###-####}", Double.Parse(number));
+        }
+
+        /// <summary>
+        /// Get a label CSS class name.
+        /// </summary>
+        /// <param name="type">Activity log type.</param>
+        /// <param name="typeLabels">
+        /// Dictionary returned by
+        /// <see cref="Belletrix.Domain.ActivityService.GetActivityTypeLabels"/>.
+        /// </param>
+        /// <returns>Suitable label name.</returns>
+        public static string ActivityLogLabel(ActivityLogTypes type, IDictionary<int, string> typeLabels)
+        {
+            int i = (int)type % typeLabels.Count;
+            return typeLabels.ContainsKey(i) ? typeLabels[i] : typeLabels[1];
         }
     }
 }

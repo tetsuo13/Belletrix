@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Belletrix.Web", "Belletrix.Web\Belletrix.Web.csproj", "{72018DEC-CA2F-4AC1-A83B-FFEAB8087989}"
 EndProject
@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Belletrix.Entity.Tests", "Belletrix.Entity.Tests\Belletrix.Entity.Tests.csproj", "{BECAD3EA-C938-4A5E-9099-5D3EC12CF27C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Belletrix.Core.Tests", "Belletrix.Core.Tests\Belletrix.Core.Tests.csproj", "{2FB2FFA9-BB64-44C3-870F-D968A19F079D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,6 +64,10 @@ Global
 		{BECAD3EA-C938-4A5E-9099-5D3EC12CF27C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BECAD3EA-C938-4A5E-9099-5D3EC12CF27C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BECAD3EA-C938-4A5E-9099-5D3EC12CF27C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FB2FFA9-BB64-44C3-870F-D968A19F079D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FB2FFA9-BB64-44C3-870F-D968A19F079D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FB2FFA9-BB64-44C3-870F-D968A19F079D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FB2FFA9-BB64-44C3-870F-D968A19F079D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
