@@ -1,4 +1,5 @@
-﻿@using Belletrix.Entity.Enum;
+﻿@using Belletrix.Core;
+@using Belletrix.Entity.Enum;
 @using Belletrix.Entity.Model;
 
 @model IEnumerable<ActivityLogModel>
@@ -76,7 +77,7 @@
                                 {
                                     int i = (int)type % ViewBag.TypeLabels.Count;
                                     string labelClassName = ViewBag.TypeLabels.ContainsKey(i) ? ViewBag.TypeLabels[i] : ViewBag.TypeLabels[0];
-                                    <span class="label @labelClassName">@type</span>
+                                    <span class="label @labelClassName">@type.GetDisplayName()</span>
                                 }
                             </td>
                             <td>
