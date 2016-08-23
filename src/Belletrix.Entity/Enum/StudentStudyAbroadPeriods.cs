@@ -1,4 +1,6 @@
-﻿namespace Belletrix.Entity.Enum
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Belletrix.Entity.Enum
 {
     public enum StudentStudyAbroadPeriods
     {
@@ -6,6 +8,8 @@
         Spring,
         Summer,
         Maymester,
+
+        [Display(Name = "Academic Year")]
         AcademicYear
     }
 }

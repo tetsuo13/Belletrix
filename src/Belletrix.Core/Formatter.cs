@@ -41,5 +41,28 @@ namespace Belletrix.Core
             int i = (int)type % typeLabels.Count;
             return typeLabels.ContainsKey(i) ? typeLabels[i] : typeLabels[1];
         }
+
+        public static string StudyAbroadPeriodString(int semester)
+        {
+            switch (semester)
+            {
+                case (int)StudentStudyAbroadPeriods.Fall:
+                    return StudentStudyAbroadPeriods.Fall.GetDisplayName();
+
+                case (int)StudentStudyAbroadPeriods.Spring:
+                    return StudentStudyAbroadPeriods.Spring.GetDisplayName();
+
+                case (int)StudentStudyAbroadPeriods.Summer:
+                    return StudentStudyAbroadPeriods.Summer.GetDisplayName();
+
+                case (int)StudentStudyAbroadPeriods.Maymester:
+                    return StudentStudyAbroadPeriods.Maymester.GetDisplayName();
+
+                case (int)StudentStudyAbroadPeriods.AcademicYear:
+                    return StudentStudyAbroadPeriods.AcademicYear.GetDisplayName();
+            }
+
+            return semester.ToString();
+        }
     }
 }

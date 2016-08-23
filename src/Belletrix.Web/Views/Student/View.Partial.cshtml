@@ -13,31 +13,6 @@
                 {
                     foreach (StudyAbroadModel studyAbroad in ViewBag.StudyAbroad)
                     {
-                        string semesterName = studyAbroad.Semester.ToString();
-
-                        switch (studyAbroad.Semester)
-                        {
-                            case (int)StudentStudyAbroadPeriods.Fall:
-                                semesterName = "Fall";
-                                break;
-
-                            case (int)StudentStudyAbroadPeriods.Spring:
-                                semesterName = "Spring";
-                                break;
-
-                            case (int)StudentStudyAbroadPeriods.Summer:
-                                semesterName = "Summer";
-                                break;
-
-                            case (int)StudentStudyAbroadPeriods.Maymester:
-                                semesterName = "Maymester";
-                                break;
-
-                            case (int)StudentStudyAbroadPeriods.AcademicYear:
-                                semesterName = "Academic Year";
-                                break;
-                        }
-
                         ICollection<string> programTypes = null;
 
                         if (studyAbroad.ProgramTypes != null)
@@ -53,7 +28,7 @@
                         <div class="row">
                             <div class="col-md-8">
                                 <strong class="h4">
-                                    @semesterName
+                                    @Formatter.StudyAbroadPeriodString(studyAbroad.Semester)
                                     @studyAbroad.Year:
                                     @if (!String.IsNullOrEmpty(studyAbroad.City))
                                     {

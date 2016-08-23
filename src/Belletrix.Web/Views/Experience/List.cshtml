@@ -50,31 +50,6 @@
                 <tbody>
                     @foreach (StudyAbroadModel study in Model)
                     {
-                        string semesterName = study.Semester.ToString();
-
-                        switch (study.Semester)
-                        {
-                            case (int)StudentStudyAbroadPeriods.Fall:
-                                semesterName = "Fall";
-                                break;
-
-                            case (int)StudentStudyAbroadPeriods.Spring:
-                                semesterName = "Spring";
-                                break;
-
-                            case (int)StudentStudyAbroadPeriods.Summer:
-                                semesterName = "Summer";
-                                break;
-
-                            case (int)StudentStudyAbroadPeriods.Maymester:
-                                semesterName = "Maymester";
-                                break;
-
-                            case (int)StudentStudyAbroadPeriods.AcademicYear:
-                                semesterName = "Academic Year";
-                                break;
-
-                        }
                         CountryModel selectedCountry = (ViewBag.Countries as List<CountryModel>).FirstOrDefault(c => c.Id == study.CountryId);
                         string countryName = String.Empty;
 
@@ -113,7 +88,7 @@
                                 <a href="@Url.Action("View", "Student", new { id = study.StudentId })">@study.Student.LastName, @study.Student.FirstName @study.Student.MiddleName</a>
                             </td>
                             <td>@study.Year</td>
-                            <td>@semesterName</td>
+                            <td>@Formatter.StudyAbroadPeriodString(study.Semester)</td>
                             <td>
                                 @if (study.StartDate != null)
                                 {
