@@ -30,7 +30,7 @@
         </div>
     </div>
 
-    <div class="table-responsive">
+    <div class="">
         <table id="studentlist" class="table table-bordered table-hover table-striped tablesorter table-condensed">
             <thead>
                 <tr>
@@ -46,13 +46,11 @@
                             <a href="@Url.Action("View", "Student", new { id = student.Id })">@student.LastName, @student.FirstName @student.MiddleName</a>
                         </td>
                         <td>
-                            <ul class="list-inline" style="margin-bottom: 0">
-                                <li>
-                                    <a href="@Url.Action("Edit", "Student", new { id = student.Id })"
-                                       class="studentlisttooltop" data-placement="top"
-                                       title="Edit"><i class="glyphicon glyphicon-pencil"></i></a>
-                                </li>
-                            </ul>
+                            <div class="btn-group">
+                                <a href="@Url.Action("Edit", "Student", new { id = student.Id })"
+                                    class="studentlisttooltop btn btn-xs btn-info" data-placement="top"
+                                    title="Edit"><i class="glyphicon glyphicon-pencil"></i></a>
+                            </div>
                         </td>
                     </tr>
                 }
