@@ -103,6 +103,9 @@
          * Initialize the student list page.
          */
         public initStudentList(): void {
+            new StudentNote();
+            $("a.studentlisttooltop").tooltip();
+
             $('#studentlist').DataTable({
                 orderClasses: false,
                 columnDefs: [{
@@ -111,10 +114,8 @@
                 }]
             });
 
-            $("a.studentlisttooltop").tooltip();
             $(".collapse").collapse();
 
-            new StudentNote();
             Belletrix.Common.initMultiselect(0, 300);
         };
 

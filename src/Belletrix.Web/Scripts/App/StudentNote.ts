@@ -5,7 +5,7 @@ module Belletrix {
         constructor() {
             let self = this;
 
-            $("a.studentnote").click(function (e) {
+            $("a.studentnote").on('click', function (e: JQueryEventObject): void {
                 let anchor: JQuery = $(this);
                 let studentFullName: string = anchor.attr("data-bt-studentname");
 

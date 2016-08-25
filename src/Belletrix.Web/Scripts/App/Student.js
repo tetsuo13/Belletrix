@@ -96,6 +96,8 @@ var Belletrix;
          * Initialize the student list page.
          */
         Student.prototype.initStudentList = function () {
+            new Belletrix.StudentNote();
+            $("a.studentlisttooltop").tooltip();
             $('#studentlist').DataTable({
                 orderClasses: false,
                 columnDefs: [{
@@ -103,9 +105,7 @@ var Belletrix;
                         orderable: false
                     }]
             });
-            $("a.studentlisttooltop").tooltip();
             $(".collapse").collapse();
-            new Belletrix.StudentNote();
             Belletrix.Common.initMultiselect(0, 300);
         };
         ;
@@ -190,4 +190,3 @@ var Belletrix;
     }());
     Belletrix.Student = Student;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=Student.js.map
