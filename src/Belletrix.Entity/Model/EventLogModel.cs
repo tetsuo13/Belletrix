@@ -25,5 +25,10 @@ namespace Belletrix.Entity.Model
         public string UserLastName { get; set; }
 
         public string RelativeDate { get; set; }
+
+        /// <summary>
+        /// IP address that originated the event.
+        /// </summary>
+        public string IPAddress { get; set; }
     }
 }

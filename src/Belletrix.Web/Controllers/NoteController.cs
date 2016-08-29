@@ -42,7 +42,8 @@ namespace Belletrix.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                await StudentNoteService.InsertNote((Session["User"] as UserModel).Id, model);
+                await StudentNoteService.InsertNote((Session["User"] as UserModel).Id, model,
+                    HttpContext.Request.UserHostAddress);
             }
         }
     }

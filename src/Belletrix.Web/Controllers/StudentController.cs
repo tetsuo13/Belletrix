@@ -143,7 +143,8 @@ namespace Belletrix.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                await StudentService.UpdateStudent(model, Session["User"] as UserModel);
+                await StudentService.UpdateStudent(model, Session["User"] as UserModel,
+                    HttpContext.Request.UserHostAddress);
                 return RedirectToAction("List");
             }
 
@@ -167,7 +168,8 @@ namespace Belletrix.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                await StudentService.InsertStudent(model, Session["User"] as UserModel);
+                await StudentService.InsertStudent(model, Session["User"] as UserModel,
+                    HttpContext.Request.UserHostAddress);
                 return RedirectToAction("List");
             }
 

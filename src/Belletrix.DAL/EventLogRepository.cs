@@ -30,7 +30,8 @@ namespace Belletrix.DAL
                                 s.FirstName AS StudentFirstName,
                                 s.LastName AS StudentLastName,
                                 us.FirstName AS UserFirstName,
-                                us.LastName AS UserLastName
+                                us.LastName AS UserLastName,
+                                IPAddress
                 FROM            [dbo].[EventLog] e
                 INNER JOIN      [dbo].[Users] u ON
                                 [ModifiedBy] = u.id
@@ -68,7 +69,8 @@ namespace Belletrix.DAL
                         ModifiedByLastName = (string)row["LastName"],
                         Student = student,
                         Type = (int)row["Type"],
-                        Action = (string)row["Action"]
+                        Action = (string)row["Action"],
+                        IPAddress = row["IPAddress"] as string
                     };
 
                     if (row.ContainsKey("UserId") && row["UserId"] != null)
@@ -93,18 +95,19 @@ namespace Belletrix.DAL
             return events;
         }
 
-        public async Task AddStudentEvent(int studentId, EventLogTypes eventType)
+        public async Task AddStudentEvent(int studentId, EventLogTypes eventType, string remoteIp)
         {
-            await AddStudentEvent(0, studentId, eventType);
+            await AddStudentEvent(0, studentId, eventType, remoteIp);
         }
 
-        public async Task AddStudentEvent(int modifiedBy, int studentId, EventLogTypes eventType)
+        public async Task AddStudentEvent(int modifiedBy, int studentId,
+            EventLogTypes eventType, string remoteIp)
         {
             const string sql = @"
                 INSERT INTO [dbo].[EventLog]
-                ([Date], [ModifiedBy], [StudentId], [Type])
+                ([Date], [ModifiedBy], [StudentId], [Type], [IPAddress])
                 VALUES
-                (@Date, @ModifiedBy, @StudentId, @Type)";
+                (@Date, @ModifiedBy, @StudentId, @Type, @IpAddress)";
 
             try
             {
@@ -114,7 +117,8 @@ namespace Belletrix.DAL
                         Date = DateTime.Now.ToUniversalTime(),
                         ModifiedBy = modifiedBy == 0 ? null : (object)modifiedBy,
                         StudentId = studentId,
-                        Type = (int)eventType
+                        Type = (int)eventType,
+                        IpAddress = remoteIp
                     });
             }
             catch (Exception e)

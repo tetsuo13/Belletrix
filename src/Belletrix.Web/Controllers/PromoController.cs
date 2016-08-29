@@ -167,7 +167,8 @@ namespace Belletrix.Web.Controllers
                     userId = (Session["User"] as UserModel).Id;
                 }
 
-                await StudentService.InsertStudent(model, userId, cookie.Value);
+                await StudentService.InsertStudent(model, userId, cookie.Value,
+                    HttpContext.Request.UserHostAddress);
                 return RedirectToAction("Success");
             }
 

@@ -25,12 +25,13 @@ namespace Belletrix.Domain
             return await StudentNoteRepository.GetNotes(studentId);
         }
 
-        public async Task InsertNote(int userId, AddStudentNoteViewModel model)
+        public async Task InsertNote(int userId, AddStudentNoteViewModel model, string remoteIp)
         {
             using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 await StudentNoteRepository.InsertNote(userId, model);
-                await EventLogRepository.AddStudentEvent(userId, model.StudentId, EventLogTypes.AddStudentNote);
+                await EventLogRepository.AddStudentEvent(userId, model.StudentId, EventLogTypes.AddStudentNote,
+                    remoteIp);
 
                 scope.Complete();
             }

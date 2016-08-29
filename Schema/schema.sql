@@ -516,6 +516,7 @@ CREATE TABLE [dbo].[UserPromo] (
     [Created]           [datetime] NOT NULL,
     [Code]              [varchar](32) NOT NULL,
     [Active]            [bit] NOT NULL DEFAULT 1,
+    [PublicToken]       [char](32),
 
     CONSTRAINT [PK_UserPromo] PRIMARY KEY ([Id]),
     CONSTRAINT [UN_UserPromo_Code] UNIQUE ([Code]),
@@ -544,6 +545,7 @@ CREATE TABLE [dbo].[EventLog] (
     [UserId]        [int],
     [Type]          [int] NOT NULL,
     [Action]        [nvarchar](512),
+    [IPAddress]     [varchar](15),
 
     CONSTRAINT [PK_EventLog] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_EventLog_ModifiedBy] FOREIGN KEY ([ModifiedBy]) REFERENCES [dbo].[Users] ([Id]),

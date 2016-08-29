@@ -211,7 +211,7 @@ namespace Belletrix.Domain
             return await StudentRepository.GetProgramTypes();
         }
 
-        public async Task InsertStudent(StudentModel model, UserModel user)
+        public async Task InsertStudent(StudentModel model, UserModel user, string remoteIp)
         {
             using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
@@ -219,13 +219,14 @@ namespace Belletrix.Domain
 
                 model.Id = studentId;
 
-                await EventLogRepository.AddStudentEvent(user.Id, studentId, EventLogTypes.AddStudent);
+                await EventLogRepository.AddStudentEvent(user.Id, studentId,
+                    EventLogTypes.AddStudent, remoteIp);
 
                 scope.Complete();
             }
         }
 
-        public async Task InsertStudent(StudentPromoModel model, int? userId, string promoCode)
+        public async Task InsertStudent(StudentPromoModel model, int? userId, string promoCode, string remoteIp)
         {
             using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
@@ -236,18 +237,19 @@ namespace Belletrix.Domain
 
                 if (userId.HasValue)
                 {
-                    await EventLogRepository.AddStudentEvent(userId.Value, model.Id, EventLogTypes.EditStudent);
+                    await EventLogRepository.AddStudentEvent(userId.Value, model.Id,
+                        EventLogTypes.EditStudent, remoteIp);
                 }
                 else
                 {
-                    await EventLogRepository.AddStudentEvent(model.Id, EventLogTypes.EditStudent);
+                    await EventLogRepository.AddStudentEvent(model.Id, EventLogTypes.EditStudent, remoteIp);
                 }
 
                 scope.Complete();
             }
         }
 
-        public async Task UpdateStudent(StudentModel model, UserModel user)
+        public async Task UpdateStudent(StudentModel model, UserModel user, string remoteIp)
         {
             using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
@@ -288,7 +290,7 @@ namespace Belletrix.Domain
 
                 await StudentRepository.UpdateStudent(model);
                 await StudentPromoRepository.Save(model.Id, model.PromoIds);
-                await EventLogRepository.AddStudentEvent(user.Id, model.Id, EventLogTypes.EditStudent);
+                await EventLogRepository.AddStudentEvent(user.Id, model.Id, EventLogTypes.EditStudent, remoteIp);
 
                 scope.Complete();
             }
