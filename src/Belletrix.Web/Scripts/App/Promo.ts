@@ -1,12 +1,14 @@
 ﻿/// <reference path="Common.ts" />
 /// <reference path="..\typings\jquery\jquery.d.ts" />
 
-'use strict';
-
 module Belletrix {
+    /**
+     * Promo management only available to internal users.
+     */
     export class Promo {
         /**
          * Promotions initialization.
+         *
          * @param uniqueNameCheckUrl URL for the name check ajax function.
          * @param nameSelector Selector for name input.
          * @param resultImageSelector Selector for inline image for results.
@@ -68,58 +70,6 @@ module Belletrix {
                 type: "POST"
             });
         }
-
-        /**
-         * Student entry from promo form.
-         * @param pingerUrl
-         */
-        initForm(pingerUrl: string): void {
-            Belletrix.Common.initPinger(pingerUrl);
-            Belletrix.Common.initMultiselect(0, 300);
-            Belletrix.Common.handleMvcEditor();
-            $("#DateOfBirth").datepicker();
-
-            $("a#studyAbroadDestinations").click((e): void => {
-                e.preventDefault();
-                this.addStudyAbroadRows();
-            })
-        };
-
-        /**
-         * Add a year and semester row group.
-         */
-        public addStudyAbroadRows(): void {
-            let rowId: string = Belletrix.Common.randomString();
-            let enclosure: JQuery;
-            let anchor: JQuery;
-            let paragraph: JQuery = $('<p class="help-block text-right"></p>');
-
-            $.each(["StudyAbroadYear", "StudyAbroadPeriod"], function (i: number, fieldName: string): void {
-                let firstSelect: JQuery = $("select#" + fieldName);
-                let newSelect: JQuery = firstSelect.clone().removeAttr("id");
-
-                $('<div class="form-group reducePadding" />')
-                    .addClass(rowId)
-                    .append(newSelect)
-                    .appendTo(firstSelect.parent().parent());
-            });
-
-            enclosure = $('<div class="form-group reducePadding" style="margin-top:-20px">&nbsp;</div>')
-                .addClass(rowId);
-
-            anchor = $('<a href="" title="Remove destination row"></a>')
-                .html('<i class="glyphicon glyphicon-minus-sign"></i> Del')
-                .click(function (e: JQueryEventObject) {
-                    e.preventDefault();
-                    $("." + rowId).remove();
-                });
-
-            paragraph.append(anchor);
-
-            enclosure
-                .append(paragraph)
-                .appendTo($("div#studyAbroadRowRemovals").parent());
-        };
 
         /**
          * Initialize the student list page for a promo.

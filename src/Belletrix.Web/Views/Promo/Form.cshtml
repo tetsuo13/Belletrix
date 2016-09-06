@@ -17,7 +17,8 @@
 @section FooterScript {
     <script>
         $(function () {
-            Belletrix.Promo.initForm('@Url.Action("Ping", "Home")');
+            var promo = new Belletrix.StudentPromo();
+            promo.initForm('@Url.Action("NameCheck")');
             Belletrix.Common.singleSubmit();
         });
     </script>
@@ -32,7 +33,7 @@
             </p>
         </div>
 
-        @using (Html.BeginForm(null, null, FormMethod.Post, new { role = "form" }))
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { role = "form", id = "student-form" }))
         {
             @Html.AntiForgeryToken()
             @Html.ValidationSummary()
@@ -61,6 +62,7 @@
                                         @Html.TextBoxFor(s => s.LastName, new { @class = "form-control", placeholder = "Last" })
                                     </div>
                                 </div>
+                                <div class="col-lg-12" id="unique-name"></div>
                             </div>
 
                             <div class="row">

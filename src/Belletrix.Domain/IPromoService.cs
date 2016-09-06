@@ -1,5 +1,4 @@
-﻿using Belletrix.Entity.Model;
-using Belletrix.Entity.ViewModel;
+﻿using Belletrix.Entity.ViewModel;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

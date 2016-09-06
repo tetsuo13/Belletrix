@@ -39,6 +39,8 @@ namespace Belletrix.Web.Controllers
             }
         }
 
+        #region Promo management
+
         public async Task<ActionResult> List()
         {
             Analytics.TrackPageView(Request, "Promo List", (Session["User"] as UserModel).Login);
@@ -101,6 +103,10 @@ namespace Belletrix.Web.Controllers
             return View(await StudentService.FromPromo(id));
         }
 
+        #endregion
+
+        #region User portal
+
         [AllowAnonymous]
         public ActionResult Entry()
         {
@@ -150,6 +156,12 @@ namespace Belletrix.Web.Controllers
             await PrepareDropDowns();
 
             return View();
+        }
+
+        [AllowAnonymous]
+        public async Task<PartialViewResult> NameCheck(string firstName, string lastName)
+        {
+            return PartialView(await StudentService.SearchByFullName(firstName, lastName));
         }
 
         [AllowAnonymous]
@@ -216,5 +228,7 @@ namespace Belletrix.Web.Controllers
             ViewBag.StudyAbroadYears = new SelectList(studyYears, "Id", "Name");
             ViewBag.StudyAbroadSemesters = StudentService.GetStudyAbroadWishlistPeriodsWithCatchAll();
         }
+
+        #endregion
     }
 }

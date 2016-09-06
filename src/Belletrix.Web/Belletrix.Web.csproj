@@ -290,6 +290,7 @@
     <Content Include="Views\Login\MigratePassword.cshtml" />
     <Content Include="Views\User\Add.cshtml" />
     <Content Include="Views\User\Edit.cshtml" />
+    <Content Include="Views\Promo\NameCheck.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -334,7 +335,9 @@
     <TypeScriptCompile Include="Scripts\App\JQuery.DataTables.d.ts" />
     <TypeScriptCompile Include="Scripts\App\Promo.ts" />
     <TypeScriptCompile Include="Scripts\App\Student.ts" />
+    <TypeScriptCompile Include="Scripts\App\StudentBase.ts" />
     <TypeScriptCompile Include="Scripts\App\StudentNote.ts" />
+    <TypeScriptCompile Include="Scripts\App\StudentPromo.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootbox\bootbox.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap.datepicker\bootstrap.datepicker.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap.multiselect\bootstrap.multiselect.d.ts" />

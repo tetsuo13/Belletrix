@@ -1,95 +1,27 @@
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var Belletrix;
 (function (Belletrix) {
-    var Student = (function () {
+    var Student = (function (_super) {
+        __extends(Student, _super);
         function Student() {
-            this.ajaxUrls = {
-                nameCheck: ""
-            };
+            _super.apply(this, arguments);
         }
         /**
          * Initialize student add/edit page.
+         *
          * @param nameCheckUrl URL for unique name check.
          */
         Student.prototype.initStudentAddEdit = function (nameCheckUrl) {
             var _this = this;
-            this.ajaxUrls.nameCheck = nameCheckUrl;
-            Belletrix.Common.initMultiselect(1);
-            Belletrix.Common.handleMvcEditor();
-            $("#DateOfBirth, #InitialMeeting").datepicker();
+            _super.prototype.initForm.call(this, nameCheckUrl);
+            $("#InitialMeeting").datepicker();
             $("a#studyAbroadDestinations").click(function (e) {
                 e.preventDefault();
                 _this.addStudyAbroadRows();
-            });
-            this.prepareForm();
-        };
-        ;
-        /**
-         * Enable/disable all form fields.
-         * @param disabled True to disable all fields.
-         */
-        Student.prototype.toggleAllFormFields = function (disabled) {
-            $("#student-form input, #student-form select, #student-form button")
-                .prop("disabled", disabled);
-        };
-        /**
-         * Disable all fields except first and last name, force the user to
-         * enter that information first.
-         */
-        Student.prototype.prepareForm = function () {
-            var _this = this;
-            // https://stackoverflow.com/a/1909508
-            var delay = (function () {
-                var timer = 0;
-                return function (callback, ms) {
-                    clearTimeout(timer);
-                    timer = setTimeout(callback, ms);
-                };
-            })();
-            this.toggleAllFormFields(true);
-            $("#FirstName, #LastName").prop("disabled", false);
-            $("#FirstName, #LastName").keyup(function () {
-                delay(function () {
-                    _this.checkNameUniqueness($("#FirstName").val(), $("#LastName").val());
-                }, 500);
-            });
-        };
-        /**
-         * Submit first and last name for unique check. If unique, enable all
-         * form fields; otherwise display a list of links to other students
-         * matching.
-         * @param firstName Student's first name.
-         * @param lastName Student's last name.
-         */
-        Student.prototype.checkNameUniqueness = function (firstName, lastName) {
-            if (firstName.length == 0 || lastName.length == 0) {
-                return;
-            }
-            var self = this;
-            $.ajax({
-                url: this.ajaxUrls.nameCheck,
-                data: {
-                    firstName: firstName,
-                    lastName: lastName
-                },
-                method: "GET",
-                cache: false,
-                success: function (result) {
-                    var uniqueNameContainer = $("#unique-name").empty();
-                    if (result.trim().length > 0) {
-                        self.toggleAllFormFields(true);
-                        $("#FirstName, #LastName").prop("disabled", false);
-                        uniqueNameContainer.html(result);
-                    }
-                    else {
-                        // No duplicates found. Enable all form fields and move on.
-                        self.toggleAllFormFields(false);
-                    }
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    var message = "<p>An unknown error occurred while checking student name.</p>" +
-                        "<p>" + textStatus + "</p>";
-                    Belletrix.Common.errorMessage(message);
-                }
             });
         };
         /**
@@ -187,7 +119,7 @@ var Belletrix;
                 .appendTo($("div#studyAbroadRowRemovals").parent());
         };
         return Student;
-    }());
+    }(Belletrix.StudentBase));
     Belletrix.Student = Student;
 })(Belletrix || (Belletrix = {}));
 //# sourceMappingURL=Student.js.map

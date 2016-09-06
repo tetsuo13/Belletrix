@@ -1,101 +1,18 @@
 ﻿module Belletrix {
-    export class Student {
-        private ajaxUrls = {
-            nameCheck: ""
-        };
-
+    export class Student extends StudentBase {
         /**
          * Initialize student add/edit page.
+         *
          * @param nameCheckUrl URL for unique name check.
          */
         public initStudentAddEdit(nameCheckUrl: string): void {
-            this.ajaxUrls.nameCheck = nameCheckUrl;
+            super.initForm(nameCheckUrl);
 
-            Belletrix.Common.initMultiselect(1);
-            Belletrix.Common.handleMvcEditor();
-            $("#DateOfBirth, #InitialMeeting").datepicker();
+            $("#InitialMeeting").datepicker();
 
             $("a#studyAbroadDestinations").click((e: JQueryEventObject): void => {
                 e.preventDefault();
                 this.addStudyAbroadRows();
-            })
-
-            this.prepareForm();
-        };
-
-        /**
-         * Enable/disable all form fields.
-         * @param disabled True to disable all fields.
-         */
-        private toggleAllFormFields(disabled: boolean): void {
-            $("#student-form input, #student-form select, #student-form button")
-                .prop("disabled", disabled);
-        }
-
-        /**
-         * Disable all fields except first and last name, force the user to
-         * enter that information first.
-         */
-        private prepareForm(): void {
-            // https://stackoverflow.com/a/1909508
-            let delay = (function () {
-                let timer: number = 0;
-
-                return function (callback, ms) {
-                    clearTimeout(timer);
-                    timer = setTimeout(callback, ms);
-                };
-            })();
-
-            this.toggleAllFormFields(true);
-            $("#FirstName, #LastName").prop("disabled", false);
-
-            $("#FirstName, #LastName").keyup(() => {
-                delay(() => {
-                    this.checkNameUniqueness($("#FirstName").val(), $("#LastName").val())
-                }, 500);
-            });
-        }
-
-        /**
-         * Submit first and last name for unique check. If unique, enable all
-         * form fields; otherwise display a list of links to other students
-         * matching.
-         * @param firstName Student's first name.
-         * @param lastName Student's last name.
-         */
-        private checkNameUniqueness(firstName: string, lastName: string): void {
-            if (firstName.length == 0 || lastName.length == 0) {
-                return;
-            }
-
-            let self = this;
-
-            $.ajax({
-                url: this.ajaxUrls.nameCheck,
-                data: {
-                    firstName: firstName,
-                    lastName: lastName
-                },
-                method: "GET",
-                cache: false,
-                success: function (result: string): void {
-                    let uniqueNameContainer: JQuery = $("#unique-name").empty();
-
-                    if (result.trim().length > 0) {
-                        self.toggleAllFormFields(true);
-                        $("#FirstName, #LastName").prop("disabled", false);
-                        uniqueNameContainer.html(result);
-                    } else {
-                        // No duplicates found. Enable all form fields and move on.
-                        self.toggleAllFormFields(false);
-                    }
-                },
-                error: function (jqXHR: JQueryXHR, textStatus: any, errorThrown: any): void {
-                    let message: string = "<p>An unknown error occurred while checking student name.</p>" +
-                        "<p>" + textStatus + "</p>";
-                    Belletrix.Common.errorMessage(message);
-                }
             })
         }
 

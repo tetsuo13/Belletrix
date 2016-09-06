@@ -82,18 +82,10 @@
 @section Body {
     <div class="container">
         <div class="header">
-            @*
-                <ul class="nav nav-pills pull-right">
-                    <li class="active"><a href="#">Home</a></li>
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Contact</a></li>
-                </ul>
-            *@
             <h3 class="text-muted">Belletrix</h3>
         </div>
 
         <div class="jumbotron">
-            @*<h1>Promo</h1>*@
             <p class="lead">Please enter a promo code to continue.</p>
 
             @using (Html.BeginForm("Entry", "Promo", FormMethod.Post,
@@ -114,11 +106,5 @@
                 <p class="text-danger"><small>@ViewBag.ErrorMessage</small></p>
             }
         </div>
-
-        @*
-            <div class="footer">
-                <p>&copy; @DateTime.Now.Year</p>
-            </div>
-        *@
     </div>
 }
