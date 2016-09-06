@@ -1,5 +1,6 @@
 ﻿using Belletrix.DAL;
 using Belletrix.Entity.Model;
+using Belletrix.Entity.ViewModel;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -14,22 +15,22 @@ namespace Belletrix.Domain
             PromoRepository = promoRepository;
         }
 
-        public async Task<IEnumerable<PromoModel>> GetPromos()
+        public async Task<IEnumerable<PromoViewModel>> GetPromos()
         {
             return await PromoRepository.GetPromos();
         }
 
-        public async Task<PromoModel> GetPromo(int id)
+        public async Task<PromoViewModel> GetPromo(int id)
         {
             return await PromoRepository.GetPromo(id);
         }
 
-        public async Task<PromoModel> GetPromo(string code)
+        public async Task<PromoViewModel> GetPromo(string code)
         {
             return await PromoRepository.GetPromo(code);
         }
 
-        public async Task Save(PromoModel model, int userId)
+        public async Task Save(PromoCreateViewModel model, int userId)
         {
             await PromoRepository.Save(model, userId);
         }
@@ -39,7 +40,7 @@ namespace Belletrix.Domain
             return await PromoRepository.CheckNameForUniqueness(name);
         }
 
-        public async Task<IEnumerable<PromoModel>> AsSources()
+        public async Task<IEnumerable<PromoSourceViewModel>> AsSources()
         {
             return await PromoRepository.AsSources();
         }

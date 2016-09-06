@@ -51,7 +51,6 @@
     <Compile Include="Model\NoteModel.cs" />
     <Compile Include="Model\ProgramModel.cs" />
     <Compile Include="Model\ProgramTypeModel.cs" />
-    <Compile Include="Model\PromoModel.cs" />
     <Compile Include="Model\StudentClassificationModel.cs" />
     <Compile Include="Model\StudentModels.cs" />
     <Compile Include="Model\StudentPromoLog.cs" />
@@ -67,6 +66,7 @@
     <Compile Include="ViewModel\EditUserViewModel.cs" />
     <Compile Include="ViewModel\LoginViewModel.cs" />
     <Compile Include="ViewModel\MigratePasswordViewModel.cs" />
+    <Compile Include="ViewModel\PromoViewModels.cs" />
     <Compile Include="ViewModel\StudentNotesViewModels.cs" />
     <Compile Include="ViewModel\StudentSearchViewModel.cs" />
   </ItemGroup>

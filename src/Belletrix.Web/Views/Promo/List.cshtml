@@ -1,7 +1,7 @@
 ﻿@using Belletrix.Core;
-@using Belletrix.Entity.Model;
+@using Belletrix.Entity.ViewModel;
 
-@model IEnumerable<PromoModel>
+@model IEnumerable<PromoViewModel>
 
 @{
     ViewBag.Title = "List";
@@ -53,7 +53,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (PromoModel promo in Model)
+                    @foreach (PromoViewModel promo in Model)
                     {
                         <tr>
                             <td>@Html.ActionLink(promo.Code, "Info", new { id = promo.Id })</td>

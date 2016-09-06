@@ -1,19 +1,18 @@
-﻿@using Belletrix.Entity.Model;
+﻿@using Belletrix.Entity.ViewModel;
 
-@model PromoModel
+@model PromoViewModel
 
 @{
     ViewBag.Title = "Info";
     UriBuilder landingPage = new UriBuilder()
     {
-        Scheme = "https",
+        Scheme = Request.Url.Scheme,
         Host = Request.Url.Host,
         Path = Url.Action("Entry")
     };
     
     if (Request.IsLocal)
     {
-        landingPage.Scheme = "http";
         landingPage.Port = Request.Url.Port;
     }
 }

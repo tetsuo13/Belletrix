@@ -1,6 +1,7 @@
 ﻿using Belletrix.Core;
 using Belletrix.Domain;
 using Belletrix.Entity.Model;
+using Belletrix.Entity.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,12 +60,12 @@ namespace Belletrix.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Add(PromoModel model)
+        public async Task<ActionResult> Add(PromoCreateViewModel model)
         {
             if (ModelState.IsValid)
             {
                 await PromoService.Save(model, (Session["User"] as UserModel).Id);
-                return RedirectToAction("Info", new { id = model.Id });
+                return RedirectToAction("List");
             }
 
             Analytics.TrackPageView(Request, "Add Promo", (Session["User"] as UserModel).Login);
@@ -73,7 +74,7 @@ namespace Belletrix.Web.Controllers
 
         public async Task<ActionResult> Info(int id)
         {
-            PromoModel promo = await PromoService.GetPromo(id);
+            PromoViewModel promo = await PromoService.GetPromo(id);
 
             if (promo == null)
             {
@@ -86,7 +87,7 @@ namespace Belletrix.Web.Controllers
 
         public async Task<ActionResult> Students(int id)
         {
-            PromoModel promo = await PromoService.GetPromo(id);
+            PromoViewModel promo = await PromoService.GetPromo(id);
 
             if (promo == null)
             {
@@ -95,7 +96,7 @@ namespace Belletrix.Web.Controllers
 
             ViewBag.Promo = promo;
 
-            string title = String.Format("Students of {0} promo ({1})", promo.Description, promo.Code);
+            string title = string.Format("Students of {0} promo ({1})", promo.Description, promo.Code);
             Analytics.TrackPageView(Request, title, (Session["User"] as UserModel).Login);
             return View(await StudentService.FromPromo(id));
         }
@@ -112,13 +113,13 @@ namespace Belletrix.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Entry(string code)
         {
-            if (code == null || String.IsNullOrWhiteSpace(code))
+            if (code == null || string.IsNullOrWhiteSpace(code))
             {
                 ViewBag.ErrorMessage = "Invalid code";
                 return View();
             }
 
-            PromoModel promo = await PromoService.GetPromo(code);
+            PromoViewModel promo = await PromoService.GetPromo(code);
 
             if (promo == null)
             {

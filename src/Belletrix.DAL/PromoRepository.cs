@@ -1,5 +1,6 @@
 ﻿using Belletrix.Core;
 using Belletrix.Entity.Model;
+using Belletrix.Entity.ViewModel;
 using Dapper;
 using StackExchange.Exceptional;
 using System;
@@ -19,12 +20,17 @@ namespace Belletrix.DAL
             UnitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<PromoModel>> GetPromos()
+        public async Task<IEnumerable<PromoViewModel>> GetPromos()
         {
-            List<PromoModel> promos = new List<PromoModel>();
+            List<PromoViewModel> promos = new List<PromoViewModel>();
             const string sql = @"
-                SELECT      p.Id AS Id, [Description], [CreatedBy] AS CreatedById, p.Created, [Code], p.Active,
-                            u.FirstName AS CreatedByFirstName, u.LastName AS CreatedByLastName,
+                SELECT      p.Id AS Id,
+                            [Description],
+                            p.Created,
+                            [Code],
+                            p.Active AS IsActive,
+                            u.FirstName AS CreatedByFirstName,
+                            u.LastName AS CreatedByLastName,
                             (SELECT COUNT(*) FROM [StudentPromoLog] WHERE [PromoId] = p.Id) AS Students
                 FROM        [dbo].[UserPromo] p
                 INNER JOIN  [dbo].[Users] u ON
@@ -33,7 +39,7 @@ namespace Belletrix.DAL
 
             try
             {
-                promos = (await UnitOfWork.Context().QueryAsync<PromoModel>(sql)).ToList();
+                promos = (await UnitOfWork.Context().QueryAsync<PromoViewModel>(sql)).ToList();
                 promos.ForEach(x => x.Created = DateTimeFilter.UtcToLocal(x.Created));
             }
             catch (Exception e)
@@ -45,17 +51,17 @@ namespace Belletrix.DAL
             return promos;
         }
 
-        public async Task<PromoModel> GetPromo(int id)
+        public async Task<PromoViewModel> GetPromo(int id)
         {
             return (await GetPromos()).FirstOrDefault(p => p.Id == id);
         }
 
-        public async Task<PromoModel> GetPromo(string code)
+        public async Task<PromoViewModel> GetPromo(string code)
         {
             return (await GetPromos()).FirstOrDefault(p => p.Code == code.ToLower());
         }
 
-        public async Task Save(PromoModel model, int userId)
+        public async Task Save(PromoCreateViewModel model, int userId)
         {
             const string sql = @"
                 INSERT INTO [dbo].[UserPromo]
@@ -108,16 +114,16 @@ namespace Belletrix.DAL
             return false;
         }
 
-        public async Task<IEnumerable<PromoModel>> AsSources()
+        public async Task<IEnumerable<PromoSourceViewModel>> AsSources()
         {
             const string sql = @"
-                SELECT      [Id], [Code], [Description]
+                SELECT      [Id], [Description]
                 FROM        [UserPromo]
                 ORDER BY    [Description]";
 
             try
             {
-                return await UnitOfWork.Context().QueryAsync<PromoModel>(sql);
+                return await UnitOfWork.Context().QueryAsync<PromoSourceViewModel>(sql);
             }
             catch (Exception e)
             {
@@ -125,7 +131,7 @@ namespace Belletrix.DAL
                 ErrorStore.LogException(e, HttpContext.Current);
             }
 
-            return new List<PromoModel>();
+            return Enumerable.Empty<PromoSourceViewModel>();
         }
     }
 }
