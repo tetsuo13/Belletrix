@@ -219,6 +219,7 @@ namespace Belletrix.Domain
 
                 model.Id = studentId;
 
+                await StudentPromoRepository.Save(model.Id, model.PromoIds);
                 await EventLogRepository.AddStudentEvent(user.Id, studentId,
                     EventLogTypes.AddStudent, remoteIp);
 
