@@ -19,12 +19,12 @@ namespace Belletrix.Entity.ViewModel
     {
         [Required]
         [Display(Name = "Description")]
-        [MaxLength(256)]
+        [StringLength(256)]
         public string Description { get; set; }
 
         [Required]
         [Display(Name = "Unique Code")]
-        [MaxLength(32)]
+        [StringLength(32)]
         public string Code { get; set; }
     }
 

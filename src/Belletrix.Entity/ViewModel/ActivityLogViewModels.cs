@@ -10,21 +10,21 @@ namespace Belletrix.Entity.ViewModel
     {
         [Required]
         [Display(Name = "Main")]
-        [MaxLength(256)]
+        [StringLength(256)]
         public string Title { get; set; }
 
         [Display(Name = "Subtitle")]
-        [MaxLength(256)]
+        [StringLength(256)]
         public string Title2 { get; set; }
 
         [Display(Name = "Additional")]
-        [MaxLength(256)]
+        [StringLength(256)]
         public string Title3 { get; set; }
 
-        [MaxLength(256)]
+        [StringLength(256)]
         public string Organizers { get; set; }
 
-        [MaxLength(512)]
+        [StringLength(512)]
         public string Location { get; set; }
 
         [Required]
@@ -40,12 +40,12 @@ namespace Belletrix.Entity.ViewModel
         [Display(Name = "On Campus?")]
         public bool? OnCampus { get; set; }
 
-        [MaxLength(2048)]
+        [StringLength(2048)]
         [Display(Name = "Web Site")]
         [Url]
         public string WebSite { get; set; }
 
-        [MaxLength(4096)]
+        [StringLength(4096)]
         [DataType(DataType.MultilineText)]
         public string Notes { get; set; }
 
@@ -101,21 +101,21 @@ namespace Belletrix.Entity.ViewModel
     {
         [Required]
         [Display(Name = "Name")]
-        [MaxLength(128)]
+        [StringLength(128)]
         public string FullName { get; set; }
 
         public Guid SessionId { get; set; }
 
-        [MaxLength(256)]
+        [StringLength(256)]
         [DataType(DataType.MultilineText)]
         public string Description { get; set; }
 
         [Display(Name = "Phone Number")]
-        [MaxLength(32)]
+        [StringLength(32)]
         [Phone]
         public string PhoneNumber { get; set; }
 
-        [MaxLength(128)]
+        [StringLength(128)]
         [EmailAddress]
         public string Email { get; set; }
 
