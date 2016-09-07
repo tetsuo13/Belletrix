@@ -162,7 +162,8 @@
             </div>
             <div class="panel-footer">
                 <div class="btn-group">
-                    @{ 
+                    @if (ViewBag.ShowActionButtons == true)
+                    {
                         string notes = "Notes";
 
                         if (Model.NumberOfNotes > 0)
@@ -174,17 +175,21 @@
                                 notes += "s";
                             }
                         }
+
+                        <a href="@Url.Action("List", "Note", new { studentId = Model.Id })"
+                            class="btn btn-sm btn-default studentlisttooltop studentnote"
+                            data-bt-studentname="@Model.FirstName @Model.MiddleName @Model.LastName"
+                            title="Notes">
+                            <i class="glyphicon glyphicon-book"></i>
+                            @notes
+                        </a>
+                        <a href="@Url.Action("Edit", "Student", new { id = Model.Id })"
+                            class="btn btn-sm btn-default studentlisttooltop" data-placement="top"
+                            title="Edit">
+                            <i class="glyphicon glyphicon-pencil"></i>
+                            Edit
+                        </a>
                     }
-                    <a href="@Url.Action("List", "Note", new { studentId = Model.Id })"
-                        class="btn btn-sm btn-default studentlisttooltop studentnote"
-                        data-bt-studentname="@Model.FirstName @Model.MiddleName @Model.LastName"
-                        title="Notes">
-                        <i class="glyphicon glyphicon-book"></i>
-                        @notes
-                    </a>
-                    <a href="@Url.Action("Edit", "Student", new { id = Model.Id })"
-                        class="btn btn-sm btn-default studentlisttooltop" data-placement="top"
-                        title="Edit"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
                 </div>
             </div>
         </div>

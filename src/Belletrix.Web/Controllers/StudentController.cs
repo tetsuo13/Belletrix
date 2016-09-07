@@ -75,6 +75,7 @@ namespace Belletrix.Web.Controllers
 
             ViewBag.StudyAbroad = await StudyAbroadService.GetAll(id);
             ViewBag.Notes = await StudentNoteService.GetAllNotes(id);
+            ViewBag.ShowActionButtons = true;
             await PrepareDropDowns();
             await PrepareStudyAbroadDropDowns();
             Analytics.TrackPageView(Request, "Student", (Session["User"] as UserModel).Login);
@@ -102,6 +103,7 @@ namespace Belletrix.Web.Controllers
 
             ViewBag.StudyAbroad = await StudyAbroadService.GetAll(id);
             ViewBag.Notes = await StudentNoteService.GetAllNotes(id);
+            ViewBag.ShowActionButtons = false;
             await PrepareDropDowns();
             await PrepareStudyAbroadDropDowns();
 
