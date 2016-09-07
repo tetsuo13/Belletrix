@@ -6,6 +6,8 @@ var Belletrix;
      * Promo management only available to internal users.
      */
     var Promo = (function () {
+        function Promo() {
+        }
         /**
          * Promotions initialization.
          *
@@ -13,12 +15,11 @@ var Belletrix;
          * @param nameSelector Selector for name input.
          * @param resultImageSelector Selector for inline image for results.
          */
-        function Promo(uniqueNameCheckUrl, nameSelector, resultImageSelector) {
+        Promo.prototype.initAddForm = function (uniqueNameCheckUrl, nameSelector, resultImageSelector) {
             var self = this;
-            $(resultImageSelector).hide();
             // Add a delay when checking the name to give the user a chance to
-            // complete their typing. Otherwise, a straight "onkeyup" event would
-            // trigger many times before the user would be finished.
+            // complete their typing. Otherwise, a straight "onkeyup" event
+            // would trigger many times before the user would be finished.
             $(nameSelector)
                 .data("timeout", null)
                 .keyup(function (event) {
@@ -28,7 +29,8 @@ var Belletrix;
                     self.checkNameForUniqueness(uniqueNameCheckUrl, nameSelector, resultImageSelector);
                 }, 500));
             });
-        }
+            $('[data-toggle="tooltip"]').tooltip();
+        };
         /**
          * Pass name along to ajax request to check for uniqueness.
          *
@@ -39,26 +41,27 @@ var Belletrix;
          */
         Promo.prototype.checkNameForUniqueness = function (uniqueNameCheckUrl, nameSelector, resultImageSelector) {
             var feedbackImage = $(resultImageSelector);
-            feedbackImage.removeClass("glyphicon-ok").show().addClass("glyphicon-refresh");
+            feedbackImage.removeClass("glyphicon-remove").addClass("glyphicon-refresh");
             $.ajax({
                 url: uniqueNameCheckUrl,
+                type: "POST",
                 data: { name: $(nameSelector).val() },
                 success: function (data) {
                     var submitButton = $('button[type="submit"]');
+                    feedbackImage.removeClass("glyphicon-ok glyphicon-refresh");
                     switch (data) {
                         case "win":
                             submitButton.removeClass("disabled");
-                            feedbackImage.hide();
+                            feedbackImage.addClass("glyphicon-ok");
                             break;
                         default:
                             if (!submitButton.hasClass("disabled")) {
                                 submitButton.addClass("disabled");
                             }
-                            feedbackImage.removeClass("glyphicon-ok glyphicon-refresh").addClass("glyphicon-remove");
+                            feedbackImage.addClass("glyphicon-remove");
                             break;
                     }
-                },
-                type: "POST"
+                }
             });
         };
         /**
@@ -77,4 +80,3 @@ var Belletrix;
     }());
     Belletrix.Promo = Promo;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=Promo.js.map

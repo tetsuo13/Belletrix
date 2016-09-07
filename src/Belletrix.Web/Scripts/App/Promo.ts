@@ -13,14 +13,12 @@ module Belletrix {
          * @param nameSelector Selector for name input.
          * @param resultImageSelector Selector for inline image for results.
          */
-        constructor(uniqueNameCheckUrl: string, nameSelector: string, resultImageSelector: string) {
+        public initAddForm(uniqueNameCheckUrl: string, nameSelector: string, resultImageSelector: string): void {
             let self = this;
 
-            $(resultImageSelector).hide();
-
             // Add a delay when checking the name to give the user a chance to
-            // complete their typing. Otherwise, a straight "onkeyup" event would
-            // trigger many times before the user would be finished.
+            // complete their typing. Otherwise, a straight "onkeyup" event
+            // would trigger many times before the user would be finished.
             $(nameSelector)
                 .data("timeout", null)
                 .keyup(function (event: JQueryEventObject): void {
@@ -32,6 +30,8 @@ module Belletrix {
                         self.checkNameForUniqueness(uniqueNameCheckUrl, nameSelector, resultImageSelector);
                     }, 500));
                 });
+
+            $('[data-toggle="tooltip"]').tooltip();
         }
 
         /**
@@ -42,32 +42,36 @@ module Belletrix {
          * @param nameSelector Selector for name input.
          * @param resultImageSelector Selector for inline image for results.
          */
-        private checkNameForUniqueness(uniqueNameCheckUrl: string, nameSelector: string, resultImageSelector: string): void {
+        private checkNameForUniqueness(uniqueNameCheckUrl: string, nameSelector: string,
+            resultImageSelector: string): void {
+
             let feedbackImage: JQuery = $(resultImageSelector);
 
-            feedbackImage.removeClass("glyphicon-ok").show().addClass("glyphicon-refresh");
+            feedbackImage.removeClass("glyphicon-remove").addClass("glyphicon-refresh");
 
             $.ajax({
                 url: uniqueNameCheckUrl,
+                type: "POST",
                 data: { name: $(nameSelector).val() },
                 success: function (data: string): void {
-                    var submitButton = $('button[type="submit"]');
+                    let submitButton: JQuery = $('button[type="submit"]');
+
+                    feedbackImage.removeClass("glyphicon-ok glyphicon-refresh");
 
                     switch (data) {
                         case "win":
                             submitButton.removeClass("disabled");
-                            feedbackImage.hide();
+                            feedbackImage.addClass("glyphicon-ok");
                             break;
 
                         default:
                             if (!submitButton.hasClass("disabled")) {
                                 submitButton.addClass("disabled");
                             }
-                            feedbackImage.removeClass("glyphicon-ok glyphicon-refresh").addClass("glyphicon-remove");
+                            feedbackImage.addClass("glyphicon-remove");
                             break;
                     }
-                },
-                type: "POST"
+                }
             });
         }
 

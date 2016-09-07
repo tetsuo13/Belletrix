@@ -26,6 +26,10 @@ namespace Belletrix.Entity.ViewModel
         [Display(Name = "Unique Code")]
         [StringLength(32)]
         public string Code { get; set; }
+
+        [Required]
+        [Display(Name = "Require Code for Access?")]
+        public bool RequireCode { get; set; }
     }
 
     /// <summary>

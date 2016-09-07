@@ -71,7 +71,7 @@ namespace Belletrix.Web.Controllers
             }
 
             Analytics.TrackPageView(Request, "Add Promo", (Session["User"] as UserModel).Login);
-            return View();
+            return View(model);
         }
 
         public async Task<ActionResult> Info(int id)
