@@ -30,9 +30,9 @@ namespace Belletrix.Domain
             return await PromoRepository.GetPromo(code);
         }
 
-        public async Task Save(PromoCreateViewModel model, int userId)
+        public async Task<int> Save(PromoCreateViewModel model, int userId)
         {
-            await PromoRepository.Save(model, userId);
+            return await PromoRepository.Save(model, userId);
         }
 
         public async Task<bool> CheckNameForUniqueness(string name)

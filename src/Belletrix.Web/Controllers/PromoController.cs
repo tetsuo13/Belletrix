@@ -66,8 +66,8 @@ namespace Belletrix.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                await PromoService.Save(model, (Session["User"] as UserModel).Id);
-                return RedirectToAction("List");
+                int promoId = await PromoService.Save(model, (Session["User"] as UserModel).Id);
+                return RedirectToAction("Info", new { id = promoId });
             }
 
             Analytics.TrackPageView(Request, "Add Promo", (Session["User"] as UserModel).Login);

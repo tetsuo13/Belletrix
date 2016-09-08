@@ -9,7 +9,7 @@ namespace Belletrix.Domain
         Task<IEnumerable<PromoViewModel>> GetPromos();
         Task<PromoViewModel> GetPromo(int id);
         Task<PromoViewModel> GetPromo(string code);
-        Task Save(PromoCreateViewModel model, int userId);
+        Task<int> Save(PromoCreateViewModel model, int userId);
         Task<bool> CheckNameForUniqueness(string name);
         Task<IEnumerable<PromoSourceViewModel>> AsSources();
     }
