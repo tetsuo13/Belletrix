@@ -85,7 +85,9 @@ namespace Belletrix.Web.Controllers
 
             if (user == null)
             {
-                return HttpNotFound();
+                string message = string.Format("User ID {0} not found", id);
+                MvcApplication.LogException(new ArgumentException(message, "id"));
+                return RedirectToAction("NotFound", "Error");
             }
 
             UserModel currentUser = Session["User"] as UserModel;
