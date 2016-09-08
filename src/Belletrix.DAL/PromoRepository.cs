@@ -55,17 +55,18 @@ namespace Belletrix.DAL
             return (await GetPromos()).FirstOrDefault(p => p.Code == code.ToLower());
         }
 
-        public async Task Save(PromoModel model, int userId)
+        public async Task<int> Save(PromoModel model, int userId)
         {
             const string sql = @"
                 INSERT INTO [dbo].[UserPromo]
                 ([Description], [CreatedBy], [Created], [Code], [Active])
+                OUTPUT INSERTED.Id
                 VALUES
                 (@Description, @CreatedBy, @Created, @Code, @Active)";
 
             try
             {
-                await UnitOfWork.Context().ExecuteAsync(sql,
+                return (await UnitOfWork.Context().QueryAsync<int>(sql,
                     new
                     {
                         Description = model.Description,
@@ -73,7 +74,7 @@ namespace Belletrix.DAL
                         Created = DateTime.Now.ToUniversalTime(),
                         Code = model.Code.ToLower(),
                         Active = true
-                    });
+                    })).Single();
             }
             catch (Exception e)
             {
