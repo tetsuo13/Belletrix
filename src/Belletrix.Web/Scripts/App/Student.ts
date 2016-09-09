@@ -51,7 +51,7 @@
                 "StudyAbroadYear": years,
                 "StudyAbroadPeriod": periods
             };
-            let addExistingValues = countries && years && periods;
+            const addExistingValues = countries && years && periods;
 
             if (addExistingValues && countries.length == 0) {
                 return;
@@ -62,7 +62,7 @@
                 $.each(destinationFieldNames, function (idName, values) {
                     // Select the "Please Select" option in cases of a zero. This
                     // is an invalid value.
-                    let optionSelector: string = values[0] == "" ? "option:first" : "option[value=" + values[0] + "]";
+                    const optionSelector: string = values[0] == "" ? "option:first" : "option[value=" + values[0] + "]";
 
                     $("select#" + idName + " " + optionSelector).attr("selected", "selected");
                 });
@@ -88,7 +88,7 @@
          * @param selIndex Index to select.
          */
         private addStudyAbroadRow(destinationFieldNames: any, selIndex?: number): void {
-            let rowId: string = Belletrix.Common.randomString();
+            const rowId: string = Belletrix.Common.randomString();
             let enclosure: JQuery;
             let anchor: JQuery;
 

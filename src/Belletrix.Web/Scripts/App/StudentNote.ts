@@ -6,8 +6,8 @@ module Belletrix {
             let self = this;
 
             $("a.studentnote").on('click', function (e: JQueryEventObject): void {
-                let anchor: JQuery = $(this);
-                let studentFullName: string = anchor.attr("data-bt-studentname");
+                const anchor: JQuery = $(this);
+                const studentFullName: string = anchor.attr("data-bt-studentname");
 
                 e.preventDefault();
 
@@ -38,7 +38,7 @@ module Belletrix {
         private handleNewNote(formSelector: string, noteSelector: string): void {
             $(formSelector).submit(function (event) {
                 let noteElement: JQuery = $(noteSelector);
-                let noteValue: string = noteElement.val();
+                const noteValue: string = noteElement.val();
 
                 event.preventDefault();
 
