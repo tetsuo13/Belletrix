@@ -44,9 +44,11 @@ namespace Belletrix.Web.Controllers
             {
                 await PrepareStudent(studentId);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return HttpNotFound("Invalid student");
+                string message = string.Format("Invalid student ID {0}", studentId);
+                MvcApplication.LogException(new ArgumentException(message, "studentId", e));
+                return RedirectToAction("NotFound", "Error");
             }
 
             await PrepareDropDowns();
@@ -68,9 +70,11 @@ namespace Belletrix.Web.Controllers
             {
                 await PrepareStudent(model.StudentId);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return HttpNotFound("Invalid student");
+                string message = string.Format("Invalid student ID {0}", model.StudentId);
+                MvcApplication.LogException(new ArgumentException(message, "model", e));
+                return RedirectToAction("NotFound", "Error");
             }
 
             await PrepareDropDowns();

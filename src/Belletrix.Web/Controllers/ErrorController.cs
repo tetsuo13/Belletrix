@@ -10,5 +10,11 @@ namespace Belletrix.Web.Controllers
             Analytics.TrackPageView(Request, "Error - AntiForgery");
             return View();
         }
+
+        public ActionResult NotFound()
+        {
+            Analytics.TrackPageView(Request, "Error - NotFound");
+            return View();
+        }
     }
 }

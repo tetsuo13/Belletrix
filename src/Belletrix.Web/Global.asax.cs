@@ -1,16 +1,16 @@
 ﻿using Belletrix.Web.App_Start;
-using System.Linq;
 using StackExchange.Exceptional;
 using StackExchange.Profiling;
+using StackExchange.Profiling.Mvc;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web;
 using System.Web.Helpers;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-using StackExchange.Profiling.Mvc;
-using System.Collections.Generic;
 
 namespace Belletrix.Web
 {
@@ -56,7 +56,7 @@ namespace Belletrix.Web
         /// Configures the anti-forgery tokens. See
         /// http://www.asp.net/mvc/overview/security/xsrfcsrf-prevention-in-aspnet-mvc-and-web-pages
         /// </summary>
-        private static void ConfigureAntiForgeryTokens()
+        private void ConfigureAntiForgeryTokens()
         {
             // Rename the Anti-Forgery cookie from "__RequestVerificationToken" to "f". This adds a little security
             // through obscurity and also saves sending a few characters over the wire. Sadly there is no way to change
@@ -65,9 +65,9 @@ namespace Belletrix.Web
             // <input name="__RequestVerificationToken" type="hidden" value="..." />
             AntiForgeryConfig.CookieName = "f";
 
+#if !DEBUG
             // If you have enabled SSL. Uncomment this line to ensure that the Anti-Forgery
             // cookie requires SSL to be sent across the wire.
-#if !DEBUG
             AntiForgeryConfig.RequireSsl = true;
 #endif
         }
@@ -77,7 +77,7 @@ namespace Belletrix.Web
         /// Razor (RazorViewEngine) view engines. You can remove view engines you are not using here for better
         /// performance.
         /// </summary>
-        private static void ConfigureViewEngines()
+        private void ConfigureViewEngines()
         {
             // Only use the RazorViewEngine.
             ViewEngines.Engines.Clear();

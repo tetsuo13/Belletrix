@@ -63,14 +63,18 @@ namespace Belletrix.Web.Controllers
             {
                 student = await StudentService.GetStudent(id);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return HttpNotFound();
+                string message = string.Format("Student ID {0} not found", id);
+                MvcApplication.LogException(new ArgumentException(message, "id", e));
+                return RedirectToAction("NotFound", "Error");
             }
 
             if (student == null)
             {
-                return HttpNotFound();
+                string message = string.Format("Student ID {0} returned null", id);
+                MvcApplication.LogException(new ArgumentException(message, "id"));
+                return RedirectToAction("NotFound", "Error");
             }
 
             ViewBag.StudyAbroad = await StudyAbroadService.GetAll(id);
@@ -91,14 +95,18 @@ namespace Belletrix.Web.Controllers
             {
                 student = await StudentService.GetStudent(id);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return HttpNotFound();
+                string message = string.Format("Student ID {0} not found", id);
+                MvcApplication.LogException(new ArgumentException(message, "id", e));
+                return RedirectToAction("NotFound", "Error");
             }
 
             if (student == null)
             {
-                return HttpNotFound();
+                string message = string.Format("Student ID {0} returned null", id);
+                MvcApplication.LogException(new ArgumentException(message, "id"));
+                return RedirectToAction("NotFound", "Error");
             }
 
             ViewBag.StudyAbroad = await StudyAbroadService.GetAll(id);
@@ -114,7 +122,8 @@ namespace Belletrix.Web.Controllers
         {
             if (id == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                MvcApplication.LogException(new ArgumentException("Missing student ID", "id"));
+                return RedirectToAction("NotFound", "Error");
             }
 
             StudentModel student;
@@ -123,14 +132,18 @@ namespace Belletrix.Web.Controllers
             {
                 student = await StudentService.GetStudent(id.Value);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return HttpNotFound();
+                string message = string.Format("Student ID {0} not found", id.Value);
+                MvcApplication.LogException(new ArgumentException(message, "id", e));
+                return RedirectToAction("NotFound", "Error");
             }
 
             if (student == null)
             {
-                return HttpNotFound();
+                string message = string.Format("Student ID {0} returned null", id.Value);
+                MvcApplication.LogException(new ArgumentException(message, "id"));
+                return RedirectToAction("NotFound", "Error");
             }
 
             await PrepareDropDowns();

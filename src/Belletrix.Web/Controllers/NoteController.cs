@@ -26,9 +26,11 @@ namespace Belletrix.Web.Controllers
             {
                 ViewBag.Student = await StudentService.GetStudent(studentId);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return HttpNotFound();
+                string message = string.Format("Student ID {0} not found", studentId);
+                MvcApplication.LogException(new ArgumentException(message, "studentId", e));
+                return RedirectToAction("NotFound", "Error");
             }
 
             Analytics.TrackPageView(Request, "Note List", (Session["User"] as UserModel).Login);

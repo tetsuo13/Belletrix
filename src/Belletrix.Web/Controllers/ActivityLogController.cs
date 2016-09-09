@@ -38,8 +38,9 @@ namespace Belletrix.Web.Controllers
 
             if (activity == null)
             {
-                Analytics.TrackPageView(Request, "Activity Log Error", (Session["User"] as UserModel).Login);
-                return HttpNotFound();
+                string message = string.Format("Activity Log ID {0} not found", id);
+                MvcApplication.LogException(new ArgumentException(message, "id"));
+                return RedirectToAction("NotFound", "Error");
             }
 
             Analytics.TrackPageView(Request, "Activity Log View", (Session["User"] as UserModel).Login);
@@ -122,8 +123,9 @@ namespace Belletrix.Web.Controllers
 
             if (activity == null)
             {
-                Analytics.TrackPageView(Request, "Activity Log Error", (Session["User"] as UserModel).Login);
-                return HttpNotFound();
+                string message = string.Format("Activity Log ID {0} not found", id);
+                MvcApplication.LogException(new ArgumentException(message, "id"));
+                return RedirectToAction("NotFound", "Error");
             }
 
             Analytics.TrackPageView(Request, "Activity Log Edit", (Session["User"] as UserModel).Login);

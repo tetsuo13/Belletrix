@@ -80,7 +80,9 @@ namespace Belletrix.Web.Controllers
 
             if (promo == null)
             {
-                return HttpNotFound();
+                string message = string.Format("Promo ID {0} not found", id);
+                MvcApplication.LogException(new ArgumentException(message, "id"));
+                return RedirectToAction("NotFound", "Error");
             }
 
             Analytics.TrackPageView(Request, "Promo Info", (Session["User"] as UserModel).Login);
@@ -93,7 +95,9 @@ namespace Belletrix.Web.Controllers
 
             if (promo == null)
             {
-                return HttpNotFound();
+                string message = string.Format("Promo ID {0} not found", id);
+                MvcApplication.LogException(new ArgumentException(message, "id"));
+                return RedirectToAction("NotFound", "Error");
             }
 
             ViewBag.Promo = promo;
