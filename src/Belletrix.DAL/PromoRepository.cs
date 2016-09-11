@@ -23,12 +23,17 @@ namespace Belletrix.DAL
         public async Task<IEnumerable<PromoViewModel>> GetPromos()
         {
             List<PromoViewModel> promos = new List<PromoViewModel>();
+
+            // Must convert the Guid column otherwise you get: "Invalid cast
+            // from 'System.String' to 'System.Guid'" exception. See
+            // https://github.com/StackExchange/dapper-dot-net/issues/447
             const string sql = @"
                 SELECT      p.Id AS Id,
                             [Description],
                             p.Created,
                             [Code],
-                            p.Active AS IsActive,
+                            CONVERT(UNIQUEIDENTIFIER, PublicToken) AS PublicToken,
+                            p.Active,
                             u.FirstName AS CreatedByFirstName,
                             u.LastName AS CreatedByLastName,
                             (SELECT COUNT(*) FROM [StudentPromoLog] WHERE [PromoId] = p.Id) AS Students
@@ -61,26 +66,18 @@ namespace Belletrix.DAL
             return (await GetPromos()).FirstOrDefault(p => p.Code == code.ToLower());
         }
 
-        public async Task<int> Save(PromoCreateViewModel model, int userId)
+        public async Task<int> Save(UserPromoModel model, int userId)
         {
             const string sql = @"
                 INSERT INTO [dbo].[UserPromo]
-                ([Description], [CreatedBy], [Created], [Code], [Active])
+                ([Description], [CreatedBy], [Created], [Code], [Active], [PublicToken])
                 OUTPUT INSERTED.Id
                 VALUES
-                (@Description, @CreatedBy, @Created, @Code, @Active)";
+                (@Description, @CreatedBy, @Created, @Code, @Active, @PublicToken)";
 
             try
             {
-                return (await UnitOfWork.Context().QueryAsync<int>(sql,
-                    new
-                    {
-                        Description = model.Description,
-                        CreatedBy = userId,
-                        Created = DateTime.Now.ToUniversalTime(),
-                        Code = model.Code.ToLower(),
-                        Active = true
-                    })).Single();
+                return (await UnitOfWork.Context().QueryAsync<int>(sql, model)).Single();
             }
             catch (Exception e)
             {

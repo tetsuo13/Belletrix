@@ -10,7 +10,18 @@
 @section FooterScript {
     <script>
         $(function () {
-            $('#promolist').dataTable();
+            'use strict';
+            $('#promolist').dataTable({
+                columns: [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    { orderable: false }
+                ]
+            });
+            $('[data-toggle="tooltip"]').tooltip();
         });
     </script>
 }
@@ -45,11 +56,12 @@
                 <thead>
                     <tr>
                         <th>Code</th>
-                        <th>Creator</th>
                         <th>Created</th>
                         <th>Description</th>
                         <th>Students</th>
                         <th>Active</th>
+                        <th>Public</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -57,8 +69,12 @@
                     {
                         <tr>
                             <td>@Html.ActionLink(promo.Code, "Info", new { id = promo.Id })</td>
-                            <td>@promo.CreatedByFirstName @promo.CreatedByLastName</td>
-                            <td>@DateTimeFilter.UtcToLocal(promo.Created)</td>
+                            <td>
+                                <span data-toggle="tooltip"
+                                    title="@promo.Created by @promo.CreatedByFirstName @promo.CreatedByLastName">
+                                    @promo.Created.ToShortDateString()
+                                </span>
+                            </td>
                             <td>@promo.Description</td>
                             <td>
                                 @if (promo.Students > 0)
@@ -67,10 +83,23 @@
                                 }
                             </td>
                             <td>
-                                @if (promo.IsActive)
+                                @if (promo.Active)
                                 {
                                     <i class="glyphicon glyphicon-ok"></i>
                                 }
+                            </td>
+                            <td>
+                                @if (promo.PublicToken.HasValue)
+                                {
+                                    <i class="glyphicon glyphicon-ok"></i>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="@Url.Action("Edit", "Promo", new { id = promo.Id })"
+                                       class="btn btn-xs btn-info" data-placement="top"
+                                       title="Edit"><i class="glyphicon glyphicon-pencil"></i></a>
+                                </div>
                             </td>
                         </tr>
                     }

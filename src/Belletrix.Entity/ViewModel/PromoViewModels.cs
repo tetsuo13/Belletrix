@@ -11,8 +11,9 @@ namespace Belletrix.Entity.ViewModel
         public string CreatedByLastName { get; set; }
         public DateTime Created { get; set; }
         public string Code { get; set; }
-        public bool IsActive { get; set; }
+        public bool Active { get; set; }
         public int Students { get; set; }
+        public Guid? PublicToken { get; set; }
     }
 
     public class PromoCreateViewModel
