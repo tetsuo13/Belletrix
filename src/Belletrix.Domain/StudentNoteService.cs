@@ -11,13 +11,13 @@ namespace Belletrix.Domain
     public class StudentNoteService : IStudentNoteService
     {
         private readonly IStudentNoteRepository StudentNoteRepository;
-        private readonly IEventLogRepository EventLogRepository;
+        private readonly IEventLogService EventLogService;
 
         public StudentNoteService(IStudentNoteRepository studentNoteRepository,
-            IEventLogRepository eventLogRepository)
+            IEventLogService eventLogService)
         {
             StudentNoteRepository = studentNoteRepository;
-            EventLogRepository = eventLogRepository;
+            EventLogService = eventLogService;
         }
 
         public async Task<IEnumerable<NoteModel>> GetAllNotes(int studentId)
@@ -30,7 +30,7 @@ namespace Belletrix.Domain
             using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 await StudentNoteRepository.InsertNote(userId, model);
-                await EventLogRepository.AddStudentEvent(userId, model.StudentId, EventLogTypes.AddStudentNote,
+                await EventLogService.AddStudentEvent(userId, model.StudentId, EventLogTypes.AddStudentNote,
                     remoteIp);
 
                 scope.Complete();

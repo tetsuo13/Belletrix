@@ -1,6 +1,6 @@
 ﻿using Belletrix.Core;
-using Belletrix.Entity.Enum;
 using Belletrix.Entity.Model;
+using Belletrix.Entity.ViewModel;
 using Dapper;
 using StackExchange.Exceptional;
 using System;
@@ -19,9 +19,9 @@ namespace Belletrix.DAL
             UnitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<EventLogModel>> GetEvents()
+        public async Task<IEnumerable<EventLogViewModel>> GetEvents()
         {
-            ICollection<EventLogModel> events = new List<EventLogModel>();
+            ICollection<EventLogViewModel> events = new List<EventLogViewModel>();
 
             const string sql = @"
                 SELECT          TOP(8) e.Id, e.Date, e.ModifiedBy,
@@ -60,7 +60,7 @@ namespace Belletrix.DAL
                         };
                     }
 
-                    EventLogModel eventLog = new EventLogModel()
+                    EventLogViewModel eventLog = new EventLogViewModel()
                     {
                         Id = (int)row["Id"],
                         EventDate = DateTimeFilter.UtcToLocal((DateTime)row["Date"]),
@@ -69,8 +69,7 @@ namespace Belletrix.DAL
                         ModifiedByLastName = (string)row["LastName"],
                         Student = student,
                         Type = (int)row["Type"],
-                        Action = (string)row["Action"],
-                        IPAddress = row["IPAddress"] as string
+                        Action = (string)row["Action"]
                     };
 
                     if (row.ContainsKey("UserId") && row["UserId"] != null)
@@ -95,13 +94,7 @@ namespace Belletrix.DAL
             return events;
         }
 
-        public async Task AddStudentEvent(int studentId, EventLogTypes eventType, string remoteIp)
-        {
-            await AddStudentEvent(0, studentId, eventType, remoteIp);
-        }
-
-        public async Task AddStudentEvent(int modifiedBy, int studentId,
-            EventLogTypes eventType, string remoteIp)
+        public async Task AddStudentEvent(EventLogModel log)
         {
             const string sql = @"
                 INSERT INTO [dbo].[EventLog]
@@ -111,15 +104,8 @@ namespace Belletrix.DAL
 
             try
             {
-                await UnitOfWork.Context().ExecuteAsync(sql,
-                    new
-                    {
-                        Date = DateTime.Now.ToUniversalTime(),
-                        ModifiedBy = modifiedBy == 0 ? null : (object)modifiedBy,
-                        StudentId = studentId,
-                        Type = (int)eventType,
-                        IpAddress = remoteIp
-                    });
+                log.Date = log.Date.ToUniversalTime();
+                await UnitOfWork.Context().ExecuteAsync(sql, log);
             }
             catch (Exception e)
             {

@@ -16,15 +16,15 @@ namespace Belletrix.Domain
         private readonly IStudentRepository StudentRepository;
         private readonly IStudentPromoRepository StudentPromoRepository;
         private readonly IStudyAbroadRepository StudyAbroadRepository;
-        private readonly IEventLogRepository EventLogRepository;
+        private readonly IEventLogService EventLogService;
 
         public StudentService(IStudentRepository studentRepository, IStudentPromoRepository studentPromoRepository,
-            IStudyAbroadRepository studyAbroadRepository, IEventLogRepository eventLogRepository)
+            IStudyAbroadRepository studyAbroadRepository, IEventLogService eventLogService)
         {
             StudentRepository = studentRepository;
             StudentPromoRepository = studentPromoRepository;
             StudyAbroadRepository = studyAbroadRepository;
-            EventLogRepository = eventLogRepository;
+            EventLogService = eventLogService;
         }
 
         private async Task<IEnumerable<StudentModel>> PopulatePromoLogs(IEnumerable<StudentModel> students)
@@ -220,8 +220,7 @@ namespace Belletrix.Domain
                 model.Id = studentId;
 
                 await StudentPromoRepository.Save(model.Id, model.PromoIds);
-                await EventLogRepository.AddStudentEvent(user.Id, studentId,
-                    EventLogTypes.AddStudent, remoteIp);
+                await EventLogService.AddStudentEvent(user.Id, studentId, EventLogTypes.AddStudent, remoteIp);
 
                 scope.Complete();
             }
@@ -238,12 +237,12 @@ namespace Belletrix.Domain
 
                 if (userId.HasValue)
                 {
-                    await EventLogRepository.AddStudentEvent(userId.Value, model.Id,
-                        EventLogTypes.EditStudent, remoteIp);
+                    await EventLogService.AddStudentEvent(userId.Value, model.Id, EventLogTypes.EditStudent,
+                        remoteIp);
                 }
                 else
                 {
-                    await EventLogRepository.AddStudentEvent(model.Id, EventLogTypes.EditStudent, remoteIp);
+                    await EventLogService.AddStudentEvent(model.Id, EventLogTypes.EditStudent, remoteIp);
                 }
 
                 scope.Complete();
@@ -291,7 +290,7 @@ namespace Belletrix.Domain
 
                 await StudentRepository.UpdateStudent(model);
                 await StudentPromoRepository.Save(model.Id, model.PromoIds);
-                await EventLogRepository.AddStudentEvent(user.Id, model.Id, EventLogTypes.EditStudent, remoteIp);
+                await EventLogService.AddStudentEvent(user.Id, model.Id, EventLogTypes.EditStudent, remoteIp);
 
                 scope.Complete();
             }
