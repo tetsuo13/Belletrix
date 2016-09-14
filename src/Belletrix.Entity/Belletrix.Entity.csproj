@@ -45,6 +45,7 @@
     <Compile Include="Model\ActivityLogSessionModel.cs" />
     <Compile Include="Model\CountryModel.cs" />
     <Compile Include="Model\EventLogModel.cs" />
+    <Compile Include="ViewModel\EventLogViewModel.cs" />
     <Compile Include="Model\LanguageModel.cs" />
     <Compile Include="Model\MajorsModel.cs" />
     <Compile Include="Model\MinorsModel.cs" />

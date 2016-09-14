@@ -1,5 +1,5 @@
-﻿using Belletrix.Entity.Enum;
-using Belletrix.Entity.Model;
+﻿using Belletrix.Entity.Model;
+using Belletrix.Entity.ViewModel;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,8 +7,7 @@ namespace Belletrix.DAL
 {
     public interface IEventLogRepository
     {
-        Task<IEnumerable<EventLogModel>> GetEvents();
-        Task AddStudentEvent(int studentId, EventLogTypes eventType);
-        Task AddStudentEvent(int modifiedBy, int studentId, EventLogTypes eventType);
+        Task<IEnumerable<EventLogViewModel>> GetEvents();
+        Task AddStudentEvent(EventLogModel log);
     }
 }

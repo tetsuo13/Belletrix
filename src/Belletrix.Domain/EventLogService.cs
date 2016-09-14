@@ -1,6 +1,8 @@
 ﻿using Belletrix.DAL;
 using Belletrix.Entity.Enum;
 using Belletrix.Entity.Model;
+using Belletrix.Entity.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -15,19 +17,39 @@ namespace Belletrix.Domain
             EventLogRepository = eventLogRepository;
         }
 
-        public async Task<IEnumerable<EventLogModel>> GetEvents()
+        public async Task<IEnumerable<EventLogViewModel>> GetEvents()
         {
             return await EventLogRepository.GetEvents();
         }
 
         public async Task AddStudentEvent(int studentId, EventLogTypes eventType)
         {
-            await EventLogRepository.AddStudentEvent(studentId, eventType);
+            EventLogModel log = new EventLogModel()
+            {
+                Date = DateTime.Now,
+                StudentId = studentId,
+                Type = (int)eventType
+            };
+
+            await AddStudentEvent(log);
         }
 
         public async Task AddStudentEvent(int modifiedBy, int studentId, EventLogTypes eventType)
         {
-            await EventLogRepository.AddStudentEvent(modifiedBy, studentId, eventType);
+            EventLogModel log = new EventLogModel()
+            {
+                Date = DateTime.Now,
+                ModifiedBy = modifiedBy,
+                StudentId = studentId,
+                Type = (int)eventType
+            };
+
+            await AddStudentEvent(log);
+        }
+
+        private async Task AddStudentEvent(EventLogModel log)
+        {
+            await EventLogRepository.AddStudentEvent(log);
         }
     }
 }

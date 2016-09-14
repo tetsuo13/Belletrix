@@ -1,6 +1,6 @@
 ﻿@using Belletrix.Core;
 @using Belletrix.Entity.Enum;
-@using Belletrix.Entity.Model;
+@using Belletrix.Entity.ViewModel;
 
 @{
     ViewBag.Title = "Index";
@@ -20,7 +20,7 @@
                 </div>
                 <div class="panel-body">
                     <div class="list-group">
-                        @foreach (EventLogModel eventLog in ViewBag.RecentActivity)
+                        @foreach (EventLogViewModel eventLog in ViewBag.RecentActivity)
                         {
                             string action = String.Empty;
                             string personName = eventLog.Student.FirstName + " " + eventLog.Student.LastName;
