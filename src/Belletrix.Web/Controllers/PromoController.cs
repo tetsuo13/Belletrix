@@ -147,6 +147,13 @@ namespace Belletrix.Web.Controllers
         }
 
         [AllowAnonymous]
+        public ActionResult Entry(Guid token)
+        {
+            TrackPageView("Promo Entry");
+            return View();
+        }
+
+        [AllowAnonymous]
         public async Task<ActionResult> Form()
         {
             HttpCookie cookie = HttpContext.Request.Cookies["promo"] ?? null;

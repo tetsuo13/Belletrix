@@ -10,14 +10,25 @@
         Host = Request.Url.Host,
         Path = Url.Action("Entry")
     };
-    
+
     if (Request.IsLocal)
     {
         landingPage.Port = Request.Url.Port;
     }
+
+    if (Model.PublicToken.HasValue)
+    {
+        landingPage.Path = Url.Action("Entry", new { token = Model.PublicToken.Value });
+    }
 }
 
 @section Body {
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">@Model.Description <small>(@Model.Code)</small></h1>
+        </div>
+    </div>
+@*
     <div class="jumbotron">
         <p class="lead">
             The details to the promotional form <code>@Model.Code</code>
@@ -33,10 +44,19 @@
             <dd>@Model.Code</dd>
         </dl>
 
+        @if (Model.PublicToken.HasValue)
+        {
+            <dl class="dl-horizontal">
+                <dt>URL:</dt>
+                <dd>@landingPage.Uri</dd>
+            </dl>
+        }
+
         <p>To continue to the landing page now, click the following:</p>
 
         <p>
             <a class="btn btn-lg btn-success" role="button" href="@landingPage.Uri">Go To the Landing Page</a>
         </p>
     </div>
+*@
 }
