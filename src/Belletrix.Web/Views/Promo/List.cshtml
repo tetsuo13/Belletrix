@@ -5,23 +5,24 @@
 
 @{
     ViewBag.Title = "List";
+    UriBuilder landingPage = new UriBuilder()
+    {
+        Scheme = Request.Url.Scheme,
+        Host = Request.Url.Host,
+        Path = Url.Action("Entry")
+    };
+
+    if (Request.IsLocal)
+    {
+        landingPage.Port = Request.Url.Port;
+    }
 }
 
 @section FooterScript {
     <script>
         $(function () {
-            'use strict';
-            $('#promolist').dataTable({
-                columns: [
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    { orderable: false }
-                ]
-            });
-            $('[data-toggle="tooltip"]').tooltip();
+            new Belletrix.Promo().initPromoList('#promolist', '#deleteconfirm',
+                '@Url.Action("Delete", "Promo")');
         });
     </script>
 }
@@ -47,6 +48,10 @@
                 for students to fill out. These pages do not require logging
                 in. Please separate events into their own promos.
             </p>
+            <div class="alert alert-info">
+                Link to promo entries:
+                @Html.ActionLink(landingPage.ToString(), "Entry")
+            </div>
         </div>
     </div>
 
@@ -60,7 +65,6 @@
                         <th>Description</th>
                         <th>Students</th>
                         <th>Active</th>
-                        <th>Public</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -68,7 +72,15 @@
                     @foreach (PromoViewModel promo in Model)
                     {
                         <tr>
-                            <td>@Html.ActionLink(promo.Code, "Info", new { id = promo.Id })</td>
+                            <td>
+                                @Html.ActionLink(promo.Code, "Info", new { id = promo.Id })
+                                @if (!promo.PublicToken.HasValue)
+                                {
+                                    <sup title="Access to promo requires the code">
+                                        <small><span class="glyphicon glyphicon-lock"></span></small>
+                                    </sup>
+                                }
+                            </td>
                             <td>
                                 <span data-toggle="tooltip"
                                     title="@promo.Created by @promo.CreatedByFirstName @promo.CreatedByLastName">
@@ -76,20 +88,9 @@
                                 </span>
                             </td>
                             <td>@promo.Description</td>
-                            <td>
-                                @if (promo.Students > 0)
-                                {
-                                    @Html.ActionLink(promo.Students.ToString("N0"), "Students", new { id = promo.Id })
-                                }
-                            </td>
+                            <td>@promo.TotalStudents</td>
                             <td>
                                 @if (promo.Active)
-                                {
-                                    <i class="glyphicon glyphicon-ok"></i>
-                                }
-                            </td>
-                            <td>
-                                @if (promo.PublicToken.HasValue)
                                 {
                                     <i class="glyphicon glyphicon-ok"></i>
                                 }
@@ -99,12 +100,39 @@
                                     <a href="@Url.Action("Edit", "Promo", new { id = promo.Id })"
                                        class="btn btn-xs btn-info" data-placement="top"
                                        title="Edit"><i class="glyphicon glyphicon-pencil"></i></a>
+
+                                    @if (promo.CanDelete)
+                                    {
+                                        <button type="button" class="btn btn-xs btn-danger"
+                                            data-toggle="modal" data-target="#deleteconfirm"
+                                            data-promoid="@promo.Id">
+                                            <i class="glyphicon glyphicon-trash"></i>
+                                        </button>
+                                    }
                                 </div>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteconfirm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Confirm Delete</h4>
+                </div>
+                <div class="modal-body">
+                    Really delete the promo?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
         </div>
     </div>
 }

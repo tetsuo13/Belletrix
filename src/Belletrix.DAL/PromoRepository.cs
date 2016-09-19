@@ -36,7 +36,7 @@ namespace Belletrix.DAL
                             p.Active,
                             u.FirstName AS CreatedByFirstName,
                             u.LastName AS CreatedByLastName,
-                            (SELECT COUNT(*) FROM [StudentPromoLog] WHERE [PromoId] = p.Id) AS Students
+                            (SELECT COUNT(*) FROM [StudentPromoLog] WHERE [PromoId] = p.Id) AS TotalStudents
                 FROM        [dbo].[UserPromo] p
                 INNER JOIN  [dbo].[Users] u ON
                             [CreatedBy] = u.id
@@ -130,6 +130,26 @@ namespace Belletrix.DAL
             }
 
             return Enumerable.Empty<PromoSourceViewModel>();
+        }
+
+        public async Task<bool> Delete(int id)
+        {
+            const string sql = @"
+                DELETE FROM [UserPromo]
+                WHERE       [Id] = @Id";
+
+            try
+            {
+                await UnitOfWork.Context().ExecuteAsync(sql, new { Id = id });
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
+                return false;
+            }
+
+            return true;
         }
     }
 }

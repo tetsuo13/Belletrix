@@ -1,33 +1,108 @@
-﻿@using Belletrix.Entity.ViewModel;
+﻿@using Belletrix.Entity.Model;
+@using Belletrix.Entity.ViewModel;
 
 @model PromoViewModel
 
 @{
     ViewBag.Title = "Info";
-    UriBuilder landingPage = new UriBuilder()
-    {
-        Scheme = Request.Url.Scheme,
-        Host = Request.Url.Host,
-        Path = Url.Action("Entry")
-    };
+}
 
-    if (Request.IsLocal)
-    {
-        landingPage.Port = Request.Url.Port;
-    }
-
-    if (Model.PublicToken.HasValue)
-    {
-        landingPage.Path = Url.Action("Entry", new { token = Model.PublicToken.Value });
-    }
+@section FooterScript {
+    <script>
+        $(function () {
+            $('#studentlist').dataTable({
+                columns: [
+                    null,
+                    null,
+                    { orderable: false }
+                ]
+            });
+        });
+    </script>
 }
 
 @section Body {
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">@Model.Description <small>(@Model.Code)</small></h1>
+            <h1 class="page-header">
+                @Model.Description
+                <small>(@Model.Code)</small>
+                <a href="@Url.Action("Edit", "Promo", new { id = Model.Id })"
+                    class="btn btn-xs btn-info pull-right" data-placement="top"
+                    title="Edit"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+            </h1>
+            <p>
+                <span class="glyphicon glyphicon-time"></span>
+                Created @Model.Created by @Model.CreatedByFirstName @Model.CreatedByLastName
+            </p>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <p>Promo code <code>@Model.Code</code></p>
+
+                    @if (Model.PublicToken.HasValue)
+                    {
+                        UriBuilder landingPage = new UriBuilder()
+                        {
+                            Scheme = Request.Url.Scheme,
+                            Host = Request.Url.Host,
+                            Path = Url.Action("Entry", new { token = Model.PublicToken.Value })
+                        };
+
+                        if (Request.IsLocal)
+                        {
+                            landingPage.Port = Request.Url.Port;
+                        }
+
+                        <p>
+                            Direct link without code:
+                            @Html.ActionLink(landingPage.ToString(), "Entry", new { token = Model.PublicToken.Value })
+                        </p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            @if (Model.TotalStudents > 0)
+            {
+                <table id="studentlist" class="table table-bordered table-hover table-striped tablesorter table-condensed">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Created</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (StudentModel student in Model.Students)
+                        {
+                            <tr>
+                                <td>
+                                    <a href="@Url.Action("View", "Student", new { id = student.Id })">@student.LastName, @student.FirstName @student.MiddleName</a>
+                                </td>
+                                <td>@student.Created</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="@Url.Action("Edit", "Student", new { id = student.Id })"
+                                           class="studentlisttooltop btn btn-xs btn-info" data-placement="top"
+                                           title="Edit"><i class="glyphicon glyphicon-pencil"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
 @*
     <div class="jumbotron">
         <p class="lead">

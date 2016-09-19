@@ -2,6 +2,11 @@
 /// <reference path="..\typings\jquery\jquery.d.ts" />
 var Belletrix;
 (function (Belletrix) {
+    var GenericResult = (function () {
+        function GenericResult() {
+        }
+        return GenericResult;
+    }());
     /**
      * Promo management only available to internal users.
      */
@@ -65,14 +70,52 @@ var Belletrix;
             });
         };
         /**
-         * Initialize the student list page for a promo.
+         * Initialize the promo list page.
+         * @param tableSelector Main promo listing table.
+         * @param deleteModalSelector Promo delete confirm dialog.
          */
-        Promo.prototype.initStudentList = function () {
-            $("#studentlist").DataTable({
-                columnDefs: [{
-                        targets: -1,
-                        orderable: false
-                    }]
+        Promo.prototype.initPromoList = function (tableSelector, deleteModalSelector, deleteUrl) {
+            $(tableSelector).DataTable({
+                columns: [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    { orderable: false }
+                ]
+            });
+            $('[data-toggle="tooltip"]').tooltip();
+            this.handlePromoDelete(deleteModalSelector, deleteUrl);
+        };
+        Promo.prototype.handlePromoDelete = function (deleteModalSelector, deleteUrl) {
+            var deleteDialog = $(deleteModalSelector);
+            var confirmDeleteSelector = ".btn-danger";
+            deleteDialog.on("show.bs.modal", function (event) {
+                var button = $(event.relatedTarget);
+                var promoId = button.data("promoid");
+                $(confirmDeleteSelector, deleteDialog).click(function () {
+                    $(this).addClass("disabled");
+                    $.ajax({
+                        method: "DELETE",
+                        url: deleteUrl,
+                        data: {
+                            id: promoId
+                        },
+                        success: function (data) {
+                            console.log(data);
+                            if (!data.Result) {
+                                deleteDialog.modal("hide");
+                                Belletrix.Common.errorMessage("Something went wrong: " + data.Message);
+                                return;
+                            }
+                            window.location.reload();
+                        }
+                    });
+                });
+            });
+            deleteDialog.on("hide.bs.modal", function (event) {
+                $(confirmDeleteSelector, deleteDialog).off();
             });
         };
         ;
@@ -80,4 +123,3 @@ var Belletrix;
     }());
     Belletrix.Promo = Promo;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=Promo.js.map

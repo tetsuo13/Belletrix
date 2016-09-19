@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Belletrix.Entity.Model;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Belletrix.Entity.ViewModel
@@ -12,8 +14,10 @@ namespace Belletrix.Entity.ViewModel
         public DateTime Created { get; set; }
         public string Code { get; set; }
         public bool Active { get; set; }
-        public int Students { get; set; }
         public Guid? PublicToken { get; set; }
+        public int TotalStudents { get; set; }
+        public IEnumerable<StudentModel> Students { get; set; }
+        public bool CanDelete { get; set; }
     }
 
     public class PromoCreateViewModel

@@ -66,6 +66,7 @@
     <Compile Include="ViewModel\ActivityLogViewModels.cs" />
     <Compile Include="ViewModel\AddUserViewModel.cs" />
     <Compile Include="ViewModel\EditUserViewModel.cs" />
+    <Compile Include="ViewModel\GenericResult.cs" />
     <Compile Include="ViewModel\LoginViewModel.cs" />
     <Compile Include="ViewModel\MigratePasswordViewModel.cs" />
     <Compile Include="ViewModel\PromoViewModels.cs" />

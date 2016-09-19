@@ -74,6 +74,33 @@ namespace Belletrix.Web.Controllers
             return View(model);
         }
 
+        [HttpDelete]
+        public async Task<ActionResult> Delete(int id)
+        {
+            PromoViewModel promo = await PromoService.GetPromo(id);
+            Analytics.TrackPageView(Request, "Promo Delete", (Session["User"] as UserModel).Login);
+
+            if (promo == null)
+            {
+                return Json(new GenericResult()
+                {
+                    Result = false,
+                    Message = "Invalid promo code"
+                });
+            }
+
+            if (!promo.CanDelete)
+            {
+                return Json(new GenericResult()
+                {
+                    Result = false,
+                    Message = "Promo not eligible for deletion"
+                });
+            }
+
+            return Json(await PromoService.Delete(id));
+        }
+
         public async Task<ActionResult> Info(int id)
         {
             PromoViewModel promo = await PromoService.GetPromo(id);
@@ -86,25 +113,8 @@ namespace Belletrix.Web.Controllers
             }
 
             Analytics.TrackPageView(Request, "Promo Info", (Session["User"] as UserModel).Login);
+            promo.Students = await StudentService.FromPromo(promo.Id);
             return View(promo);
-        }
-
-        public async Task<ActionResult> Students(int id)
-        {
-            PromoViewModel promo = await PromoService.GetPromo(id);
-
-            if (promo == null)
-            {
-                string message = string.Format("Promo ID {0} not found", id);
-                MvcApplication.LogException(new ArgumentException(message, "id"));
-                return RedirectToAction("NotFound", "Error");
-            }
-
-            ViewBag.Promo = promo;
-
-            string title = string.Format("Students of {0} promo ({1})", promo.Description, promo.Code);
-            Analytics.TrackPageView(Request, title, (Session["User"] as UserModel).Login);
-            return View(await StudentService.FromPromo(id));
         }
 
         #endregion

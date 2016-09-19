@@ -13,5 +13,6 @@ namespace Belletrix.DAL
         Task<int> Save(UserPromoModel model, int userId);
         Task<bool> CheckNameForUniqueness(string name);
         Task<IEnumerable<PromoSourceViewModel>> AsSources();
+        Task<bool> Delete(int id);
     }
 }

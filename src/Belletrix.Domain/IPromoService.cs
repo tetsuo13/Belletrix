@@ -12,5 +12,6 @@ namespace Belletrix.Domain
         Task<int> Save(PromoCreateViewModel model, int userId);
         Task<bool> CheckNameForUniqueness(string name);
         Task<IEnumerable<PromoSourceViewModel>> AsSources();
+        Task<GenericResult> Delete(int id);
     }
 }

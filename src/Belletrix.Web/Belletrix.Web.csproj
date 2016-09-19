@@ -278,7 +278,6 @@
     <Content Include="Views\Student\NameCheck.cshtml" />
     <Content Include="Views\Student\View.Partial.cshtml" />
     <Content Include="Views\Student\View.NameCheck.cshtml" />
-    <Content Include="Views\Promo\Students.cshtml" />
     <Content Include="Views\Error\AntiForgery.cshtml" />
     <Content Include="Views\ActivityLog\List.cshtml" />
     <Content Include="Views\ActivityLog\Add.cshtml" />

@@ -3,6 +3,7 @@ using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Belletrix.Domain
@@ -18,17 +19,32 @@ namespace Belletrix.Domain
 
         public async Task<IEnumerable<PromoViewModel>> GetPromos()
         {
-            return await PromoRepository.GetPromos();
+            List<PromoViewModel> promos = (await PromoRepository.GetPromos()).ToList();
+
+            for (int i = 0; i < promos.Count; i++)
+            {
+                promos[i] = PrepPromo(promos[i]);
+            }
+
+            return promos;
         }
 
         public async Task<PromoViewModel> GetPromo(int id)
         {
-            return await PromoRepository.GetPromo(id);
+            PromoViewModel promo = await PromoRepository.GetPromo(id);
+            return PrepPromo(promo);
         }
 
         public async Task<PromoViewModel> GetPromo(string code)
         {
-            return await PromoRepository.GetPromo(code);
+            PromoViewModel promo = await PromoRepository.GetPromo(code);
+            return PrepPromo(promo);
+        }
+
+        private PromoViewModel PrepPromo(PromoViewModel promo)
+        {
+            promo.CanDelete = promo.TotalStudents == 0;
+            return promo;
         }
 
         public async Task<int> Save(PromoCreateViewModel model, int userId)
@@ -54,6 +70,19 @@ namespace Belletrix.Domain
         public async Task<IEnumerable<PromoSourceViewModel>> AsSources()
         {
             return await PromoRepository.AsSources();
+        }
+
+        public async Task<GenericResult> Delete(int id)
+        {
+            GenericResult result = new GenericResult();
+            result.Result = await PromoRepository.Delete(id);
+
+            if (!result.Result)
+            {
+                result.Message = "Error deleting promo";
+            }
+
+            return result;
         }
     }
 }
