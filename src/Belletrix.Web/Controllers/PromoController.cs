@@ -206,7 +206,6 @@ namespace Belletrix.Web.Controllers
                 return RedirectToAction("Success");
             }
 
-            Analytics.TrackPageView(Request, "Student Add", (Session["User"] as UserModel).Login);
             TrackPageView("Promo Form for " + cookie.Value);
             await PrepareDropDowns();
 

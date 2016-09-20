@@ -1,21 +1,13 @@
 ﻿@{
     Layout = "~/Views/Shared/_PromoLayout.cshtml";
-    int redirectSeconds = 5;
-}
-
-@section FooterScript {
-    <script>
-        window.setTimeout(function () {
-            window.location = '@Url.Action("Form")';
-        }, @(redirectSeconds * 1000));
-    </script>
 }
 
 @section Body {
     <div class="container">
         <div class="jumbotron">
-            <h2>Thank you</h2>
-            <p>This page will automatically redirect in @redirectSeconds seconds&hellip;</p>
+            <h2>Thank you for completing the form</h2>
         </div>
+        <hr />
+        <p class="text-muted">Click @Html.ActionLink("here", "Entry") to go back to the login page.</p>
     </div>
 }
