@@ -54,13 +54,6 @@ namespace Belletrix.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> CheckUniqueName(string name)
-        {
-            bool result = await PromoService.CheckNameForUniqueness(name.Trim());
-            return Content(result ? "win" : "fail");
-        }
-
-        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Add(PromoCreateViewModel model)
         {
@@ -122,24 +115,15 @@ namespace Belletrix.Web.Controllers
         #region User portal
 
         [AllowAnonymous]
-        public ActionResult Entry()
+        public async Task<ActionResult> Entry(Guid token)
         {
-            TrackPageView("Promo Entry");
-            return View();
-        }
-
-        [AllowAnonymous]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Entry(string code)
-        {
-            if (code == null || string.IsNullOrWhiteSpace(code))
+            if (token == null)
             {
                 ViewBag.ErrorMessage = "Invalid code";
                 return View();
             }
 
-            PromoViewModel promo = await PromoService.GetPromo(code);
+            PromoViewModel promo = await PromoService.GetPromo(token);
 
             if (promo == null)
             {
@@ -148,19 +132,12 @@ namespace Belletrix.Web.Controllers
                 return View();
             }
 
-            HttpCookie cookie = new HttpCookie("promo", code);
+            HttpCookie cookie = new HttpCookie("promo", token.ToString());
             cookie.Expires = DateTime.Now.AddHours(8);
             HttpContext.Response.SetCookie(cookie);
 
-            TrackPageView("Promo Form for " + code);
+            TrackPageView("Promo Form for " + token);
             return RedirectToAction("Form");
-        }
-
-        [AllowAnonymous]
-        public ActionResult Entry(Guid token)
-        {
-            TrackPageView("Promo Entry");
-            return View();
         }
 
         [AllowAnonymous]
@@ -201,7 +178,7 @@ namespace Belletrix.Web.Controllers
                     userId = (Session["User"] as UserModel).Id;
                 }
 
-                await StudentService.InsertStudent(model, userId, cookie.Value,
+                await StudentService.InsertStudent(model, userId, Guid.Parse(cookie.Value),
                     HttpContext.Request.UserHostAddress);
                 return RedirectToAction("Success");
             }

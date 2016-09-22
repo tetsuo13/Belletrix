@@ -1,5 +1,6 @@
 ﻿using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -37,7 +38,7 @@ namespace Belletrix.Domain
         Task<IEnumerable<ProgramTypeModel>> GetProgramTypes();
 
         Task InsertStudent(StudentModel model, UserModel user, string remoteIp);
-        Task InsertStudent(StudentPromoModel model, int? userId, string promoCode, string remoteIp);
+        Task InsertStudent(StudentPromoModel model, int? userId, Guid promoToken, string remoteIp);
         Task UpdateStudent(StudentModel model, UserModel user, string remoteIp);
     }
 }

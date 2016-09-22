@@ -79,14 +79,14 @@ namespace Belletrix.DAL
                 .Select(x => x.PromoId);
         }
 
-        public async Task Save(int studentId, string promoCode)
+        public async Task Save(int studentId, Guid promoToken)
         {
             const string sql = @"
                 INSERT INTO [dbo].[StudentPromoLog]
                 ([PromoId], [StudentId], [Created])
                 VALUES
                 (
-                    (SELECT [Id] FROM [dbo].[UserPromo] WHERE [Code] = @PromoCode), @StudentId, @Created
+                    (SELECT [Id] FROM [dbo].[UserPromo] WHERE [PublicToken] = @PromoToken), @StudentId, @Created
                 )";
 
             try
@@ -94,7 +94,7 @@ namespace Belletrix.DAL
                 await UnitOfWork.Context().ExecuteAsync(sql,
                     new
                     {
-                        PromoCode = promoCode.ToLower(),
+                        PromoToken = promoToken,
                         StudentId = studentId,
                         Created = DateTime.Now.ToUniversalTime()
                     });

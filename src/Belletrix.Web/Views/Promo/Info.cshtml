@@ -5,6 +5,17 @@
 
 @{
     ViewBag.Title = "Info";
+    UriBuilder landingPage = new UriBuilder()
+    {
+        Scheme = Request.Url.Scheme,
+        Host = Request.Url.Host,
+        Path = Url.Action("Entry", new { token = Model.PublicToken })
+    };
+
+    if (Request.IsLocal)
+    {
+        landingPage.Port = Request.Url.Port;
+    }
 }
 
 @section FooterScript {
@@ -26,7 +37,6 @@
         <div class="col-lg-12">
             <h1 class="page-header">
                 @Model.Description
-                <small>(@Model.Code)</small>
                 <a href="@Url.Action("Edit", "Promo", new { id = Model.Id })"
                     class="btn btn-xs btn-info pull-right" data-placement="top"
                     title="Edit"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
@@ -42,27 +52,8 @@
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <p>Promo code <code>@Model.Code</code></p>
-
-                    @if (Model.PublicToken.HasValue)
-                    {
-                        UriBuilder landingPage = new UriBuilder()
-                        {
-                            Scheme = Request.Url.Scheme,
-                            Host = Request.Url.Host,
-                            Path = Url.Action("Entry", new { token = Model.PublicToken.Value })
-                        };
-
-                        if (Request.IsLocal)
-                        {
-                            landingPage.Port = Request.Url.Port;
-                        }
-
-                        <p>
-                            Direct link without code:
-                            @Html.ActionLink(landingPage.ToString(), "Entry", new { token = Model.PublicToken.Value })
-                        </p>
-                    }
+                    Direct link without code:
+                    @Html.ActionLink(landingPage.ToString(), "Entry", new { token = Model.PublicToken })
                 </div>
             </div>
         </div>

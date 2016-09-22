@@ -35,9 +35,9 @@ namespace Belletrix.Domain
             return PrepPromo(promo);
         }
 
-        public async Task<PromoViewModel> GetPromo(string code)
+        public async Task<PromoViewModel> GetPromo(Guid token)
         {
-            PromoViewModel promo = await PromoRepository.GetPromo(code);
+            PromoViewModel promo = await PromoRepository.GetPromo(token);
             return PrepPromo(promo);
         }
 
@@ -52,19 +52,13 @@ namespace Belletrix.Domain
             UserPromoModel promo = new UserPromoModel()
             {
                 Description = model.Description,
-                Code = model.Code.ToLower(),
                 Created = DateTime.Now.ToUniversalTime(),
                 CreatedBy = userId,
                 Active = true,
-                PublicToken = !model.RequireCode ? Guid.NewGuid() : (Guid?)null
+                PublicToken = Guid.NewGuid()
             };
 
             return await PromoRepository.Save(promo, userId);
-        }
-
-        public async Task<bool> CheckNameForUniqueness(string name)
-        {
-            return await PromoRepository.CheckNameForUniqueness(name);
         }
 
         public async Task<IEnumerable<PromoSourceViewModel>> AsSources()

@@ -31,8 +31,7 @@ namespace Belletrix.DAL
                 SELECT      p.Id AS Id,
                             [Description],
                             p.Created,
-                            [Code],
-                            CONVERT(UNIQUEIDENTIFIER, PublicToken) AS PublicToken,
+                            [PublicToken],
                             p.Active,
                             u.FirstName AS CreatedByFirstName,
                             u.LastName AS CreatedByLastName,
@@ -40,7 +39,7 @@ namespace Belletrix.DAL
                 FROM        [dbo].[UserPromo] p
                 INNER JOIN  [dbo].[Users] u ON
                             [CreatedBy] = u.id
-                ORDER BY    [Code]";
+                ORDER BY    [Description]";
 
             try
             {
@@ -61,19 +60,19 @@ namespace Belletrix.DAL
             return (await GetPromos()).FirstOrDefault(p => p.Id == id);
         }
 
-        public async Task<PromoViewModel> GetPromo(string code)
+        public async Task<PromoViewModel> GetPromo(Guid token)
         {
-            return (await GetPromos()).FirstOrDefault(p => p.Code == code.ToLower());
+            return (await GetPromos()).FirstOrDefault(p => p.PublicToken == token);
         }
 
         public async Task<int> Save(UserPromoModel model, int userId)
         {
             const string sql = @"
                 INSERT INTO [dbo].[UserPromo]
-                ([Description], [CreatedBy], [Created], [Code], [Active], [PublicToken])
+                ([Description], [CreatedBy], [Created], [Active], [PublicToken])
                 OUTPUT INSERTED.Id
                 VALUES
-                (@Description, @CreatedBy, @Created, @Code, @Active, @PublicToken)";
+                (@Description, @CreatedBy, @Created, @Active, @PublicToken)";
 
             try
             {
@@ -85,31 +84,6 @@ namespace Belletrix.DAL
                 ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
-        }
-
-        public async Task<bool> CheckNameForUniqueness(string name)
-        {
-            if (string.IsNullOrEmpty(name))
-            {
-                return false;
-            }
-
-            const string sql = @"
-                SELECT  COUNT([Id]) AS Count
-                FROM    [UserPromo]
-                WHERE   LOWER([Code]) = @Code";
-
-            try
-            {
-                return (await UnitOfWork.Context().ExecuteScalarAsync<int>(sql, new { Code = name.ToLower() })) == 0;
-            }
-            catch (Exception e)
-            {
-                e.Data["SQL"] = sql;
-                ErrorStore.LogException(e, HttpContext.Current);
-            }
-
-            return false;
         }
 
         public async Task<IEnumerable<PromoSourceViewModel>> AsSources()

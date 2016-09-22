@@ -1,21 +1,9 @@
-﻿@using Belletrix.Core;
-@using Belletrix.Entity.ViewModel;
+﻿@using Belletrix.Entity.ViewModel;
 
 @model IEnumerable<PromoViewModel>
 
 @{
-    ViewBag.Title = "List";
-    UriBuilder landingPage = new UriBuilder()
-    {
-        Scheme = Request.Url.Scheme,
-        Host = Request.Url.Host,
-        Path = Url.Action("Entry")
-    };
-
-    if (Request.IsLocal)
-    {
-        landingPage.Port = Request.Url.Port;
-    }
+    ViewBag.Title = "Promos";
 }
 
 @section FooterScript {
@@ -48,10 +36,6 @@
                 for students to fill out. These pages do not require logging
                 in. Please separate events into their own promos.
             </p>
-            <div class="alert alert-info">
-                Link to promo entries:
-                @Html.ActionLink(landingPage.ToString(), "Entry")
-            </div>
         </div>
     </div>
 
@@ -60,7 +44,6 @@
             <table id="promolist" class="table table-bordered table-hover table-striped tablesorter table-condensed">
                 <thead>
                     <tr>
-                        <th>Code</th>
                         <th>Created</th>
                         <th>Description</th>
                         <th>Students</th>
@@ -71,15 +54,10 @@
                 <tbody>
                     @foreach (PromoViewModel promo in Model)
                     {
+                        string totalStudentsClass = promo.TotalStudents == 0 ? "text-muted" : null;
                         <tr>
                             <td>
-                                @Html.ActionLink(promo.Code, "Info", new { id = promo.Id })
-                                @if (!promo.PublicToken.HasValue)
-                                {
-                                    <sup title="Access to promo requires the code">
-                                        <small><span class="glyphicon glyphicon-lock"></span></small>
-                                    </sup>
-                                }
+                                @Html.ActionLink(promo.Description, "Info", new { id = promo.Id })
                             </td>
                             <td>
                                 <span data-toggle="tooltip"
@@ -87,8 +65,7 @@
                                     @promo.Created.ToShortDateString()
                                 </span>
                             </td>
-                            <td>@promo.Description</td>
-                            <td>@promo.TotalStudents</td>
+                            <td><span class="@totalStudentsClass">@promo.TotalStudents</span></td>
                             <td>
                                 @if (promo.Active)
                                 {

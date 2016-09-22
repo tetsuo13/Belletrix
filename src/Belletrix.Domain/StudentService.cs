@@ -226,14 +226,14 @@ namespace Belletrix.Domain
             }
         }
 
-        public async Task InsertStudent(StudentPromoModel model, int? userId, string promoCode, string remoteIp)
+        public async Task InsertStudent(StudentPromoModel model, int? userId, Guid promoToken, string remoteIp)
         {
             using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 int studentId = await StudentRepository.InsertStudent(model);
                 model.Id = studentId;
 
-                await StudentPromoRepository.Save(model.Id, promoCode);
+                await StudentPromoRepository.Save(model.Id, promoToken);
 
                 if (userId.HasValue)
                 {

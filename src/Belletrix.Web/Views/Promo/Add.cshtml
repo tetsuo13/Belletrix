@@ -12,7 +12,7 @@
     <script>
         $(function () {
             var promo = new Belletrix.Promo();
-            promo.initAddForm('@Url.Action("CheckUniqueName")', '#Code', '#codecheckresult');
+            promo.initAddForm();
             Belletrix.Common.singleSubmit();
         });
     </script>
@@ -56,14 +56,6 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-lg-12">
-                                <div class="form-group has-error has-feedback">
-                                    @Html.LabelFor(x => x.Code)
-                                    <span class="glyphicon glyphicon-question-sign text-primary" aria-hidden="true"
-                                        data-toggle="tooltip" title="Unique code used as a password into the data entry form."></span>
-                                    @Html.TextBoxFor(x => x.Code, new { @class = "form-control", autofocus = "autofocus" })
-                                    <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" id="codecheckresult"></span>
-                                    @Html.ValidationMessageFor(x => x.Code)
-                                </div>
                                 <div class="form-group has-error">
                                     @Html.LabelFor(x => x.Description)
                                     @Html.TextBoxFor(x => x.Description, new { @class = "form-control" })
@@ -74,35 +66,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Optional</h3>
-                    </div>
-
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="form-group">
-                                    @Html.LabelFor(x => x.RequireCode)
-                                    <span class="glyphicon glyphicon-question-sign text-primary" aria-hidden="true"
-                                        data-toggle="tooltip" title="When disabled, allows users into the entry form without having to know the unique code."></span>
-                                    @Html.DropDownListFor(x => x.RequireCode, new SelectList(
-                                        new[]
-                                        {
-                                            new { Value = false, Text = "No" },
-                                            new { Value = true, Text = "Yes" }
-                                        },
-                                        "Value",
-                                        "Text",
-                                        true), new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(x => x.RequireCode)
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="col-lg-4"></div>
         </div>
 
         <div class="row">

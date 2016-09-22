@@ -514,12 +514,13 @@ CREATE TABLE [dbo].[UserPromo] (
     [Description]       [nvarchar](256) NOT NULL,
     [CreatedBy]         [int] NOT NULL,
     [Created]           [datetime] NOT NULL,
-    [Code]              [varchar](32) NOT NULL,
     [Active]            [bit] NOT NULL DEFAULT 1,
-    [PublicToken]       [char](32),
+
+	-- Not the primary key so that it can be regenerated at any time for
+	-- security reasons.
+    [PublicToken]       [uniqueidentifier] NOT NULL,
 
     CONSTRAINT [PK_UserPromo] PRIMARY KEY ([Id]),
-    CONSTRAINT [UN_UserPromo_Code] UNIQUE ([Code]),
     CONSTRAINT [FK_UserPromo_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users] ([Id])
 );
 
