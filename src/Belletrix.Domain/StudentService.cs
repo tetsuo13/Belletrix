@@ -27,42 +27,14 @@ namespace Belletrix.Domain
             EventLogService = eventLogService;
         }
 
-        private async Task<IEnumerable<StudentModel>> PopulatePromoLogs(IEnumerable<StudentModel> students)
-        {
-            if (students == null || !students.Any())
-            {
-                return students;
-            }
-
-            List<StudentModel> updatedStudents = new List<StudentModel>(students);
-
-            // Done this was instead of List<T>.ForEach() because the former
-            // doesn't play well with async.
-            var tasks = updatedStudents.Select(async x => x.PromoIds = await StudentPromoRepository.GetPromoIdsForStudent(x.Id));
-            var result = await Task.WhenAll(tasks);
-
-            return updatedStudents;
-        }
-
         public async Task<IEnumerable<StudentModel>> GetStudents(int? id = null)
         {
-            IEnumerable<StudentModel> students = await StudentRepository.GetStudents(id);
-            return await PopulatePromoLogs(students);
+            return await StudentRepository.GetStudents(id);
         }
 
         public async Task<StudentModel> GetStudent(int id)
         {
-            StudentModel student = await StudentRepository.GetStudent(id);
-
-            if (student != null)
-            {
-                ICollection<StudentModel> x = new List<StudentModel>();
-                x.Add(student);
-
-                return (await PopulatePromoLogs(x)).First();
-            }
-
-            return null;
+            return await StudentRepository.GetStudent(id);
         }
 
         public async Task<IEnumerable<StudentModel>> Search(StudentSearchViewModel search)

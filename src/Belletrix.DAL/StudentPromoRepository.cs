@@ -18,25 +18,6 @@ namespace Belletrix.DAL
             UnitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<StudentPromoLog>> Get()
-        {
-            const string sql = @"
-                SELECT  [PromoId], [StudentId], [Created]
-                FROM    [StudentPromoLog]";
-
-            try
-            {
-                return await UnitOfWork.Context().QueryAsync<StudentPromoLog>(sql);
-            }
-            catch (Exception e)
-            {
-                e.Data["SQL"] = sql;
-                ErrorStore.LogException(e, HttpContext.Current);
-            }
-
-            return new List<StudentPromoLog>();
-        }
-
         public async Task Save(int studentId, IEnumerable<int> promoIds)
         {
             await Delete(studentId);
@@ -72,13 +53,6 @@ namespace Belletrix.DAL
             }
         }
 
-        public async Task<IEnumerable<int>> GetPromoIdsForStudent(int studentId)
-        {
-            return (await Get())
-                .Where(x => x.StudentId == studentId)
-                .Select(x => x.PromoId);
-        }
-
         public async Task Save(int studentId, Guid promoToken)
         {
             const string sql = @"
@@ -104,11 +78,6 @@ namespace Belletrix.DAL
                 e.Data["SQL"] = sql;
                 ErrorStore.LogException(e, HttpContext.Current);
             }
-        }
-
-        public async Task<IEnumerable<StudentPromoLog>> GetLogsForPromo(int id)
-        {
-            return (await Get()).Where(x => x.PromoId == id);
         }
 
         private async Task Delete(int studentId)

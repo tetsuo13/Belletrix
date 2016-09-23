@@ -38,6 +38,7 @@ namespace Belletrix.DAL
                                     (SELECT DISTINCT STUFF((SELECT ',' + CAST([CountryId] AS VARCHAR(3)) FROM [dbo].[StudentStudyAbroadWishlist] WHERE [StudentId] = s.Id FOR XML PATH('')),1,1,'')) AS StudyAbroadCountryIds,
                                     (SELECT DISTINCT STUFF((SELECT ',' + CAST([Year] AS VARCHAR(4)) FROM [dbo].[StudentStudyAbroadWishlist] WHERE [StudentId] = s.Id FOR XML PATH('')),1,1,'')) AS StudyAbroadYearIds,
                                     (SELECT DISTINCT STUFF((SELECT ',' + CAST([Period] AS VARCHAR(3)) FROM [dbo].[StudentStudyAbroadWishlist] WHERE [StudentId] = s.Id FOR XML PATH('')),1,1,'')) AS StudyAbroadPeriodIds,
+                                    (SELECT DISTINCT STUFF((SELECT ',' + CAST([PromoId] AS VARCHAR(3)) FROM [dbo].[StudentPromoLog] WHERE [StudentId] = s.Id FOR XML PATH('')),1,1,'')) AS StudentPromoLogIds,
                                     s.FirstName, s.MiddleName, s.LastName,
                                     s.LivingOnCampus, s.PhoneNumber, s.StudentId,
                                     s.Dob, s.EnrolledFullTime, s.Citizenship,
@@ -143,6 +144,11 @@ namespace Belletrix.DAL
                     if (row.ContainsKey("FluentLanguageIds") && row["FluentLanguageIds"] != null)
                     {
                         student.SelectedLanguages = Array.ConvertAll(((string)row["FluentLanguageIds"]).Split(','), int.Parse);
+                    }
+
+                    if (row.ContainsKey("StudentPromoLogIds") && row["StudentPromoLogIds"] != null)
+                    {
+                        student.PromoIds = Array.ConvertAll(((string)row["StudentPromoLogIds"]).Split(','), int.Parse);
                     }
 
                     // View and JavaScript expects these collections
