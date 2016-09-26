@@ -114,22 +114,33 @@ namespace Belletrix.Web.Controllers
 
         #region User portal
 
+        /// <summary>
+        /// Requires a guid to work but accept anything that's a string and
+        /// try parsing it as a guid. Done this way to ensure all students
+        /// will hit this page regardless if something's happened to the
+        /// token (sent via email which truncated a few characters off the
+        /// end).
+        /// </summary>
         [AllowAnonymous]
-        public async Task<ActionResult> Entry(Guid token)
+        public async Task<ActionResult> Entry(string token)
         {
-            if (token == null)
+            if (string.IsNullOrEmpty(token))
             {
-                ViewBag.ErrorMessage = "Invalid code";
-                return View();
+                return View(model: "Missing code");
             }
 
-            PromoViewModel promo = await PromoService.GetPromo(token);
+            Guid guidToken;
+
+            if (!Guid.TryParse(token, out guidToken))
+            {
+                return View(model: "Invalid code");
+            }
+
+            PromoViewModel promo = await PromoService.GetPromo(guidToken);
 
             if (promo == null)
             {
-                TrackPageView("Promo Invalid Code");
-                ViewBag.ErrorMessage = "Invalid code";
-                return View();
+                return View(model: "The code you tried to use is invalid");
             }
 
             HttpCookie cookie = new HttpCookie("promo", token.ToString());

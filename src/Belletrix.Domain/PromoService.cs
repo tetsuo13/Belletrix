@@ -41,9 +41,18 @@ namespace Belletrix.Domain
             return PrepPromo(promo);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="promo">May be <see langword="null"/>.</param>
+        /// <returns></returns>
         private PromoViewModel PrepPromo(PromoViewModel promo)
         {
-            promo.CanDelete = promo.TotalStudents == 0;
+            if (promo != null)
+            {
+                promo.CanDelete = promo.TotalStudents == 0;
+            }
+
             return promo;
         }
 

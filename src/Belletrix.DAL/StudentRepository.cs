@@ -106,7 +106,7 @@ namespace Belletrix.DAL
                         HasPassport = row["PassportHolder"] as bool?,
                         CampusEmail = row["CampusEmail"] as string,
                         AlternateEmail = row["AlternateEmail"] as string,
-                        Created = (DateTime)row["Created"],
+                        Created = DateTimeFilter.UtcToLocal((DateTime)row["Created"]),
                         NumberOfNotes = (int)row["NumNotes"],
                         Gpa = row["Gpa"] as decimal?,
                     };

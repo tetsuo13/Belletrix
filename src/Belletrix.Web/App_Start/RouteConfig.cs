@@ -44,6 +44,16 @@ namespace Belletrix.Web
             );
 
             routes.MapRoute(
+                name: "Promo_Entry",
+                url: "p/{token}",
+                defaults: new
+                {
+                    controller = "Promo",
+                    action = "Entry"
+                }
+            );
+
+            routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
                 defaults: new

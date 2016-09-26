@@ -2,12 +2,21 @@
     Layout = "~/Views/Shared/_PromoLayout.cshtml";
 }
 
+@section headerStyle {
+    <style>
+        .container {
+            width: auto;
+            max-width: 680px;
+            padding: 0 15px;
+        }
+    </style>
+}
+
 @section Body {
     <div class="container">
-        <div class="jumbotron">
+        <div class="page-header">
             <h2>Thank you for completing the form</h2>
         </div>
-        <hr />
-        <p class="text-muted">Click @Html.ActionLink("here", "Entry") to go back to the login page.</p>
+        <p class="lead">@Model</p>
     </div>
 }
