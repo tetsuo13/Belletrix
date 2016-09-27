@@ -13,5 +13,6 @@ namespace Belletrix.Domain
         Task<int> Save(PromoCreateViewModel model, int userId);
         Task<IEnumerable<PromoSourceViewModel>> AsSources();
         Task<GenericResult> Delete(int id);
+        Task Update(PromoEditViewModel promo);
     }
 }

@@ -27,6 +27,21 @@ namespace Belletrix.Entity.ViewModel
         public string Description { get; set; }
     }
 
+    public class PromoEditViewModel
+    {
+        [Required]
+        public int Id { get; set; }
+
+        [Required]
+        [Display(Name = "Description")]
+        [StringLength(256)]
+        public string Description { get; set; }
+
+        [Required]
+        [Display(Name = "Active?")]
+        public bool Active { get; set; }
+    }
+
     /// <summary>
     /// Used as a select list for student add/edit to associate them without
     /// having to use the promo portal.

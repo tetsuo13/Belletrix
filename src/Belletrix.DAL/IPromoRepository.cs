@@ -14,5 +14,6 @@ namespace Belletrix.DAL
         Task<int> Save(UserPromoModel model, int userId);
         Task<IEnumerable<PromoSourceViewModel>> AsSources();
         Task<bool> Delete(int id);
+        Task Update(PromoEditViewModel promo);
     }
 }

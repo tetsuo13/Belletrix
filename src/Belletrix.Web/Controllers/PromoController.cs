@@ -67,11 +67,46 @@ namespace Belletrix.Web.Controllers
             return View(model);
         }
 
+        public async Task<ActionResult> Edit(int id)
+        {
+            PromoViewModel promo = await PromoService.GetPromo(id);
+
+            if (promo == null)
+            {
+                string message = string.Format("Promo ID {0} not found", id);
+                MvcApplication.LogException(new ArgumentException(message, "id"));
+                return RedirectToAction("NotFound", "Error");
+            }
+
+            Analytics.TrackPageView(Request, "Edit Promo", (Session["User"] as UserModel).Login);
+
+            PromoEditViewModel model = new PromoEditViewModel()
+            {
+                Id = promo.Id,
+                Description = promo.Description,
+                Active = promo.Active
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Edit(PromoEditViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                await PromoService.Update(model);
+                return RedirectToAction("Info", new { id = model.Id });
+            }
+
+            return View(model);
+        }
+
         [HttpDelete]
         public async Task<ActionResult> Delete(int id)
         {
             PromoViewModel promo = await PromoService.GetPromo(id);
-            Analytics.TrackPageView(Request, "Promo Delete", (Session["User"] as UserModel).Login);
+            Analytics.TrackPageView(Request, "Delete Promo", (Session["User"] as UserModel).Login);
 
             if (promo == null)
             {
@@ -126,21 +161,25 @@ namespace Belletrix.Web.Controllers
         {
             if (string.IsNullOrEmpty(token))
             {
-                return View(model: "Missing code");
+                return View(model: "Missing code.");
             }
 
             Guid guidToken;
 
             if (!Guid.TryParse(token, out guidToken))
             {
-                return View(model: "Invalid code");
+                return View(model: "Invalid code.");
             }
 
             PromoViewModel promo = await PromoService.GetPromo(guidToken);
 
             if (promo == null)
             {
-                return View(model: "The code you tried to use is invalid");
+                return View(model: "The code you tried to use is invalid.");
+            }
+            else if (!promo.Active)
+            {
+                return View(model: "Promo has expired. Please contact Center for Global Studies for help.");
             }
 
             HttpCookie cookie = new HttpCookie("promo", token.ToString());

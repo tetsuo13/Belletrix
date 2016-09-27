@@ -291,6 +291,7 @@
     <Content Include="Views\User\Edit.cshtml" />
     <Content Include="Views\Promo\NameCheck.cshtml" />
     <Content Include="Views\Error\NotFound.cshtml" />
+    <Content Include="Views\Promo\Edit.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

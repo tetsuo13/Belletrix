@@ -87,5 +87,10 @@ namespace Belletrix.Domain
 
             return result;
         }
+
+        public async Task Update(PromoEditViewModel promo)
+        {
+            await PromoRepository.Update(promo);
+        }
     }
 }

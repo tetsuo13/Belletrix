@@ -125,5 +125,24 @@ namespace Belletrix.DAL
 
             return true;
         }
+
+        public async Task Update(PromoEditViewModel promo)
+        {
+            const string sql = @"
+                UPDATE  [dbo].[UserPromo]
+                SET     [Description] = @Description,
+                        [Active] = @Active
+                WHERE   [Id] = @Id";
+
+            try
+            {
+                await UnitOfWork.Context().ExecuteAsync(sql, promo);
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
+            }
+        }
     }
 }
