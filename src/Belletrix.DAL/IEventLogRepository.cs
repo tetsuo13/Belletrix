@@ -7,7 +7,7 @@ namespace Belletrix.DAL
 {
     public interface IEventLogRepository
     {
-        Task<IEnumerable<EventLogViewModel>> GetEvents();
+        Task<IEnumerable<EventLogViewModel>> GetEvents(int numEvents);
         Task AddStudentEvent(EventLogModel log);
         Task<bool> TransferOwnership(int oldId, int newId);
     }

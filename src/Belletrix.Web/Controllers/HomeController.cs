@@ -1,6 +1,7 @@
 ﻿using Belletrix.Core;
 using Belletrix.Domain;
 using Belletrix.Entity.Model;
+using Belletrix.Entity.ViewModel;
 using StackExchange.Exceptional;
 using StackExchange.Profiling;
 using System.Threading.Tasks;
@@ -27,14 +28,15 @@ namespace Belletrix.Web.Controllers
             Analytics.TrackPageView(Request, "Dashboard", (Session["User"] as UserModel).Login);
             ViewBag.ActivePage = ActivePageName;
 
+            DashboardViewModel model = new DashboardViewModel();
             MiniProfiler profiler = MiniProfiler.Current;
 
             using (profiler.Step("Get events"))
             {
-                ViewBag.RecentActivity = await EventLogService.GetEvents();
+                model.RecentActivity = await EventLogService.GetEvents(10);
             }
 
-            return View();
+            return View(model);
         }
 
         /// <summary>

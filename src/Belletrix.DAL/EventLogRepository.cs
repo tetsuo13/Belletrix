@@ -19,12 +19,12 @@ namespace Belletrix.DAL
             UnitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<EventLogViewModel>> GetEvents()
+        public async Task<IEnumerable<EventLogViewModel>> GetEvents(int numEvents)
         {
             ICollection<EventLogViewModel> events = new List<EventLogViewModel>();
 
             const string sql = @"
-                SELECT          TOP(8) e.Id, e.Date, e.ModifiedBy,
+                SELECT          TOP(@NumEvents) e.Id, e.Date, e.ModifiedBy,
                                 e.StudentId, e.UserId, e.Type,
                                 e.Action, u.FirstName, u.LastName,
                                 s.FirstName AS StudentFirstName,
@@ -43,7 +43,8 @@ namespace Belletrix.DAL
 
             try
             {
-                IEnumerable<dynamic> rows = await UnitOfWork.Context().QueryAsync<dynamic>(sql);
+                IEnumerable<dynamic> rows = await UnitOfWork.Context().QueryAsync<dynamic>(sql,
+                    new { NumEvents = numEvents });
 
                 foreach (IDictionary<string, object> row in rows)
                 {

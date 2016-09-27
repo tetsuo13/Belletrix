@@ -17,9 +17,9 @@ namespace Belletrix.Domain
             EventLogRepository = eventLogRepository;
         }
 
-        public async Task<IEnumerable<EventLogViewModel>> GetEvents()
+        public async Task<IEnumerable<EventLogViewModel>> GetEvents(int numEvents)
         {
-            return await EventLogRepository.GetEvents();
+            return await EventLogRepository.GetEvents(numEvents);
         }
 
         public async Task AddStudentEvent(int studentId, EventLogTypes eventType, string remoteIp)
