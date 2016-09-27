@@ -27,6 +27,9 @@ namespace Belletrix.Entity.Enum
 
         Meeting,
         Other,
-        Workshop
+        Workshop,
+
+        [Display(Name = "Faculty Led Program")]
+        FacultyLedProgram
     }
 }
