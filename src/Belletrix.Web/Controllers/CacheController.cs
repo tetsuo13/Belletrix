@@ -16,7 +16,7 @@ namespace Belletrix.Web.Controllers
 
             TimeSpan span = DateTime.Now - startDate;
 
-            return String.Format("Cached {0} objects in {1} seconds",
+            return string.Format("Cached {0} objects in {1} seconds",
                 HttpRuntime.Cache.Count, span.TotalSeconds);
         }
     }

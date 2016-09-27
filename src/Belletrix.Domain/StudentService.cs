@@ -89,8 +89,8 @@ namespace Belletrix.Domain
         {
             return (await GetStudents()).Where(x =>
             {
-                return String.Equals(x.FirstName, firstName, StringComparison.InvariantCultureIgnoreCase) &&
-                    String.Equals(x.LastName, lastName, StringComparison.InvariantCultureIgnoreCase);
+                return string.Equals(x.FirstName, firstName, StringComparison.InvariantCultureIgnoreCase) &&
+                    string.Equals(x.LastName, lastName, StringComparison.InvariantCultureIgnoreCase);
             });
         }
 

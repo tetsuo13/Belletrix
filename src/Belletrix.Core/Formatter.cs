@@ -20,11 +20,11 @@ namespace Belletrix.Core
         /// <returns>Formatted number.</returns>
         public static string PhoneNumber(string number)
         {
-            if (String.IsNullOrWhiteSpace(number) || number.Length != 10)
+            if (string.IsNullOrWhiteSpace(number) || number.Length != 10)
             {
                 return number;
             }
-            return String.Format("{0:(###) ###-####}", Double.Parse(number));
+            return string.Format("{0:(###) ###-####}", Double.Parse(number));
         }
 
         /// <summary>

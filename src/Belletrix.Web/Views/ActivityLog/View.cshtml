@@ -29,12 +29,12 @@
                 }
             </p>
 
-            @if (!String.IsNullOrEmpty(Model.ActivityLog.Title2))
+            @if (!string.IsNullOrEmpty(Model.ActivityLog.Title2))
             {
                 <p>
                     <strong>@Model.ActivityLog.Title2</strong>
 
-                    @if (!String.IsNullOrEmpty(Model.ActivityLog.Title3))
+                    @if (!string.IsNullOrEmpty(Model.ActivityLog.Title3))
                     {
                         <br />@Model.ActivityLog.Title3
                     }
@@ -81,20 +81,20 @@
                                     <span class="badge">@particpant.Type</span>
                                     <h4 class="list-group-item-heading">@particpant.Person.FullName</h4>
 
-                                    @if (!String.IsNullOrEmpty(particpant.Person.Description))
+                                    @if (!string.IsNullOrEmpty(particpant.Person.Description))
                                     {
                                         <p>@particpant.Person.Description</p>
                                     }
 
                                     <p>
-                                        @if (!String.IsNullOrEmpty(particpant.Person.Email))
+                                        @if (!string.IsNullOrEmpty(particpant.Person.Email))
                                         {
                                             <span class="glyphicon glyphicon-envelope"></span>
                                             <a href="mailto:@particpant.Person.Email">@particpant.Person.Email</a>
                                             <br />
                                         }
 
-                                        @if (!String.IsNullOrEmpty(particpant.Person.PhoneNumber))
+                                        @if (!string.IsNullOrEmpty(particpant.Person.PhoneNumber))
                                         {
                                             <span class="glyphicon glyphicon-earphone"></span>
                                             if (Request.Browser.CanInitiateVoiceCall)

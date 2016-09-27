@@ -127,7 +127,7 @@ namespace Belletrix.Web.Tests.Student
             Assert.AreEqual(1, WebDriver.FindElements(selector).Count, "Should be one note after adding it");
             Assert.AreEqual(note, WebDriver.FindElement(By.XPath("//div[contains(@class, 'bootbox')]/div[@class='list-group']/a/p")).Text,
                 "Displayed note should match what was typed in");
-            Assert.AreEqual(String.Empty, WebDriver.FindElement(By.Id("Note")).Text);
+            Assert.AreEqual(string.Empty, WebDriver.FindElement(By.Id("Note")).Text);
         }
     }
 }

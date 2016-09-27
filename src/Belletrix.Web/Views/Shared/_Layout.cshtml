@@ -5,7 +5,7 @@
 @{
     Layout = null;
     const string siteTitle = "Belletrix";
-    string pageTitle = (!String.IsNullOrEmpty(ViewBag.Title) ? ViewBag.Title + " | " : String.Empty) + siteTitle;
+    string pageTitle = (!string.IsNullOrEmpty(ViewBag.Title) ? ViewBag.Title + " | " : string.Empty) + siteTitle;
     UserModel user = Session["User"] as UserModel;
     const string sidebarLinkActiveClassName = "active";
 

@@ -37,7 +37,7 @@ namespace Belletrix.Core
                 {
                     string token = ConfigurationManager.AppSettings["AnalyticsAdminToken"];
 
-                    if (!String.IsNullOrEmpty(token))
+                    if (!string.IsNullOrEmpty(token))
                     {
                         tracker.setTokenAuth(token);
                         tracker.setIp(request.UserHostAddress);
@@ -62,7 +62,7 @@ namespace Belletrix.Core
                     tracker.setUrlReferrer(request.UrlReferrer.ToString());
                 }
 
-                if (!String.IsNullOrEmpty(username))
+                if (!string.IsNullOrEmpty(username))
                 {
                     tracker.setCustomVariable(1, "username", username);
                 }

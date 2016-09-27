@@ -29,7 +29,7 @@
                                 <strong class="h4">
                                     @Formatter.StudyAbroadPeriodString(studyAbroad.Semester)
                                     @studyAbroad.Year:
-                                    @if (!String.IsNullOrEmpty(studyAbroad.City))
+                                    @if (!string.IsNullOrEmpty(studyAbroad.City))
                                     {
                                         @studyAbroad.City@:,
                                     }
@@ -65,7 +65,7 @@
                                 <div>
                                     @if (programTypes != null && programTypes.Count > 0)
                                     {
-                                        @String.Join(", ", programTypes)
+                                        @string.Join(", ", programTypes)
                                     }
                                 </div>
                             </div>
@@ -105,12 +105,12 @@
                         <br />
                     }
                     <strong class="h2">@Model.FirstName @Model.MiddleName @Model.LastName</strong>
-                    @if (!String.IsNullOrEmpty(Model.CampusEmail))
+                    @if (!string.IsNullOrEmpty(Model.CampusEmail))
                     {
                         <br />
                         <a href="mailto:@Model.CampusEmail">@Model.CampusEmail</a>
                     }
-                    @if (!String.IsNullOrEmpty(Model.AlternateEmail))
+                    @if (!string.IsNullOrEmpty(Model.AlternateEmail))
                     {
                         <br />
                         <a href="mailto:@Model.AlternateEmail">@Model.AlternateEmail</a>
@@ -119,11 +119,11 @@
 
                 <br />
 
-                @if (!String.IsNullOrEmpty(Model.StreetAddress))
+                @if (!string.IsNullOrEmpty(Model.StreetAddress))
                 {
                     string address = Model.StreetAddress;
 
-                    if (!String.IsNullOrEmpty(Model.StreetAddress2))
+                    if (!string.IsNullOrEmpty(Model.StreetAddress2))
                     {
                         address += ", " + Model.StreetAddress2;
                     }
@@ -133,7 +133,7 @@
                     <address>
                         <a href="https://maps.google.com/maps?q=@Url.Encode(address)" target="_blank">
                             @Model.StreetAddress
-                            @if (!String.IsNullOrEmpty(Model.StreetAddress2))
+                            @if (!string.IsNullOrEmpty(Model.StreetAddress2))
                             {
                                 <br />
                                 @Model.StreetAddress2
@@ -144,7 +144,7 @@
                     </address>
                 }
 
-                @if (!String.IsNullOrEmpty(Model.PhoneNumber))
+                @if (!string.IsNullOrEmpty(Model.PhoneNumber))
                 {
                     <div>
                         <abbr title="Phone">P:</abbr>

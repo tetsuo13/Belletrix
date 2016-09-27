@@ -103,7 +103,7 @@
                                 <a href="@Url.Action("View", "Student", new { id = student.Id })">@student.LastName, @student.FirstName @student.MiddleName</a>
                             </td>
                             <td>
-                                @if (!String.IsNullOrEmpty(student.CampusEmail))
+                                @if (!string.IsNullOrEmpty(student.CampusEmail))
                                 {
                                     <a href="mailto:@student.CampusEmail">@student.CampusEmail</a>
                                 }
@@ -140,12 +140,12 @@
     @if (Request.HttpMethod == "POST" && Model.Count() > 0)
     {
         IEnumerable<string> emailableStudents = Model
-            .Where(s => !String.IsNullOrEmpty(s.CampusEmail))
+            .Where(s => !string.IsNullOrEmpty(s.CampusEmail))
             .Select(s => s.FirstName + "%20" + s.LastName + "%20<" + s.CampusEmail + ">");
 
         if (emailableStudents != null && emailableStudents.Any())
         {
-            <a href="mailto:@String.Join(";", emailableStudents)">Send email to student list</a>
+            <a href="mailto:@string.Join(";", emailableStudents)">Send email to student list</a>
         }
     }
 }

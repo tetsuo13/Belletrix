@@ -107,7 +107,7 @@ namespace Belletrix.Web.Controllers
                     return Json(new
                         {
                             Success = true,
-                            Message = String.Empty,
+                            Message = string.Empty,
                             Id = id
                         });
                 }
@@ -155,7 +155,7 @@ namespace Belletrix.Web.Controllers
             return Json(new
             {
                 Success = true,
-                Message = String.Empty
+                Message = string.Empty
             });
         }
 
@@ -184,7 +184,7 @@ namespace Belletrix.Web.Controllers
             return Json(new
                 {
                     Success = true,
-                    Message = String.Empty
+                    Message = string.Empty
                 });
         }
 

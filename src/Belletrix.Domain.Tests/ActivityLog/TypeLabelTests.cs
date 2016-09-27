@@ -29,7 +29,7 @@ namespace Belletrix.Domain.Tests.ActivityLog
 
             foreach (ActivityLogTypes type in values)
             {
-                string message = String.Format("Checking value {0} ({1})", (int)type, type.ToString());
+                string message = string.Format("Checking value {0} ({1})", (int)type, type.ToString());
                 Assert.IsTrue(labels.ContainsKey((int)type), message);
             }
         }

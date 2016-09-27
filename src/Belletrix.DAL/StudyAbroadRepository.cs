@@ -132,7 +132,7 @@ namespace Belletrix.DAL
         private void AddParameter(ref Dictionary<string, string> columns, ref List<SqlParameter> parameters,
             StringBuilder sql, string columnName, SqlDbType columnType, object columnValue, int columnLength)
         {
-            string parameterName = String.Format("@{0}", columnName);
+            string parameterName = string.Format("@{0}", columnName);
             columns.Add(columnName, parameterName);
 
             if (columnLength > 0)
