@@ -29,5 +29,7 @@ namespace Belletrix.DAL
         /// <param name="activityId">Activity log ID.</param>
         /// <returns>Types for the activity.</returns>
         Task<ActivityLogTypes[]> GetActivityTypes(int activityId);
+
+        Task<bool> TransferOwnership(int oldId, int newId);
     }
 }

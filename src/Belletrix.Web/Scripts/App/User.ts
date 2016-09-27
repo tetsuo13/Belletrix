@@ -1,46 +1,37 @@
-﻿/// <reference path="Common.ts" />
-/// <reference path="..\typings\jquery\jquery.d.ts" />
+﻿/// <reference path="..\typings\jquery\jquery.d.ts" />
 
 module Belletrix {
-    /**
-     * Promo management only available to internal users.
-     */
-    export class Promo {
+    export class User {
         /**
-         * Promotions initialization.
+         * Initialize the user list page.
+         * @param tableSelector Main user listing table.
+         * @param deleteModalSelector User delete confirm dialog.
+         * @param deleteUrl URL to call for user deletion.
          */
-        public initAddForm(): void {
-        }
-
-        /**
-         * Initialize the promo list page.
-         * @param tableSelector Main promo listing table.
-         * @param deleteModalSelector Promo delete confirm dialog.
-         * @param deleteUrl URL to call for promo deletion.
-         */
-        public initPromoList(tableSelector: string, deleteModalSelector: string,
+        public initUserList(tableSelector: string, deleteModalSelector: string,
             deleteUrl: string): void {
+
             $(tableSelector).DataTable({
                 columns: [
                     null,
                     null,
                     null,
                     null,
+                    { orderable: false },
                     { orderable: false }
                 ]
             });
 
-            $('[data-toggle="tooltip"]').tooltip();
-            this.handlePromoDelete(deleteModalSelector, deleteUrl);
+            this.handleUserDelete(deleteModalSelector, deleteUrl);
         }
 
-        private handlePromoDelete(deleteModalSelector: string, deleteUrl: string): void {
+        private handleUserDelete(deleteModalSelector: string, deleteUrl: string): void {
             let deleteDialog: JQuery = $(deleteModalSelector);
             let confirmDeleteSelector: string = ".btn-danger";
 
             deleteDialog.on("show.bs.modal", function (event: JQueryEventObject): void {
                 let button: JQuery = $(event.relatedTarget);
-                let promoId: number = button.data("promoid");
+                let promoId: number = button.data("userid");
 
                 $(confirmDeleteSelector, deleteDialog).click(function (): void {
                     $(this).addClass("disabled");

@@ -164,7 +164,37 @@ namespace Belletrix.Web.Controllers
             }
 
             Analytics.TrackPageView(Request, "User List", (Session["User"] as UserModel).Login);
+            ViewBag.CurrentUser = currentUser;
             return View(await UserService.GetUsers());
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult> Delete(int id)
+        {
+            UserModel user = await UserService.GetUser(id);
+            Analytics.TrackPageView(Request, "Delete User", (Session["User"] as UserModel).Login);
+
+            if (user == null)
+            {
+                return Json(new GenericResult()
+                {
+                    Result = false,
+                    Message = "Invalid user id"
+                });
+            }
+
+            UserModel currentUser = Session["User"] as UserModel;
+
+            if (!currentUser.IsAdmin)
+            {
+                return Json(new GenericResult()
+                {
+                    Result = false,
+                    Message = "User not eligible for deletion"
+                });
+            }
+
+            return Json(await UserService.Delete(id, currentUser.Id));
         }
     }
 }

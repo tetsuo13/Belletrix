@@ -1,43 +1,34 @@
-/// <reference path="Common.ts" />
 /// <reference path="..\typings\jquery\jquery.d.ts" />
 var Belletrix;
 (function (Belletrix) {
-    /**
-     * Promo management only available to internal users.
-     */
-    var Promo = (function () {
-        function Promo() {
+    var User = (function () {
+        function User() {
         }
         /**
-         * Promotions initialization.
+         * Initialize the user list page.
+         * @param tableSelector Main user listing table.
+         * @param deleteModalSelector User delete confirm dialog.
+         * @param deleteUrl URL to call for user deletion.
          */
-        Promo.prototype.initAddForm = function () {
-        };
-        /**
-         * Initialize the promo list page.
-         * @param tableSelector Main promo listing table.
-         * @param deleteModalSelector Promo delete confirm dialog.
-         * @param deleteUrl URL to call for promo deletion.
-         */
-        Promo.prototype.initPromoList = function (tableSelector, deleteModalSelector, deleteUrl) {
+        User.prototype.initUserList = function (tableSelector, deleteModalSelector, deleteUrl) {
             $(tableSelector).DataTable({
                 columns: [
                     null,
                     null,
                     null,
                     null,
+                    { orderable: false },
                     { orderable: false }
                 ]
             });
-            $('[data-toggle="tooltip"]').tooltip();
-            this.handlePromoDelete(deleteModalSelector, deleteUrl);
+            this.handleUserDelete(deleteModalSelector, deleteUrl);
         };
-        Promo.prototype.handlePromoDelete = function (deleteModalSelector, deleteUrl) {
+        User.prototype.handleUserDelete = function (deleteModalSelector, deleteUrl) {
             var deleteDialog = $(deleteModalSelector);
             var confirmDeleteSelector = ".btn-danger";
             deleteDialog.on("show.bs.modal", function (event) {
                 var button = $(event.relatedTarget);
-                var promoId = button.data("promoid");
+                var promoId = button.data("userid");
                 $(confirmDeleteSelector, deleteDialog).click(function () {
                     $(this).addClass("disabled");
                     $.ajax({
@@ -63,8 +54,8 @@ var Belletrix;
             });
         };
         ;
-        return Promo;
+        return User;
     }());
-    Belletrix.Promo = Promo;
+    Belletrix.User = User;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=Promo.js.map
+//# sourceMappingURL=User.js.map

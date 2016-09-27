@@ -9,5 +9,6 @@ namespace Belletrix.DAL
     {
         Task<IEnumerable<EventLogViewModel>> GetEvents();
         Task AddStudentEvent(EventLogModel log);
+        Task<bool> TransferOwnership(int oldId, int newId);
     }
 }

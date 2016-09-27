@@ -1,4 +1,5 @@
 ﻿using Belletrix.Entity.Model;
+using Belletrix.Entity.ViewModel;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -12,5 +13,6 @@ namespace Belletrix.Domain
         Task<UserModel> GetUser(int id);
         Task Update(UserModel model);
         Task InsertUser(UserModel model);
+        Task<GenericResult> Delete(int id, int currentUserId);
     }
 }

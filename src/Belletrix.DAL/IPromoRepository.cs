@@ -15,5 +15,6 @@ namespace Belletrix.DAL
         Task<IEnumerable<PromoSourceViewModel>> AsSources();
         Task<bool> Delete(int id);
         Task Update(PromoEditViewModel promo);
+        Task<bool> TransferOwnership(int oldId, int newId);
     }
 }

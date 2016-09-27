@@ -12,5 +12,6 @@ namespace Belletrix.DAL
         Task<UserModel> GetUser(int id);
         Task Update(UserModel model);
         Task InsertUser(UserModel model);
+        Task<bool> Delete(int id);
     }
 }

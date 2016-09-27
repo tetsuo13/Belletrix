@@ -333,12 +333,14 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\App\ActivityLog.ts" />
     <TypeScriptCompile Include="Scripts\App\Common.ts" />
+    <TypeScriptCompile Include="Scripts\App\GenericResult.ts" />
     <TypeScriptCompile Include="Scripts\App\JQuery.DataTables.d.ts" />
     <TypeScriptCompile Include="Scripts\App\Promo.ts" />
     <TypeScriptCompile Include="Scripts\App\Student.ts" />
     <TypeScriptCompile Include="Scripts\App\StudentBase.ts" />
     <TypeScriptCompile Include="Scripts\App\StudentNote.ts" />
     <TypeScriptCompile Include="Scripts\App\StudentPromo.ts" />
+    <TypeScriptCompile Include="Scripts\App\User.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootbox\bootbox.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap.datepicker\bootstrap.datepicker.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap.multiselect\bootstrap.multiselect.d.ts" />

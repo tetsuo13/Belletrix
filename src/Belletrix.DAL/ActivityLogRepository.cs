@@ -263,5 +263,26 @@ namespace Belletrix.DAL
                 throw e;
             }
         }
+
+        public async Task<bool> TransferOwnership(int oldId, int newId)
+        {
+            const string sql = @"
+                UPDATE  [dbo].[ActivityLog]
+                SET     [CreatedBy] = @NewId
+                WHERE   [CreatedBy] = @OldId";
+
+            try
+            {
+                await UnitOfWork.Context().ExecuteAsync(sql, new { OldId = oldId, NewId = newId });
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
+                return false;
+            }
+
+            return true;
+        }
     }
 }
