@@ -30,6 +30,8 @@ namespace Belletrix.Entity.Enum
         Workshop,
 
         [Display(Name = "Faculty Led Program")]
-        FacultyLedProgram
+        FacultyLedProgram,
+
+        Course
     }
 }

@@ -253,7 +253,8 @@ namespace Belletrix.Domain
                 { 7, "label-default" },
                 { 8, "label-primary" },
                 { 9, "label-success" },
-                { 10, "label-info" }
+                { 10, "label-info" },
+                { 11, "label-warning" }
             };
         }
 
