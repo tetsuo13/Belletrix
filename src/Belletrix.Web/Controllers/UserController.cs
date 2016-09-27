@@ -86,7 +86,7 @@ namespace Belletrix.Web.Controllers
             if (user == null)
             {
                 string message = string.Format("User ID {0} not found", id);
-                MvcApplication.LogException(new ArgumentException(message, "id"));
+                MvcApplication.LogException(new ArgumentException(message, nameof(id)));
                 return RedirectToAction("NotFound", "Error");
             }
 

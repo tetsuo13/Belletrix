@@ -47,7 +47,7 @@ namespace Belletrix.Web.Controllers
             catch (Exception e)
             {
                 string message = string.Format("Invalid student ID {0}", studentId);
-                MvcApplication.LogException(new ArgumentException(message, "studentId", e));
+                MvcApplication.LogException(new ArgumentException(message, nameof(studentId), e));
                 return RedirectToAction("NotFound", "Error");
             }
 
@@ -73,7 +73,7 @@ namespace Belletrix.Web.Controllers
             catch (Exception e)
             {
                 string message = string.Format("Invalid student ID {0}", model.StudentId);
-                MvcApplication.LogException(new ArgumentException(message, "model", e));
+                MvcApplication.LogException(new ArgumentException(message, nameof(model), e));
                 return RedirectToAction("NotFound", "Error");
             }
 

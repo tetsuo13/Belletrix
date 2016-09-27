@@ -66,14 +66,14 @@ namespace Belletrix.Web.Controllers
             catch (Exception e)
             {
                 string message = string.Format("Student ID {0} not found", id);
-                MvcApplication.LogException(new ArgumentException(message, "id", e));
+                MvcApplication.LogException(new ArgumentException(message, nameof(id), e));
                 return RedirectToAction("NotFound", "Error");
             }
 
             if (student == null)
             {
                 string message = string.Format("Student ID {0} returned null", id);
-                MvcApplication.LogException(new ArgumentException(message, "id"));
+                MvcApplication.LogException(new ArgumentException(message, nameof(id)));
                 return RedirectToAction("NotFound", "Error");
             }
 
@@ -98,14 +98,14 @@ namespace Belletrix.Web.Controllers
             catch (Exception e)
             {
                 string message = string.Format("Student ID {0} not found", id);
-                MvcApplication.LogException(new ArgumentException(message, "id", e));
+                MvcApplication.LogException(new ArgumentException(message, nameof(id), e));
                 return RedirectToAction("NotFound", "Error");
             }
 
             if (student == null)
             {
                 string message = string.Format("Student ID {0} returned null", id);
-                MvcApplication.LogException(new ArgumentException(message, "id"));
+                MvcApplication.LogException(new ArgumentException(message, nameof(id)));
                 return RedirectToAction("NotFound", "Error");
             }
 
@@ -122,7 +122,7 @@ namespace Belletrix.Web.Controllers
         {
             if (id == null)
             {
-                MvcApplication.LogException(new ArgumentException("Missing student ID", "id"));
+                MvcApplication.LogException(new ArgumentException("Missing student ID", nameof(id)));
                 return RedirectToAction("NotFound", "Error");
             }
 
@@ -135,14 +135,14 @@ namespace Belletrix.Web.Controllers
             catch (Exception e)
             {
                 string message = string.Format("Student ID {0} not found", id.Value);
-                MvcApplication.LogException(new ArgumentException(message, "id", e));
+                MvcApplication.LogException(new ArgumentException(message, nameof(id), e));
                 return RedirectToAction("NotFound", "Error");
             }
 
             if (student == null)
             {
                 string message = string.Format("Student ID {0} returned null", id.Value);
-                MvcApplication.LogException(new ArgumentException(message, "id"));
+                MvcApplication.LogException(new ArgumentException(message, nameof(id)));
                 return RedirectToAction("NotFound", "Error");
             }
 

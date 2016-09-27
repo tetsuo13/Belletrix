@@ -29,7 +29,7 @@ namespace Belletrix.Web.Controllers
             catch (Exception e)
             {
                 string message = string.Format("Student ID {0} not found", studentId);
-                MvcApplication.LogException(new ArgumentException(message, "studentId", e));
+                MvcApplication.LogException(new ArgumentException(message, nameof(studentId), e));
                 return RedirectToAction("NotFound", "Error");
             }
 
