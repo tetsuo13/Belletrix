@@ -39,7 +39,7 @@ namespace Belletrix.Web.Controllers
                 {
                     UserModel user = await UserService.GetUser(model.UserName);
 
-                    if (user.IsActive)
+                    if (user != null && user.IsActive)
                     {
                         // Column for hash is a CHAR so even if the user has
                         // migrated they'll have spaces.

@@ -91,14 +91,7 @@ namespace Belletrix.DAL
 
         public async Task<UserModel> GetUser(string username)
         {
-            IEnumerable<UserModel> users = await GetUsers(username);
-
-            if (users.Any())
-            {
-                return users.First();
-            }
-
-            throw new Exception("User not found");
+            return (await GetUsers(username)).FirstOrDefault();
         }
 
         public async Task<UserModel> GetUser(int id)
