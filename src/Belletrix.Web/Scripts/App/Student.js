@@ -12,7 +12,6 @@ var Belletrix;
         }
         /**
          * Initialize student add/edit page.
-         *
          * @param nameCheckUrl URL for unique name check.
          */
         Student.prototype.initStudentAddEdit = function (nameCheckUrl) {
@@ -22,6 +21,32 @@ var Belletrix;
             $("a#studyAbroadDestinations").click(function (e) {
                 e.preventDefault();
                 _this.addStudyAbroadRows();
+            });
+        };
+        /**
+         * Add click event to Study Abroad tab. Will fetch student's
+         * experiences in a list and display partial inline.
+         * @param tabSelector Selector to tab.
+         * @param dataUrl URL to call for student experiences.
+         * @param experiencesTableSelector Selector for experiences table.
+         */
+        Student.prototype.initStudyAbroadTab = function (tabSelector, dataUrl, experiencesTableSelector) {
+            $('a[href="' + tabSelector + '"]').on("show.bs.tab", function (e) {
+                $.ajax({
+                    url: dataUrl,
+                    method: "GET",
+                    cache: false,
+                    success: function (data) {
+                        $(tabSelector).html(data);
+                        var timer = setInterval(function () {
+                            var studyAbroadTable = $(experiencesTableSelector);
+                            if (studyAbroadTable.length) {
+                                studyAbroadTable.DataTable();
+                                clearInterval(timer);
+                            }
+                        });
+                    }
+                });
             });
         };
         /**
@@ -122,4 +147,3 @@ var Belletrix;
     }(Belletrix.StudentBase));
     Belletrix.Student = Student;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=Student.js.map

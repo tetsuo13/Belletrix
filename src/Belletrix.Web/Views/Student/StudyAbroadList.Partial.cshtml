@@ -1,0 +1,105 @@
+﻿@using Belletrix.Core;
+@using Belletrix.Entity.Model;
+
+@model IEnumerable<StudyAbroadModel>
+
+@{ 
+    bool showStudent = ViewData.ContainsKey("ShowStudent") && (bool)ViewData["ShowStudent"];
+}
+
+<table id="experiencelist" class="table table-bordered table-hover table-striped tablesorter">
+    <thead>
+        <tr>
+            @if (showStudent)
+            {
+                <th>Student</th>
+            }
+            <th>Year</th>
+            <th>Semester</th>
+            <th>Starting</th>
+            <th>Ending</th>
+            <th>Credit</th>
+            <th>Internship</th>
+            <th>Country</th>
+            <th>City</th>
+            <th>Program</th>
+            <th>Types</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (StudyAbroadModel study in Model)
+        {
+            CountryModel selectedCountry = (ViewBag.Countries as List<CountryModel>).FirstOrDefault(c => c.Id == study.CountryId);
+            string countryName = string.Empty;
+
+            if (selectedCountry != null)
+            {
+                countryName = selectedCountry.Name;
+            }
+
+            ProgramModel selectedProgram = (ViewBag.Programs as List<ProgramModel>).FirstOrDefault(p => p.Id == study.ProgramId);
+            string programName = string.Empty;
+
+            if (selectedProgram != null)
+            {
+                programName = selectedProgram.Name;
+            }
+
+            ICollection<string> programTypes = new List<string>();
+
+            foreach (int type in study.ProgramTypes)
+            {
+                ProgramTypeModel programType = (ViewBag.ProgramTypes as List<ProgramTypeModel>).FirstOrDefault(p => p.Id == type);
+
+                if (programType != null)
+                {
+                    programTypes.Add(programType.Name);
+                }
+            }
+
+            <tr>
+                @if (showStudent)
+                {
+                    <td>
+                        <a href="@Url.Action("View", "Student", new { id = study.StudentId })">@study.Student.LastName, @study.Student.FirstName @study.Student.MiddleName</a>
+                    </td>
+                }
+                <td>@study.Year</td>
+                <td>@Formatter.StudyAbroadPeriodString(study.Semester)</td>
+                <td>
+                    @if (study.StartDate.HasValue)
+                    {
+                        @DateTimeFilter.UtcToLocal(study.StartDate.Value).ToShortDateString()
+                    }
+                </td>
+                <td>
+                    @if (study.EndDate.HasValue)
+                    {
+                        @DateTimeFilter.UtcToLocal(study.EndDate.Value).ToShortDateString()
+                    }
+                </td>
+                <td>
+                    @if (study.CreditBearing)
+                    {
+                        <i class="glyphicon glyphicon-ok"></i>
+                    }
+                </td>
+                <td>
+                    @if (study.Internship)
+                    {
+                        <i class="glyphicon glyphicon-ok"></i>
+                    }
+                </td>
+                <td>@countryName</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(study.City))
+                    {
+                        @study.City
+                    }
+                </td>
+                <td>@programName</td>
+                <td>@string.Join(", ", programTypes)</td>
+            </tr>
+        }
+    </tbody>
+</table>

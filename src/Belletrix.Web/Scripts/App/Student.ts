@@ -2,7 +2,6 @@
     export class Student extends StudentBase {
         /**
          * Initialize student add/edit page.
-         *
          * @param nameCheckUrl URL for unique name check.
          */
         public initStudentAddEdit(nameCheckUrl: string): void {
@@ -14,6 +13,35 @@
                 e.preventDefault();
                 this.addStudyAbroadRows();
             })
+        }
+
+        /**
+         * Add click event to Study Abroad tab. Will fetch student's
+         * experiences in a list and display partial inline.
+         * @param tabSelector Selector to tab.
+         * @param dataUrl URL to call for student experiences.
+         * @param experiencesTableSelector Selector for experiences table.
+         */
+        public initStudyAbroadTab(tabSelector: string, dataUrl: string, experiencesTableSelector: string): void {
+            $('a[href="' + tabSelector + '"]').on("show.bs.tab", function (e: JQueryEventObject): void {
+                $.ajax({
+                    url: dataUrl,
+                    method: "GET",
+                    cache: false,
+                    success: function (data) {
+                        $(tabSelector).html(data);
+
+                        let timer = setInterval(function () {
+                            let studyAbroadTable: JQuery = $(experiencesTableSelector);
+
+                            if (studyAbroadTable.length) {
+                                studyAbroadTable.DataTable();
+                                clearInterval(timer);
+                            }
+                        });
+                    }
+                });
+            });
         }
 
         /**

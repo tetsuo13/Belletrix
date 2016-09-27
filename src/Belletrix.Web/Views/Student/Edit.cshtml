@@ -21,25 +21,9 @@
 
             Belletrix.Common.singleSubmit();
 
-            $('a[href="#studyabroadtab"]').on('show.bs.tab', function (e) {
-                $.ajax({
-                    url: '@Url.Action("StudyAbroad", new { id = Model.Id })',
-                    method: 'GET',
-                    cache: false,
-                    success: function (data) {
-                        $('#studyabroadtab').html(data);
-
-                        var timer = setInterval(function () {
-                            var studyAbroadTable = $('#studyabroad');
-
-                            if (studyAbroadTable.length) {
-                                studyAbroadTable.dataTable();
-                                clearInterval(timer);
-                            }
-                        });
-                    }
-                });
-            });
+            student.initStudyAbroadTab('#studyabroadtab',
+                '@Url.Action("StudyAbroad", new { id = Model.Id })',
+                '#experiencelist');
         });
     </script>
 }
