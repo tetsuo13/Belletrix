@@ -1,9 +1,8 @@
-﻿@using Belletrix.Core;
-@using Belletrix.Entity.Model;
+﻿@using Belletrix.Entity.Model;
 
 @model IEnumerable<StudentModel>
 
-@if (Model.Count() > 0)
+@if (Model != null && Model.Any())
 {
     <div class="panel panel-danger">
         <div class="panel-heading">
@@ -21,7 +20,7 @@
                     <a data-toggle="modal" href="@Url.Action("ViewInline", new { id = student.Id })" class="list-group-item" data-target="#dup">
                         <h4 class="list-group-item-heading">@student.FirstName @student.LastName</h4>
                         <p class="list-group-item-text">
-                            Created @DateTimeFilter.UtcToLocal(student.Created)
+                            Created @student.Created
                         </p>
                     </a>
                 }

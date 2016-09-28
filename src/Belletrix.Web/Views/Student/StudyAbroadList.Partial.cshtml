@@ -69,13 +69,13 @@
                 <td>
                     @if (study.StartDate.HasValue)
                     {
-                        @DateTimeFilter.UtcToLocal(study.StartDate.Value).ToShortDateString()
+                        @study.StartDate.Value.ToShortDateString()
                     }
                 </td>
                 <td>
                     @if (study.EndDate.HasValue)
                     {
-                        @DateTimeFilter.UtcToLocal(study.EndDate.Value).ToShortDateString()
+                        @study.EndDate.Value.ToShortDateString()
                     }
                 </td>
                 <td>
