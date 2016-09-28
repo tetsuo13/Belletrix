@@ -55,3 +55,4 @@ var Belletrix;
     }());
     Belletrix.StudentNote = StudentNote;
 })(Belletrix || (Belletrix = {}));
+//# sourceMappingURL=StudentNote.js.map

@@ -21,6 +21,12 @@ namespace Belletrix.Core
         /// <summary>
         /// 
         /// </summary>
+        /// <remarks>
+        /// Short, sweet, and simple.
+        /// <see href="https://github.com/Humanizr/Humanizer">Humanizer</see>
+        /// is another, more complete, method to accomplishing the same thing
+        /// but will handle a lot more options.
+        /// </remarks>
         /// <param name="date"></param>
         /// <returns></returns>
         /// <seealso href="https://stackoverflow.com/a/1248">

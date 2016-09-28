@@ -58,3 +58,4 @@ var Belletrix;
     }());
     Belletrix.User = User;
 })(Belletrix || (Belletrix = {}));
+//# sourceMappingURL=User.js.map
