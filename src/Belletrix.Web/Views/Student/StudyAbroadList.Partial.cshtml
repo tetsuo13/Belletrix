@@ -7,7 +7,7 @@
     bool showStudent = ViewData.ContainsKey("ShowStudent") && (bool)ViewData["ShowStudent"];
 }
 
-<table id="experiencelist" class="display">
+<table id="experiencelist" class="display table-condensed">
     <thead>
         <tr>
             @if (showStudent)
@@ -21,9 +21,7 @@
             <th>Credit</th>
             <th>Internship</th>
             <th>Country</th>
-            <th>City</th>
             <th>Program</th>
-            <th>Types</th>
         </tr>
     </thead>
     <tbody>
@@ -91,14 +89,7 @@
                     }
                 </td>
                 <td>@countryName</td>
-                <td>
-                    @if (!string.IsNullOrEmpty(study.City))
-                    {
-                        @study.City
-                    }
-                </td>
                 <td>@programName</td>
-                <td>@string.Join(", ", programTypes)</td>
             </tr>
         }
     </tbody>
