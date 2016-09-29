@@ -334,6 +334,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\App\ActivityLog.ts" />
     <TypeScriptCompile Include="Scripts\App\Common.ts" />
+    <TypeScriptCompile Include="Scripts\App\Experience.ts" />
     <TypeScriptCompile Include="Scripts\App\GenericResult.ts" />
     <TypeScriptCompile Include="Scripts\App\JQuery.DataTables.d.ts" />
     <TypeScriptCompile Include="Scripts\App\Promo.ts" />

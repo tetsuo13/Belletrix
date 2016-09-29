@@ -9,8 +9,9 @@ var Belletrix;
          * @param tableSelector Main user listing table.
          * @param deleteModalSelector User delete confirm dialog.
          * @param deleteUrl URL to call for user deletion.
+         * @param dataString Part after the "data-" attribute containing the ID value.
          */
-        User.prototype.initUserList = function (tableSelector, deleteModalSelector, deleteUrl) {
+        User.prototype.initUserList = function (tableSelector, deleteModalSelector, deleteUrl, dataString) {
             $(tableSelector).DataTable({
                 columns: [
                     null,
@@ -21,39 +22,8 @@ var Belletrix;
                     { orderable: false }
                 ]
             });
-            this.handleUserDelete(deleteModalSelector, deleteUrl);
+            Belletrix.Common.handleDeleteModal(deleteModalSelector, deleteUrl, dataString);
         };
-        User.prototype.handleUserDelete = function (deleteModalSelector, deleteUrl) {
-            var deleteDialog = $(deleteModalSelector);
-            var confirmDeleteSelector = ".btn-danger";
-            deleteDialog.on("show.bs.modal", function (event) {
-                var button = $(event.relatedTarget);
-                var promoId = button.data("userid");
-                $(confirmDeleteSelector, deleteDialog).click(function () {
-                    $(this).addClass("disabled");
-                    $.ajax({
-                        method: "DELETE",
-                        url: deleteUrl,
-                        data: {
-                            id: promoId
-                        },
-                        success: function (data) {
-                            console.log(data);
-                            if (!data.Result) {
-                                deleteDialog.modal("hide");
-                                Belletrix.Common.errorMessage("Something went wrong: " + data.Message);
-                                return;
-                            }
-                            window.location.reload();
-                        }
-                    });
-                });
-            });
-            deleteDialog.on("hide.bs.modal", function (event) {
-                $(confirmDeleteSelector, deleteDialog).off();
-            });
-        };
-        ;
         return User;
     }());
     Belletrix.User = User;

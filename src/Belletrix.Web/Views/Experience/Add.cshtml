@@ -4,23 +4,14 @@
 
 @{
     ViewBag.Title = "Add";
+    HtmlHelper.ClientValidationEnabled = true;
+    HtmlHelper.UnobtrusiveJavaScriptEnabled = true;
 }
 
 @section FooterScript {
     <script>
         $(function () {
-            'use strict';
-
-            Belletrix.Common.handleMvcEditor();
-
-            $('.multiselect').multiselect({
-                numberDisplayed: 1,
-                buttonContainer: '<div class="button-default" />'
-            });
-
-            $('#StartDate, #EndDate').datepicker();
-
-            Belletrix.Common.singleSubmit();
+            new Belletrix.Experience().initAdd();
         });
     </script>
 }
@@ -40,9 +31,9 @@
     @using (Html.BeginForm(null, null, FormMethod.Post, new { role = "form" }))
     {
         @Html.AntiForgeryToken()
-        @Html.ValidationSummary()
+        @Html.ValidationSummary(true)
         @Html.Hidden("StudentId", (int)ViewBag.Student.Id)
-        
+
         <div class="row">
             <div class="col-lg-6">
                 <div class="panel panel-primary">
@@ -55,10 +46,12 @@
                             <div class="col-lg-6">
                                 @Html.LabelFor(s => s.CountryId)
                                 @Html.DropDownListFor(s => s.CountryId, ViewBag.Countries as SelectList, "Please Select", new { @class = "form-control" })
+                                @Html.ValidationMessageFor(x => x.CountryId)
                             </div>
                             <div class="col-lg-6">
                                 @Html.LabelFor(s => s.City) <i>(Optional)</i>
                                 @Html.TextBoxFor(s => s.City, new { @class = "form-control "})
+                                @Html.ValidationMessageFor(x => x.City)
                             </div>
                         </div>
 
@@ -66,10 +59,12 @@
                             <div class="col-lg-6">
                                 @Html.LabelFor(s => s.Year)
                                 @Html.DropDownListFor(s => s.Year, ViewBag.Years as SelectList, "Please Select", new { @class = "form-control" })
+                                @Html.ValidationMessageFor(x => x.Year)
                             </div>
                             <div class="col-lg-6">
                                 @Html.LabelFor(s => s.Semester)
                                 @Html.DropDownListFor(s => s.Semester, new SelectList(ViewBag.Semesters, "Id", "Name"), "Please Select", new { @class = "form-control" })
+                                @Html.ValidationMessageFor(x => x.Semester)
                             </div>
                         </div>
 
@@ -77,10 +72,12 @@
                             <div class="col-lg-6">
                                 @Html.LabelFor(s => s.StartDate) <i>(Optional)</i>
                                 @Html.TextBoxFor(s => s.StartDate, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(x => x.StartDate)
                             </div>
                             <div class="col-lg-6">
                                 @Html.LabelFor(s => s.EndDate) <i>(Optional)</i>
                                 @Html.TextBoxFor(s => s.EndDate, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(x => x.EndDate)
                             </div>
                         </div>
                     </div>
@@ -107,6 +104,7 @@
                                         "Value",
                                         "Text",
                                         Model), "Please Select", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.CreditBearing)
                                 </div>
                             </div>
                             <div class="col-lg-6">
@@ -121,6 +119,7 @@
                                         "Value",
                                         "Text",
                                         Model), "Please Select", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.Internship)
                                 </div>
                             </div>
                         </div>
@@ -129,17 +128,19 @@
                             <div class="col-lg-6">
                                 @Html.LabelFor(s => s.ProgramId)
                                 @Html.DropDownListFor(s => s.ProgramId, ViewBag.Programs as SelectList, "Please Select", new { @class = "form-control" })
+                                @Html.ValidationMessageFor(x => x.ProgramId)
                             </div>
                             <div class="col-lg-6">
                                 @Html.LabelFor(s => s.ProgramTypes)
                                 @Html.ListBoxFor(s => s.ProgramTypes, new MultiSelectList(ViewBag.ProgramTypes, "Id", "Name"), new { @class = "multiselect", multiple = "multiple" })
+                                @Html.ValidationMessageFor(x => x.ProgramTypes)
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
+
         <div class="row">
             <div class="col-lg-12 text-center">
                 <button type="submit" class="btn btn-default">Add Experience</button>

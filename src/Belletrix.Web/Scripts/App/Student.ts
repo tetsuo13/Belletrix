@@ -21,22 +21,44 @@
          * @param tabSelector Selector to tab.
          * @param dataUrl URL to call for student experiences.
          * @param experiencesTableSelector Selector for experiences table.
+         * @param experienceDeleteModalSelector
+         * @param experienceDeleteUrl
+         * @param experienceDataString
          */
-        public initStudyAbroadTab(tabSelector: string, dataUrl: string, experiencesTableSelector: string): void {
+        public initStudyAbroadTab(tabSelector: string, dataUrl: string, experiencesTableSelector: string,
+            experienceDeleteModalSelector: string, experienceDeleteUrl: string,
+            experienceDataString: string): void {
+
             $('a[href="' + tabSelector + '"]').on("show.bs.tab", function (e: JQueryEventObject): void {
                 $.ajax({
                     url: dataUrl,
                     method: "GET",
                     cache: false,
-                    success: function (data) {
+                    success: function (data: string): void {
                         $(tabSelector).html(data);
 
-                        let timer = setInterval(function () {
+                        let timer = setInterval(function (): void {
                             let studyAbroadTable: JQuery = $(experiencesTableSelector);
 
                             if (studyAbroadTable.length) {
-                                studyAbroadTable.DataTable();
+                                studyAbroadTable.DataTable({
+                                    columns: [
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        { orderable: false }
+                                    ]
+                                });
+
                                 clearInterval(timer);
+
+                                Belletrix.Common.handleDeleteModal(experienceDeleteModalSelector,
+                                    experienceDeleteUrl, experienceDataString);
                             }
                         });
                     }

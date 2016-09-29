@@ -23,7 +23,8 @@
 
             student.initStudyAbroadTab('#studyabroadtab',
                 '@Url.Action("StudyAbroad", new { id = Model.Id })',
-                '#experiencelist');
+                '#experiencelist',
+                '#deleteconfirm', '@Url.Action("Delete", "Experience")', 'experienceid');
         });
     </script>
 }

@@ -226,5 +226,26 @@ namespace Belletrix.DAL
                 throw e;
             }
         }
+
+        public async Task<bool> Delete(int id)
+        {
+            int rowsDeleted;
+            const string sql = @"
+                DELETE FROM [dbo].[StudyAbroad]
+                WHERE   [Id] = @Id";
+
+            try
+            {
+                rowsDeleted = await UnitOfWork.Context().ExecuteAsync(sql, new { Id = id });
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
+                return false;
+            }
+
+            return rowsDeleted == 1;
+        }
     }
 }

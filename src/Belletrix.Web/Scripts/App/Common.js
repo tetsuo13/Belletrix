@@ -81,6 +81,35 @@ var Belletrix;
             return (Math.random() + 1).toString(36).slice(2);
         };
         ;
+        Common.handleDeleteModal = function (deleteModalSelector, deleteUrl, dataString) {
+            var deleteDialog = $(deleteModalSelector);
+            var confirmDeleteSelector = ".btn-danger";
+            deleteDialog.on("show.bs.modal", function (event) {
+                var button = $(event.relatedTarget);
+                var deleteId = button.data(dataString);
+                $(confirmDeleteSelector, deleteDialog).click(function () {
+                    $(this).addClass("disabled");
+                    $.ajax({
+                        method: "DELETE",
+                        url: deleteUrl,
+                        data: {
+                            id: deleteId
+                        },
+                        success: function (data) {
+                            if (!data.Result) {
+                                deleteDialog.modal("hide");
+                                Belletrix.Common.errorMessage("Something went wrong: " + data.Message);
+                                return;
+                            }
+                            window.location.reload();
+                        }
+                    });
+                });
+            });
+            deleteDialog.on("hide.bs.modal", function (event) {
+                $(confirmDeleteSelector, deleteDialog).off();
+            });
+        };
         /** Number of milliseconds between pinging the server. */
         Common._idleKillerInterval = 1000 * 60 * 10;
         return Common;

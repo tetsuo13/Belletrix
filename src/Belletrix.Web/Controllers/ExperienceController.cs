@@ -1,6 +1,7 @@
 ﻿using Belletrix.Core;
 using Belletrix.Domain;
 using Belletrix.Entity.Model;
+using Belletrix.Entity.ViewModel;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -102,6 +103,22 @@ namespace Belletrix.Web.Controllers
             ViewBag.Countries = new SelectList(await StudentService.GetCountries(), "Id", "Name");
             ViewBag.Programs = new SelectList(await StudentService.GetPrograms(), "Id", "Name");
             ViewBag.ProgramTypes = await StudentService.GetProgramTypes();
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult> Delete(int id)
+        {
+            Analytics.TrackPageView(Request, "Delete Experience", (Session["User"] as UserModel).Login);
+
+            GenericResult result = new GenericResult();
+            result.Result = await StudyAbroadService.Delete(id);
+
+            if (!result.Result)
+            {
+                result.Message = "Invalid experience id";
+            }
+
+            return Json(result);
         }
     }
 }

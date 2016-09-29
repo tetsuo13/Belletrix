@@ -23,5 +23,10 @@ namespace Belletrix.Domain
         {
             await StudyAbroadRepository.Save(model, userId);
         }
+
+        public async Task<bool> Delete(int id)
+        {
+            return await StudyAbroadRepository.Delete(id);
+        }
     }
 }

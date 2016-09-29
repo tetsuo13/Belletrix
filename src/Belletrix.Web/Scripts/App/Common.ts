@@ -111,5 +111,40 @@ module Belletrix {
         static randomString(): string {
             return (Math.random() + 1).toString(36).slice(2);
         };
+
+        public static handleDeleteModal(deleteModalSelector: string, deleteUrl: string, dataString: string): void {
+            let deleteDialog: JQuery = $(deleteModalSelector);
+            let confirmDeleteSelector: string = ".btn-danger";
+
+            deleteDialog.on("show.bs.modal", function (event: JQueryEventObject): void {
+                let button: JQuery = $(event.relatedTarget);
+                let deleteId: number = button.data(dataString);
+
+                $(confirmDeleteSelector, deleteDialog).click(function (): void {
+                    $(this).addClass("disabled");
+
+                    $.ajax({
+                        method: "DELETE",
+                        url: deleteUrl,
+                        data: {
+                            id: deleteId
+                        },
+                        success: function (data: GenericResult): void {
+                            if (!data.Result) {
+                                deleteDialog.modal("hide");
+                                Belletrix.Common.errorMessage("Something went wrong: " + data.Message);
+                                return;
+                            }
+
+                            window.location.reload();
+                        }
+                    });
+                });
+            });
+
+            deleteDialog.on("hide.bs.modal", function (event: JQueryEventObject): void {
+                $(confirmDeleteSelector, deleteDialog).off();
+            });
+        }
     }
 }

@@ -10,7 +10,7 @@
     <script>
         $(function () {
             new Belletrix.User().initUserList('#userlist', '#deleteconfirm',
-                '@Url.Action("Delete", "User")');
+                '@Url.Action("Delete", "User")', 'userid');
         });
     </script>
 }

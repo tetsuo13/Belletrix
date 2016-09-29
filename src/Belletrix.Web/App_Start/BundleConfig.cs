@@ -19,6 +19,7 @@ namespace Belletrix.Web.App_Start
                 "~/Scripts/App/Common.js",
                 "~/Scripts/App/GenericResult.js",
                 "~/Scripts/App/ActivityLog.js",
+                "~/Scripts/App/Experience.js",
                 "~/Scripts/App/StudentBase.js",
                 "~/Scripts/App/Student.js",
                 "~/Scripts/App/StudentNote.js",

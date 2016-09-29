@@ -29,8 +29,11 @@ var Belletrix;
          * @param tabSelector Selector to tab.
          * @param dataUrl URL to call for student experiences.
          * @param experiencesTableSelector Selector for experiences table.
+         * @param experienceDeleteModalSelector
+         * @param experienceDeleteUrl
+         * @param experienceDataString
          */
-        Student.prototype.initStudyAbroadTab = function (tabSelector, dataUrl, experiencesTableSelector) {
+        Student.prototype.initStudyAbroadTab = function (tabSelector, dataUrl, experiencesTableSelector, experienceDeleteModalSelector, experienceDeleteUrl, experienceDataString) {
             $('a[href="' + tabSelector + '"]').on("show.bs.tab", function (e) {
                 $.ajax({
                     url: dataUrl,
@@ -41,8 +44,21 @@ var Belletrix;
                         var timer = setInterval(function () {
                             var studyAbroadTable = $(experiencesTableSelector);
                             if (studyAbroadTable.length) {
-                                studyAbroadTable.DataTable();
+                                studyAbroadTable.DataTable({
+                                    columns: [
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        { orderable: false }
+                                    ]
+                                });
                                 clearInterval(timer);
+                                Belletrix.Common.handleDeleteModal(experienceDeleteModalSelector, experienceDeleteUrl, experienceDataString);
                             }
                         });
                     }

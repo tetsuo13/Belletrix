@@ -7,9 +7,10 @@ module Belletrix {
          * @param tableSelector Main user listing table.
          * @param deleteModalSelector User delete confirm dialog.
          * @param deleteUrl URL to call for user deletion.
+         * @param dataString Part after the "data-" attribute containing the ID value.
          */
         public initUserList(tableSelector: string, deleteModalSelector: string,
-            deleteUrl: string): void {
+            deleteUrl: string, dataString: string): void {
 
             $(tableSelector).DataTable({
                 columns: [
@@ -22,43 +23,7 @@ module Belletrix {
                 ]
             });
 
-            this.handleUserDelete(deleteModalSelector, deleteUrl);
+            Belletrix.Common.handleDeleteModal(deleteModalSelector, deleteUrl, dataString);
         }
-
-        private handleUserDelete(deleteModalSelector: string, deleteUrl: string): void {
-            let deleteDialog: JQuery = $(deleteModalSelector);
-            let confirmDeleteSelector: string = ".btn-danger";
-
-            deleteDialog.on("show.bs.modal", function (event: JQueryEventObject): void {
-                let button: JQuery = $(event.relatedTarget);
-                let promoId: number = button.data("userid");
-
-                $(confirmDeleteSelector, deleteDialog).click(function (): void {
-                    $(this).addClass("disabled");
-
-                    $.ajax({
-                        method: "DELETE",
-                        url: deleteUrl,
-                        data: {
-                            id: promoId
-                        },
-                        success: function (data: GenericResult): void {
-                            console.log(data);
-                            if (!data.Result) {
-                                deleteDialog.modal("hide");
-                                Belletrix.Common.errorMessage("Something went wrong: " + data.Message);
-                                return;
-                            }
-
-                            window.location.reload();
-                        }
-                    });
-                });
-            });
-
-            deleteDialog.on("hide.bs.modal", function (event: JQueryEventObject): void {
-                $(confirmDeleteSelector, deleteDialog).off();
-            });
-        };
     }
 }
