@@ -15,11 +15,10 @@ module Belletrix {
         /**
          * Initialize the promo list page.
          * @param tableSelector Main promo listing table.
-         * @param deleteModalSelector Promo delete confirm dialog.
          * @param deleteUrl URL to call for promo deletion.
+         * @param dataString
          */
-        public initPromoList(tableSelector: string, deleteModalSelector: string,
-            deleteUrl: string): void {
+        public initPromoList(tableSelector: string, deleteUrl: string, dataString: string): void {
             $(tableSelector).DataTable({
                 columns: [
                     null,
@@ -31,43 +30,24 @@ module Belletrix {
             });
 
             $('[data-toggle="tooltip"]').tooltip();
-            this.handlePromoDelete(deleteModalSelector, deleteUrl);
-        }
 
-        private handlePromoDelete(deleteModalSelector: string, deleteUrl: string): void {
-            let deleteDialog: JQuery = $(deleteModalSelector);
-            let confirmDeleteSelector: string = ".btn-danger";
+            $("button.promo-list-delete").click(function (event: JQueryEventObject): void {
+                let promoId: number = parseInt($(this).data(dataString));
 
-            deleteDialog.on("show.bs.modal", function (event: JQueryEventObject): void {
-                let button: JQuery = $(event.relatedTarget);
-                let promoId: number = button.data("promoid");
-
-                $(confirmDeleteSelector, deleteDialog).click(function (): void {
-                    $(this).addClass("disabled");
-
-                    $.ajax({
-                        method: "DELETE",
-                        url: deleteUrl,
-                        data: {
-                            id: promoId
-                        },
-                        success: function (data: GenericResult): void {
-                            console.log(data);
-                            if (!data.Result) {
-                                deleteDialog.modal("hide");
-                                Belletrix.Common.errorMessage("Something went wrong: " + data.Message);
-                                return;
-                            }
-
-                            window.location.reload();
+                bootbox.confirm({
+                    size: "small",
+                    message: "Are you sure?",
+                    callback: function (result: boolean): void {
+                        if (!result) {
+                            return;
                         }
-                    });
+
+                        Belletrix.Common.handleDeleteCall(deleteUrl, promoId, function () {
+                            window.location.reload();
+                        });
+                    }
                 });
             });
-
-            deleteDialog.on("hide.bs.modal", function (event: JQueryEventObject): void {
-                $(confirmDeleteSelector, deleteDialog).off();
-            });
-        };
+        }
     }
 }
