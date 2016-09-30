@@ -1,5 +1,6 @@
 ﻿using Belletrix.DAL;
 using Belletrix.Entity.Model;
+using Belletrix.Entity.ViewModel;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -24,9 +25,17 @@ namespace Belletrix.Domain
             await StudyAbroadRepository.Save(model, userId);
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task<GenericResult> Delete(int id)
         {
-            return await StudyAbroadRepository.Delete(id);
+            GenericResult result = new GenericResult();
+            result.Result = await StudyAbroadRepository.Delete(id);
+
+            if (!result.Result)
+            {
+                result.Message = "Invalid experience id";
+            }
+
+            return result;
         }
     }
 }

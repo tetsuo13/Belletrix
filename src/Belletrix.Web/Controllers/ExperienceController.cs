@@ -109,16 +109,7 @@ namespace Belletrix.Web.Controllers
         public async Task<ActionResult> Delete(int id)
         {
             Analytics.TrackPageView(Request, "Delete Experience", (Session["User"] as UserModel).Login);
-
-            GenericResult result = new GenericResult();
-            result.Result = await StudyAbroadService.Delete(id);
-
-            if (!result.Result)
-            {
-                result.Message = "Invalid experience id";
-            }
-
-            return Json(result);
+            return Json(await StudyAbroadService.Delete(id));
         }
     }
 }
