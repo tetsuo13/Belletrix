@@ -11,7 +11,7 @@ var Belletrix;
          * @param deleteUrl URL to call for user deletion.
          * @param dataString Part after the "data-" attribute containing the ID value.
          */
-        User.prototype.initUserList = function (tableSelector, deleteModalSelector, deleteUrl, dataString) {
+        User.prototype.initUserList = function (tableSelector, deleteUrl, dataString) {
             $(tableSelector).DataTable({
                 columns: [
                     null,
@@ -22,10 +22,23 @@ var Belletrix;
                     { orderable: false }
                 ]
             });
-            Belletrix.Common.handleDeleteModal(deleteModalSelector, deleteUrl, dataString);
+            $("button.user-list-delete").click(function (event) {
+                var userId = parseInt($(this).data(dataString));
+                bootbox.confirm({
+                    size: "small",
+                    message: "Are you sure?",
+                    callback: function (result) {
+                        if (!result) {
+                            return;
+                        }
+                        Belletrix.Common.handleDeleteCall(deleteUrl, userId, function () {
+                            window.location.reload();
+                        });
+                    }
+                });
+            });
         };
         return User;
     }());
     Belletrix.User = User;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=User.js.map

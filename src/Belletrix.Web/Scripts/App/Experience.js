@@ -10,11 +10,24 @@ var Belletrix;
             Belletrix.Common.initMultiselect(1);
             $('#StartDate, #EndDate').datepicker();
         };
-        Experience.prototype.bindDelete = function (deleteModalSelector, deleteUrl, dataString) {
-            Belletrix.Common.handleDeleteModal(deleteModalSelector, deleteUrl, dataString);
+        Experience.prototype.bindDelete = function (deleteUrl, dataString) {
+            $("button.experience-list-delete").click(function (event) {
+                var experienceId = parseInt($(this).data(dataString));
+                bootbox.confirm({
+                    size: "small",
+                    message: "Are you sure?",
+                    callback: function (result) {
+                        if (!result) {
+                            return;
+                        }
+                        Belletrix.Common.handleDeleteCall(deleteUrl, experienceId, function () {
+                            window.location.reload();
+                        });
+                    }
+                });
+            });
         };
         return Experience;
     }());
     Belletrix.Experience = Experience;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=Experience.js.map

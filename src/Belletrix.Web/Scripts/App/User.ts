@@ -9,8 +9,7 @@ module Belletrix {
          * @param deleteUrl URL to call for user deletion.
          * @param dataString Part after the "data-" attribute containing the ID value.
          */
-        public initUserList(tableSelector: string, deleteModalSelector: string,
-            deleteUrl: string, dataString: string): void {
+        public initUserList(tableSelector: string, deleteUrl: string, dataString: string): void {
 
             $(tableSelector).DataTable({
                 columns: [
@@ -23,7 +22,23 @@ module Belletrix {
                 ]
             });
 
-            Belletrix.Common.handleDeleteModal(deleteModalSelector, deleteUrl, dataString);
+            $("button.user-list-delete").click(function (event: JQueryEventObject): void {
+                let userId: number = parseInt($(this).data(dataString));
+
+                bootbox.confirm({
+                    size: "small",
+                    message: "Are you sure?",
+                    callback: function (result: boolean): void {
+                        if (!result) {
+                            return;
+                        }
+
+                        Belletrix.Common.handleDeleteCall(deleteUrl, userId, function () {
+                            window.location.reload();
+                        });
+                    }
+                });
+            });
         }
     }
 }

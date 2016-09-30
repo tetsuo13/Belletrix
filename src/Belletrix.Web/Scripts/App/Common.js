@@ -81,33 +81,20 @@ var Belletrix;
             return (Math.random() + 1).toString(36).slice(2);
         };
         ;
-        Common.handleDeleteModal = function (deleteModalSelector, deleteUrl, dataString) {
-            var deleteDialog = $(deleteModalSelector);
-            var confirmDeleteSelector = ".btn-danger";
-            deleteDialog.on("show.bs.modal", function (event) {
-                var button = $(event.relatedTarget);
-                var deleteId = button.data(dataString);
-                $(confirmDeleteSelector, deleteDialog).click(function () {
-                    $(this).addClass("disabled");
-                    $.ajax({
-                        method: "DELETE",
-                        url: deleteUrl,
-                        data: {
-                            id: deleteId
-                        },
-                        success: function (data) {
-                            if (!data.Result) {
-                                deleteDialog.modal("hide");
-                                Belletrix.Common.errorMessage("Something went wrong: " + data.Message);
-                                return;
-                            }
-                            window.location.reload();
-                        }
-                    });
-                });
-            });
-            deleteDialog.on("hide.bs.modal", function (event) {
-                $(confirmDeleteSelector, deleteDialog).off();
+        Common.handleDeleteCall = function (deleteUrl, deleteId, successCallback) {
+            $.ajax({
+                method: "DELETE",
+                url: deleteUrl,
+                data: {
+                    id: deleteId
+                },
+                success: function (data) {
+                    if (!data.Result) {
+                        Belletrix.Common.errorMessage("Something went wrong: " + data.Message);
+                        return;
+                    }
+                    successCallback();
+                }
             });
         };
         /** Number of milliseconds between pinging the server. */
@@ -116,4 +103,3 @@ var Belletrix;
     }());
     Belletrix.Common = Common;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=Common.js.map

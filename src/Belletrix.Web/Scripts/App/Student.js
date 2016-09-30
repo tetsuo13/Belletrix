@@ -29,11 +29,10 @@ var Belletrix;
          * @param tabSelector Selector to tab.
          * @param dataUrl URL to call for student experiences.
          * @param experiencesTableSelector Selector for experiences table.
-         * @param experienceDeleteModalSelector
          * @param experienceDeleteUrl
          * @param experienceDataString
          */
-        Student.prototype.initStudyAbroadTab = function (tabSelector, dataUrl, experiencesTableSelector, experienceDeleteModalSelector, experienceDeleteUrl, experienceDataString) {
+        Student.prototype.initStudyAbroadTab = function (tabSelector, dataUrl, experiencesTableSelector, experienceDeleteUrl, experienceDataString) {
             $('a[href="' + tabSelector + '"]').on("show.bs.tab", function (e) {
                 $.ajax({
                     url: dataUrl,
@@ -58,7 +57,21 @@ var Belletrix;
                                     ]
                                 });
                                 clearInterval(timer);
-                                Belletrix.Common.handleDeleteModal(experienceDeleteModalSelector, experienceDeleteUrl, experienceDataString);
+                                $("button.experience-list-delete").click(function (event) {
+                                    var experienceId = parseInt($(this).data(experienceDataString));
+                                    bootbox.confirm({
+                                        size: "small",
+                                        message: "Are you sure?",
+                                        callback: function (result) {
+                                            if (!result) {
+                                                return;
+                                            }
+                                            Belletrix.Common.handleDeleteCall(experienceDeleteUrl, experienceId, function () {
+                                                window.location.reload();
+                                            });
+                                        }
+                                    });
+                                });
                             }
                         });
                     }
@@ -68,11 +81,10 @@ var Belletrix;
         /**
          * Initialize the student list page.
          * @param tableSelector
-         * @param deleteModalSelector
          * @param deleteUrl
          * @param dataString
          */
-        Student.prototype.initStudentList = function (tableSelector, deleteModalSelector, deleteUrl, dataString) {
+        Student.prototype.initStudentList = function (tableSelector, deleteUrl, dataString) {
             new Belletrix.StudentNote();
             $("a.studentlisttooltop").tooltip();
             $(tableSelector).DataTable({
@@ -83,10 +95,32 @@ var Belletrix;
                     }]
             });
             $(".collapse").collapse();
+            this.handleStudentDelete("button.student-list-delete", deleteUrl, dataString, function () {
+                window.location.reload();
+            });
             Belletrix.Common.initMultiselect(0, 300);
-            Belletrix.Common.handleDeleteModal(deleteModalSelector, deleteUrl, dataString);
         };
         ;
+        Student.prototype.initView = function (deleteUrl, dataString, listUrl) {
+            this.handleStudentDelete("button.student-view-delete", deleteUrl, dataString, function () {
+                window.location.href = listUrl;
+            });
+        };
+        Student.prototype.handleStudentDelete = function (classSelector, deleteUrl, dataString, successCallback) {
+            $(classSelector).on("click", function (event) {
+                var studentId = parseInt($(this).data(dataString));
+                bootbox.confirm({
+                    size: "small",
+                    message: "Are you sure?",
+                    callback: function (result) {
+                        if (!result) {
+                            return;
+                        }
+                        Belletrix.Common.handleDeleteCall(deleteUrl, studentId, successCallback);
+                    }
+                });
+            });
+        };
         /**
          * Add a country, year, semester row group.
          *
@@ -168,4 +202,3 @@ var Belletrix;
     }(Belletrix.StudentBase));
     Belletrix.Student = Student;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=Student.js.map

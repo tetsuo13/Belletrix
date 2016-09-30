@@ -10,8 +10,24 @@ module Belletrix {
             $('#StartDate, #EndDate').datepicker();
         }
 
-        public bindDelete(deleteModalSelector: string, deleteUrl: string, dataString: string): void {
-            Belletrix.Common.handleDeleteModal(deleteModalSelector, deleteUrl, dataString);
+        public bindDelete(deleteUrl: string, dataString: string): void {
+            $("button.experience-list-delete").click(function (event: JQueryEventObject): void {
+                let experienceId: number = parseInt($(this).data(dataString));
+
+                bootbox.confirm({
+                    size: "small",
+                    message: "Are you sure?",
+                    callback: function (result: boolean): void {
+                        if (!result) {
+                            return;
+                        }
+
+                        Belletrix.Common.handleDeleteCall(deleteUrl, experienceId, function () {
+                            window.location.reload();
+                        });
+                    }
+                });
+            });
         }
     }
 }

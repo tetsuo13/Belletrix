@@ -4,7 +4,7 @@ var Belletrix;
     var StudentNote = (function () {
         function StudentNote() {
             var self = this;
-            $("a.studentnote").on('click', function (e) {
+            $("a.studentnote").on("click", function (e) {
                 var anchor = $(this);
                 var studentFullName = anchor.attr("data-bt-studentname");
                 e.preventDefault();
@@ -55,4 +55,3 @@ var Belletrix;
     }());
     Belletrix.StudentNote = StudentNote;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=StudentNote.js.map

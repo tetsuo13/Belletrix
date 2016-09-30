@@ -21,13 +21,11 @@
          * @param tabSelector Selector to tab.
          * @param dataUrl URL to call for student experiences.
          * @param experiencesTableSelector Selector for experiences table.
-         * @param experienceDeleteModalSelector
          * @param experienceDeleteUrl
          * @param experienceDataString
          */
         public initStudyAbroadTab(tabSelector: string, dataUrl: string, experiencesTableSelector: string,
-            experienceDeleteModalSelector: string, experienceDeleteUrl: string,
-            experienceDataString: string): void {
+            experienceDeleteUrl: string, experienceDataString: string): void {
 
             $('a[href="' + tabSelector + '"]').on("show.bs.tab", function (e: JQueryEventObject): void {
                 $.ajax({
@@ -57,8 +55,24 @@
 
                                 clearInterval(timer);
 
-                                Belletrix.Common.handleDeleteModal(experienceDeleteModalSelector,
-                                    experienceDeleteUrl, experienceDataString);
+                                $("button.experience-list-delete").click(function (event: JQueryEventObject): void {
+                                    let experienceId: number = parseInt($(this).data(experienceDataString));
+
+                                    bootbox.confirm({
+                                        size: "small",
+                                        message: "Are you sure?",
+                                        callback: function (result: boolean): void {
+                                            if (!result) {
+                                                return;
+                                            }
+
+                                            Belletrix.Common.handleDeleteCall(experienceDeleteUrl,
+                                                experienceId, function () {
+                                                window.location.reload();
+                                            });
+                                        }
+                                    });
+                                });
                             }
                         });
                     }
@@ -69,13 +83,10 @@
         /**
          * Initialize the student list page.
          * @param tableSelector
-         * @param deleteModalSelector
          * @param deleteUrl
          * @param dataString
          */
-        public initStudentList(tableSelector: string, deleteModalSelector: string, deleteUrl: string,
-            dataString: string): void {
-
+        public initStudentList(tableSelector: string, deleteUrl: string, dataString: string): void {
             new StudentNote();
             $("a.studentlisttooltop").tooltip();
 
@@ -89,9 +100,38 @@
 
             $(".collapse").collapse();
 
+            this.handleStudentDelete("button.student-list-delete", deleteUrl, dataString, function (): void {
+                window.location.reload();
+            });
+
             Belletrix.Common.initMultiselect(0, 300);
-            Belletrix.Common.handleDeleteModal(deleteModalSelector, deleteUrl, dataString);
         };
+
+        public initView(deleteUrl: string, dataString: string, listUrl: string): void {
+            this.handleStudentDelete("button.student-view-delete", deleteUrl, dataString, function (): void {
+                window.location.href = listUrl;
+            });
+        }
+
+        private handleStudentDelete(classSelector: string, deleteUrl: string, dataString: string,
+            successCallback: Function) {
+
+            $(classSelector).on("click", function (event: JQueryEventObject): void {
+                let studentId: number = parseInt($(this).data(dataString));
+
+                bootbox.confirm({
+                    size: "small",
+                    message: "Are you sure?",
+                    callback: function (result: boolean): void {
+                        if (!result) {
+                            return;
+                        }
+
+                        Belletrix.Common.handleDeleteCall(deleteUrl, studentId, successCallback);
+                    }
+                });
+            });
+        }
 
         /**
          * Add a country, year, semester row group.
