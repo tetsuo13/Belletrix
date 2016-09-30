@@ -95,5 +95,25 @@ namespace Belletrix.DAL
 
             return true;
         }
+
+        public async Task<bool> Delete(int id)
+        {
+            const string sql = @"
+                DELETE FROM [dbo].[StudentNotes]
+                WHERE   StudentId = @Id";
+
+            try
+            {
+                await UnitOfWork.Context().ExecuteAsync(sql, new { Id = id });
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
+                return false;
+            }
+
+            return true;
+        }
     }
 }

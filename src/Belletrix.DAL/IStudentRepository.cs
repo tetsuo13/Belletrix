@@ -22,5 +22,10 @@ namespace Belletrix.DAL
 
         Task<int> InsertStudent(object model);
         Task UpdateStudent(StudentModel model);
+        Task<bool> Delete(int id);
+
+        Task<bool> DeleteStudyAbroadDestinations(int id);
+        Task<bool> DeleteMatriculations(int id);
+        Task<bool> DeleteLanguages(int id);
     }
 }

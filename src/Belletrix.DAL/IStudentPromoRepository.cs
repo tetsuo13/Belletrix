@@ -8,5 +8,6 @@ namespace Belletrix.DAL
     {
         Task Save(int studentId, IEnumerable<int> promoIds);
         Task Save(int studentId, Guid promoToken);
+        Task<bool> Delete(int id);
     }
 }

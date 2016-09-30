@@ -80,7 +80,7 @@ namespace Belletrix.DAL
             }
         }
 
-        private async Task Delete(int studentId)
+        public async Task<bool> Delete(int id)
         {
             const string sql = @"
                 DELETE FROM [dbo].[StudentPromoLog]
@@ -88,14 +88,16 @@ namespace Belletrix.DAL
 
             try
             {
-                await UnitOfWork.Context().ExecuteAsync(sql, new { StudentId = studentId });
+                await UnitOfWork.Context().ExecuteAsync(sql, new { StudentId = id });
             }
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
                 ErrorStore.LogException(e, HttpContext.Current);
-                throw e;
+                return false;
             }
+
+            return true;
         }
     }
 }

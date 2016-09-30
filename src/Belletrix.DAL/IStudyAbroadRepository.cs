@@ -9,5 +9,6 @@ namespace Belletrix.DAL
         Task<IEnumerable<StudyAbroadModel>> GetAll(int? studentId = null);
         Task Save(StudyAbroadModel model, int userId);
         Task<bool> Delete(int id);
+        Task<bool> DeleteStudent(int id);
     }
 }

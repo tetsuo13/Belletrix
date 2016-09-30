@@ -67,11 +67,15 @@ var Belletrix;
         };
         /**
          * Initialize the student list page.
+         * @param tableSelector
+         * @param deleteModalSelector
+         * @param deleteUrl
+         * @param dataString
          */
-        Student.prototype.initStudentList = function () {
+        Student.prototype.initStudentList = function (tableSelector, deleteModalSelector, deleteUrl, dataString) {
             new Belletrix.StudentNote();
             $("a.studentlisttooltop").tooltip();
-            $('#studentlist').DataTable({
+            $(tableSelector).DataTable({
                 orderClasses: false,
                 columnDefs: [{
                         targets: -1,
@@ -80,6 +84,7 @@ var Belletrix;
             });
             $(".collapse").collapse();
             Belletrix.Common.initMultiselect(0, 300);
+            Belletrix.Common.handleDeleteModal(deleteModalSelector, deleteUrl, dataString);
         };
         ;
         /**

@@ -40,5 +40,7 @@ namespace Belletrix.Domain
         Task InsertStudent(StudentModel model, UserModel user, string remoteIp);
         Task InsertStudent(StudentPromoModel model, int? userId, Guid promoToken, string remoteIp);
         Task UpdateStudent(StudentModel model, UserModel user, string remoteIp);
+
+        Task<GenericResult> Delete(int id);
     }
 }

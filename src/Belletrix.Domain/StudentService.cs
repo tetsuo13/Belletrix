@@ -17,14 +17,19 @@ namespace Belletrix.Domain
         private readonly IStudentPromoRepository StudentPromoRepository;
         private readonly IStudyAbroadRepository StudyAbroadRepository;
         private readonly IEventLogService EventLogService;
+        private readonly IStudentNoteRepository StudentNoteRepository;
+        private readonly IEventLogRepository EventLogRepository;
 
         public StudentService(IStudentRepository studentRepository, IStudentPromoRepository studentPromoRepository,
-            IStudyAbroadRepository studyAbroadRepository, IEventLogService eventLogService)
+            IStudyAbroadRepository studyAbroadRepository, IEventLogService eventLogService,
+            IStudentNoteRepository studentNoteRepository, IEventLogRepository eventLogRepository)
         {
             StudentRepository = studentRepository;
             StudentPromoRepository = studentPromoRepository;
             StudyAbroadRepository = studyAbroadRepository;
             EventLogService = eventLogService;
+            StudentNoteRepository = studentNoteRepository;
+            EventLogRepository = eventLogRepository;
         }
 
         public async Task<IEnumerable<StudentModel>> GetStudents(int? id = null)
@@ -223,49 +228,105 @@ namespace Belletrix.Domain
 
         public async Task UpdateStudent(StudentModel model, UserModel user, string remoteIp)
         {
+            if (model.InitialMeeting.HasValue)
+            {
+                model.InitialMeeting = model.InitialMeeting.Value.ToUniversalTime();
+            }
+
+            if (!string.IsNullOrEmpty(model.MiddleName))
+            {
+                model.MiddleName = model.MiddleName.CapitalizeFirstLetter();
+            }
+
+            if (!string.IsNullOrEmpty(model.PhoneNumber))
+            {
+                model.PhoneNumber = model.PhoneNumber.Trim();
+            }
+
+            if (!string.IsNullOrEmpty(model.StudentId))
+            {
+                model.StudentId = model.StudentId.Trim();
+            }
+
+            if (model.DateOfBirth.HasValue)
+            {
+                model.DateOfBirth = model.DateOfBirth.Value.ToUniversalTime();
+            }
+
+            if (!string.IsNullOrEmpty(model.CampusEmail))
+            {
+                model.CampusEmail = model.CampusEmail.Trim();
+            }
+
+            if (!string.IsNullOrEmpty(model.AlternateEmail))
+            {
+                model.AlternateEmail = model.AlternateEmail.Trim();
+            }
+
             using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                if (model.InitialMeeting.HasValue)
-                {
-                    model.InitialMeeting = model.InitialMeeting.Value.ToUniversalTime();
-                }
-
-                if (!string.IsNullOrEmpty(model.MiddleName))
-                {
-                    model.MiddleName = model.MiddleName.CapitalizeFirstLetter();
-                }
-
-                if (!string.IsNullOrEmpty(model.PhoneNumber))
-                {
-                    model.PhoneNumber = model.PhoneNumber.Trim();
-                }
-
-                if (!string.IsNullOrEmpty(model.StudentId))
-                {
-                    model.StudentId = model.StudentId.Trim();
-                }
-
-                if (model.DateOfBirth.HasValue)
-                {
-                    model.DateOfBirth = model.DateOfBirth.Value.ToUniversalTime();
-                }
-
-                if (!string.IsNullOrEmpty(model.CampusEmail))
-                {
-                    model.CampusEmail = model.CampusEmail.Trim();
-                }
-
-                if (!string.IsNullOrEmpty(model.AlternateEmail))
-                {
-                    model.AlternateEmail = model.AlternateEmail.Trim();
-                }
-
                 await StudentRepository.UpdateStudent(model);
                 await StudentPromoRepository.Save(model.Id, model.PromoIds);
                 await EventLogService.AddStudentEvent(user.Id, model.Id, EventLogTypes.EditStudent, remoteIp);
 
                 scope.Complete();
             }
+        }
+
+        public async Task<GenericResult> Delete(int id)
+        {
+            GenericResult result = new GenericResult();
+
+            try
+            {
+                using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    if (!await StudentRepository.DeleteStudyAbroadDestinations(id))
+                    {
+                        result.Message = "Error deleting study abroad destinations";
+                    }
+                    else if (!await StudentNoteRepository.Delete(id))
+                    {
+                        result.Message = "Error deleting student notes";
+                    }
+                    else if (!await EventLogRepository.DeleteStudent(id))
+                    {
+                        result.Message = "Error deleting student event logs";
+                    }
+                    else if (!await StudentPromoRepository.Delete(id))
+                    {
+                        result.Message = "Error deleting details from promo";
+                    }
+                    else if (!await StudyAbroadRepository.DeleteStudent(id))
+                    {
+                        result.Message = "Error deleting experiences";
+                    }
+                    else if (!await StudentRepository.DeleteMatriculations(id))
+                    {
+                        result.Message = "Error deleting matriculations";
+                    }
+                    else if (!await StudentRepository.DeleteLanguages(id))
+                    {
+                        result.Message = "Error deleting fluent/desired/studied languages";
+                    }
+                    else if (!await StudentRepository.Delete(id))
+                    {
+                        result.Message = "Error deleting student record";
+                    }
+                    else
+                    {
+                        result.Result = true;
+                        scope.Complete();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                result.Result = false;
+                result.Message = "Error completing transaction scope: " + e.Message;
+            }
+
+            return result;
         }
     }
 }

@@ -524,6 +524,7 @@ namespace Belletrix.DAL
             await SaveStudentMajors(studentId, majors, true);
             await SaveStudentMajors(studentId, minors, false);
 
+            await DeleteStudyAbroadDestinations(studentId);
             await SaveStudyAbroadDestinations(studentId, studyAbroadCountry, studyAbroadYear, studyAbroadPeriod);
 
             await SaveStudentLanguages(studentId, "StudentFluentLanguages", languages);
@@ -531,7 +532,24 @@ namespace Belletrix.DAL
             await SaveStudentLanguages(studentId, "StudentStudiedLanguages", studiedLanguages);
         }
 
-        private async Task SaveStudentLanguages(int studentId, string tableName, IEnumerable<int> languages)
+        public async Task<bool> DeleteLanguages(int id)
+        {
+            if (!await DeleteLanguages(id, "StudentFluentLanguages"))
+            {
+                return false;
+            }
+            if (!await DeleteLanguages(id, "StudentDesiredLanguages"))
+            {
+                return false;
+            }
+            if (!await DeleteLanguages(id, "StudentStudiedLanguages"))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private async Task<bool> DeleteLanguages(int id, string tableName)
         {
             string sql = string.Format(@"
                 DELETE FROM [dbo].[{0}]
@@ -540,14 +558,21 @@ namespace Belletrix.DAL
 
             try
             {
-                await UnitOfWork.Context().ExecuteAsync(sql, new { StudentId = studentId });
+                await UnitOfWork.Context().ExecuteAsync(sql, new { StudentId = id });
             }
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
                 ErrorStore.LogException(e, HttpContext.Current);
-                throw e;
+                return false;
             }
+
+            return true;
+        }
+
+        private async Task SaveStudentLanguages(int studentId, string tableName, IEnumerable<int> languages)
+        {
+            await DeleteLanguages(studentId, tableName);
 
             if (languages != null && languages.Any())
             {
@@ -579,8 +604,7 @@ namespace Belletrix.DAL
             }
         }
 
-        private async Task SaveStudyAbroadDestinations(int studentId, IEnumerable<int> countries,
-            IEnumerable<int> years, IEnumerable<int> periods)
+        public async Task<bool> DeleteStudyAbroadDestinations(int id)
         {
             const string sql = @"
                 DELETE FROM [dbo].[StudentStudyAbroadWishlist]
@@ -588,15 +612,21 @@ namespace Belletrix.DAL
 
             try
             {
-                await UnitOfWork.Context().ExecuteAsync(sql, new { StudentId = studentId });
+                await UnitOfWork.Context().ExecuteAsync(sql, new { StudentId = id });
             }
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
                 ErrorStore.LogException(e, HttpContext.Current);
-                throw e;
+                return false;
             }
 
+            return true;
+        }
+
+        private async Task SaveStudyAbroadDestinations(int studentId, IEnumerable<int> countries,
+            IEnumerable<int> years, IEnumerable<int> periods)
+        {
             if (countries == null || years == null || periods == null)
             {
                 return;
@@ -644,6 +674,26 @@ namespace Belletrix.DAL
                 ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
             }
+        }
+
+        public async Task<bool> DeleteMatriculations(int id)
+        {
+            const string sql = @"
+                DELETE FROM [dbo].[Matriculation]
+                WHERE       [StudentId] = @StudentId";
+
+            try
+            {
+                await UnitOfWork.Context().ExecuteAsync(sql, new { StudentId = id });
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
+                return false;
+            }
+
+            return true;
         }
 
         private async Task SaveStudentMajors(int studentId, IEnumerable<int> majors, bool isMajor)
@@ -697,6 +747,26 @@ namespace Belletrix.DAL
                     throw e;
                 }
             }
+        }
+
+        public async Task<bool> Delete(int id)
+        {
+            const string sql = @"
+                DELETE FROM [dbo].[Students]
+                WHERE       [Id] = @Id";
+
+            try
+            {
+                await UnitOfWork.Context().ExecuteAsync(sql, new { Id = id });
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
+                return false;
+            }
+
+            return true;
         }
     }
 }

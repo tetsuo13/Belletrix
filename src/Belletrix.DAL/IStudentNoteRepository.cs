@@ -10,5 +10,6 @@ namespace Belletrix.DAL
         Task<IEnumerable<NoteModel>> GetNotes(int studentId);
         Task InsertNote(int userId, AddStudentNoteViewModel model);
         Task<bool> TransferOwnership(int oldId, int newId);
+        Task<bool> Delete(int id);
     }
 }

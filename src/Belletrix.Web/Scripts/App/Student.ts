@@ -68,12 +68,18 @@
 
         /**
          * Initialize the student list page.
+         * @param tableSelector
+         * @param deleteModalSelector
+         * @param deleteUrl
+         * @param dataString
          */
-        public initStudentList(): void {
+        public initStudentList(tableSelector: string, deleteModalSelector: string, deleteUrl: string,
+            dataString: string): void {
+
             new StudentNote();
             $("a.studentlisttooltop").tooltip();
 
-            $('#studentlist').DataTable({
+            $(tableSelector).DataTable({
                 orderClasses: false,
                 columnDefs: [{
                     targets: -1,
@@ -84,6 +90,7 @@
             $(".collapse").collapse();
 
             Belletrix.Common.initMultiselect(0, 300);
+            Belletrix.Common.handleDeleteModal(deleteModalSelector, deleteUrl, dataString);
         };
 
         /**

@@ -5,7 +5,6 @@ using Belletrix.Entity.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
@@ -35,7 +34,7 @@ namespace Belletrix.Web.Controllers
         public async Task<ActionResult> List()
         {
             Analytics.TrackPageView(Request, "Student List", (Session["User"] as UserModel).Login);
-            await PrepareDropDowns();
+            await PrepareViewBag();
 
             return View(await StudentService.GetStudents());
         }
@@ -46,7 +45,7 @@ namespace Belletrix.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                await PrepareDropDowns();
+                await PrepareViewBag();
                 Analytics.TrackPageView(Request, "Student List", (Session["User"] as UserModel).Login);
 
                 return View("List", await StudentService.Search(model));
@@ -80,7 +79,7 @@ namespace Belletrix.Web.Controllers
             ViewBag.StudyAbroad = await StudyAbroadService.GetAll(id);
             ViewBag.Notes = await StudentNoteService.GetAllNotes(id);
             ViewBag.ShowActionButtons = true;
-            await PrepareDropDowns();
+            await PrepareViewBag();
             await PrepareStudyAbroadDropDowns();
             Analytics.TrackPageView(Request, "Student", (Session["User"] as UserModel).Login);
 
@@ -112,7 +111,7 @@ namespace Belletrix.Web.Controllers
             ViewBag.StudyAbroad = await StudyAbroadService.GetAll(id);
             ViewBag.Notes = await StudentNoteService.GetAllNotes(id);
             ViewBag.ShowActionButtons = false;
-            await PrepareDropDowns();
+            await PrepareViewBag();
             await PrepareStudyAbroadDropDowns();
 
             return PartialView("View.NameCheck", student);
@@ -146,7 +145,7 @@ namespace Belletrix.Web.Controllers
                 return RedirectToAction("NotFound", "Error");
             }
 
-            await PrepareDropDowns();
+            await PrepareViewBag();
             Analytics.TrackPageView(Request, "Student Edit", (Session["User"] as UserModel).Login);
 
             return View(student);
@@ -164,14 +163,14 @@ namespace Belletrix.Web.Controllers
             }
 
             Analytics.TrackPageView(Request, "Student Edit", (Session["User"] as UserModel).Login);
-            await PrepareDropDowns();
+            await PrepareViewBag();
 
             return View(model);
         }
 
         public async Task<ActionResult> Add()
         {
-            await PrepareDropDowns();
+            await PrepareViewBag();
             Analytics.TrackPageView(Request, "Student Add", (Session["User"] as UserModel).Login);
 
             return View();
@@ -189,7 +188,7 @@ namespace Belletrix.Web.Controllers
             }
 
             Analytics.TrackPageView(Request, "Student Add", (Session["User"] as UserModel).Login);
-            await PrepareDropDowns();
+            await PrepareViewBag();
 
             return View(model);
         }
@@ -202,7 +201,7 @@ namespace Belletrix.Web.Controllers
             return PartialView(await StudyAbroadService.GetAll(id));
         }
 
-        private async Task PrepareDropDowns()
+        private async Task PrepareViewBag()
         {
             IEnumerable<object> years = Enumerable.Range(1990, (DateTime.Now.Year - 1990 + 7))
                 .Reverse()
@@ -245,6 +244,8 @@ namespace Belletrix.Web.Controllers
 
             ViewBag.StudyAbroadPlaces = places;
             ViewBag.Promos = await PromoService.AsSources();
+
+            ViewBag.CanUserDeleteStudents = (Session["User"] as UserModel).IsAdmin;
         }
 
         private async Task PrepareStudyAbroadDropDowns()
@@ -258,6 +259,35 @@ namespace Belletrix.Web.Controllers
         public async Task<PartialViewResult> NameCheck(string firstName, string lastName)
         {
             return PartialView(await StudentService.SearchByFullName(firstName, lastName));
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult> Delete(int id)
+        {
+            StudentModel student = await StudentService.GetStudent(id);
+            Analytics.TrackPageView(Request, "Delete Student", (Session["User"] as UserModel).Login);
+
+            if (student == null)
+            {
+                return Json(new GenericResult()
+                {
+                    Result = false,
+                    Message = "Invalid student id"
+                });
+            }
+
+            UserModel currentUser = Session["User"] as UserModel;
+
+            if (!currentUser.IsAdmin)
+            {
+                return Json(new GenericResult()
+                {
+                    Result = false,
+                    Message = "Student not eligible for deletion"
+                });
+            }
+
+            return Json(await StudentService.Delete(id));
         }
     }
 }
