@@ -67,7 +67,7 @@
          * @param populateSessionUrl URL to populate existing participants into the session for an existing activity.
          * @param participantsUrl URL to fetch existing participants.
          */
-        initSession(startSessionUrl: string, populateSessionUrl?: string, participantsUrl?: string): void {
+        public initSession(startSessionUrl: string, populateSessionUrl?: string, participantsUrl?: string): void {
             $.ajax({
                 url: startSessionUrl,
                 cache: false
@@ -88,8 +88,8 @@
                             dataType: "json",
                             url: participantsUrl,
                             cache: false,
-                            success: function (data, textStatus, jqXHR) {
-                                $.each(data, function (index, value) {
+                            success: function (data): void {
+                                $.each(data, function (index, value): void {
                                     self.addParticipantRow(value.Person.FullName, value.Person.Id);
                                 });
                             }
@@ -118,7 +118,7 @@
             if (personSelect.length) {
                 let self = this;
 
-                submitButton.click(function (event: JQueryEventObject) {
+                submitButton.click(function (event: JQueryEventObject): void {
                     event.preventDefault();
 
                     $.ajax({
@@ -129,7 +129,7 @@
                             type: typeSelect.val(),
                             sessionId: self._sessionId
                         },
-                        success: function (result: any) {
+                        success: function (result: any): void {
                             if (!result.hasOwnProperty("Success") ||
                                 !result.hasOwnProperty("Message")) {
                                 Belletrix.Common.errorMessage("Unexpected result. Try again?\n" + result);
@@ -166,14 +166,14 @@
 
             $.validator.unobtrusive.parse(modalDialogForm);
 
-            modalDialogForm.submit(function (event: JQueryEventObject) {
+            modalDialogForm.submit(function (event: JQueryEventObject): void {
                 event.preventDefault();
 
                 $.ajax({
                     url: this.action,
                     type: this.method,
                     data: $(this).serialize(),
-                    success: function (result: any) {
+                    success: function (result: any): void {
                         if (!result.hasOwnProperty("Success") ||
                             !result.hasOwnProperty("Message") ||
                             !result.hasOwnProperty("Id")) {
@@ -213,13 +213,13 @@
                     id: id,
                     sessionId: self._sessionId
                 },
-                success: function (result: any) {
+                success: function (result: any): void {
                     if (!result.hasOwnProperty("Success") ||
                         !result.hasOwnProperty("Message")) {
                         Belletrix.Common.errorMessage("Unexpected result. Try again?\n" + result);
 
                     } else if (result.Success === true) {
-                        $("#participant-" + id).fadeOut(300, function () {
+                        $("#participant-" + id).fadeOut(300, function (): void {
                             $(this).remove();
                         });
 

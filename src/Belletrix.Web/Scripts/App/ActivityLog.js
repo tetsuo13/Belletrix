@@ -76,7 +76,7 @@ var Belletrix;
                             dataType: "json",
                             url: participantsUrl,
                             cache: false,
-                            success: function (data, textStatus, jqXHR) {
+                            success: function (data) {
                                 $.each(data, function (index, value) {
                                     self_1.addParticipantRow(value.Person.FullName, value.Person.Id);
                                 });

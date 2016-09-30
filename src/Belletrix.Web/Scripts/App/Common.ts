@@ -10,13 +10,13 @@ module Belletrix {
         /** Number of milliseconds between pinging the server. */
         private static _idleKillerInterval: number = 1000 * 60 * 10;
 
-        static UserFirstName: string;
-        static UserLastName: string;
+        public static UserFirstName: string;
+        public static UserLastName: string;
 
         /**
          * Disable the form submit button after clicking it.
          */
-        static singleSubmit(): void {
+        public static singleSubmit(): void {
             $("form").submit(function () {
                 // We're going to disable all submit buttons unless otherwise
                 // told to.
@@ -40,7 +40,7 @@ module Belletrix {
          * Show an error message as a modal dialog.
          * @param message Error message.
          */
-        static errorMessage(message: string): void {
+        public static errorMessage(message: string): void {
             const setup: string = `
 <div class="modal fade">
     <div class="modal-dialog">
@@ -68,8 +68,8 @@ module Belletrix {
          * application pool from shutting down after a period of inactivity.
          * @param pingUrl
          */
-        static initPinger(pingUrl: string): void {
-            setInterval(function () {
+        public static initPinger(pingUrl: string): void {
+            setInterval(function (): void {
                 $.ajax({
                     url: pingUrl,
                     cache: false,
@@ -83,7 +83,7 @@ module Belletrix {
          * @param numberToDisplay Number of selected elements to summarize.
          * @param maxHeight Maximum height in pixels.
          */
-        static initMultiselect(numberToDisplay: number, maxHeight?: number): void {
+        public static initMultiselect(numberToDisplay: number, maxHeight?: number): void {
             let options: any = {
                 numberDisplayed: numberToDisplay,
                 buttonContainer: '<div class="button-default" />',
@@ -101,17 +101,23 @@ module Belletrix {
          * Adds the "form-control" Bootstrap class to any input types that
          * were generated with the MVC EditorFor() HTML helper.
          */
-        static handleMvcEditor(): void {
+        public static handleMvcEditor(): void {
             $("input[type=email]").addClass("form-control");
         }
 
         /**
          * Generate a random string.
          */
-        static randomString(): string {
+        public static randomString(): string {
             return (Math.random() + 1).toString(36).slice(2);
         };
 
+        /**
+         * Make generic ajax request to delete a resource.
+         * @param deleteUrl URL to call.
+         * @param deleteId Resource ID to delete.
+         * @param successCallback Function to call after a successful ajax request.
+         */
         public static handleDeleteCall(deleteUrl: string, deleteId: number, successCallback: Function): void {
             $.ajax({
                 method: "DELETE",

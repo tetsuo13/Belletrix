@@ -20,7 +20,6 @@ module Belletrix {
         /**
          * Standard initialization for internal student form and public promo
          * form.
-         *
          * @param nameCheckUrl URL for unique name check.
          */
         protected initForm(nameCheckUrl: string): void {
@@ -33,7 +32,6 @@ module Belletrix {
 
         /**
          * Enable/disable all form fields.
-         *
          * @param disabled True to disable all fields.
          */
         private toggleAllFormFields(disabled: boolean): void {

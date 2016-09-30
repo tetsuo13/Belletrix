@@ -81,6 +81,12 @@ var Belletrix;
             return (Math.random() + 1).toString(36).slice(2);
         };
         ;
+        /**
+         * Make generic ajax request to delete a resource.
+         * @param deleteUrl URL to call.
+         * @param deleteId Resource ID to delete.
+         * @param successCallback Function to call after a successful ajax request.
+         */
         Common.handleDeleteCall = function (deleteUrl, deleteId, successCallback) {
             $.ajax({
                 method: "DELETE",

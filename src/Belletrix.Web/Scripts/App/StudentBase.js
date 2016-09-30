@@ -18,7 +18,6 @@ var Belletrix;
         /**
          * Standard initialization for internal student form and public promo
          * form.
-         *
          * @param nameCheckUrl URL for unique name check.
          */
         StudentBase.prototype.initForm = function (nameCheckUrl) {
@@ -29,7 +28,6 @@ var Belletrix;
         };
         /**
          * Enable/disable all form fields.
-         *
          * @param disabled True to disable all fields.
          */
         StudentBase.prototype.toggleAllFormFields = function (disabled) {
