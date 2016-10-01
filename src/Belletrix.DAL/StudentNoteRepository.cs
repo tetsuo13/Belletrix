@@ -23,9 +23,9 @@ namespace Belletrix.DAL
         public async Task<IEnumerable<NoteModel>> GetNotes(int studentId)
         {
             const string sql = @"
-                SELECT      n.Id AS StudentId, u.Id AS Id, u.FirstName,
-                            u.LastName, [EntryDate], [Note],
-                            u.Id AS UserId
+                SELECT      n.Id AS StudentId, u.Id AS Id, u.FirstName AS CreatedByFirstName,
+                            u.LastName AS CreatedByLastName, [EntryDate], [Note],
+                            u.Id AS CreatedById
                 FROM        [dbo].[StudentNotes] n
                 INNER JOIN  [dbo].[Users] u ON
                             [CreatedBy] = u.[Id]
