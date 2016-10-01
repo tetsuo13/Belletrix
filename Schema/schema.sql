@@ -776,26 +776,3 @@ CREATE NONCLUSTERED INDEX [IX_Exceptions_ApplicationName_DeletionDate_CreationDa
 WHERE DeletionDate Is Null;
 
 GO
-
-
-CREATE PROCEDURE [dbo].[DeleteStudent]
-    @StudentId [int]
-AS
-BEGIN
-    IF NOT EXISTS (SELECT * FROM [dbo].[Students] WHERE [StudentId] = @StudentId)
-    BEGIN TRY
-        THROW 50001, 'Student ID not found in [Users] table.', 1
-    END TRY
-    BEGIN CATCH
-    END CATCH
-
-    DELETE FROM [dbo].[EventLog] WHERE [StudentId] = @StudentId;
-    DELETE FROM [dbo].[Matriculation] WHERE [StudentId] = @StudentId;
-    DELETE FROM [dbo].[StudentDesiredLanguages] WHERE [StudentId] = @StudentId;
-    DELETE FROM [dbo].[StudentFluentLanguages] WHERE [StudentId] = @StudentId;
-    DELETE FROM [dbo].[StudentNotes] WHERE [StudentId] = @StudentId;
-    DELETE FROM [dbo].[StudentStudyAbroadWishlist] WHERE [StudentId] = @StudentId;
-    DELETE FROM [dbo].[StudyAbroad] WHERE [StudentId] = @StudentId;
-    DELETE FROM [dbo].[Students] WHERE [Id] = @StudentId;
-END
-GO
