@@ -17,12 +17,11 @@ var Belletrix;
                     size: "small",
                     message: "Are you sure?",
                     callback: function (result) {
-                        if (!result) {
-                            return;
+                        if (result) {
+                            Belletrix.Common.handleDeleteCall(deleteUrl, experienceId, function () {
+                                window.location.reload();
+                            });
                         }
-                        Belletrix.Common.handleDeleteCall(deleteUrl, experienceId, function () {
-                            window.location.reload();
-                        });
                     }
                 });
             });

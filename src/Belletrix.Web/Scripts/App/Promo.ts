@@ -19,6 +19,22 @@ module Belletrix {
          * @param dataString
          */
         public initPromoList(tableSelector: string, deleteUrl: string, dataString: string): void {
+            $("button.promo-list-delete").click(function (event: JQueryEventObject): void {
+                let promoId: number = parseInt($(this).data(dataString));
+
+                bootbox.confirm({
+                    size: "small",
+                    message: "Are you sure?",
+                    callback: function (result: boolean): void {
+                        if (result) {
+                            Belletrix.Common.handleDeleteCall(deleteUrl, promoId, function (): void {
+                                window.location.reload();
+                            });
+                        }
+                    }
+                });
+            });
+
             $(tableSelector).DataTable({
                 columns: [
                     null,
@@ -30,24 +46,6 @@ module Belletrix {
             });
 
             $('[data-toggle="tooltip"]').tooltip();
-
-            $("button.promo-list-delete").click(function (event: JQueryEventObject): void {
-                let promoId: number = parseInt($(this).data(dataString));
-
-                bootbox.confirm({
-                    size: "small",
-                    message: "Are you sure?",
-                    callback: function (result: boolean): void {
-                        if (!result) {
-                            return;
-                        }
-
-                        Belletrix.Common.handleDeleteCall(deleteUrl, promoId, function () {
-                            window.location.reload();
-                        });
-                    }
-                });
-            });
         }
     }
 }

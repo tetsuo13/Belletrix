@@ -12,6 +12,20 @@ var Belletrix;
          * @param dataString Part after the "data-" attribute containing the ID value.
          */
         User.prototype.initUserList = function (tableSelector, deleteUrl, dataString) {
+            $("button.user-list-delete").click(function (event) {
+                var userId = parseInt($(this).data(dataString));
+                bootbox.confirm({
+                    size: "small",
+                    message: "Are you sure?",
+                    callback: function (result) {
+                        if (result) {
+                            Belletrix.Common.handleDeleteCall(deleteUrl, userId, function () {
+                                window.location.reload();
+                            });
+                        }
+                    }
+                });
+            });
             $(tableSelector).DataTable({
                 columns: [
                     null,
@@ -21,21 +35,6 @@ var Belletrix;
                     { orderable: false },
                     { orderable: false }
                 ]
-            });
-            $("button.user-list-delete").click(function (event) {
-                var userId = parseInt($(this).data(dataString));
-                bootbox.confirm({
-                    size: "small",
-                    message: "Are you sure?",
-                    callback: function (result) {
-                        if (!result) {
-                            return;
-                        }
-                        Belletrix.Common.handleDeleteCall(deleteUrl, userId, function () {
-                            window.location.reload();
-                        });
-                    }
-                });
             });
         };
         return User;

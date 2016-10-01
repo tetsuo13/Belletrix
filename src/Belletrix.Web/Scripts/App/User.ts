@@ -10,6 +10,21 @@ module Belletrix {
          * @param dataString Part after the "data-" attribute containing the ID value.
          */
         public initUserList(tableSelector: string, deleteUrl: string, dataString: string): void {
+            $("button.user-list-delete").click(function (event: JQueryEventObject): void {
+                let userId: number = parseInt($(this).data(dataString));
+
+                bootbox.confirm({
+                    size: "small",
+                    message: "Are you sure?",
+                    callback: function (result: boolean): void {
+                        if (result) {
+                            Belletrix.Common.handleDeleteCall(deleteUrl, userId, function (): void {
+                                window.location.reload();
+                            });
+                        }
+                    }
+                });
+            });
 
             $(tableSelector).DataTable({
                 columns: [
@@ -20,24 +35,6 @@ module Belletrix {
                     { orderable: false },
                     { orderable: false }
                 ]
-            });
-
-            $("button.user-list-delete").click(function (event: JQueryEventObject): void {
-                let userId: number = parseInt($(this).data(dataString));
-
-                bootbox.confirm({
-                    size: "small",
-                    message: "Are you sure?",
-                    callback: function (result: boolean): void {
-                        if (!result) {
-                            return;
-                        }
-
-                        Belletrix.Common.handleDeleteCall(deleteUrl, userId, function () {
-                            window.location.reload();
-                        });
-                    }
-                });
             });
         }
     }

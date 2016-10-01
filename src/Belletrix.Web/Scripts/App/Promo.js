@@ -20,6 +20,20 @@ var Belletrix;
          * @param dataString
          */
         Promo.prototype.initPromoList = function (tableSelector, deleteUrl, dataString) {
+            $("button.promo-list-delete").click(function (event) {
+                var promoId = parseInt($(this).data(dataString));
+                bootbox.confirm({
+                    size: "small",
+                    message: "Are you sure?",
+                    callback: function (result) {
+                        if (result) {
+                            Belletrix.Common.handleDeleteCall(deleteUrl, promoId, function () {
+                                window.location.reload();
+                            });
+                        }
+                    }
+                });
+            });
             $(tableSelector).DataTable({
                 columns: [
                     null,
@@ -30,21 +44,6 @@ var Belletrix;
                 ]
             });
             $('[data-toggle="tooltip"]').tooltip();
-            $("button.promo-list-delete").click(function (event) {
-                var promoId = parseInt($(this).data(dataString));
-                bootbox.confirm({
-                    size: "small",
-                    message: "Are you sure?",
-                    callback: function (result) {
-                        if (!result) {
-                            return;
-                        }
-                        Belletrix.Common.handleDeleteCall(deleteUrl, promoId, function () {
-                            window.location.reload();
-                        });
-                    }
-                });
-            });
         };
         return Promo;
     }());

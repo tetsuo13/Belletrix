@@ -10,6 +10,8 @@
 @section FooterScript {
     <script>
         $(function () {
+            new Belletrix.Experience().bindDelete('@Url.Action("Delete", "Experience")', 'experienceid');
+
             $('#experiencelist').dataTable({
                 columns: [
                     null,
@@ -24,8 +26,6 @@
                     { orderable: false }
                 ]
             });
-
-            new Belletrix.Experience().bindDelete('@Url.Action("Delete", "Experience")', 'experienceid');
         });
     </script>
 }

@@ -39,6 +39,25 @@
                             let studyAbroadTable: JQuery = $(experiencesTableSelector);
 
                             if (studyAbroadTable.length) {
+                                clearInterval(timer);
+
+                                $("button.experience-list-delete").on("click", function (event: JQueryEventObject): void {
+                                    let experienceId: number = parseInt($(this).data(experienceDataString));
+
+                                    bootbox.confirm({
+                                        size: "small",
+                                        message: "Are you sure?",
+                                        callback: function (result: boolean): void {
+                                            if (result) {
+                                                Belletrix.Common.handleDeleteCall(experienceDeleteUrl,
+                                                    experienceId, function (): void {
+                                                        window.location.reload();
+                                                    });
+                                            }
+                                        }
+                                    });
+                                });
+
                                 studyAbroadTable.DataTable({
                                     columns: [
                                         null,
@@ -51,27 +70,6 @@
                                         null,
                                         { orderable: false }
                                     ]
-                                });
-
-                                clearInterval(timer);
-
-                                $("button.experience-list-delete").click(function (event: JQueryEventObject): void {
-                                    let experienceId: number = parseInt($(this).data(experienceDataString));
-
-                                    bootbox.confirm({
-                                        size: "small",
-                                        message: "Are you sure?",
-                                        callback: function (result: boolean): void {
-                                            if (!result) {
-                                                return;
-                                            }
-
-                                            Belletrix.Common.handleDeleteCall(experienceDeleteUrl,
-                                                experienceId, function () {
-                                                window.location.reload();
-                                            });
-                                        }
-                                    });
                                 });
                             }
                         });
@@ -90,6 +88,10 @@
             new StudentNote();
             $("a.studentlisttooltop").tooltip();
 
+            this.handleStudentDelete("button.student-list-delete", deleteUrl, dataString, function (): void {
+                window.location.reload();
+            });
+
             $(tableSelector).DataTable({
                 orderClasses: false,
                 columnDefs: [{
@@ -99,10 +101,6 @@
             });
 
             $(".collapse").collapse();
-
-            this.handleStudentDelete("button.student-list-delete", deleteUrl, dataString, function (): void {
-                window.location.reload();
-            });
 
             Belletrix.Common.initMultiselect(0, 300);
         };
@@ -123,11 +121,9 @@
                     size: "small",
                     message: "Are you sure?",
                     callback: function (result: boolean): void {
-                        if (!result) {
-                            return;
+                        if (result) {
+                            Belletrix.Common.handleDeleteCall(deleteUrl, studentId, successCallback);
                         }
-
-                        Belletrix.Common.handleDeleteCall(deleteUrl, studentId, successCallback);
                     }
                 });
             });
