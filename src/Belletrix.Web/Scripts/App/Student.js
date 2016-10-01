@@ -175,7 +175,7 @@ var Belletrix;
                 var firstSelect = $("select#" + idName);
                 var newSelect = firstSelect.clone().removeAttr('id');
                 // Get rid of the selected value cloned over.
-                $("option", newSelect).removeAttr("selected");
+                $("option", newSelect).prop("selected", false);
                 if (selIndex) {
                     $("option[value=" + values[selIndex] + "]", newSelect).attr("selected", "selected");
                 }
