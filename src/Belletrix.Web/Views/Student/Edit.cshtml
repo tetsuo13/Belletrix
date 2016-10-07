@@ -125,7 +125,7 @@
                                     <div class="col-lg-12">
                                         <div class="form-group">
                                             @Html.LabelFor(s => s.DateOfBirth)
-                                            @Html.TextBoxFor(s => s.DateOfBirth, new { @class = "form-control" })
+                                            @Html.TextBoxFor(s => s.DateOfBirth, "{0:MM/dd/yyyy}", htmlAttributes: new { @class = "form-control" })
                                         </div>
                                     </div>
                                 </div>
@@ -142,7 +142,7 @@
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             @Html.LabelFor(s => s.InitialMeeting)
-                                            @Html.TextBoxFor(s => s.InitialMeeting, new { @class = "form-control" })
+                                            @Html.TextBoxFor(s => s.InitialMeeting, "{0:MM/dd/yyyy}", htmlAttributes: new { @class = "form-control" })
                                         </div>
                                     </div>
                                     <div class="col-lg-6">

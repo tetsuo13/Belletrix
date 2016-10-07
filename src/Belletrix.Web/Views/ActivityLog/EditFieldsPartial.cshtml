@@ -101,12 +101,12 @@
                 <div class="row">
                     <div class="col-lg-6 has-error">
                         @Html.LabelFor(s => s.StartDate)
-                        @Html.TextBoxFor(s => s.StartDate, new { @class = "form-control" })
+                        @Html.TextBoxFor(s => s.StartDate, "{0:MM/dd/yyyy}", htmlAttributes: new { @class = "form-control" })
                         @Html.ValidationMessageFor(x => x.StartDate)
                     </div>
                     <div class="col-lg-6 has-error">
                         @Html.LabelFor(s => s.EndDate)
-                        @Html.TextBoxFor(s => s.EndDate, new { @class = "form-control" })
+                        @Html.TextBoxFor(s => s.EndDate, "{0:MM/dd/yyyy}", htmlAttributes: new { @class = "form-control" })
                         @Html.ValidationMessageFor(x => x.EndDate)
                     </div>
                 </div>
