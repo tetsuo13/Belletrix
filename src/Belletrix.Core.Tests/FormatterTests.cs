@@ -31,5 +31,17 @@ namespace Belletrix.Core.Tests
         {
             Assert.AreEqual("one", Formatter.ActivityLogLabel(ActivityLogTypes.Workshop, TypeLabels));
         }
+
+        [TestMethod]
+        public void SanitizeEmail_Trim()
+        {
+            Assert.AreEqual("foo@bar.com", Formatter.SanitizeEmail(" foo@bar.com  "));
+        }
+
+        [TestMethod]
+        public void SanitizeEmail_Lowercase()
+        {
+            Assert.AreEqual("foo@bar.com", Formatter.SanitizeEmail("Foo@Bar.COM"));
+        }
     }
 }

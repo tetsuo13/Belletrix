@@ -64,5 +64,14 @@ namespace Belletrix.Core
 
             return semester.ToString();
         }
+
+        public static string SanitizeEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return null;
+            }
+            return email.Trim().ToLower();
+        }
     }
 }

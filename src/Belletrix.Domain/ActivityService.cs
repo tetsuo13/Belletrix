@@ -1,4 +1,5 @@
-﻿using Belletrix.DAL;
+﻿using Belletrix.Core;
+using Belletrix.DAL;
 using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
 using System;
@@ -225,7 +226,7 @@ namespace Belletrix.Domain
             ActivityLogPersonModel model = new ActivityLogPersonModel()
             {
                 FullName = createModel.FullName,
-                Email = createModel.Email,
+                Email = Formatter.SanitizeEmail(createModel.Email),
                 Description = createModel.Description,
                 PhoneNumber = createModel.PhoneNumber,
                 SessionId = createModel.SessionId

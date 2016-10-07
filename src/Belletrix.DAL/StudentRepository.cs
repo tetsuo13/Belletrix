@@ -378,15 +378,8 @@ namespace Belletrix.DAL
                     baseModel.DateOfBirth = baseModel.DateOfBirth.Value.ToUniversalTime();
                 }
 
-                if (!string.IsNullOrEmpty(baseModel.CampusEmail))
-                {
-                    baseModel.CampusEmail = baseModel.CampusEmail.Trim();
-                }
-
-                if (!string.IsNullOrEmpty(baseModel.AlternateEmail))
-                {
-                    baseModel.AlternateEmail = baseModel.AlternateEmail.Trim();
-                }
+                baseModel.CampusEmail = Formatter.SanitizeEmail(baseModel.CampusEmail);
+                baseModel.AlternateEmail = Formatter.SanitizeEmail(baseModel.AlternateEmail);
 
                 bool? phiBetaDeltaMember = null;
 

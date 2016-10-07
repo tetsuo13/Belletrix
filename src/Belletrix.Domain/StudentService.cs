@@ -253,15 +253,8 @@ namespace Belletrix.Domain
                 model.DateOfBirth = model.DateOfBirth.Value.ToUniversalTime();
             }
 
-            if (!string.IsNullOrEmpty(model.CampusEmail))
-            {
-                model.CampusEmail = model.CampusEmail.Trim();
-            }
-
-            if (!string.IsNullOrEmpty(model.AlternateEmail))
-            {
-                model.AlternateEmail = model.AlternateEmail.Trim();
-            }
+            model.CampusEmail = Formatter.SanitizeEmail(model.CampusEmail);
+            model.AlternateEmail = Formatter.SanitizeEmail(model.AlternateEmail);
 
             using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
