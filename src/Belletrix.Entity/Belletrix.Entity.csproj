@@ -57,7 +57,6 @@
     <Compile Include="Model\StudentModels.cs" />
     <Compile Include="Model\StudentPromoLog.cs" />
     <Compile Include="Model\StudentStudyAbroadWishlistModel.cs" />
-    <Compile Include="Model\StudyAbroadModel.cs" />
     <Compile Include="Model\UserModel.cs" />
     <Compile Include="Model\ActivityLogModel.cs" />
     <Compile Include="Model\ActivityLogParticipantModel.cs" />
@@ -73,6 +72,7 @@
     <Compile Include="ViewModel\PromoViewModels.cs" />
     <Compile Include="ViewModel\StudentNotesViewModels.cs" />
     <Compile Include="ViewModel\StudentSearchViewModel.cs" />
+    <Compile Include="ViewModel\StudyAbroadViewModels.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

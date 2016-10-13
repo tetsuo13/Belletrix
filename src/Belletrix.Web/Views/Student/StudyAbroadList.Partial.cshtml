@@ -1,7 +1,8 @@
 ﻿@using Belletrix.Core;
 @using Belletrix.Entity.Model;
+@using Belletrix.Entity.ViewModel;
 
-@model IEnumerable<StudyAbroadModel>
+@model IEnumerable<StudyAbroadViewModel>
 
 @{
     bool showStudent = ViewData.ContainsKey("ShowStudent") && (bool)ViewData["ShowStudent"];
@@ -26,7 +27,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (StudyAbroadModel study in Model)
+        @foreach (StudyAbroadViewModel study in Model)
         {
             CountryModel selectedCountry = (ViewBag.Countries as List<CountryModel>).FirstOrDefault(c => c.Id == study.CountryId);
             string countryName = string.Empty;

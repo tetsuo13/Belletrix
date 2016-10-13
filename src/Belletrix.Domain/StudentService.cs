@@ -76,7 +76,7 @@ namespace Belletrix.Domain
 
             if (filterByCountries)
             {
-                IEnumerable<StudyAbroadModel> studyAbroad = await StudyAbroadRepository.GetAll();
+                IEnumerable<StudyAbroadViewModel> studyAbroad = await StudyAbroadRepository.GetAll();
 
                 students = studyAbroad
                     .Where(x => search.SelectedCountries.Any(y => y == x.CountryId))

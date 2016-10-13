@@ -1,5 +1,4 @@
 ﻿using Belletrix.DAL;
-using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,12 +14,12 @@ namespace Belletrix.Domain
             StudyAbroadRepository = studyAbroadRepository;
         }
 
-        public async Task<IEnumerable<StudyAbroadModel>> GetAll(int? studentId = null)
+        public async Task<IEnumerable<StudyAbroadViewModel>> GetAll(int? studentId = null)
         {
             return await StudyAbroadRepository.GetAll(studentId);
         }
 
-        public async Task Save(StudyAbroadModel model, int userId)
+        public async Task Save(AddStudyAbroadViewModel model, int userId)
         {
             await StudyAbroadRepository.Save(model, userId);
         }

@@ -1,6 +1,7 @@
 ﻿using Belletrix.Core;
 using Belletrix.Domain;
 using Belletrix.Entity.Model;
+using Belletrix.Entity.ViewModel;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -58,7 +59,7 @@ namespace Belletrix.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Add(StudyAbroadModel model)
+        public async Task<ActionResult> Add(AddStudyAbroadViewModel model)
         {
             if (ModelState.IsValid)
             {

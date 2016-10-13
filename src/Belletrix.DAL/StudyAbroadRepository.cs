@@ -1,5 +1,6 @@
 ﻿using Belletrix.Core;
 using Belletrix.Entity.Model;
+using Belletrix.Entity.ViewModel;
 using Dapper;
 using StackExchange.Exceptional;
 using System;
@@ -22,9 +23,9 @@ namespace Belletrix.DAL
             UnitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<StudyAbroadModel>> GetAll(int? studentId = null)
+        public async Task<IEnumerable<StudyAbroadViewModel>> GetAll(int? studentId = null)
         {
-            List<StudyAbroadModel> studyAbroad = new List<StudyAbroadModel>();
+            List<StudyAbroadViewModel> studyAbroad = new List<StudyAbroadViewModel>();
 
             string sql = @"
                 SELECT      a.[Id], a.[StudentId], [Semester],
@@ -58,7 +59,7 @@ namespace Belletrix.DAL
 
                 foreach (IDictionary<string, object> row in rows)
                 {
-                    StudyAbroadModel study = new StudyAbroadModel()
+                    StudyAbroadViewModel study = new StudyAbroadViewModel()
                     {
                         Id = (int)row["Id"],
                         StudentId = (int)row["StudentId"],
@@ -103,9 +104,9 @@ namespace Belletrix.DAL
             return studyAbroad;
         }
 
-        private async Task<List<StudyAbroadModel>> PopulateProgramTypes(List<StudyAbroadModel> studyAbroad)
+        private async Task<List<StudyAbroadViewModel>> PopulateProgramTypes(List<StudyAbroadViewModel> studyAbroad)
         {
-            List<StudyAbroadModel> updated = new List<StudyAbroadModel>(studyAbroad);
+            List<StudyAbroadViewModel> updated = new List<StudyAbroadViewModel>(studyAbroad);
             const string sql = @"
                 SELECT  [ProgramTypeId]
                 FROM    [dbo].[StudyAbroadProgramTypes]
@@ -145,7 +146,7 @@ namespace Belletrix.DAL
             }
         }
 
-        public async Task Save(StudyAbroadModel model, int userId)
+        public async Task Save(AddStudyAbroadViewModel model, int userId)
         {
             const string sql = @"
                 INSERT INTO [dbo].[StudyAbroad]

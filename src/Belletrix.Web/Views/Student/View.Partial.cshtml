@@ -1,5 +1,6 @@
 ﻿@using Belletrix.Core;
 @using Belletrix.Entity.Model;
+@using Belletrix.Entity.ViewModel;
 
 @model StudentModel
 
@@ -8,9 +9,9 @@
         <div class="panel panel-default">
             <div class="panel-heading">Study Abroad Experiences</div>
             <div class="panel-body">
-                @if ((ViewBag.StudyAbroad as IEnumerable<StudyAbroadModel>).Count() > 0)
+                @if ((ViewBag.StudyAbroad as IEnumerable<StudyAbroadViewModel>).Count() > 0)
                 {
-                    foreach (StudyAbroadModel studyAbroad in ViewBag.StudyAbroad)
+                    foreach (StudyAbroadViewModel studyAbroad in ViewBag.StudyAbroad)
                     {
                         ICollection<string> programTypes = null;
 

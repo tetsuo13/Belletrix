@@ -1,17 +1,14 @@
-﻿using System;
+﻿using Belletrix.Entity.Model;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Belletrix.Entity.Model
+namespace Belletrix.Entity.ViewModel
 {
-    public class StudyAbroadModel
+    public class AddStudyAbroadViewModel
     {
-        public int Id { get; set; }
-
         [Required]
         public int StudentId { get; set; }
-
-        public StudentModel Student { get; set; }
 
         [Required]
         [Display(Name = "Semester")]
@@ -53,6 +50,23 @@ namespace Belletrix.Entity.Model
         public int ProgramId { get; set; }
 
         [Display(Name = "Program Types")]
+        public IEnumerable<int> ProgramTypes { get; set; }
+    }
+
+    public class StudyAbroadViewModel
+    {
+        public int Id { get; set; }
+        public int StudentId { get; set; }
+        public StudentModel Student { get; set; }
+        public int Semester { get; set; }
+        public int Year { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public bool CreditBearing { get; set; }
+        public bool Internship { get; set; }
+        public int CountryId { get; set; }
+        public string City { get; set; }
+        public int ProgramId { get; set; }
         public IEnumerable<int> ProgramTypes { get; set; }
     }
 }
