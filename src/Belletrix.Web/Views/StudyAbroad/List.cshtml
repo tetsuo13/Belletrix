@@ -10,9 +10,9 @@
 @section FooterScript {
     <script>
         $(function () {
-            new Belletrix.Experience().bindDelete('@Url.Action("Delete", "Experience")', 'experienceid');
+            new Belletrix.StudyAbroad().bindDelete('@Url.Action("Delete", "StudyAbroad")', 'studyabroadid');
 
-            $('#experiencelist').dataTable({
+            $('#studyabroadlist').dataTable({
                 columns: [
                     null,
                     null,

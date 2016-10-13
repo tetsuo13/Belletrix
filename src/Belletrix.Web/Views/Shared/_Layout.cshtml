@@ -13,7 +13,7 @@
     {
         { HomeController.ActivePageName, null },
         { StudentController.ActivePageName, null },
-        { ExperienceController.ActivePageName, null },
+        { StudyAbroadController.ActivePageName, null },
         { PromoController.ActivePageName, null },
         { ActivityLogController.ActivePageName, null }
     };
@@ -73,7 +73,7 @@
                         <ul class="nav" id="side-menu">
                             <li><a href="@Url.Action("Index", "Home")" class="@sidebarLinks[HomeController.ActivePageName]"><i class="glyphicon glyphicon-dashboard"></i> Dashboard</a></li>
                             <li><a href="@Url.Action("List", "Student")" class="@sidebarLinks[StudentController.ActivePageName]"><i class="glyphicon glyphicon-th-list"></i> Students</a></li>
-                            <li><a href="@Url.Action("List", "Experience")" class="@sidebarLinks[ExperienceController.ActivePageName]"><i class="glyphicon glyphicon-plane"></i> Experiences</a></li>
+                            <li><a href="@Url.Action("List", "StudyAbroad")" class="@sidebarLinks[StudyAbroadController.ActivePageName]"><i class="glyphicon glyphicon-plane"></i> Experiences</a></li>
                             <li><a href="@Url.Action("List", "Promo")" class="@sidebarLinks[PromoController.ActivePageName]"><i class="glyphicon glyphicon-certificate"></i> Promos</a></li>
                             <li><a href="@Url.Action("List", "ActivityLog")" class="@sidebarLinks[ActivityLogController.ActivePageName]"><i class="glyphicon glyphicon-edit"></i> Activity Log</a></li>
                         </ul>

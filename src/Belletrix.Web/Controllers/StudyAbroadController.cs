@@ -1,7 +1,6 @@
 ﻿using Belletrix.Core;
 using Belletrix.Domain;
 using Belletrix.Entity.Model;
-using Belletrix.Entity.ViewModel;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,14 +9,14 @@ using System.Web.Mvc;
 namespace Belletrix.Web.Controllers
 {
     [Authorize]
-    public class ExperienceController : Controller
+    public class StudyAbroadController : Controller
     {
         public static string ActivePageName = "experiences";
 
         private readonly IStudentService StudentService;
         private readonly IStudyAbroadService StudyAbroadService;
 
-        public ExperienceController(IStudentService studentService, IStudyAbroadService studyAbroadService)
+        public StudyAbroadController(IStudentService studentService, IStudyAbroadService studyAbroadService)
         {
             StudentService = studentService;
             StudyAbroadService = studyAbroadService;

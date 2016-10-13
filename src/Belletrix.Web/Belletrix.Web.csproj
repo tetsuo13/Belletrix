@@ -180,7 +180,7 @@
     <Compile Include="Controllers\ActivityLogPersonController.cs" />
     <Compile Include="Controllers\CacheController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
-    <Compile Include="Controllers\ExperienceController.cs" />
+    <Compile Include="Controllers\StudyAbroadController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\NoteController.cs" />
@@ -265,8 +265,8 @@
     <Content Include="Views\Student\View.cshtml" />
     <Content Include="Views\Student\Edit.cshtml" />
     <Content Include="Views\Student\StudyAbroad.cshtml" />
-    <Content Include="Views\Experience\List.cshtml" />
-    <Content Include="Views\Experience\Add.cshtml" />
+    <Content Include="Views\StudyAbroad\List.cshtml" />
+    <Content Include="Views\StudyAbroad\Add.cshtml" />
     <Content Include="Views\Home\Robots.cshtml" />
     <Content Include="Views\Promo\List.cshtml" />
     <Content Include="Views\Promo\Add.cshtml" />
@@ -334,7 +334,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\App\ActivityLog.ts" />
     <TypeScriptCompile Include="Scripts\App\Common.ts" />
-    <TypeScriptCompile Include="Scripts\App\Experience.ts" />
+    <TypeScriptCompile Include="Scripts\App\StudyAbroad.ts" />
     <TypeScriptCompile Include="Scripts\App\GenericResult.ts" />
     <TypeScriptCompile Include="Scripts\App\JQuery.DataTables.d.ts" />
     <TypeScriptCompile Include="Scripts\App\Promo.ts" />

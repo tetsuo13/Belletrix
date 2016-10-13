@@ -28,11 +28,11 @@ var Belletrix;
          * experiences in a list and display partial inline.
          * @param tabSelector Selector to tab.
          * @param dataUrl URL to call for student experiences.
-         * @param experiencesTableSelector Selector for experiences table.
-         * @param experienceDeleteUrl
-         * @param experienceDataString
+         * @param studyAbroadTableSelector Selector for experiences table.
+         * @param studyAbroadDeleteUrl
+         * @param studyAbroadDataString
          */
-        Student.prototype.initStudyAbroadTab = function (tabSelector, dataUrl, experiencesTableSelector, experienceDeleteUrl, experienceDataString) {
+        Student.prototype.initStudyAbroadTab = function (tabSelector, dataUrl, studyAbroadTableSelector, studyAbroadDeleteUrl, studyAbroadDataString) {
             $('a[href="' + tabSelector + '"]').on("show.bs.tab", function (e) {
                 $.ajax({
                     url: dataUrl,
@@ -41,17 +41,17 @@ var Belletrix;
                     success: function (data) {
                         $(tabSelector).html(data);
                         var timer = setInterval(function () {
-                            var studyAbroadTable = $(experiencesTableSelector);
+                            var studyAbroadTable = $(studyAbroadTableSelector);
                             if (studyAbroadTable.length) {
                                 clearInterval(timer);
-                                $("button.experience-list-delete").on("click", function (event) {
-                                    var experienceId = parseInt($(this).data(experienceDataString));
+                                $("button.studyabroad-list-delete").on("click", function (event) {
+                                    var studyAbroadId = parseInt($(this).data(studyAbroadDataString));
                                     bootbox.confirm({
                                         size: "small",
                                         message: "Are you sure?",
                                         callback: function (result) {
                                             if (result) {
-                                                Belletrix.Common.handleDeleteCall(experienceDeleteUrl, experienceId, function () {
+                                                Belletrix.Common.handleDeleteCall(studyAbroadDeleteUrl, studyAbroadId, function () {
                                                     window.location.reload();
                                                 });
                                             }

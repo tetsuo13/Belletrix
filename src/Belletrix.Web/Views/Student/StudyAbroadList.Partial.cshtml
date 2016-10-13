@@ -7,7 +7,7 @@
     bool showStudent = ViewData.ContainsKey("ShowStudent") && (bool)ViewData["ShowStudent"];
 }
 
-<table id="experiencelist" class="display table-condensed">
+<table id="studyabroadlist" class="display table-condensed">
     <thead>
         <tr>
             @if (showStudent)
@@ -92,8 +92,8 @@
                 <td>@countryName</td>
                 <td>@programName</td>
                 <td>
-                    <button type="button" class="btn btn-xs btn-danger experience-list-delete"
-                        data-experienceid="@study.Id">
+                    <button type="button" class="btn btn-xs btn-danger studyabroad-list-delete"
+                        data-studyabroadid="@study.Id">
                         <i class="glyphicon glyphicon-trash"></i>
                     </button>
                 </td>
