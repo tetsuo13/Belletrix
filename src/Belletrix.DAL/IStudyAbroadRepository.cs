@@ -7,7 +7,7 @@ namespace Belletrix.DAL
     public interface IStudyAbroadRepository
     {
         Task<IEnumerable<StudyAbroadViewModel>> GetAll(int? studentId = null);
-        Task Save(AddStudyAbroadViewModel model, int userId);
+        Task Save(AddStudyAbroadViewModel model);
         Task<bool> Delete(int id);
         Task<bool> DeleteStudent(int id);
     }

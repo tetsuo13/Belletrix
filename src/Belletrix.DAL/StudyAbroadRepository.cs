@@ -146,7 +146,7 @@ namespace Belletrix.DAL
             }
         }
 
-        public async Task Save(AddStudyAbroadViewModel model, int userId)
+        public async Task Save(AddStudyAbroadViewModel model)
         {
             const string sql = @"
                 INSERT INTO [dbo].[StudyAbroad]
@@ -215,10 +215,6 @@ namespace Belletrix.DAL
                         throw e;
                     }
                 }
-
-                //EventLogModel eventLog = new EventLogModel();
-                //eventLog.AddStudentEvent(connection, transaction, userId, StudentId,
-                //    EventLogModel.EventType.AddStudentExperience);
             }
             catch (Exception e)
             {

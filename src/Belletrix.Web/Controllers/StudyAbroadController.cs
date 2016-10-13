@@ -63,7 +63,8 @@ namespace Belletrix.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                await StudyAbroadService.Save(model, (Session["User"] as UserModel).Id);
+                await StudyAbroadService.Save(model, (Session["User"] as UserModel).Id,
+                    HttpContext.Request.UserHostAddress);
                 return RedirectToAction("View", "Student", new { Id = model.StudentId });
             }
 

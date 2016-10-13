@@ -1,17 +1,21 @@
 ﻿using Belletrix.DAL;
+using Belletrix.Entity.Enum;
 using Belletrix.Entity.ViewModel;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace Belletrix.Domain
 {
     public class StudyAbroadService : IStudyAbroadService
     {
         private readonly IStudyAbroadRepository StudyAbroadRepository;
+        private readonly IEventLogService EventLogService;
 
-        public StudyAbroadService(IStudyAbroadRepository studyAbroadRepository)
+        public StudyAbroadService(IStudyAbroadRepository studyAbroadRepository, IEventLogService eventLogService)
         {
             StudyAbroadRepository = studyAbroadRepository;
+            EventLogService = eventLogService;
         }
 
         public async Task<IEnumerable<StudyAbroadViewModel>> GetAll(int? studentId = null)
@@ -19,9 +23,14 @@ namespace Belletrix.Domain
             return await StudyAbroadRepository.GetAll(studentId);
         }
 
-        public async Task Save(AddStudyAbroadViewModel model, int userId)
+        public async Task Save(AddStudyAbroadViewModel model, int userId, string remoteIp)
         {
-            await StudyAbroadRepository.Save(model, userId);
+            using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                await StudyAbroadRepository.Save(model);
+                await EventLogService.AddStudentEvent(userId, model.StudentId, EventLogTypes.AddStudentExperience,
+                    remoteIp);
+            }
         }
 
         public async Task<GenericResult> Delete(int id)
