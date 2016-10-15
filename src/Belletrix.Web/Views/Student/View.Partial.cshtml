@@ -13,6 +13,7 @@
                 {
                     foreach (StudyAbroadViewModel studyAbroad in ViewBag.StudyAbroad)
                     {
+                        CountryModel country = (ViewBag.Countries as List<CountryModel>).Single(c => c.Id == studyAbroad.CountryId);
                         ICollection<string> programTypes = null;
 
                         if (studyAbroad.ProgramTypes != null)
@@ -30,11 +31,14 @@
                                 <strong class="h4">
                                     @Formatter.StudyAbroadPeriodString(studyAbroad.Semester)
                                     @studyAbroad.Year:
+
+                                    @GeneralLayout.DisplayCountryFlag(country)
+
                                     @if (!string.IsNullOrEmpty(studyAbroad.City))
                                     {
                                         @studyAbroad.City@:,
                                     }
-                                    @((ViewBag.Countries as List<CountryModel>).Where(c => c.Id == studyAbroad.CountryId).First().Name)
+                                    @country.Name
                                 </strong>
 
                                 @if (studyAbroad.CreditBearing)

@@ -34,6 +34,7 @@ namespace Belletrix.Web.App_Start
                 .Include("~/Content/css/datepicker.css")
                 .Include("~/Content/css/jquery.dataTables.min.css", new CssRewriteUrlTransform())
                 .Include("~/Content/css/jquery.dataTables.bootstrap.css", new CssRewriteUrlTransform())
+                .Include("~/Content/css/flags.css", new CssRewriteUrlTransform())
                 .Include("~/Content/css/Belletrix.css"));
         }
     }

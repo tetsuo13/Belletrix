@@ -172,6 +172,7 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <None Include="App_Code\GeneralLayout.cshtml" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
@@ -202,13 +203,16 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\css\Belletrix.css" />
     <Content Include="Content\css\bootstrap-multiselect.css" />
+    <Content Include="Content\css\flags.css" />
     <Content Include="Content\css\jquery.dataTables.bootstrap.css" />
     <Content Include="Content\css\datepicker.css" />
     <Content Include="Content\css\jquery.dataTables.min.css" />
     <Content Include="Content\images\back_disabled.png" />
     <Content Include="Content\images\back_enabled.png" />
     <Content Include="Content\images\back_enabled_hover.png" />
+    <Content Include="Content\images\blank.gif" />
     <Content Include="Content\images\favicon.ico" />
+    <Content Include="Content\images\flags.png" />
     <Content Include="Content\images\forward_disabled.png" />
     <Content Include="Content\images\forward_enabled.png" />
     <Content Include="Content\images\forward_enabled_hover.png" />

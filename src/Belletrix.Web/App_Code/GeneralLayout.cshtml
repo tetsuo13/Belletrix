@@ -1,0 +1,31 @@
+﻿@using Belletrix.Entity.Model;
+@using System.Web.Mvc;
+
+@helper DisplayCountryFlag(CountryModel country)
+{
+    UrlHelper url = new UrlHelper(Request.RequestContext);
+
+    switch (country.Abbreviation)
+    {
+        case "": // Anywhere
+        case "XAS": // Asia
+        case "XAF": // Africa
+        case "XLA": // Latin America
+        case "XES": // English-speaking
+        case "XSS": // Spanish-speaking
+            @country.Name
+            break;
+
+        default:
+            <img src="@url.Content("~/Content/images/blank.gif")"
+                class="flag flag-@country.Abbreviation.ToLower()"
+                aria-hidden="true"
+                alt="@country.Name" title="@country.Name" />
+            @*
+            This hidden SPAN is there purely to provide something for the
+            table sorter to use. Removing it breaks sorting.
+            *@
+            <span class="sr-only">@country.Name</span>
+            break;
+    }
+}

@@ -29,13 +29,7 @@
     <tbody>
         @foreach (StudyAbroadViewModel study in Model)
         {
-            CountryModel selectedCountry = (ViewBag.Countries as List<CountryModel>).FirstOrDefault(c => c.Id == study.CountryId);
-            string countryName = string.Empty;
-
-            if (selectedCountry != null)
-            {
-                countryName = selectedCountry.Name;
-            }
+            CountryModel selectedCountry = (ViewBag.Countries as List<CountryModel>).Single(c => c.Id == study.CountryId);
 
             ProgramModel selectedProgram = (ViewBag.Programs as List<ProgramModel>).FirstOrDefault(p => p.Id == study.ProgramId);
             string programName = string.Empty;
@@ -90,7 +84,7 @@
                         <i class="glyphicon glyphicon-ok"></i>
                     }
                 </td>
-                <td>@countryName</td>
+                <td>@GeneralLayout.DisplayCountryFlag(selectedCountry)</td>
                 <td>@programName</td>
                 <td>
                     <button type="button" class="btn btn-xs btn-danger studyabroad-list-delete"
