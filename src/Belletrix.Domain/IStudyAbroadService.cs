@@ -6,8 +6,11 @@ namespace Belletrix.Domain
 {
     public interface IStudyAbroadService
     {
-        Task<IEnumerable<StudyAbroadViewModel>> GetAll(int? studentId = null);
+        Task<IEnumerable<StudyAbroadViewModel>> GetAll();
+        Task<IEnumerable<StudyAbroadViewModel>> GetAllForStudent(int studentId);
+        Task<StudyAbroadViewModel> FindById(int studyAbroadId);
         Task Save(AddStudyAbroadViewModel model, int userId, string remoteIp);
-        Task<GenericResult> Delete(int id);
+        Task<GenericResult> Delete(int studyAbroadId);
+        Task Update(EditStudyAbroadViewModel model, int userId, string remoteIp);
     }
 }

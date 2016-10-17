@@ -5,7 +5,7 @@ var Belletrix;
     var StudyAbroad = (function () {
         function StudyAbroad() {
         }
-        StudyAbroad.prototype.initAdd = function () {
+        StudyAbroad.prototype.initAddEdit = function () {
             Belletrix.Common.handleMvcEditor();
             Belletrix.Common.initMultiselect(1);
             $('#StartDate, #EndDate').datepicker();

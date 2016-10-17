@@ -39,18 +39,6 @@
                 programName = selectedProgram.Name;
             }
 
-            ICollection<string> programTypes = new List<string>();
-
-            foreach (int type in study.ProgramTypes)
-            {
-                ProgramTypeModel programType = (ViewBag.ProgramTypes as List<ProgramTypeModel>).FirstOrDefault(p => p.Id == type);
-
-                if (programType != null)
-                {
-                    programTypes.Add(programType.Name);
-                }
-            }
-
             <tr>
                 @if (showStudent)
                 {
@@ -87,10 +75,16 @@
                 <td>@GeneralLayout.DisplayCountryFlag(selectedCountry)</td>
                 <td>@programName</td>
                 <td>
-                    <button type="button" class="btn btn-xs btn-danger studyabroad-list-delete"
-                        data-studyabroadid="@study.Id">
-                        <i class="glyphicon glyphicon-trash"></i>
-                    </button>
+                    <div class="btn-group">
+                        <a href="@Url.Action("Edit", "StudyAbroad", new { id = study.Id })"
+                           class="btn btn-xs btn-info" data-placement="top"
+                           title="Edit"><i class="glyphicon glyphicon-pencil"></i></a>
+
+                        <button type="button" class="btn btn-xs btn-danger studyabroad-list-delete"
+                                data-studyabroadid="@study.Id">
+                            <i class="glyphicon glyphicon-trash"></i>
+                        </button>
+                    </div>
                 </td>
             </tr>
         }

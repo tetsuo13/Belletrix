@@ -7,6 +7,7 @@
         AddUser,
         EditUser,
         AddStudentExperience,
-        AddStudentNote
+        AddStudentNote,
+        EditStudentExperience
     };
 }

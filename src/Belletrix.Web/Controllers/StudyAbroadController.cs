@@ -43,7 +43,7 @@ namespace Belletrix.Web.Controllers
 
             try
             {
-                await PrepareStudent(studentId);
+                ViewBag.Student = await StudentService.GetStudent(studentId);
             }
             catch (Exception e)
             {
@@ -70,7 +70,7 @@ namespace Belletrix.Web.Controllers
 
             try
             {
-                await PrepareStudent(model.StudentId);
+                ViewBag.Student = await StudentService.GetStudent(model.StudentId);
             }
             catch (Exception e)
             {
@@ -83,18 +83,6 @@ namespace Belletrix.Web.Controllers
             Analytics.TrackPageView(Request, "Add Experience", (Session["User"] as UserModel).Login);
 
             return View(model);
-        }
-
-        private async Task PrepareStudent(int studentId)
-        {
-            try
-            {
-                ViewBag.Student = await StudentService.GetStudent(studentId);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
         }
 
         private async Task PrepareDropDowns()
@@ -111,6 +99,64 @@ namespace Belletrix.Web.Controllers
         {
             Analytics.TrackPageView(Request, "Delete Experience", (Session["User"] as UserModel).Login);
             return Json(await StudyAbroadService.Delete(id));
+        }
+
+        public async Task<ActionResult> Edit(int id)
+        {
+            StudyAbroadViewModel study = await StudyAbroadService.FindById(id);
+
+            if (study == null)
+            {
+                string message = string.Format("Study abroad experience ID {0} not found", id);
+                MvcApplication.LogException(new ArgumentException(message, nameof(id)));
+                return RedirectToAction("NotFound", "Error");
+            }
+
+            try
+            {
+                ViewBag.Student = await StudentService.GetStudent(study.StudentId);
+            }
+            catch (Exception e)
+            {
+                string message = string.Format("Invalid student ID {0}", study.StudentId);
+                MvcApplication.LogException(new ArgumentException(message, nameof(id), e));
+                return RedirectToAction("NotFound", "Error");
+            }
+
+            Analytics.TrackPageView(Request, "Experience Edit", (Session["User"] as UserModel).Login);
+
+            EditStudyAbroadViewModel model = (EditStudyAbroadViewModel)study;
+            await PrepareDropDowns();
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Edit(EditStudyAbroadViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                await StudyAbroadService.Update(model, (Session["User"] as UserModel).Id,
+                    HttpContext.Request.UserHostAddress);
+                return RedirectToAction("View", "Student", new { Id = model.StudentId });
+            }
+
+            try
+            {
+                ViewBag.Student = await StudentService.GetStudent(model.StudentId);
+            }
+            catch (Exception e)
+            {
+                string message = string.Format("Invalid student ID {0}", model.StudentId);
+                MvcApplication.LogException(new ArgumentException(message, nameof(model), e));
+                return RedirectToAction("NotFound", "Error");
+            }
+
+            Analytics.TrackPageView(Request, "Experience Edit", (Session["User"] as UserModel).Login);
+            await PrepareDropDowns();
+
+            return View(model);
         }
     }
 }

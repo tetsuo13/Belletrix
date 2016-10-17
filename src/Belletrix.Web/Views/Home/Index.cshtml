@@ -1,5 +1,4 @@
-﻿@using Belletrix.Core;
-@using Belletrix.Entity.Enum;
+﻿@using Belletrix.Entity.Enum;
 @using Belletrix.Entity.ViewModel;
 
 @model DashboardViewModel
@@ -25,7 +24,6 @@
                         @foreach (EventLogViewModel eventLog in Model.RecentActivity)
                         {
                             string action = string.Empty;
-                            string personName = eventLog.Student.FirstName + " " + eventLog.Student.LastName;
                             bool modifiedByRealUser = eventLog.ModifiedById != default(int);
                             string iconClass = string.Empty;
                             string anchorLinkUrl = anchorLinkUrl = Url.Action("View", "Student", new { id = eventLog.Student.Id });
@@ -51,6 +49,11 @@
                                     action = "commented on";
                                     iconClass = "glyphicon-comment";
                                     break;
+
+                                case (int)EventLogTypes.EditStudentExperience:
+                                    action = "edited experience for";
+                                    iconClass = "glyphicon-plane";
+                                    break;
                             }
 
                             if (string.IsNullOrEmpty(action))
@@ -60,9 +63,12 @@
 
                             string eventBy = !modifiedByRealUser ? "System" : eventLog.ModifiedByFirstName;
 
-                            <a href="@anchorLinkUrl" class="list-group-item" title="@eventBy @action @personName">
-                                <i class="glyphicon @iconClass"></i> @personName
-                                <span class="badge" title="@eventLog.EventDate.ToString("dddd, MMMM d, yyyy \\a\\t h:mm tt")">
+                            <a href="@anchorLinkUrl" class="list-group-item"
+                                title="@eventBy @action @eventLog.Student.FirstName @eventLog.Student.LastName">
+                                <i class="glyphicon @iconClass"></i>
+                                @eventLog.Student.FirstName @eventLog.Student.LastName
+                                <span class="badge"
+                                    title="@eventLog.EventDate.ToLongDateString() at @eventLog.EventDate.ToLongTimeString()">
                                     @eventLog.RelativeDate
                                 </span>
                             </a>

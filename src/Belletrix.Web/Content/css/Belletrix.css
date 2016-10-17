@@ -303,3 +303,11 @@
     font-weight: bold;
     color: #b94a48;
 }
+
+/*
+    Prevent button groups from wrapping inside tables.
+    See https://github.com/twbs/bootstrap/issues/9939
+*/
+.btn-group {
+    display: flex;
+}

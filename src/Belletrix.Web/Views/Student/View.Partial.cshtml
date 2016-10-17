@@ -22,7 +22,7 @@
 
                             foreach (int programType in studyAbroad.ProgramTypes)
                             {
-                                programTypes.Add((ViewBag.Programs as IEnumerable<ProgramModel>).Where(p => p.Id == programType).First().Name);
+                                programTypes.Add((ViewBag.Programs as IEnumerable<ProgramModel>).First(p => p.Id == programType).Name);
                             }
                         }
 
@@ -64,7 +64,7 @@
                                 </div>
 
                                 <div>
-                                    @((ViewBag.Programs as IEnumerable<ProgramModel>).Where(p => p.Id == studyAbroad.ProgramId).First().Name)
+                                    @((ViewBag.Programs as IEnumerable<ProgramModel>).First(p => p.Id == studyAbroad.ProgramId).Name)
                                 </div>
 
                                 <div>
@@ -106,7 +106,7 @@
                 <div>
                     @if (Model.Classification.HasValue)
                     {
-                        @((ViewBag.Classifications as SelectList).Where(c => c.Value == Model.Classification.Value.ToString()).First().Text)
+                        @((ViewBag.Classifications as SelectList).First(c => c.Value == Model.Classification.Value.ToString()).Text)
                         <br />
                     }
                     <strong class="h2">@Model.FirstName @Model.MiddleName @Model.LastName</strong>

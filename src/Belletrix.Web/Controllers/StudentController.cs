@@ -76,7 +76,7 @@ namespace Belletrix.Web.Controllers
                 return RedirectToAction("NotFound", "Error");
             }
 
-            ViewBag.StudyAbroad = await StudyAbroadService.GetAll(id);
+            ViewBag.StudyAbroad = await StudyAbroadService.GetAllForStudent(id);
             ViewBag.Notes = await StudentNoteService.GetAllNotes(id);
             ViewBag.ShowActionButtons = true;
             await PrepareViewBag();
@@ -108,7 +108,7 @@ namespace Belletrix.Web.Controllers
                 return RedirectToAction("NotFound", "Error");
             }
 
-            ViewBag.StudyAbroad = await StudyAbroadService.GetAll(id);
+            ViewBag.StudyAbroad = await StudyAbroadService.GetAllForStudent(id);
             ViewBag.Notes = await StudentNoteService.GetAllNotes(id);
             ViewBag.ShowActionButtons = false;
             await PrepareViewBag();
@@ -198,7 +198,7 @@ namespace Belletrix.Web.Controllers
             ViewBag.StudentId = id;
             await PrepareStudyAbroadDropDowns();
 
-            return PartialView(await StudyAbroadService.GetAll(id));
+            return PartialView(await StudyAbroadService.GetAllForStudent(id));
         }
 
         private async Task PrepareViewBag()

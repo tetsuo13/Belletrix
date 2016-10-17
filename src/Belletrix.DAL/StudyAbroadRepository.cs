@@ -23,111 +23,132 @@ namespace Belletrix.DAL
             UnitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<StudyAbroadViewModel>> GetAll(int? studentId = null)
+        private IEnumerable<StudyAbroadViewModel> ProcessRecords(IEnumerable<dynamic> rows)
         {
-            List<StudyAbroadViewModel> studyAbroad = new List<StudyAbroadViewModel>();
+            ICollection<StudyAbroadViewModel> studyAbroad = new List<StudyAbroadViewModel>();
 
-            string sql = @"
-                SELECT      a.[Id], a.[StudentId], [Semester],
-                            [Year], [StartDate], [EndDate],
-                            [CreditBearing], [Internship], [CountryId],
-                            a.[City], [ProgramId],
-                            [FirstName], [MiddleName], [LastName]
-                FROM        [dbo].[StudyAbroad] a
-                INNER JOIN  [dbo].[Students] s ON
-                            a.[StudentId] = s.[Id] ";
-
-            if (studentId.HasValue)
+            foreach (IDictionary<string, object> row in rows)
             {
-                sql += "WHERE a.[StudentId] = @StudentId ";
-            }
-
-            sql += "ORDER BY [Year] DESC, [Semester] DESC";
-
-            try
-            {
-                IEnumerable<dynamic> rows;
-
-                if (studentId.HasValue)
+                StudyAbroadViewModel study = new StudyAbroadViewModel()
                 {
-                    rows = await UnitOfWork.Context().QueryAsync<dynamic>(sql, new { StudentId = studentId.Value });
-                }
-                else
+                    Id = (int)row["Id"],
+                    StudentId = (int)row["StudentId"],
+                    Semester = (int)row["Semester"],
+                    Year = (int)row["Year"],
+                    CreditBearing = (bool)row["CreditBearing"],
+                    Internship = (bool)row["Internship"],
+                    CountryId = (int)row["CountryId"],
+                    ProgramId = (int)row["ProgramId"],
+                    City = row["City"] as string
+                };
+
+                if (row.ContainsKey("StartDate") && row["StartDate"] != null)
                 {
-                    rows = await UnitOfWork.Context().QueryAsync<dynamic>(sql);
+                    study.StartDate = DateTimeFilter.UtcToLocal((DateTime)row["StartDate"]);
                 }
 
-                foreach (IDictionary<string, object> row in rows)
+                if (row.ContainsKey("EndDate") && row["EndDate"] != null)
                 {
-                    StudyAbroadViewModel study = new StudyAbroadViewModel()
-                    {
-                        Id = (int)row["Id"],
-                        StudentId = (int)row["StudentId"],
-                        Semester = (int)row["Semester"],
-                        Year = (int)row["Year"],
-                        CreditBearing = (bool)row["CreditBearing"],
-                        Internship = (bool)row["Internship"],
-                        CountryId = (int)row["CountryId"],
-                        ProgramId = (int)row["ProgramId"],
-                        City = row["City"] as string
-                    };
-
-                    if (row.ContainsKey("StartDate") && row["StartDate"] != null)
-                    {
-                        study.StartDate = DateTimeFilter.UtcToLocal((DateTime)row["StartDate"]);
-                    }
-
-                    if (row.ContainsKey("EndDate") && row["EndDate"] != null)
-                    {
-                        study.EndDate = DateTimeFilter.UtcToLocal((DateTime)row["EndDate"]);
-                    }
-
-                    study.Student = new StudentModel()
-                    {
-                        FirstName = (string)row["FirstName"],
-                        MiddleName = row["MiddleName"] as string,
-                        LastName = (string)row["LastName"]
-                    };
-
-                    studyAbroad.Add(study);
+                    study.EndDate = DateTimeFilter.UtcToLocal((DateTime)row["EndDate"]);
                 }
 
-                studyAbroad = await PopulateProgramTypes(studyAbroad);
-            }
-            catch (Exception e)
-            {
-                e.Data["SQL"] = sql;
-                ErrorStore.LogException(e, HttpContext.Current);
-                throw e;
+                if (row.ContainsKey("ProgramTypeIds") && row["ProgramTypeIds"] != null)
+                {
+                    study.ProgramTypes = Array.ConvertAll(((string)row["ProgramTypeIds"]).Split(','), int.Parse);
+                }
+
+                study.Student = new StudentModel()
+                {
+                    FirstName = (string)row["FirstName"],
+                    MiddleName = row["MiddleName"] as string,
+                    LastName = (string)row["LastName"]
+                };
+
+                studyAbroad.Add(study);
             }
 
             return studyAbroad;
         }
 
-        private async Task<List<StudyAbroadViewModel>> PopulateProgramTypes(List<StudyAbroadViewModel> studyAbroad)
+        private string PrepareQuery(bool limitByStudentId, bool limitByStudyAbroadId)
         {
-            List<StudyAbroadViewModel> updated = new List<StudyAbroadViewModel>(studyAbroad);
-            const string sql = @"
-                SELECT  [ProgramTypeId]
-                FROM    [dbo].[StudyAbroadProgramTypes]
-                WHERE   [StudyAbroadId] = @StudyAbroadId";
+            string sql = @"
+                SELECT      a.[Id], a.[StudentId], [Semester],
+                            [Year], [StartDate], [EndDate],
+                            [CreditBearing], [Internship], [CountryId],
+                            a.[City], [ProgramId],
+                            (SELECT DISTINCT STUFF((SELECT ',' + CAST([ProgramTypeId] AS VARCHAR(3)) FROM [dbo].[StudyAbroadProgramTypes] WHERE [StudyAbroadId] = a.Id FOR XML PATH('')),1,1,'')) AS ProgramTypeIds,
+                            [FirstName], [MiddleName], [LastName]
+                FROM        [dbo].[StudyAbroad] a
+                INNER JOIN  [dbo].[Students] s ON
+                            a.[StudentId] = s.[Id] ";
+
+            if (limitByStudentId)
+            {
+                sql += "WHERE a.[StudentId] = @StudentId ";
+            }
+            else if (limitByStudyAbroadId)
+            {
+                sql += "WHERE a.[Id] = @StudyAbroadId ";
+            }
+
+            sql += "ORDER BY [Year] DESC, [Semester] DESC";
+
+            return sql;
+        }
+
+        public async Task<IEnumerable<StudyAbroadViewModel>> GetAll()
+        {
+            string sql = PrepareQuery(false, false);
 
             try
             {
-                for (int i = 0; i < updated.Count; i++)
-                {
-                    updated[i].ProgramTypes = await UnitOfWork.Context().QueryAsync<int>(sql,
-                        new { StudyAbroadId = updated[i].Id });
-                }
+                IEnumerable<dynamic> rows = await UnitOfWork.Context().QueryAsync<dynamic>(sql);
+                return ProcessRecords(rows);
             }
             catch (Exception e)
             {
                 e.Data["SQL"] = sql;
                 ErrorStore.LogException(e, HttpContext.Current);
-                throw e;
             }
 
-            return updated;
+            return Enumerable.Empty<StudyAbroadViewModel>();
+        }
+
+        public async Task<IEnumerable<StudyAbroadViewModel>> GetAllForStudent(int studentId)
+        {
+            string sql = PrepareQuery(true, false);
+
+            try
+            {
+                IEnumerable<dynamic> rows = await UnitOfWork.Context().QueryAsync<dynamic>(sql, new { StudentId = studentId });
+                return ProcessRecords(rows);
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
+            }
+
+            return Enumerable.Empty<StudyAbroadViewModel>();
+        }
+
+        public async Task<StudyAbroadViewModel> GetById(int studyAbroadId)
+        {
+            string sql = PrepareQuery(false, true);
+
+            try
+            {
+                IEnumerable<dynamic> rows = await UnitOfWork.Context().QueryAsync<dynamic>(sql, new { StudyAbroadId = studyAbroadId });
+                return ProcessRecords(rows).FirstOrDefault();
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
+            }
+
+            return null;
         }
 
         private void AddParameter(ref Dictionary<string, string> columns, ref List<SqlParameter> parameters,
@@ -171,9 +192,11 @@ namespace Belletrix.DAL
                 model.EndDate = model.EndDate.Value.ToUniversalTime();
             }
 
+            int studyAbroadId;
+
             try
             {
-                int studyAbroadId = (await UnitOfWork.Context().QueryAsync<int>(sql,
+                studyAbroadId = (await UnitOfWork.Context().QueryAsync<int>(sql,
                     new
                     {
                         StudentId = model.StudentId,
@@ -187,40 +210,67 @@ namespace Belletrix.DAL
                         EndDate = model.EndDate,
                         City = model.City
                     })).Single();
-
-                if (model.ProgramTypes != null && model.ProgramTypes.Any())
-                {
-                    const string insertSql = @"
-                        INSERT INTO [dbo].[StudyAbroadProgramTypes]
-                        ([StudyAbroadId], [ProgramTypeId])
-                        VALUES
-                        (@StudyAbroadId, @ProgramTypeId)";
-
-                    try
-                    {
-                        foreach (int programTypeId in model.ProgramTypes)
-                        {
-                            await UnitOfWork.Context().ExecuteAsync(insertSql,
-                                new
-                                {
-                                    StudyAbroadId = studyAbroadId,
-                                    ProgramTypeId = programTypeId
-                                });
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        e.Data["SQL"] = insertSql.ToString();
-                        ErrorStore.LogException(e, HttpContext.Current);
-                        throw e;
-                    }
-                }
             }
             catch (Exception e)
             {
-                e.Data["SQL"] = sql.ToString();
+                e.Data["SQL"] = sql;
                 ErrorStore.LogException(e, HttpContext.Current);
                 throw e;
+            }
+
+            try
+            {
+                await ReplaceProgramTypes(studyAbroadId, model.ProgramTypes);
+            }
+            catch (Exception)
+            {
+                // Caught and logged already.
+            }
+        }
+
+        private async Task ReplaceProgramTypes(int studyAbroadId, IEnumerable<int> programTypes)
+        {
+            string sql = @"
+                DELETE  FROM [dbo].[StudyAbroadProgramTypes]
+                WHERE   [StudyAbroadId] = @StudyAbroadId";
+
+            try
+            {
+                await UnitOfWork.Context().ExecuteAsync(sql, new { StudyAbroadId = studyAbroadId });
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
+                throw e;
+            }
+
+            if (programTypes != null && programTypes.Any())
+            {
+                sql = @"
+                    INSERT INTO [dbo].[StudyAbroadProgramTypes]
+                    ([StudyAbroadId], [ProgramTypeId])
+                    VALUES
+                    (@StudyAbroadId, @ProgramTypeId)";
+
+                try
+                {
+                    foreach (int programTypeId in programTypes)
+                    {
+                        await UnitOfWork.Context().ExecuteAsync(sql,
+                            new
+                            {
+                                StudyAbroadId = studyAbroadId,
+                                ProgramTypeId = programTypeId
+                            });
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.Data["SQL"] = sql;
+                    ErrorStore.LogException(e, HttpContext.Current);
+                    throw e;
+                }
             }
         }
 
@@ -242,12 +292,40 @@ namespace Belletrix.DAL
                 return false;
             }
 
+            try
+            {
+                await ReplaceProgramTypes(id, null);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
             return rowsDeleted == 1;
         }
 
         public async Task<bool> DeleteStudent(int id)
         {
-            const string sql = @"
+            string sql = @"
+                DELETE FROM [dbo].[StudyAbroadProgramTypes]
+                WHERE       [StudyAbroadId] IN (
+                                SELECT  [Id]
+                                FROM    [StudyAbroad]
+                                WHERE   [StudentId] = @StudentId
+                            )";
+
+            try
+            {
+                await UnitOfWork.Context().ExecuteAsync(sql, new { StudentId = id });
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
+                return false;
+            }
+
+            sql = @"
                 DELETE FROM [dbo].[StudyAbroad]
                 WHERE   [StudentId] = @Id";
 
@@ -263,6 +341,46 @@ namespace Belletrix.DAL
             }
 
             return true;
+        }
+
+        public async Task Update(EditStudyAbroadViewModel model)
+        {
+            const string sql = @"
+                UPDATE  [dbo].[StudyAbroad]
+                SET     [StudentId] = @StudentId,
+                        [Semester] = @Semester,
+                        [Year] = @Year,
+                        [StartDate] = @StartDate,
+                        [EndDate] = @EndDate,
+                        [CreditBearing] = @CreditBearing,
+                        [Internship] = @Internship,
+                        [CountryId] = @CountryId,
+                        [City] = @City,
+                        [ProgramId] = @ProgramId
+                WHERE   Id = @Id";
+
+            try
+            {
+                if (model.StartDate.HasValue)
+                {
+                    model.StartDate = model.StartDate.Value.ToUniversalTime();
+                }
+
+                if (model.EndDate.HasValue)
+                {
+                    model.EndDate = model.EndDate.Value.ToUniversalTime();
+                }
+
+                await UnitOfWork.Context().ExecuteAsync(sql, model);
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
+                throw e;
+            }
+
+            await ReplaceProgramTypes(model.Id, model.ProgramTypes);
         }
     }
 }

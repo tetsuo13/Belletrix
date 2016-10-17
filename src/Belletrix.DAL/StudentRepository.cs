@@ -321,7 +321,7 @@ namespace Belletrix.DAL
                 ErrorStore.LogException(e, HttpContext.Current);
             }
 
-            return new List<ProgramTypeModel>();
+            return Enumerable.Empty<ProgramTypeModel>();
         }
 
         public async Task<int> InsertStudent(object model)

@@ -1,0 +1,111 @@
+﻿@using Belletrix.Entity.ViewModel;
+
+@model AddStudyAbroadViewModel
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Destination</h3>
+            </div>
+
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-6">
+                        @Html.LabelFor(x => x.CountryId)
+                        @Html.DropDownListFor(x => x.CountryId, ViewBag.Countries as SelectList, "Please Select", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(x => x.CountryId)
+                    </div>
+                    <div class="col-lg-6">
+                        @Html.LabelFor(x => x.City) <i>(Optional)</i>
+                        @Html.TextBoxFor(x => x.City, new { @class = "form-control " })
+                        @Html.ValidationMessageFor(x => x.City)
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        @Html.LabelFor(x => x.Year)
+                        @Html.DropDownListFor(x => x.Year, ViewBag.Years as SelectList, "Please Select", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(x => x.Year)
+                    </div>
+                    <div class="col-lg-6">
+                        @Html.LabelFor(x => x.Semester)
+                        @Html.DropDownListFor(x => x.Semester, new SelectList(ViewBag.Semesters, "Id", "Name"), "Please Select", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(x => x.Semester)
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        @Html.LabelFor(x => x.StartDate) <i>(Optional)</i>
+                        @Html.TextBoxFor(x => x.StartDate, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(x => x.StartDate)
+                    </div>
+                    <div class="col-lg-6">
+                        @Html.LabelFor(x => x.EndDate) <i>(Optional)</i>
+                        @Html.TextBoxFor(x => x.EndDate, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(x => x.EndDate)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Details</h3>
+            </div>
+
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.CreditBearing)
+                            @Html.DropDownListFor(x => x.CreditBearing, new SelectList(
+                                new[]
+                                {
+                                    new { Value = false, Text = "No" },
+                                    new { Value = true, Text = "Yes" }
+                                },
+                                "Value",
+                                "Text",
+                                Model), "Please Select", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(x => x.CreditBearing)
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.Internship)
+                            @Html.DropDownListFor(x => x.Internship, new SelectList(
+                                new[]
+                                {
+                                    new { Value = false, Text = "No" },
+                                    new { Value = true, Text = "Yes" }
+                                },
+                                "Value",
+                                "Text",
+                                Model), "Please Select", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(x => x.Internship)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        @Html.LabelFor(x => x.ProgramId)
+                        @Html.DropDownListFor(x => x.ProgramId, ViewBag.Programs as SelectList, "Please Select", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(x => x.ProgramId)
+                    </div>
+                    <div class="col-lg-6">
+                        <pre>@string.Join(", ", Model.ProgramTypes)</pre>
+                        @Html.LabelFor(x => x.ProgramTypes)
+                        @Html.ListBoxFor(x => x.ProgramTypes, new MultiSelectList(ViewBag.ProgramTypes, "Id", "Name"), new { @class = "multiselect", multiple = "multiple" })
+                        @Html.ValidationMessageFor(x => x.ProgramTypes)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

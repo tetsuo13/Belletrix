@@ -3,7 +3,7 @@
 
 module Belletrix {
     export class StudyAbroad {
-        public initAdd(): void {
+        public initAddEdit(): void {
             Belletrix.Common.handleMvcEditor();
             Belletrix.Common.initMultiselect(1);
 

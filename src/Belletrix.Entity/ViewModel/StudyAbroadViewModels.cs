@@ -69,4 +69,29 @@ namespace Belletrix.Entity.ViewModel
         public int ProgramId { get; set; }
         public IEnumerable<int> ProgramTypes { get; set; }
     }
+
+    public class EditStudyAbroadViewModel : AddStudyAbroadViewModel
+    {
+        [Required]
+        public int Id { get; set; }
+
+        public static explicit operator EditStudyAbroadViewModel(StudyAbroadViewModel a)
+        {
+            return new EditStudyAbroadViewModel()
+            {
+                Id = a.Id,
+                StudentId = a.StudentId,
+                Semester = a.Semester,
+                Year = a.Year,
+                StartDate = a.StartDate,
+                EndDate = a.EndDate,
+                CreditBearing = a.CreditBearing,
+                Internship = a.Internship,
+                CountryId = a.CountryId,
+                City = a.City,
+                ProgramId = a.ProgramId,
+                ProgramTypes = a.ProgramTypes
+            };
+        }
+    }
 }
