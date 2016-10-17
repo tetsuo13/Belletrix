@@ -99,7 +99,6 @@
                         @Html.ValidationMessageFor(x => x.ProgramId)
                     </div>
                     <div class="col-lg-6">
-                        <pre>@string.Join(", ", Model.ProgramTypes)</pre>
                         @Html.LabelFor(x => x.ProgramTypes)
                         @Html.ListBoxFor(x => x.ProgramTypes, new MultiSelectList(ViewBag.ProgramTypes, "Id", "Name"), new { @class = "multiselect", multiple = "multiple" })
                         @Html.ValidationMessageFor(x => x.ProgramTypes)
