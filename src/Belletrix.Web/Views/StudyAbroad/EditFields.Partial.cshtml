@@ -100,7 +100,7 @@
                     </div>
                     <div class="col-lg-6">
                         @Html.LabelFor(x => x.ProgramTypes)
-                        @Html.ListBoxFor(x => x.ProgramTypes, new MultiSelectList(ViewBag.ProgramTypes, "Id", "Name"), new { @class = "multiselect", multiple = "multiple" })
+                        @Html.ListBoxFor(x => x.ProgramTypes, new MultiSelectList(ViewBag.ProgramTypeNames, "Id", "Name"), new { @class = "multiselect", multiple = "multiple" })
                         @Html.ValidationMessageFor(x => x.ProgramTypes)
                     </div>
                 </div>

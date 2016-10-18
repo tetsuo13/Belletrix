@@ -91,7 +91,7 @@ namespace Belletrix.Web.Controllers
             ViewBag.Semesters = StudentService.GetStudyAbroadWishlistPeriods();
             ViewBag.Countries = new SelectList(await StudentService.GetCountries(), "Id", "Name");
             ViewBag.Programs = new SelectList(await StudentService.GetPrograms(), "Id", "Name");
-            ViewBag.ProgramTypes = await StudentService.GetProgramTypes();
+            ViewBag.ProgramTypeNames = await StudentService.GetProgramTypes();
         }
 
         [HttpDelete]
