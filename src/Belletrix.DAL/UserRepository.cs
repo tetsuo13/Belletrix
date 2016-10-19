@@ -51,7 +51,6 @@ namespace Belletrix.DAL
                 SELECT  [Id], [FirstName], [LastName],
                         [Created], [LastLogin], [Email],
                         [Admin] AS IsAdmin, [Active] AS IsActive, [Login],
-                        [PasswordIterations], [PasswordSalt], [PasswordHash],
                         [Password]
                 FROM    [dbo].[Users] ";
 
@@ -113,9 +112,6 @@ namespace Belletrix.DAL
                 SET     [FirstName] = @FirstName,
                         [LastName] = @LastName,
                         [Email] = @Email,
-                        [PasswordIterations] = 0,
-                        [PasswordSalt] = '',
-                        [PasswordHash] = '',
                         [Password] = @Password,
                         [Admin] = @Admin,
                         [Active] = @Active
@@ -129,7 +125,7 @@ namespace Belletrix.DAL
                         FirstName = model.FirstName.Trim(),
                         LastName = model.LastName.Trim(),
                         Email = model.Email.Trim(),
-                        Password = model.PasswordHash,
+                        Password = model.Password,
                         Admin = model.IsAdmin,
                         Active = model.IsActive,
                         Id = model.Id
@@ -150,13 +146,13 @@ namespace Belletrix.DAL
                 (
                     [FirstName], [LastName], [Login],
                     [Created], [Email], [Admin], [Active],
-                    [PasswordIterations], [PasswordSalt], [PasswordHash], [Password]
+                    [Password]
                 )
                 VALUES
                 (
                     @FirstName, @LastName, @Login,
                     @Created, @Email, @Admin, @Active,
-                    0, '', '', @Password
+                    @Password
                 )";
 
             try
@@ -171,7 +167,7 @@ namespace Belletrix.DAL
                         Email = model.Email.Trim().ToLower(),
                         Admin = model.IsAdmin,
                         Active = model.IsActive,
-                        Password = model.PasswordHash
+                        Password = model.Password
                     });
             }
             catch (Exception e)

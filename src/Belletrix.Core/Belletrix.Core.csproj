@@ -68,7 +68,6 @@
     <Compile Include="Formatter.cs" />
     <Compile Include="ICacheService.cs" />
     <Compile Include="IDebuggingService.cs" />
-    <Compile Include="PasswordHash.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

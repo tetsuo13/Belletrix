@@ -490,10 +490,7 @@ CREATE TABLE [dbo].[Users] (
     [FirstName]             [nvarchar](64) NOT NULL,
     [LastName]              [nvarchar](64) NOT NULL,
     [Login]                 [varchar](24) NOT NULL,
-    [PasswordIterations]    [int] NOT NULL,
-    [PasswordSalt]          [char](32) NOT NULL,
-    [PasswordHash]          [char](32) NOT NULL,
-    [Password]              [varchar](160),
+    [Password]              [varchar](160) NOT NULL,
     [Created]               [datetime] NOT NULL,
     [LastLogin]             [datetime],
     [Email]                 [varchar](128) NOT NULL,
@@ -506,9 +503,9 @@ CREATE TABLE [dbo].[Users] (
 
 -- Password is the same as the login.
 INSERT INTO [dbo].[Users]
-([FirstName], [LastName], [Login], [PasswordIterations], [PasswordSalt], [PasswordHash], [Created], [Email], [Admin])
+([FirstName], [LastName], [Login], [Password], [Created], [Email], [Admin])
 VALUES
-(N'Andrei', N'Nicholson', 'anicholson', 1000, 'og85e2R6TvXl+8SuOqv3EWTc7eWX3aje', 'RzfdfsXpQQTg1E+n3wnLMEZbjJoEkqEf', GETUTCDATE(), 'contact@andreinicholson.com', 1);
+(N'Andrei', N'Nicholson', 'anicholson', 'ABRELpYv0o9L+GMhtXd+Vd0jf2KceFc+XYb9vGFb2Riuqvb6UcnFu3ibwUWprGRdJw==', GETUTCDATE(), 'contact@andreinicholson.com', 1);
 
 
 -- Promotional users attached to student entries.

@@ -68,7 +68,6 @@
     <Compile Include="ViewModel\EditUserViewModel.cs" />
     <Compile Include="ViewModel\GenericResult.cs" />
     <Compile Include="ViewModel\LoginViewModel.cs" />
-    <Compile Include="ViewModel\MigratePasswordViewModel.cs" />
     <Compile Include="ViewModel\PromoViewModels.cs" />
     <Compile Include="ViewModel\StudentNotesViewModels.cs" />
     <Compile Include="ViewModel\StudentSearchViewModel.cs" />

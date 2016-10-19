@@ -39,36 +39,24 @@ namespace Belletrix.Web.Controllers
                 {
                     UserModel user = await UserService.GetUser(model.UserName);
 
-                    if (user != null && user.IsActive)
+                    if (user != null &&
+                        user.IsActive &&
+                        new PasswordHasher().VerifyHashedPassword(user.Password, model.Password) != PasswordVerificationResult.Failed)
                     {
-                        // Column for hash is a CHAR so even if the user has
-                        // migrated they'll have spaces.
-                        if (!string.IsNullOrWhiteSpace(user.PasswordHash))
+                        await UserService.UpdateLastLogin(model.UserName);
+                        FormsAuthentication.SetAuthCookie(model.UserName, true);
+                        Session["User"] = await UserService.GetUser(model.UserName);
+
+                        if (Url.IsLocalUrl(returnUrl) &&
+                            returnUrl.Length > 1 &&
+                            returnUrl.StartsWith("/") &&
+                            !returnUrl.StartsWith("//") &&
+                            !returnUrl.StartsWith("/\\"))
                         {
-                            string correctHash = user.PasswordIterations + ":" + user.PasswordSalt + ":" + user.PasswordHash;
-
-                            if (PasswordHash.ValidatePassword(model.Password, correctHash))
-                            {
-                                return RedirectToAction("MigratePassword", new { id = user.Id });
-                            }
+                            return Redirect(returnUrl);
                         }
-                        else if (new PasswordHasher().VerifyHashedPassword(user.Password, model.Password) != PasswordVerificationResult.Failed)
-                        {
-                            await UserService.UpdateLastLogin(model.UserName);
-                            FormsAuthentication.SetAuthCookie(model.UserName, true);
-                            Session["User"] = await UserService.GetUser(model.UserName);
 
-                            if (Url.IsLocalUrl(returnUrl) &&
-                                returnUrl.Length > 1 &&
-                                returnUrl.StartsWith("/") &&
-                                !returnUrl.StartsWith("//") &&
-                                !returnUrl.StartsWith("/\\"))
-                            {
-                                return Redirect(returnUrl);
-                            }
-
-                            return RedirectToAction("Index", "Home");
-                        }
+                        return RedirectToAction("Index", "Home");
                     }
                 }
                 catch (Exception e)
@@ -80,43 +68,6 @@ namespace Belletrix.Web.Controllers
 
             Analytics.TrackPageView(Request, "Belletrix", null);
             ModelState.AddModelError("", mainError);
-            return View(model);
-        }
-
-        public ActionResult MigratePassword(int id)
-        {
-            return View(new MigratePasswordViewModel { Id = id });
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> MigratePassword(MigratePasswordViewModel model)
-        {
-            string errorMessage = "There was a problem migrating";
-
-            if (ModelState.IsValid)
-            {
-                UserModel user = await UserService.GetUser(model.Id);
-
-                if (user.IsActive)
-                {
-                    string correctHash = user.PasswordIterations + ":" + user.PasswordSalt + ":" + user.Password;
-
-                    if (!PasswordHash.ValidatePassword(model.CurrentPassword, correctHash))
-                    {
-                        errorMessage = "Current password is incorrect";
-                    }
-                    else
-                    {
-                        user.PasswordHash = new PasswordHasher().HashPassword(model.NewPassword);
-                        await UserService.Update(user);
-                        return RedirectToAction("Index");
-                    }
-                }
-            }
-
-            Analytics.TrackPageView(Request, "Belletrix", null);
-            ModelState.AddModelError("", errorMessage);
             return View(model);
         }
     }

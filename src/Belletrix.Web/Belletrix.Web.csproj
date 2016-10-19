@@ -290,7 +290,6 @@
     <Content Include="Views\ActivityLog\EditFieldsPartial.cshtml" />
     <Content Include="Views\ActivityLogPerson\AddPerson.cshtml" />
     <Content Include="Views\Home\Sitemap.cshtml" />
-    <Content Include="Views\Login\MigratePassword.cshtml" />
     <Content Include="Views\User\Add.cshtml" />
     <Content Include="Views\User\Edit.cshtml" />
     <Content Include="Views\Promo\NameCheck.cshtml" />

@@ -63,7 +63,7 @@ namespace Belletrix.Web.Controllers
                 {
                     FirstName = model.FirstName,
                     LastName = model.LastName,
-                    PasswordHash = new PasswordHasher().HashPassword(model.Password),
+                    Password = new PasswordHasher().HashPassword(model.Password),
                     Email = model.Email,
                     Login = model.Login,
                     IsAdmin = model.IsAdmin,
@@ -139,7 +139,7 @@ namespace Belletrix.Web.Controllers
 
                     if (!string.IsNullOrWhiteSpace(model.Password))
                     {
-                        user.PasswordHash = new PasswordHasher().HashPassword(model.Password);
+                        user.Password = new PasswordHasher().HashPassword(model.Password);
                     }
 
                     await UserService.Update(user);
