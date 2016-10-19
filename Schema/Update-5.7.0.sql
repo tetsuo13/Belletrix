@@ -1,5 +1,3 @@
-USE [Belletrix];
-
 -- Update country codes to ISO 3166-1 alpha-2.
 
 -- Prefix some which are not part of the ISO.
