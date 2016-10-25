@@ -28,9 +28,10 @@ namespace Belletrix.Web.Controllers
         /// session.
         /// </summary>
         /// <param name="guid">Current session ID.</param>
-        public void StartSession(Guid guid)
+        public JsonResult StartSession(Guid guid)
         {
             ActivityService.StartSession(Session, guid);
+            return Json(new { }, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -40,9 +41,10 @@ namespace Belletrix.Web.Controllers
         /// <param name="guid">Current session ID.</param>
         /// <param name="activityId">Existing activity ID.</param>
         /// <returns>Nothing</returns>
-        public async Task PopuplateSession(Guid guid, int activityId)
+        public async Task<JsonResult> PopuplateSession(Guid guid, int activityId)
         {
             await ActivityService.PopulateSession(Session, guid, activityId);
+            return Json(new { }, JsonRequestBehavior.AllowGet);
         }
 
         public async Task<PartialViewResult> AddPerson(Guid guid)
