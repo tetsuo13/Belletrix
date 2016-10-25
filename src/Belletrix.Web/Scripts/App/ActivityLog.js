@@ -58,33 +58,35 @@ var Belletrix;
          * @param participantsUrl URL to fetch existing participants.
          */
         ActivityLog.prototype.initSession = function (startSessionUrl, populateSessionUrl, participantsUrl) {
+            var self = this;
             $.ajax({
                 url: startSessionUrl,
-                cache: false
-            });
-            if (populateSessionUrl) {
-                var self_1 = this;
-                // TODO: Could these actions someday be consolidated into one server-side action perhaps? Hmmm...
-                // Get the server-side to populate session.
-                $.ajax({
-                    url: populateSessionUrl,
-                    cache: false,
-                    success: function () {
-                        // Then retrieve participants from session to populate
-                        // form.
+                cache: false,
+                success: function () {
+                    if (populateSessionUrl) {
+                        // TODO: Could these actions someday be consolidated into one server-side action perhaps? Hmmm...
+                        // Get the server-side to populate session.
                         $.ajax({
-                            dataType: "json",
-                            url: participantsUrl,
+                            url: populateSessionUrl,
                             cache: false,
-                            success: function (data) {
-                                $.each(data, function (index, value) {
-                                    self_1.addParticipantRow(value.Person.FullName, value.Person.Id);
+                            success: function () {
+                                // Then retrieve participants from session to
+                                // populate form.
+                                $.ajax({
+                                    dataType: "json",
+                                    url: participantsUrl,
+                                    cache: false,
+                                    success: function (data) {
+                                        $.each(data, function (i, value) {
+                                            self.addParticipantRow(value.Person.FullName, value.Person.Id);
+                                        });
+                                    }
                                 });
                             }
                         });
                     }
-                });
-            }
+                }
+            });
         };
         ;
         /**
@@ -103,7 +105,7 @@ var Belletrix;
             // The modal dialog will only show the existing people fields if
             // there are existing people to begin with.
             if (personSelect.length) {
-                var self_2 = this;
+                var self_1 = this;
                 submitButton.click(function (event) {
                     event.preventDefault();
                     $.ajax({
@@ -112,7 +114,7 @@ var Belletrix;
                         data: {
                             id: personSelect.val(),
                             type: typeSelect.val(),
-                            sessionId: self_2._sessionId
+                            sessionId: self_1._sessionId
                         },
                         success: function (result) {
                             if (!result.hasOwnProperty("Success") ||
@@ -120,7 +122,7 @@ var Belletrix;
                                 Belletrix.Common.errorMessage("Unexpected result. Try again?\n" + result);
                             }
                             else if (result.Success === true) {
-                                self_2.addParticipantRow($("option:selected", personSelect).text(), personSelect.val());
+                                self_1.addParticipantRow($("option:selected", personSelect).text(), personSelect.val());
                                 modalDialog.modal("hide");
                             }
                             else {
@@ -231,4 +233,3 @@ var Belletrix;
     }());
     Belletrix.ActivityLog = ActivityLog;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=ActivityLog.js.map

@@ -68,35 +68,37 @@
          * @param participantsUrl URL to fetch existing participants.
          */
         public initSession(startSessionUrl: string, populateSessionUrl?: string, participantsUrl?: string): void {
+            let self = this;
+
             $.ajax({
                 url: startSessionUrl,
-                cache: false
-            });
+                cache: false,
+                success: function (): void {
+                    if (populateSessionUrl) {
+                        // TODO: Could these actions someday be consolidated into one server-side action perhaps? Hmmm...
 
-            if (populateSessionUrl) {
-                let self = this;
-                // TODO: Could these actions someday be consolidated into one server-side action perhaps? Hmmm...
-
-                // Get the server-side to populate session.
-                $.ajax({
-                    url: populateSessionUrl,
-                    cache: false,
-                    success: function () {
-                        // Then retrieve participants from session to populate
-                        // form.
+                        // Get the server-side to populate session.
                         $.ajax({
-                            dataType: "json",
-                            url: participantsUrl,
+                            url: populateSessionUrl,
                             cache: false,
-                            success: function (data): void {
-                                $.each(data, function (index, value): void {
-                                    self.addParticipantRow(value.Person.FullName, value.Person.Id);
+                            success: function (): void {
+                                // Then retrieve participants from session to
+                                // populate form.
+                                $.ajax({
+                                    dataType: "json",
+                                    url: participantsUrl,
+                                    cache: false,
+                                    success: function (data): void {
+                                        $.each(data, function (i, value): void {
+                                            self.addParticipantRow(value.Person.FullName, value.Person.Id);
+                                        });
+                                    }
                                 });
                             }
                         });
                     }
-                });
-            }
+                }
+            });
         };
 
         /**
