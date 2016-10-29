@@ -60,14 +60,14 @@ var Belletrix;
                                 });
                                 studyAbroadTable.DataTable({
                                     columns: [
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
+                                        undefined,
+                                        undefined,
+                                        undefined,
+                                        undefined,
+                                        undefined,
+                                        undefined,
+                                        undefined,
+                                        undefined,
                                         { orderable: false }
                                     ]
                                 });
@@ -173,7 +173,7 @@ var Belletrix;
             var anchor;
             $.each(destinationFieldNames, function (idName, values) {
                 var firstSelect = $("select#" + idName);
-                var newSelect = firstSelect.clone().removeAttr('id');
+                var newSelect = firstSelect.clone().removeAttr("id");
                 // Get rid of the selected value cloned over.
                 $("option", newSelect).prop("selected", false);
                 if (selIndex) {

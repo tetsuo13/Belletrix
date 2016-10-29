@@ -60,14 +60,14 @@
 
                                 studyAbroadTable.DataTable({
                                     columns: [
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
+                                        undefined,
+                                        undefined,
+                                        undefined,
+                                        undefined,
+                                        undefined,
+                                        undefined,
+                                        undefined,
+                                        undefined,
                                         { orderable: false }
                                     ]
                                 });
@@ -187,7 +187,7 @@
 
             $.each(destinationFieldNames, function (idName, values): void {
                 let firstSelect: JQuery = $("select#" + idName);
-                let newSelect: JQuery = firstSelect.clone().removeAttr('id');
+                let newSelect: JQuery = firstSelect.clone().removeAttr("id");
 
                 // Get rid of the selected value cloned over.
                 $("option", newSelect).prop("selected", false);

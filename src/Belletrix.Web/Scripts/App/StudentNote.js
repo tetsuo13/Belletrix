@@ -38,9 +38,9 @@ var Belletrix;
                     var anchor = $('<a href="#" class="list-group-item"></a>');
                     var listGroup = $('<div class="list-group"></div>');
                     var paraNote = $('<p class="list-group-item-text"></p>');
-                    var name = Belletrix.Common.UserFirstName + ' ' + Belletrix.Common.UserLastName;
+                    var name = Belletrix.Common.UserFirstName + " " + Belletrix.Common.UserLastName;
                     paraNote.text(noteValue);
-                    anchor.append('<h4 class="list-group-item-heading">' + name + '</h4>');
+                    anchor.append('<h4 class="list-group-item-heading">' + name + "</h4>");
                     anchor.append(paraNote);
                     listGroup.append(anchor);
                     listGroup

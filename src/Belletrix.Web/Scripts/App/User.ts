@@ -11,7 +11,7 @@ module Belletrix {
          */
         public initUserList(tableSelector: string, deleteUrl: string, dataString: string): void {
             $("button.user-list-delete").click(function (event: JQueryEventObject): void {
-                let userId: number = parseInt($(this).data(dataString));
+                const userId: number = parseInt($(this).data(dataString));
 
                 bootbox.confirm({
                     size: "small",
@@ -28,10 +28,10 @@ module Belletrix {
 
             $(tableSelector).DataTable({
                 columns: [
-                    null,
-                    null,
-                    null,
-                    null,
+                    undefined,
+                    undefined,
+                    undefined,
+                    undefined,
                     { orderable: false },
                     { orderable: false }
                 ]

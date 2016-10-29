@@ -8,7 +8,7 @@ var Belletrix;
         StudyAbroad.prototype.initAddEdit = function () {
             Belletrix.Common.handleMvcEditor();
             Belletrix.Common.initMultiselect(1);
-            $('#StartDate, #EndDate').datepicker();
+            $("#StartDate, #EndDate").datepicker();
         };
         StudyAbroad.prototype.bindDelete = function (deleteUrl, dataString) {
             $("button.studyabroad-list-delete").click(function (event) {

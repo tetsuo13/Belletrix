@@ -22,8 +22,8 @@ module Belletrix {
                             title: "Notes for " + studentFullName
                         });
 
-                        noteModal.on("shown.bs.modal", function () {
-                            $("#newnotebutton").click(function () {
+                        noteModal.on("shown.bs.modal", function (): void {
+                            $("#newnotebutton").click(function (): void {
                                 $("#newnote").submit();
                             });
 
@@ -44,15 +44,15 @@ module Belletrix {
 
                 $.post($(this).attr("action"),
                     $(formSelector).serialize(),
-                    function () {
+                    function (): void {
                         let anchor: JQuery = $('<a href="#" class="list-group-item"></a>');
                         let listGroup: JQuery = $('<div class="list-group"></div>');
                         let paraNote: JQuery = $('<p class="list-group-item-text"></p>');
-                        let name: string = Belletrix.Common.UserFirstName + ' ' + Belletrix.Common.UserLastName;
+                        let name: string = Belletrix.Common.UserFirstName + " " + Belletrix.Common.UserLastName;
 
                         paraNote.text(noteValue);
 
-                        anchor.append('<h4 class="list-group-item-heading">' + name + '</h4>');
+                        anchor.append('<h4 class="list-group-item-heading">' + name + "</h4>");
                         anchor.append(paraNote);
 
                         listGroup.append(anchor);

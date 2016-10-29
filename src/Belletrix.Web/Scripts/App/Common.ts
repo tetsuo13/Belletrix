@@ -8,7 +8,7 @@ module Belletrix {
      */
     export class Common {
         /** Number of milliseconds between pinging the server. */
-        private static _idleKillerInterval: number = 1000 * 60 * 10;
+        private static idleKillerInterval: number = 1000 * 60 * 10;
 
         public static UserFirstName: string;
         public static UserLastName: string;
@@ -17,7 +17,7 @@ module Belletrix {
          * Disable the form submit button after clicking it.
          */
         public static singleSubmit(): void {
-            $("form").submit(function () {
+            $("form").submit(function (): void {
                 // We're going to disable all submit buttons unless otherwise
                 // told to.
                 let disableButtons: boolean = true;
@@ -75,7 +75,7 @@ module Belletrix {
                     cache: false,
                     type: "GET"
                 });
-            }, this._idleKillerInterval);
+            }, this.idleKillerInterval);
         }
 
         /**
@@ -87,7 +87,7 @@ module Belletrix {
             let options: any = {
                 numberDisplayed: numberToDisplay,
                 buttonContainer: '<div class="button-default" />',
-                maxHeight: null
+                maxHeight: undefined
             }
 
             if (maxHeight) {

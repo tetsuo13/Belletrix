@@ -1,12 +1,12 @@
 ﻿module Belletrix {
     export class ActivityLog {
         /** Selector for panel that contains each each participant line item. */
-        private _participantsPanelSelector: string = "#participants-panel";
+        private participantsPanelSelector: string = "#participants-panel";
 
-        private _participantModalSelector: string = "#personModal .modal-content";
+        private participantModalSelector: string = "#personModal .modal-content";
 
         /** Selectors for the existing person "form." */
-        private _existingPersonSelectors = {
+        private existingPersonSelectors = {
             /// <field type="String">Person selectlist.</field>
             PersonSelectList: "#existingpersonselect",
 
@@ -18,10 +18,10 @@
         };
 
         /** URL to call to remove existing participant from session. */
-        private _removeExistingPersonIdUrl: string = "";
+        private removeExistingPersonIdUrl: string = "";
 
         /** Current session ID. **/
-        private _sessionId: string = "";
+        private sessionId: string = "";
 
         /**
          * Activity log add/edit initialize routine.
@@ -31,8 +31,8 @@
          * @param sessionId Current activity session ID.
          */
         constructor(addPersonUrl: string, addPersonIdUrl: string, removePersonIdUrl: string, sessionId: string) {
-            this._removeExistingPersonIdUrl = removePersonIdUrl;
-            this._sessionId = sessionId;
+            this.removeExistingPersonIdUrl = removePersonIdUrl;
+            this.sessionId = sessionId;
 
             let self = this;
 
@@ -40,7 +40,7 @@
             $("#StartDate, #EndDate").datepicker();
             Belletrix.Common.initMultiselect(1);
 
-            $("#addPersonButton").click(function () {
+            $("#addPersonButton").click(function (): void {
                 $.ajax({
                     url: addPersonUrl,
                     success: function (data) {
@@ -51,7 +51,7 @@
                             title: "Create New Person"
                         });
 
-                        addPersonModal.on('shown.bs.modal', function () {
+                        addPersonModal.on("shown.bs.modal", function (): void {
                             self.bindParticipantForm(addPersonModal);
                             self.bindExistingParticipantForm(addPersonModal, addPersonIdUrl);
                             $("#FullName").focus();
@@ -111,9 +111,9 @@
          * @param addPersonIdUrl URL to submit existing select person to.
          */
         private bindExistingParticipantForm(modalDialog: JQuery, addPersonIdUrl: string): void {
-            let personSelect: JQuery = $(this._existingPersonSelectors.PersonSelectList);
-            let typeSelect: JQuery = $(this._existingPersonSelectors.TypeSelectList);
-            let submitButton: JQuery = $(this._existingPersonSelectors.SubmitButton);
+            let personSelect: JQuery = $(this.existingPersonSelectors.PersonSelectList);
+            let typeSelect: JQuery = $(this.existingPersonSelectors.TypeSelectList);
+            let submitButton: JQuery = $(this.existingPersonSelectors.SubmitButton);
 
             // The modal dialog will only show the existing people fields if
             // there are existing people to begin with.
@@ -129,7 +129,7 @@
                         data: {
                             id: personSelect.val(),
                             type: typeSelect.val(),
-                            sessionId: self._sessionId
+                            sessionId: self.sessionId
                         },
                         success: function (result: any): void {
                             if (!result.hasOwnProperty("Success") ||
@@ -207,11 +207,11 @@
             let self = this;
 
             $.ajax({
-                url: self._removeExistingPersonIdUrl,
+                url: self.removeExistingPersonIdUrl,
                 type: "DELETE",
                 data: {
                     id: id,
-                    sessionId: self._sessionId
+                    sessionId: self.sessionId
                 },
                 success: function (result: any): void {
                     if (!result.hasOwnProperty("Success") ||
@@ -248,7 +248,7 @@
                 self.deleteParticipant(id);
             });
 
-            row.append('<div class="col-lg-10"><div class="form-group">' + fullName + '</div></div>');
+            row.append('<div class="col-lg-10"><div class="form-group">' + fullName + "</div></div>");
 
             actionColumn = $('<div class="form-group"></div>')
                 .append(deleteIcon);
@@ -257,7 +257,7 @@
                 .append(actionColumn)
                 .appendTo(row);
 
-            row.insertBefore($(".last-row", this._participantsPanelSelector));
+            row.insertBefore($(".last-row", this.participantsPanelSelector));
         }
     }
 }

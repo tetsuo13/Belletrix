@@ -10,10 +10,10 @@ var Belletrix;
          */
         function ActivityLog(addPersonUrl, addPersonIdUrl, removePersonIdUrl, sessionId) {
             /** Selector for panel that contains each each participant line item. */
-            this._participantsPanelSelector = "#participants-panel";
-            this._participantModalSelector = "#personModal .modal-content";
+            this.participantsPanelSelector = "#participants-panel";
+            this.participantModalSelector = "#personModal .modal-content";
             /** Selectors for the existing person "form." */
-            this._existingPersonSelectors = {
+            this.existingPersonSelectors = {
                 /// <field type="String">Person selectlist.</field>
                 PersonSelectList: "#existingpersonselect",
                 /// <field type="String">Type selectlist.</field>
@@ -22,11 +22,11 @@ var Belletrix;
                 SubmitButton: "#existingpersonsubmit"
             };
             /** URL to call to remove existing participant from session. */
-            this._removeExistingPersonIdUrl = "";
+            this.removeExistingPersonIdUrl = "";
             /** Current session ID. **/
-            this._sessionId = "";
-            this._removeExistingPersonIdUrl = removePersonIdUrl;
-            this._sessionId = sessionId;
+            this.sessionId = "";
+            this.removeExistingPersonIdUrl = removePersonIdUrl;
+            this.sessionId = sessionId;
             var self = this;
             Belletrix.Common.handleMvcEditor();
             $("#StartDate, #EndDate").datepicker();
@@ -41,7 +41,7 @@ var Belletrix;
                             backdrop: true,
                             title: "Create New Person"
                         });
-                        addPersonModal.on('shown.bs.modal', function () {
+                        addPersonModal.on("shown.bs.modal", function () {
                             self.bindParticipantForm(addPersonModal);
                             self.bindExistingParticipantForm(addPersonModal, addPersonIdUrl);
                             $("#FullName").focus();
@@ -99,9 +99,9 @@ var Belletrix;
          * @param addPersonIdUrl URL to submit existing select person to.
          */
         ActivityLog.prototype.bindExistingParticipantForm = function (modalDialog, addPersonIdUrl) {
-            var personSelect = $(this._existingPersonSelectors.PersonSelectList);
-            var typeSelect = $(this._existingPersonSelectors.TypeSelectList);
-            var submitButton = $(this._existingPersonSelectors.SubmitButton);
+            var personSelect = $(this.existingPersonSelectors.PersonSelectList);
+            var typeSelect = $(this.existingPersonSelectors.TypeSelectList);
+            var submitButton = $(this.existingPersonSelectors.SubmitButton);
             // The modal dialog will only show the existing people fields if
             // there are existing people to begin with.
             if (personSelect.length) {
@@ -114,7 +114,7 @@ var Belletrix;
                         data: {
                             id: personSelect.val(),
                             type: typeSelect.val(),
-                            sessionId: self_1._sessionId
+                            sessionId: self_1.sessionId
                         },
                         success: function (result) {
                             if (!result.hasOwnProperty("Success") ||
@@ -184,11 +184,11 @@ var Belletrix;
         ActivityLog.prototype.deleteParticipant = function (id) {
             var self = this;
             $.ajax({
-                url: self._removeExistingPersonIdUrl,
+                url: self.removeExistingPersonIdUrl,
                 type: "DELETE",
                 data: {
                     id: id,
-                    sessionId: self._sessionId
+                    sessionId: self.sessionId
                 },
                 success: function (result) {
                     if (!result.hasOwnProperty("Success") ||
@@ -221,13 +221,13 @@ var Belletrix;
                 event.preventDefault();
                 self.deleteParticipant(id);
             });
-            row.append('<div class="col-lg-10"><div class="form-group">' + fullName + '</div></div>');
+            row.append('<div class="col-lg-10"><div class="form-group">' + fullName + "</div></div>");
             actionColumn = $('<div class="form-group"></div>')
                 .append(deleteIcon);
             $('<div class="col-lg-2"></div>')
                 .append(actionColumn)
                 .appendTo(row);
-            row.insertBefore($(".last-row", this._participantsPanelSelector));
+            row.insertBefore($(".last-row", this.participantsPanelSelector));
         };
         return ActivityLog;
     }());

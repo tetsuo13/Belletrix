@@ -7,7 +7,7 @@ module Belletrix {
             Belletrix.Common.handleMvcEditor();
             Belletrix.Common.initMultiselect(1);
 
-            $('#StartDate, #EndDate').datepicker();
+            $("#StartDate, #EndDate").datepicker();
         }
 
         public bindDelete(deleteUrl: string, dataString: string): void {

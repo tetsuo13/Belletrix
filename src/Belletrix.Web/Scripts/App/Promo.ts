@@ -37,10 +37,10 @@ module Belletrix {
 
             $(tableSelector).DataTable({
                 columns: [
-                    null,
-                    null,
-                    null,
-                    null,
+                    undefined,
+                    undefined,
+                    undefined,
+                    undefined,
                     { orderable: false }
                 ]
             });

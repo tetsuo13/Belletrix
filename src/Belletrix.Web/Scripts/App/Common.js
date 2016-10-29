@@ -49,7 +49,7 @@ var Belletrix;
                     cache: false,
                     type: "GET"
                 });
-            }, this._idleKillerInterval);
+            }, this.idleKillerInterval);
         };
         /**
          * Initialize the Bootstrap Multiselect plugin.
@@ -60,7 +60,7 @@ var Belletrix;
             var options = {
                 numberDisplayed: numberToDisplay,
                 buttonContainer: '<div class="button-default" />',
-                maxHeight: null
+                maxHeight: undefined
             };
             if (maxHeight) {
                 options.maxHeight = maxHeight;
@@ -104,7 +104,7 @@ var Belletrix;
             });
         };
         /** Number of milliseconds between pinging the server. */
-        Common._idleKillerInterval = 1000 * 60 * 10;
+        Common.idleKillerInterval = 1000 * 60 * 10;
         return Common;
     }());
     Belletrix.Common = Common;
