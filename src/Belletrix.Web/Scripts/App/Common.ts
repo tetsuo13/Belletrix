@@ -88,7 +88,7 @@ module Belletrix {
                 numberDisplayed: numberToDisplay,
                 buttonContainer: '<div class="button-default" />',
                 maxHeight: undefined
-            }
+            };
 
             if (maxHeight) {
                 options.maxHeight = maxHeight;

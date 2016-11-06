@@ -107,7 +107,7 @@ module Belletrix {
                         self.toggleAllFormFields(false);
                     }
                 },
-                error: function (jqXHR: JQueryXHR, textStatus: any, errorThrown: any): void {
+                error: function (jqXHR: JQueryXHR, textStatus: string): void {
                     const message: string = "<p>An unknown error occurred while checking student name.</p>" +
                         "<p>" + textStatus + "</p>";
                     Belletrix.Common.errorMessage(message);

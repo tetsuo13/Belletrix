@@ -96,7 +96,7 @@ var Belletrix;
                         self.toggleAllFormFields(false);
                     }
                 },
-                error: function (jqXHR, textStatus, errorThrown) {
+                error: function (jqXHR, textStatus) {
                     var message = "<p>An unknown error occurred while checking student name.</p>" +
                         "<p>" + textStatus + "</p>";
                     Belletrix.Common.errorMessage(message);
