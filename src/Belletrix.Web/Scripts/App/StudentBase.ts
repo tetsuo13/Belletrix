@@ -47,7 +47,7 @@ module Belletrix {
          */
         private prepareForm(nameCheckUrl: string): void {
             // https://stackoverflow.com/a/1909508
-            let delay = (function () {
+            const delay = (function () {
                 let timer: number = 0;
 
                 return function (callback, ms) {
@@ -81,7 +81,7 @@ module Belletrix {
                 return;
             }
 
-            let self = this;
+            const self = this;
 
             $.ajax({
                 url: nameCheckUrl,
@@ -95,7 +95,7 @@ module Belletrix {
                     // Clear it every time we enter this function. Possible
                     // that the user is performing multiple checks in which
                     // case the previous check result needs to be cleared.
-                    let uniqueNameContainer: JQuery = $(self.nameCheckResultSelector).empty();
+                    const uniqueNameContainer: JQuery = $(self.nameCheckResultSelector).empty();
 
                     if (result.trim().length > 0) {
                         self.toggleAllFormFields(true);

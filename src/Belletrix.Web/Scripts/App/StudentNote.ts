@@ -3,7 +3,7 @@
 module Belletrix {
     export class StudentNote {
         constructor() {
-            let self = this;
+            const self = this;
 
             $("a.studentnote").on("click", function (e: JQueryEventObject): void {
                 const anchor: JQuery = $(this);
@@ -15,7 +15,7 @@ module Belletrix {
                     url: anchor.attr("href"),
                     cache: false,
                     success: (data: string) => {
-                        let noteModal: JQuery = bootbox.dialog({
+                        const noteModal: JQuery = bootbox.dialog({
                             message: data,
                             //onEscape: true,
                             backdrop: true,
@@ -37,7 +37,7 @@ module Belletrix {
 
         private handleNewNote(formSelector: string, noteSelector: string): void {
             $(formSelector).submit(function (event) {
-                let noteElement: JQuery = $(noteSelector);
+                const noteElement: JQuery = $(noteSelector);
                 const noteValue: string = noteElement.val();
 
                 event.preventDefault();
@@ -45,10 +45,10 @@ module Belletrix {
                 $.post($(this).attr("action"),
                     $(formSelector).serialize(),
                     function (): void {
-                        let anchor: JQuery = $('<a href="#" class="list-group-item"></a>');
-                        let listGroup: JQuery = $('<div class="list-group"></div>');
-                        let paraNote: JQuery = $('<p class="list-group-item-text"></p>');
-                        let name: string = Belletrix.Common.UserFirstName + " " + Belletrix.Common.UserLastName;
+                        const anchor: JQuery = $('<a href="#" class="list-group-item"></a>');
+                        const listGroup: JQuery = $('<div class="list-group"></div>');
+                        const paraNote: JQuery = $('<p class="list-group-item-text"></p>');
+                        const name: string = Belletrix.Common.UserFirstName + " " + Belletrix.Common.UserLastName;
 
                         paraNote.text(noteValue);
 

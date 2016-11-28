@@ -12,7 +12,7 @@ module Belletrix {
 
         public bindDelete(deleteUrl: string, dataString: string): void {
             $("button.studyabroad-list-delete").click(function (event: JQueryEventObject): void {
-                let studyAbroadId: number = parseInt($(this).data(dataString));
+                const studyAbroadId: number = parseInt($(this).data(dataString));
 
                 bootbox.confirm({
                     size: "small",

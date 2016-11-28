@@ -34,7 +34,7 @@
             this.removeExistingPersonIdUrl = removePersonIdUrl;
             this.sessionId = sessionId;
 
-            let self = this;
+            const self = this;
 
             Belletrix.Common.handleMvcEditor();
             $("#StartDate, #EndDate").datepicker();
@@ -44,7 +44,7 @@
                 $.ajax({
                     url: addPersonUrl,
                     success: function (data) {
-                        let addPersonModal: JQuery = bootbox.dialog({
+                        const addPersonModal: JQuery = bootbox.dialog({
                             message: data,
                             //onEscape: true,
                             backdrop: true,
@@ -68,7 +68,7 @@
          * @param participantsUrl URL to fetch existing participants.
          */
         public initSession(startSessionUrl: string, populateSessionUrl?: string, participantsUrl?: string): void {
-            let self = this;
+            const self = this;
 
             $.ajax({
                 url: startSessionUrl,
@@ -111,14 +111,14 @@
          * @param addPersonIdUrl URL to submit existing select person to.
          */
         private bindExistingParticipantForm(modalDialog: JQuery, addPersonIdUrl: string): void {
-            let personSelect: JQuery = $(this.existingPersonSelectors.PersonSelectList);
-            let typeSelect: JQuery = $(this.existingPersonSelectors.TypeSelectList);
-            let submitButton: JQuery = $(this.existingPersonSelectors.SubmitButton);
+            const personSelect: JQuery = $(this.existingPersonSelectors.PersonSelectList);
+            const typeSelect: JQuery = $(this.existingPersonSelectors.TypeSelectList);
+            const submitButton: JQuery = $(this.existingPersonSelectors.SubmitButton);
 
             // The modal dialog will only show the existing people fields if
             // there are existing people to begin with.
             if (personSelect.length) {
-                let self = this;
+                const self = this;
 
                 submitButton.click(function (event: JQueryEventObject): void {
                     event.preventDefault();
@@ -144,7 +144,7 @@
                                 // Show server-side error message under the
                                 // full name field.
 
-                                let validator: JQueryValidation.Validator = modalDialog.validate();
+                                const validator: JQueryValidation.Validator = modalDialog.validate();
                                 validator.showErrors({
                                     "FullName": result.Message
                                 })
@@ -163,8 +163,8 @@
          * @param modalDialog Modal dialog.
          */
         private bindParticipantForm(modalDialog: JQuery): void {
-            let self = this;
-            let modalDialogForm: JQuery = $("form", modalDialog);
+            const self = this;
+            const modalDialogForm: JQuery = $("form", modalDialog);
 
             $.validator.unobtrusive.parse(modalDialogForm);
 
@@ -189,7 +189,7 @@
                             // Show server-side error message under the full
                             // name field.
 
-                            let validator: JQueryValidation.Validator = modalDialogForm.validate();
+                            const validator: JQueryValidation.Validator = modalDialogForm.validate();
                             validator.showErrors({
                                 "FullName": result.Message
                             })
@@ -204,7 +204,7 @@
          * @param id Participant ID.
          */
         private deleteParticipant(id: number): void {
-            let self = this;
+            const self = this;
 
             $.ajax({
                 url: self.removeExistingPersonIdUrl,
@@ -236,10 +236,10 @@
          * @param id Internal unique identifier.
          */
         private addParticipantRow(fullName: string, id: number): void {
-            let row: JQuery = $('<div class="row" id="participant-' + id + '"></div>');
-            let deleteIcon: JQuery = $('<a href="" class="btn btn-xs btn-danger pull-right" title="Remove"></a>');
+            const row: JQuery = $('<div class="row" id="participant-' + id + '"></div>');
+            const deleteIcon: JQuery = $('<a href="" class="btn btn-xs btn-danger pull-right" title="Remove"></a>');
             let actionColumn: JQuery;
-            let self = this;
+            const self = this;
 
             deleteIcon.append('<i class="glyphicon glyphicon-remove"></i>');
 

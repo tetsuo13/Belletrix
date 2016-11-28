@@ -107,3 +107,4 @@ var Belletrix;
     }());
     Belletrix.StudentBase = StudentBase;
 })(Belletrix || (Belletrix = {}));
+//# sourceMappingURL=StudentBase.js.map

@@ -20,7 +20,7 @@ module Belletrix {
          */
         public initPromoList(tableSelector: string, deleteUrl: string, dataString: string): void {
             $("button.promo-list-delete").click(function (event: JQueryEventObject): void {
-                let promoId: number = parseInt($(this).data(dataString));
+                const promoId: number = parseInt($(this).data(dataString));
 
                 bootbox.confirm({
                     size: "small",

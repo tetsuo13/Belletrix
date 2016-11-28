@@ -35,14 +35,14 @@
                     success: function (data: string): void {
                         $(tabSelector).html(data);
 
-                        let timer = setInterval(function (): void {
-                            let studyAbroadTable: JQuery = $(studyAbroadTableSelector);
+                        const timer = setInterval(function (): void {
+                            const studyAbroadTable: JQuery = $(studyAbroadTableSelector);
 
                             if (studyAbroadTable.length) {
                                 clearInterval(timer);
 
                                 $("button.studyabroad-list-delete").on("click", function (event: JQueryEventObject): void {
-                                    let studyAbroadId: number = parseInt($(this).data(studyAbroadDataString));
+                                    const studyAbroadId: number = parseInt($(this).data(studyAbroadDataString));
 
                                     bootbox.confirm({
                                         size: "small",
@@ -115,7 +115,7 @@
             successCallback: Function) {
 
             $(classSelector).on("click", function (event: JQueryEventObject): void {
-                let studentId: number = parseInt($(this).data(dataString));
+                const studentId: number = parseInt($(this).data(dataString));
 
                 bootbox.confirm({
                     size: "small",
@@ -139,7 +139,7 @@
          * @param periods
          */
         public addStudyAbroadRows(countries?: Array<number>, years?: Array<number>, periods?: Array<number>): void {
-            let destinationFieldNames = {
+            const destinationFieldNames = {
                 "StudyAbroadCountry": countries,
                 "StudyAbroadYear": years,
                 "StudyAbroadPeriod": periods
@@ -186,8 +186,8 @@
             let anchor: JQuery;
 
             $.each(destinationFieldNames, function (idName, values): void {
-                let firstSelect: JQuery = $("select#" + idName);
-                let newSelect: JQuery = firstSelect.clone().removeAttr("id");
+                const firstSelect: JQuery = $("select#" + idName);
+                const newSelect: JQuery = firstSelect.clone().removeAttr("id");
 
                 // Get rid of the selected value cloned over.
                 $("option", newSelect).prop("selected", false);

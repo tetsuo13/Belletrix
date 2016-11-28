@@ -18,14 +18,14 @@ module Belletrix {
          * Add a year and semester row group.
          */
         public addStudyAbroadRows(): void {
-            let rowId: string = Belletrix.Common.randomString();
+            const rowId: string = Belletrix.Common.randomString();
             let enclosure: JQuery;
             let anchor: JQuery;
-            let paragraph: JQuery = $('<p class="help-block text-right"></p>');
+            const paragraph: JQuery = $('<p class="help-block text-right"></p>');
 
             $.each(["StudyAbroadYear", "StudyAbroadPeriod"], function (i: number, fieldName: string): void {
-                let firstSelect: JQuery = $("select#" + fieldName);
-                let newSelect: JQuery = firstSelect.clone().removeAttr("id");
+                const firstSelect: JQuery = $("select#" + fieldName);
+                const newSelect: JQuery = firstSelect.clone().removeAttr("id");
 
                 $('<div class="form-group reducePadding" />')
                     .addClass(rowId)
