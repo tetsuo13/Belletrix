@@ -1,5 +1,4 @@
-﻿using Belletrix.Core;
-using Belletrix.Domain;
+﻿using Belletrix.Domain;
 using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
 using System;
@@ -33,7 +32,6 @@ namespace Belletrix.Web.Controllers
                 return RedirectToAction("NotFound", "Error");
             }
 
-            Analytics.TrackPageView(Request, "Note List", (Session["User"] as UserModel).Login);
             ViewBag.Notes = await StudentNoteService.GetAllNotes(studentId);
             return View();
         }

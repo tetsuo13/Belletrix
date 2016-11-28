@@ -1,5 +1,4 @@
-﻿using Belletrix.Core;
-using Belletrix.Domain;
+﻿using Belletrix.Domain;
 using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
 using System;
@@ -33,7 +32,6 @@ namespace Belletrix.Web.Controllers
 
         public async Task<ActionResult> List()
         {
-            Analytics.TrackPageView(Request, "Student List", (Session["User"] as UserModel).Login);
             await PrepareViewBag();
 
             return View(await StudentService.GetStudents());
@@ -46,7 +44,6 @@ namespace Belletrix.Web.Controllers
             if (ModelState.IsValid)
             {
                 await PrepareViewBag();
-                Analytics.TrackPageView(Request, "Student List", (Session["User"] as UserModel).Login);
 
                 return View("List", await StudentService.Search(model));
             }
@@ -81,7 +78,6 @@ namespace Belletrix.Web.Controllers
             ViewBag.ShowActionButtons = true;
             await PrepareViewBag();
             await PrepareStudyAbroadDropDowns();
-            Analytics.TrackPageView(Request, "Student", (Session["User"] as UserModel).Login);
 
             return View(student);
         }
@@ -146,7 +142,6 @@ namespace Belletrix.Web.Controllers
             }
 
             await PrepareViewBag();
-            Analytics.TrackPageView(Request, "Student Edit", (Session["User"] as UserModel).Login);
 
             return View(student);
         }
@@ -162,7 +157,6 @@ namespace Belletrix.Web.Controllers
                 return RedirectToAction("List");
             }
 
-            Analytics.TrackPageView(Request, "Student Edit", (Session["User"] as UserModel).Login);
             await PrepareViewBag();
 
             return View(model);
@@ -171,7 +165,6 @@ namespace Belletrix.Web.Controllers
         public async Task<ActionResult> Add()
         {
             await PrepareViewBag();
-            Analytics.TrackPageView(Request, "Student Add", (Session["User"] as UserModel).Login);
 
             return View();
         }
@@ -187,7 +180,6 @@ namespace Belletrix.Web.Controllers
                 return RedirectToAction("List");
             }
 
-            Analytics.TrackPageView(Request, "Student Add", (Session["User"] as UserModel).Login);
             await PrepareViewBag();
 
             return View(model);
@@ -265,7 +257,6 @@ namespace Belletrix.Web.Controllers
         public async Task<ActionResult> Delete(int id)
         {
             StudentModel student = await StudentService.GetStudent(id);
-            Analytics.TrackPageView(Request, "Delete Student", (Session["User"] as UserModel).Login);
 
             if (student == null)
             {

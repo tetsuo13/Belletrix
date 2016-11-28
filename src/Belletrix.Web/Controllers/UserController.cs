@@ -1,10 +1,8 @@
-﻿using Belletrix.Core;
-using Belletrix.Domain;
+﻿using Belletrix.Domain;
 using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
 using Microsoft.AspNet.Identity;
 using System;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -41,7 +39,6 @@ namespace Belletrix.Web.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            Analytics.TrackPageView(Request, "Add User", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Add";
             return View();
         }
@@ -74,7 +71,6 @@ namespace Belletrix.Web.Controllers
                 return RedirectToAction("List");
             }
 
-            Analytics.TrackPageView(Request, "Add User", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Add";
             return View(model);
         }
@@ -106,7 +102,6 @@ namespace Belletrix.Web.Controllers
                 IsActive = user.IsActive
             };
 
-            Analytics.TrackPageView(Request, "Edit User", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Edit";
             return View(model);
         }
@@ -149,7 +144,6 @@ namespace Belletrix.Web.Controllers
 
             ViewBag.CurrentUserIsAdmin = currentUser.IsAdmin;
 
-            Analytics.TrackPageView(Request, "Edit User", (Session["User"] as UserModel).Login);
             ViewBag.Action = "Edit";
             return View(model);
         }
@@ -163,7 +157,6 @@ namespace Belletrix.Web.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            Analytics.TrackPageView(Request, "User List", (Session["User"] as UserModel).Login);
             ViewBag.CurrentUser = currentUser;
             return View(await UserService.GetUsers());
         }
@@ -172,7 +165,6 @@ namespace Belletrix.Web.Controllers
         public async Task<ActionResult> Delete(int id)
         {
             UserModel user = await UserService.GetUser(id);
-            Analytics.TrackPageView(Request, "Delete User", (Session["User"] as UserModel).Login);
 
             if (user == null)
             {

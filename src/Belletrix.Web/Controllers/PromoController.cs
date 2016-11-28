@@ -1,5 +1,4 @@
-﻿using Belletrix.Core;
-using Belletrix.Domain;
+﻿using Belletrix.Domain;
 using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
 using System;
@@ -27,29 +26,15 @@ namespace Belletrix.Web.Controllers
             ViewBag.ActivePage = ActivePageName;
         }
 
-        private void TrackPageView(string pageTitle)
-        {
-            if (Session["User"] != null)
-            {
-                Analytics.TrackPageView(Request, pageTitle, (Session["User"] as UserModel).Login);
-            }
-            else
-            {
-                Analytics.TrackPageView(Request, pageTitle);
-            }
-        }
-
         #region Promo management
 
         public async Task<ActionResult> List()
         {
-            Analytics.TrackPageView(Request, "Promo List", (Session["User"] as UserModel).Login);
             return View(await PromoService.GetPromos());
         }
 
         public ActionResult Add()
         {
-            Analytics.TrackPageView(Request, "Add Promo", (Session["User"] as UserModel).Login);
             return View();
         }
 
@@ -63,7 +48,6 @@ namespace Belletrix.Web.Controllers
                 return RedirectToAction("Info", new { id = promoId });
             }
 
-            Analytics.TrackPageView(Request, "Add Promo", (Session["User"] as UserModel).Login);
             return View(model);
         }
 
@@ -77,8 +61,6 @@ namespace Belletrix.Web.Controllers
                 MvcApplication.LogException(new ArgumentException(message, nameof(id)));
                 return RedirectToAction("NotFound", "Error");
             }
-
-            Analytics.TrackPageView(Request, "Edit Promo", (Session["User"] as UserModel).Login);
 
             PromoEditViewModel model = new PromoEditViewModel()
             {
@@ -106,7 +88,6 @@ namespace Belletrix.Web.Controllers
         public async Task<ActionResult> Delete(int id)
         {
             PromoViewModel promo = await PromoService.GetPromo(id);
-            Analytics.TrackPageView(Request, "Delete Promo", (Session["User"] as UserModel).Login);
 
             if (promo == null)
             {
@@ -140,7 +121,6 @@ namespace Belletrix.Web.Controllers
                 return RedirectToAction("NotFound", "Error");
             }
 
-            Analytics.TrackPageView(Request, "Promo Info", (Session["User"] as UserModel).Login);
             promo.Students = await StudentService.FromPromo(promo.Id);
             return View(promo);
         }
@@ -186,7 +166,6 @@ namespace Belletrix.Web.Controllers
             cookie.Expires = DateTime.Now.AddHours(8);
             HttpContext.Response.SetCookie(cookie);
 
-            TrackPageView("Promo Form for " + token);
             return RedirectToAction("Form");
         }
 
@@ -200,7 +179,6 @@ namespace Belletrix.Web.Controllers
                 return RedirectToAction("Entry");
             }
 
-            TrackPageView("Promo Form for " + cookie.Value);
             await PrepareDropDowns();
 
             return View();
@@ -233,7 +211,6 @@ namespace Belletrix.Web.Controllers
                 return RedirectToAction("Success");
             }
 
-            TrackPageView("Promo Form for " + cookie.Value);
             await PrepareDropDowns();
 
             return View(model);
@@ -249,7 +226,6 @@ namespace Belletrix.Web.Controllers
                 return RedirectToAction("Entry");
             }
 
-            TrackPageView("Promo Success for " + cookie.Value);
             return View();
         }
 

@@ -43,8 +43,6 @@ namespace Belletrix.Web.Controllers
                 return RedirectToAction("NotFound", "Error");
             }
 
-            Analytics.TrackPageView(Request, "Activity Log View", (Session["User"] as UserModel).Login);
-
             using (profiler.Step("Get all label types"))
             {
                 ViewBag.TypeLabels = ActivityService.GetActivityTypeLabels();
@@ -55,7 +53,6 @@ namespace Belletrix.Web.Controllers
 
         public async Task<ActionResult> List()
         {
-            Analytics.TrackPageView(Request, "Activity Log List", (Session["User"] as UserModel).Login);
             MiniProfiler profiler = MiniProfiler.Current;
             IEnumerable<ActivityLogModel> logs;
 
@@ -127,8 +124,6 @@ namespace Belletrix.Web.Controllers
                 MvcApplication.LogException(new ArgumentException(message, nameof(id)));
                 return RedirectToAction("NotFound", "Error");
             }
-
-            Analytics.TrackPageView(Request, "Activity Log Edit", (Session["User"] as UserModel).Login);
 
             ActivityLogEditViewModel model = (ActivityLogEditViewModel)activity;
             PrepareViewBag(model);

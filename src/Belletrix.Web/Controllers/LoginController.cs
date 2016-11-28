@@ -1,5 +1,4 @@
-﻿using Belletrix.Core;
-using Belletrix.Domain;
+﻿using Belletrix.Domain;
 using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
 using Microsoft.AspNet.Identity;
@@ -22,7 +21,6 @@ namespace Belletrix.Web.Controllers
 
         public ActionResult Index(string returnUrl)
         {
-            Analytics.TrackPageView(Request, "Belletrix", null);
             ViewBag.ReturnUrl = returnUrl;
             return View();
         }
@@ -66,7 +64,6 @@ namespace Belletrix.Web.Controllers
                 }
             }
 
-            Analytics.TrackPageView(Request, "Belletrix", null);
             ModelState.AddModelError("", mainError);
             return View(model);
         }

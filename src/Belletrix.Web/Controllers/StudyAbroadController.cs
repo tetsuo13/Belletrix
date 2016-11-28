@@ -1,5 +1,4 @@
-﻿using Belletrix.Core;
-using Belletrix.Domain;
+﻿using Belletrix.Domain;
 using Belletrix.Entity.Model;
 using Belletrix.Entity.ViewModel;
 using System;
@@ -27,8 +26,6 @@ namespace Belletrix.Web.Controllers
 
         public async Task<ActionResult> List()
         {
-            Analytics.TrackPageView(Request, "Active Experiences", (Session["User"] as UserModel).Login);
-
             ViewBag.Countries = await StudentService.GetCountries();
             ViewBag.Semesters = StudentService.GetStudyAbroadWishlistPeriods();
             ViewBag.Programs = await StudentService.GetPrograms();
@@ -39,8 +36,6 @@ namespace Belletrix.Web.Controllers
 
         public async Task<ActionResult> Add(int studentId)
         {
-            Analytics.TrackPageView(Request, "Add Experience", (Session["User"] as UserModel).Login);
-
             try
             {
                 ViewBag.Student = await StudentService.GetStudent(studentId);
@@ -80,7 +75,6 @@ namespace Belletrix.Web.Controllers
             }
 
             await PrepareDropDowns();
-            Analytics.TrackPageView(Request, "Add Experience", (Session["User"] as UserModel).Login);
 
             return View(model);
         }
@@ -97,7 +91,6 @@ namespace Belletrix.Web.Controllers
         [HttpDelete]
         public async Task<ActionResult> Delete(int id)
         {
-            Analytics.TrackPageView(Request, "Delete Experience", (Session["User"] as UserModel).Login);
             return Json(await StudyAbroadService.Delete(id));
         }
 
@@ -122,8 +115,6 @@ namespace Belletrix.Web.Controllers
                 MvcApplication.LogException(new ArgumentException(message, nameof(id), e));
                 return RedirectToAction("NotFound", "Error");
             }
-
-            Analytics.TrackPageView(Request, "Experience Edit", (Session["User"] as UserModel).Login);
 
             EditStudyAbroadViewModel model = (EditStudyAbroadViewModel)study;
             await PrepareDropDowns();
@@ -153,7 +144,6 @@ namespace Belletrix.Web.Controllers
                 return RedirectToAction("NotFound", "Error");
             }
 
-            Analytics.TrackPageView(Request, "Experience Edit", (Session["User"] as UserModel).Login);
             await PrepareDropDowns();
 
             return View(model);

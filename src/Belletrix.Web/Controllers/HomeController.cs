@@ -1,6 +1,4 @@
-﻿using Belletrix.Core;
-using Belletrix.Domain;
-using Belletrix.Entity.Model;
+﻿using Belletrix.Domain;
 using Belletrix.Entity.ViewModel;
 using StackExchange.Exceptional;
 using StackExchange.Profiling;
@@ -25,7 +23,6 @@ namespace Belletrix.Web.Controllers
 
         public async Task<ActionResult> Index()
         {
-            Analytics.TrackPageView(Request, "Dashboard", (Session["User"] as UserModel).Login);
             ViewBag.ActivePage = ActivePageName;
 
             DashboardViewModel model = new DashboardViewModel();

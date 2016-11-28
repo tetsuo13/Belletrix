@@ -59,7 +59,6 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Analytics.cs" />
     <Compile Include="ApplicationCache.cs" />
     <Compile Include="Connections.cs" />
     <Compile Include="DateTimeFilter.cs" />
