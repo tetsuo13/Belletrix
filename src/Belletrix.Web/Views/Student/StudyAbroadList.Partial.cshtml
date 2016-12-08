@@ -39,6 +39,9 @@
                 programName = selectedProgram.Name;
             }
 
+            string startDateDataOrder = study.StartDate.HasValue ? study.StartDate.Value.ToString("yyyy-MM-dd") : null;
+            string endDateDataOrder = study.EndDate.HasValue ? study.EndDate.Value.ToString("yyyy-MM-dd") : null;
+
             <tr>
                 @if (showStudent)
                 {
@@ -48,13 +51,13 @@
                 }
                 <td>@study.Year</td>
                 <td>@Formatter.StudyAbroadPeriodString(study.Semester)</td>
-                <td>
+                <td data-order="@startDateDataOrder">
                     @if (study.StartDate.HasValue)
                     {
                         @study.StartDate.Value.ToShortDateString()
                     }
                 </td>
-                <td>
+                <td data-order="@endDateDataOrder">
                     @if (study.EndDate.HasValue)
                     {
                         @study.EndDate.Value.ToShortDateString()

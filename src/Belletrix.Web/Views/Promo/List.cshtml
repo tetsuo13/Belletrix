@@ -58,7 +58,7 @@
                             <td>
                                 @Html.ActionLink(promo.Description, "Info", new { id = promo.Id })
                             </td>
-                            <td>
+                            <td data-order="@promo.Created.ToString("yyyy-MM-dd")">
                                 <span data-toggle="tooltip"
                                     title="@promo.Created by @promo.CreatedByFirstName @promo.CreatedByLastName">
                                     @promo.Created.ToShortDateString()

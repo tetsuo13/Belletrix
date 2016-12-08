@@ -47,13 +47,15 @@
                 <tbody>
                     @foreach (UserModel user in Model)
                     {
+                        string lastLoginDataOrder = user.LastLogin != default(DateTime) ? user.LastLogin.ToString("yyyy-MM-dd HH:mm:ss") : null;
+
                         <tr>
                             <td>
                                 <a href="@Url.Action("Edit", "User", new { id = user.Id })">@user.FirstName @user.LastName</a>
                             </td>
                             <td>@user.Login</td>
                             <td>@user.Created</td>
-                            <td>
+                            <td data-order="@lastLoginDataOrder">
                                 @if (user.LastLogin != default(DateTime))
                                 {
                                     @user.LastLogin

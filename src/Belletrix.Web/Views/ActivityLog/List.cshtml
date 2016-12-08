@@ -60,7 +60,7 @@
                         <tr>
                             <td>@Html.ActionLink(activity.Title, "View", new { id = activity.Id })</td>
                             <td>@activity.Organizers</td>
-                            <td>
+                            <td data-order="@activity.StartDate.ToString("yyyy-MM-dd")">
                                 @if (activity.StartDate.Date == activity.EndDate.Date)
                                 {
                                     @activity.StartDate.ToShortDateString()
