@@ -57,6 +57,39 @@
             </div>
             <div class="row">
                 <div class="col-lg-12">
+                    <ul class="list-unstyled list-inline">
+                        @if (Model.ActivityLog.StartDate == Model.ActivityLog.EndDate)
+                        {
+                            <li class="text-uppercase text-muted"><strong>On:</strong></li>
+                            <li>@Model.ActivityLog.StartDate.ToShortDateString()</li>
+                        }
+                        else
+                        {
+                            <li class="text-uppercase text-muted"><strong>Starting:</strong></li>
+                            <li>@Model.ActivityLog.StartDate.ToShortDateString()</li>
+                            <li class="text-uppercase text-muted"><strong>Ending:</strong></li>
+                            <li>@Model.ActivityLog.EndDate.ToShortDateString()</li>
+                        }
+                    </ul>
+
+                    @if (!string.IsNullOrEmpty(Model.ActivityLog.Location))
+                    {
+                        <address>
+                            @Model.ActivityLog.Location
+                            @if (Model.ActivityLog.OnCampus.HasValue && Model.ActivityLog.OnCampus.Value)
+                            {
+                                <span class="label label-success">On Campus</span>
+                            }
+                        </address>
+                    }
+                    else if (Model.ActivityLog.OnCampus.HasValue && Model.ActivityLog.OnCampus.Value)
+                    {
+                        <span class="label label-success">On Campus</span>
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
                     <h4>Organizers</h4>
                     @Model.ActivityLog.Organizers
                 </div>
