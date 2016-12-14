@@ -14,8 +14,6 @@ namespace Belletrix.Domain
     public interface IActivityService
     {
         Task<IEnumerable<ActivityLogModel>> GetActivityLogs();
-        Task<ActivityLogModel> FindById(int id);
-        Task<ActivityLogViewViewModel> FindAllInfoById(int id);
         Task<int> InsertActivity(ActivityLogCreateViewModel createModel, int userId);
         Task UpdateActivity(ActivityLogEditViewModel saveModel);
 
@@ -47,6 +45,10 @@ namespace Belletrix.Domain
         /// that ID.
         /// </returns>
         Task<ActivityLogPersonModel> FindPersonById(int id);
+
+        Task<ActivityLogModel> FindById(int id);
+        Task<ActivityLogViewViewModel> FindAllInfoById(int id);
+        Task<ActivityLogViewViewModel> FindByTitle(string title);
 
         /// <summary>
         /// Manage the participants list for the selected activity.

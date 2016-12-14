@@ -81,6 +81,35 @@ namespace Belletrix.DAL
             return logs;
         }
 
+        public async Task<ActivityLogModel> GetActivityByTitle(string title)
+        {
+            const string sql = @"
+                SELECT  [Id], [Title], [Title2], [Title3],
+                        [Organizers], [Location], [StartDate],
+                        [EndDate], [OnCampus], [WebSite], [Notes],
+                        [Created], [CreatedBy]
+                FROM    [dbo].[ActivityLog]
+                WHERE   [Title] = @Title";
+
+            ActivityLogModel activity = null;
+
+            try
+            {
+                IEnumerable<dynamic> rows = await UnitOfWork.Context().QueryAsync<dynamic>(sql,
+                    new { Title = title });
+
+                activity = ProcessRows(rows).SingleOrDefault();
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
+                activity = null;
+            }
+
+            return activity;
+        }
+
         public async Task<IEnumerable<ActivityLogModel>> GetAllActivities()
         {
             const string sql = @"

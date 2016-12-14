@@ -8,6 +8,7 @@ namespace Belletrix.DAL
     public interface IActivityLogRepository
     {
         Task<ActivityLogModel> GetActivityById(int id);
+        Task<ActivityLogModel> GetActivityByTitle(string title);
         Task<IEnumerable<ActivityLogModel>> GetAllActivities();
         
         Task<int> InsertActivity(ActivityLogModel model, int userId);

@@ -259,5 +259,43 @@
 
             row.insertBefore($(".last-row", this.participantsPanelSelector));
         }
+
+        /**
+         * Display partial view beneath the activity log title showing an
+         * existing activity log by the same title if found.
+         * @param titleSelector Title input selector.
+         * @param resultSelector Selector for container to display any duplicate info.
+         * @param titleCheckUrl URL to send title to.
+         */
+        public initTitleCheck(titleSelector: string, resultSelector: string, titleCheckUrl: string): void {
+            $(titleSelector).blur(function (): void {
+                const title: string = $(this).val();
+
+                if (title.trim().length == 0) {
+                    return;
+                }
+
+                $.ajax({
+                    url: titleCheckUrl,
+                    data: {
+                        title: title
+                    },
+                    method: "GET",
+                    cache: false,
+                    success: function (result: string): void {
+                        const uniqueNameContainer: JQuery = $(resultSelector).empty();
+
+                        if (result.trim().length > 0) {
+                            uniqueNameContainer.html(result);
+                        }
+                    },
+                    error: function (jqXHR: JQueryXHR, textStatus: string): void {
+                        const message: string = "<p>An unknown error occurred while checking title.</p>" +
+                            "<p>" + textStatus + "</p>";
+                        Belletrix.Common.errorMessage(message);
+                    }
+                })
+            });
+        }
     }
 }

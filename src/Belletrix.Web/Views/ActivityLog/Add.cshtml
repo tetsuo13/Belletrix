@@ -24,6 +24,8 @@
 
         activityLog.initSession(
             '@Url.Action("StartSession", "ActivityLogPerson", new { guid = sessionId })');
+
+        activityLog.initTitleCheck('#Title', '#unique-name', '@Url.Action("TitleCheck")');
     });
     </script>
 }

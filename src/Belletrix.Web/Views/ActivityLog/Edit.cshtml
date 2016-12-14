@@ -26,8 +26,10 @@
             '@Url.Action("StartSession", "ActivityLogPerson", new { guid = sessionId })',
             '@Html.Raw(Url.Action("PopuplateSession", "ActivityLogPerson", new { guid = sessionId, activityId = Model.Id }))',
             '@Url.Action("ParticipantsInSession", "ActivityLogPerson", new { guid = sessionId })');
+
+        activityLog.initTitleCheck('#Title', '#unique-name', '@Url.Action("TitleCheck")');
     });
-</script>
+    </script>
 }
 
 @section Body {

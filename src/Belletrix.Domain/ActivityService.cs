@@ -62,6 +62,27 @@ namespace Belletrix.Domain
             return viewModel;
         }
 
+        public async Task<ActivityLogViewViewModel> FindByTitle(string title)
+        {
+            if (string.IsNullOrWhiteSpace(title))
+            {
+                return null;
+            }
+
+            ActivityLogModel activityLogModel = await ActivityLogRepository.GetActivityByTitle(title);
+
+            if (activityLogModel == null)
+            {
+                return null;
+            }
+
+            ActivityLogViewViewModel viewModel = new ActivityLogViewViewModel();
+            viewModel.ActivityLog = activityLogModel;
+            viewModel.CreatedBy = await UserRepository.GetUser(activityLogModel.CreatedBy);
+
+            return viewModel;
+        }
+
         public async Task<int> InsertActivity(ActivityLogCreateViewModel createModel, int userId)
         {
             ActivityLogModel model = (ActivityLogModel)createModel;

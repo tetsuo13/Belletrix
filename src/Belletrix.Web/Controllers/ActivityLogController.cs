@@ -154,5 +154,10 @@ namespace Belletrix.Web.Controllers
 
             return View(model);
         }
+
+        public async Task<PartialViewResult> TitleCheck(string title)
+        {
+            return PartialView("TitleCheck.Partial", await ActivityService.FindByTitle(title));
+        }
     }
 }
