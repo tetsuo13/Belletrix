@@ -112,7 +112,7 @@ module Belletrix {
                         "<p>" + textStatus + "</p>";
                     Belletrix.Common.errorMessage(message);
                 }
-            })
+            });
         }
     }
 }
