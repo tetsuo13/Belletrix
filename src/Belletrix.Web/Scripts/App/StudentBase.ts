@@ -1,4 +1,5 @@
 ﻿/// <reference path="Common.ts" />
+/// <reference path="..\typings\bootbox\bootbox.d.ts" />
 
 module Belletrix {
     export class StudentBase {
@@ -62,7 +63,7 @@ module Belletrix {
             $(this.firstLastNamesSelector).keyup(() => {
                 delay(() => {
                     this.checkNameUniqueness(nameCheckUrl,
-                        $(this.firstLastNamesSelector).val(), $(this.lastNameSelector).val())
+                        $(this.firstLastNamesSelector).val(), $(this.lastNameSelector).val());
                 }, 500);
             });
         }
@@ -101,6 +102,7 @@ module Belletrix {
                         self.toggleAllFormFields(true);
                         $(self.firstLastNamesSelector).prop("disabled", false);
                         uniqueNameContainer.html(result);
+                        self.handleStudentInlineView(uniqueNameContainer);
                     } else {
                         // No duplicates found. Enable all form fields and
                         // move on.
@@ -112,6 +114,29 @@ module Belletrix {
                         "<p>" + textStatus + "</p>";
                     Belletrix.Common.errorMessage(message);
                 }
+            });
+        }
+
+        private handleStudentInlineView(uniqueNameContainer: JQuery): void {
+            $("a.studentview", uniqueNameContainer).on("click", function (e: JQueryEventObject): void {
+                const anchor: JQuery = $(this);
+                const studentId: string = anchor.attr("data-bt-studentid");
+
+                e.preventDefault();
+
+                $.ajax({
+                    url: anchor.attr("href"),
+                    cache: false,
+                    success: (data: string) => {
+                        bootbox.dialog({
+                            message: data,
+                            //onEscape: true,
+                            backdrop: true,
+                            title: "Student Info",
+                            size: "large"
+                        });
+                    }
+                });
             });
         }
     }

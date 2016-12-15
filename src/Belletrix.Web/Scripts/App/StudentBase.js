@@ -1,4 +1,5 @@
 /// <reference path="Common.ts" />
+/// <reference path="..\typings\bootbox\bootbox.d.ts" />
 var Belletrix;
 (function (Belletrix) {
     var StudentBase = (function () {
@@ -89,6 +90,7 @@ var Belletrix;
                         self.toggleAllFormFields(true);
                         $(self.firstLastNamesSelector).prop("disabled", false);
                         uniqueNameContainer.html(result);
+                        self.handleStudentInlineView(uniqueNameContainer);
                     }
                     else {
                         // No duplicates found. Enable all form fields and
@@ -103,7 +105,28 @@ var Belletrix;
                 }
             });
         };
+        StudentBase.prototype.handleStudentInlineView = function (uniqueNameContainer) {
+            $("a.studentview", uniqueNameContainer).on("click", function (e) {
+                var anchor = $(this);
+                var studentId = anchor.attr("data-bt-studentid");
+                e.preventDefault();
+                $.ajax({
+                    url: anchor.attr("href"),
+                    cache: false,
+                    success: function (data) {
+                        bootbox.dialog({
+                            message: data,
+                            //onEscape: true,
+                            backdrop: true,
+                            title: "Student Info",
+                            size: "large"
+                        });
+                    }
+                });
+            });
+        };
         return StudentBase;
     }());
     Belletrix.StudentBase = StudentBase;
 })(Belletrix || (Belletrix = {}));
+//# sourceMappingURL=StudentBase.js.map

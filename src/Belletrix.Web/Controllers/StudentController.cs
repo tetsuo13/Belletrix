@@ -110,7 +110,7 @@ namespace Belletrix.Web.Controllers
             await PrepareViewBag();
             await PrepareStudyAbroadDropDowns();
 
-            return PartialView("View.NameCheck", student);
+            return PartialView("View.Partial", student);
         }
 
         public async Task<ActionResult> Edit(int? id)

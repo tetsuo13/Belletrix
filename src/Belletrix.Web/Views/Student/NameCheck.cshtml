@@ -17,7 +17,8 @@
 
                 @foreach (StudentModel student in Model)
                 {
-                    <a data-toggle="modal" href="@Url.Action("ViewInline", new { id = student.Id })" class="list-group-item" data-target="#dup">
+                    <a href="@Url.Action("ViewInline", new { id = student.Id })"
+                        class="list-group-item studentview" data-bt-studentid="@student.Id">
                         <h4 class="list-group-item-heading">@student.FirstName @student.LastName</h4>
                         <p class="list-group-item-text">
                             Created @student.Created
@@ -25,12 +26,6 @@
                     </a>
                 }
             </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="dup" tabindex="-1" role="dialog" aria-labelledby="dupLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content"></div>
         </div>
     </div>
 }
