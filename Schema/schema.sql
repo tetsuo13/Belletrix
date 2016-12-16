@@ -21,6 +21,7 @@ IF OBJECT_ID('dbo.ActivityLogParticipant', 'U') IS NOT NULL DROP TABLE [dbo].[Ac
 IF OBJECT_ID('dbo.ActivityLogTypes', 'U') IS NOT NULL DROP TABLE [dbo].[ActivityLogTypes];
 IF OBJECT_ID('dbo.ActivityLog', 'U') IS NOT NULL DROP TABLE [dbo].[ActivityLog];
 IF OBJECT_ID('dbo.Users', 'U') IS NOT NULL DROP TABLE [dbo].[Users];
+IF OBJECT_ID('dbo.Documents', 'U') IS NOT NULL DROP TABLE [dbo].[Documents];
 IF OBJECT_ID('dbo.Programs', 'U') IS NOT NULL DROP TABLE [dbo].[Programs];
 IF OBJECT_ID('dbo.StudyAbroadProgramTypes', 'U') IS NOT NULL DROP TABLE [dbo].[StudyAbroadProgramTypes];
 IF OBJECT_ID('dbo.ProgramTypes', 'U') IS NOT NULL DROP TABLE [dbo].[ProgramTypes];
@@ -722,6 +723,23 @@ CREATE TABLE [dbo].[ActivityLogParticipant] (
     CONSTRAINT [PK_ActivityLogParticipant] PRIMARY KEY ([EventId], [PersonId]),
     CONSTRAINT [FK_ActivityLogParticipant_EventId] FOREIGN KEY ([EventId]) REFERENCES [dbo].[ActivityLog] ([Id]),
     CONSTRAINT [FK_ActivityLogParticipant_PersonId] FOREIGN KEY ([PersonId]) REFERENCES [dbo].[ActivityLogPerson] ([Id])
+);
+
+
+CREATE TABLE [dbo].[Documents] (
+    [Id]                [int] NOT NULL IDENTITY,
+    [Guid]              [uniqueidentifier] NOT NULL,
+    [Created]           [datetime] NOT NULL,
+    [CreatedBy]         [int] NOT NULL,
+    [LastModified]      [datetime],
+    [LastModifiedBy]    [int],
+    [ActivityLogId]     [int],
+    [Title]             [nvarchar](1024) NOT NULL,
+    [Size]              [int] NOT NULL,
+    [Content]           [varbinary](max) NOT NULL,
+
+    CONSTRAINT [FK_Documents_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [dbo].[Users] ([Id]),
+    CONSTRAINT [FK_Documents_ActivityLogId] FOREIGN KEY ([ActivityLogId]) REFERENCES [dbo].[ActivityLog] ([Id])
 );
 
 
