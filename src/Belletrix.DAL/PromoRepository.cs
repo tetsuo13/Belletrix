@@ -24,9 +24,6 @@ namespace Belletrix.DAL
         {
             List<PromoViewModel> promos = new List<PromoViewModel>();
 
-            // Must convert the Guid column otherwise you get: "Invalid cast
-            // from 'System.String' to 'System.Guid'" exception. See
-            // https://github.com/StackExchange/dapper-dot-net/issues/447
             const string sql = @"
                 SELECT      p.Id AS Id,
                             [Description],

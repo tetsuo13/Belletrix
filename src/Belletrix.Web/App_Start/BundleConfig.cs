@@ -13,12 +13,17 @@ namespace Belletrix.Web.App_Start
                 "~/Scripts/bootstrap-multiselect.js",
                 "~/Scripts/jquery.dataTables.min.js",
                 "~/Scripts/jquery.dataTables.bootstrap.js",
+
+                "~/Scripts/jquery.ui.widget.js",
+                "~/Scripts/jquery.fileupload.js",
+
                 "~/Scripts/jquery.validate.min.js",
                 "~/Scripts/jquery.validate.unobtrusive.min.js",
                 "~/Scripts/bootbox.min.js",
                 "~/Scripts/App/Common.js",
                 "~/Scripts/App/GenericResult.js",
                 "~/Scripts/App/ActivityLog.js",
+                "~/Scripts/App/Document.js",
                 "~/Scripts/App/StudyAbroad.js",
                 "~/Scripts/App/StudentBase.js",
                 "~/Scripts/App/Student.js",

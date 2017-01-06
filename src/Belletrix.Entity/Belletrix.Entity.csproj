@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SharedAssemblyInfo.cs">
@@ -46,6 +47,7 @@
     <Compile Include="Model\CountryModel.cs" />
     <Compile Include="Model\EventLogModel.cs" />
     <Compile Include="ViewModel\DashboardViewModel.cs" />
+    <Compile Include="ViewModel\DocumentsViewModel.cs" />
     <Compile Include="ViewModel\EventLogViewModel.cs" />
     <Compile Include="Model\LanguageModel.cs" />
     <Compile Include="Model\MajorsModel.cs" />

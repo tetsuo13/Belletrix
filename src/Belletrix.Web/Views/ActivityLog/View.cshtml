@@ -9,6 +9,29 @@
     ViewBag.Title = Model.ActivityLog.Title + " Activity Log";
 }
 
+@section FooterScript {
+    <script>
+    $(function () {
+        'use strict';
+
+        var document = new Belletrix.Document();
+        document.initActivityLog('@Url.Action("AddDocument")', @Model.ActivityLog.Id, '#add-document');
+@*
+        var activityLog = new Belletrix.ActivityLog(
+            '@Url.Action("AddPerson", "ActivityLogPerson", new { guid = sessionId })',
+            '@Url.Action("AddPersonId", "ActivityLogPerson")',
+            '@Url.Action("RemovePersonId", "ActivityLogPerson")',
+            '@sessionId');
+
+        activityLog.initSession(
+            '@Url.Action("StartSession", "ActivityLogPerson", new { guid = sessionId })');
+
+        activityLog.initTitleCheck('#Title', '#unique-name', '@Url.Action("TitleCheck")');
+*@
+    });
+    </script>
+}
+
 @section Body {
     <div class="row">
         <div class="col-lg-12 page-header">
@@ -97,6 +120,23 @@
             </div>
         </div>
         <div class="col-lg-4">
+            <h4>
+                Documents
+                <label class="btn btn-success btn-xs pull-right">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    Add <input type="file" class="hidden" id="add-document" />
+                </label>
+            </h4>
+
+            @if (Model.Documents != null && Model.Documents.Any())
+            {
+                <div class="list-group">
+                    @foreach (DocumentViewModel document in Model.Documents)
+                    {
+                        <a href="#" class="list-group-item">@document.Title</a>
+                    }
+                </div>
+            }
         </div>
     </div>
     @if (Model.Participants != null && Model.Participants.Any())

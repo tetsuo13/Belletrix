@@ -31,7 +31,7 @@ namespace Belletrix.Web.Controllers
             MiniProfiler profiler = MiniProfiler.Current;
             ActivityLogViewViewModel activity = null;
 
-            using (profiler.Step("Get all activities"))
+            using (profiler.Step("Get activity"))
             {
                 activity = await ActivityService.FindAllInfoById(id);
             }
@@ -46,6 +46,11 @@ namespace Belletrix.Web.Controllers
             using (profiler.Step("Get all label types"))
             {
                 ViewBag.TypeLabels = ActivityService.GetActivityTypeLabels();
+            }
+
+            using (profiler.Step("Get all documents"))
+            {
+                activity.Documents = await ActivityService.FindDocuments(id);
             }
 
             return View(activity);
@@ -158,6 +163,21 @@ namespace Belletrix.Web.Controllers
         public async Task<PartialViewResult> TitleCheck(string title)
         {
             return PartialView("TitleCheck.Partial", await ActivityService.FindByTitle(title));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> AddDocument(AddNewDocumentViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new GenericResult()
+                {
+                    Result = false,
+                    Message = "Missing selected file"
+                });
+            }
+
+            return Json(await ActivityService.AddDocument(Session, model));
         }
     }
 }

@@ -130,5 +130,7 @@ namespace Belletrix.Entity.ViewModel
         public IEnumerable<ActivityLogParticipantModel> Participants { get; set; }
 
         public UserModel CreatedBy { get; set; }
+
+        public IEnumerable<DocumentViewModel> Documents { get; set; }
     }
 }

@@ -37,7 +37,6 @@ var Belletrix;
                     success: function (data) {
                         var addPersonModal = bootbox.dialog({
                             message: data,
-                            //onEscape: true,
                             backdrop: true,
                             title: "Create New Person"
                         });

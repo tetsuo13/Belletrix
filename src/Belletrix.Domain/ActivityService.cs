@@ -26,13 +26,16 @@ namespace Belletrix.Domain
         private readonly IActivityLogRepository ActivityLogRepository;
         private readonly IActivityLogPersonRepository ActivityLogPersonRepository;
         private readonly IUserRepository UserRepository;
+        private readonly IDocumentRepository DocumentRepository;
 
         public ActivityService(IActivityLogRepository activityLogRepository,
-            IActivityLogPersonRepository activityLogPersonRepository, IUserRepository userRepository)
+            IActivityLogPersonRepository activityLogPersonRepository, IUserRepository userRepository,
+            IDocumentRepository documentRepository)
         {
             ActivityLogRepository = activityLogRepository;
             ActivityLogPersonRepository = activityLogPersonRepository;
             UserRepository = userRepository;
+            DocumentRepository = documentRepository;
         }
 
         public async Task<IEnumerable<ActivityLogModel>> GetActivityLogs()
@@ -302,6 +305,20 @@ namespace Belletrix.Domain
 
                 scope.Complete();
             }
+        }
+
+        public async Task<IEnumerable<DocumentViewModel>> FindDocuments(int id)
+        {
+            return await DocumentRepository.GetActivityLogDocumentsList(id);
+        }
+
+        public async Task<GenericResult> AddDocument(HttpSessionStateBase session,
+            AddNewDocumentViewModel model)
+        {
+            GenericResult result = new GenericResult();
+            result.Result = await DocumentRepository.InsertActivityLogDocument(model.ActivityLogId,
+                (session["User"] as UserModel).Id, model.File);
+            return result;
         }
     }
 }

@@ -50,6 +50,9 @@ namespace Belletrix.Domain
         Task<ActivityLogViewViewModel> FindAllInfoById(int id);
         Task<ActivityLogViewViewModel> FindByTitle(string title);
 
+        Task<IEnumerable<DocumentViewModel>> FindDocuments(int id);
+        Task<GenericResult> AddDocument(HttpSessionStateBase session, AddNewDocumentViewModel model);
+
         /// <summary>
         /// Manage the participants list for the selected activity.
         /// </summary>

@@ -43,10 +43,9 @@
             $("#addPersonButton").click(function (): void {
                 $.ajax({
                     url: addPersonUrl,
-                    success: function (data) {
+                    success: function (data: any): void {
                         const addPersonModal: JQuery = bootbox.dialog({
                             message: data,
-                            //onEscape: true,
                             backdrop: true,
                             title: "Create New Person"
                         });

@@ -53,6 +53,7 @@ namespace Belletrix.Web.App_Start
 
             container.RegisterType<IActivityLogPersonRepository, ActivityLogPersonRepository>();
             container.RegisterType<IActivityLogRepository, ActivityLogRepository>();
+            container.RegisterType<IDocumentRepository, DocumentRepository>();
             container.RegisterType<IEventLogRepository, EventLogRepository>();
             container.RegisterType<IPingRepository, PingRepository>();
             container.RegisterType<IPromoRepository, PromoRepository>();

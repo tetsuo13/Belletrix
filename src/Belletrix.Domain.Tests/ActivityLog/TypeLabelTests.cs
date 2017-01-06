@@ -13,7 +13,7 @@ namespace Belletrix.Domain.Tests.ActivityLog
         public void NumberOfLabelsMatchesEnumCount()
         {
             int length = Enum.GetNames(typeof(ActivityLogTypes)).Length;
-            IActivityService service = new ActivityService(null, null, null);
+            IActivityService service = new ActivityService(null, null, null, null);
             Dictionary<int, string> labels = service.GetActivityTypeLabels();
 
             Assert.AreEqual(length, labels.Count);
@@ -22,7 +22,7 @@ namespace Belletrix.Domain.Tests.ActivityLog
         [TestMethod]
         public void EachEnumValueAssociatedWithLabel()
         {
-            IActivityService service = new ActivityService(null, null, null);
+            IActivityService service = new ActivityService(null, null, null, null);
             Dictionary<int, string> labels = service.GetActivityTypeLabels();
 
             var values = Enum.GetValues(typeof(ActivityLogTypes)).Cast<ActivityLogTypes>();

@@ -56,9 +56,11 @@
     </Compile>
     <Compile Include="ActivityLogPersonRepository.cs" />
     <Compile Include="ActivityLogRepository.cs" />
+    <Compile Include="DocumentRepository.cs" />
     <Compile Include="EventLogRepository.cs" />
     <Compile Include="IActivityLogPersonRepository.cs" />
     <Compile Include="IActivityLogRepository.cs" />
+    <Compile Include="IDocumentRepository.cs" />
     <Compile Include="IEventLogRepository.cs" />
     <Compile Include="IPingRepository.cs" />
     <Compile Include="IPromoRepository.cs" />
