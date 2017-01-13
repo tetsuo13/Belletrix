@@ -33,7 +33,7 @@
 
     <div class="row">
         <div class="col-lg-12">
-            <table id="userlist" class="display table-condensed">
+            <table id="userlist" class="display table table-condensed">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -48,10 +48,18 @@
                     @foreach (UserModel user in Model)
                     {
                         string lastLoginDataOrder = user.LastLogin != default(DateTime) ? user.LastLogin.ToString("yyyy-MM-dd HH:mm:ss") : null;
+                        string rowClass = user.IsActive ? null : "warning text-warning";
 
-                        <tr>
+                        <tr class="@rowClass">
                             <td>
-                                <a href="@Url.Action("Edit", "User", new { id = user.Id })">@user.FirstName @user.LastName</a>
+                                @Html.ActionLink(user.FirstName + " " + user.LastName, "Edit",
+                                    new { id = user.Id },
+                                    new { @class = user.IsActive ? null : "text-muted" })
+
+                                @if (!user.IsActive)
+                                {
+                                    <span class="glyphicon glyphicon-ban-circle alert-danger" aria-hidden="true"></span>
+                                }
                             </td>
                             <td>@user.Login</td>
                             <td>@user.Created</td>
