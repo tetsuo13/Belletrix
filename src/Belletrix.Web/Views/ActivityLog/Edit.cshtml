@@ -16,7 +16,8 @@
     $(function () {
         'use strict';
 
-        var activityLog = new Belletrix.ActivityLog(
+        var activityLog = new Belletrix.ActivityLog();
+        activityLog.initAddEdit(
             '@Url.Action("AddPerson", "ActivityLogPerson", new { guid = sessionId })',
             '@Url.Action("AddPersonId", "ActivityLogPerson")',
             '@Url.Action("RemovePersonId", "ActivityLogPerson")',

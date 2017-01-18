@@ -1,14 +1,8 @@
+/// <reference path="..\typings\jquery\jquery.d.ts" />
 var Belletrix;
 (function (Belletrix) {
     var ActivityLog = (function () {
-        /**
-         * Activity log add/edit initialize routine.
-         * @param addPersonUrl
-         * @param addPersonIdUrl URL to submit existing select person to.
-         * @param removePersonIdUrl URL to remove existing select person from session.
-         * @param sessionId Current activity session ID.
-         */
-        function ActivityLog(addPersonUrl, addPersonIdUrl, removePersonIdUrl, sessionId) {
+        function ActivityLog() {
             /** Selector for panel that contains each each participant line item. */
             this.participantsPanelSelector = "#participants-panel";
             this.participantModalSelector = "#personModal .modal-content";
@@ -25,6 +19,15 @@ var Belletrix;
             this.removeExistingPersonIdUrl = "";
             /** Current session ID. **/
             this.sessionId = "";
+        }
+        /**
+         * Activity log add/edit initialize routine.
+         * @param addPersonUrl
+         * @param addPersonIdUrl URL to submit existing select person to.
+         * @param removePersonIdUrl URL to remove existing select person from session.
+         * @param sessionId Current activity session ID.
+         */
+        ActivityLog.prototype.initAddEdit = function (addPersonUrl, addPersonIdUrl, removePersonIdUrl, sessionId) {
             this.removeExistingPersonIdUrl = removePersonIdUrl;
             this.sessionId = sessionId;
             var self = this;
@@ -48,7 +51,7 @@ var Belletrix;
                     }
                 });
             });
-        }
+        };
         ;
         /**
          * Initializes the back-end session for participants.
@@ -261,6 +264,16 @@ var Belletrix;
                     }
                 });
             });
+        };
+        /**
+         * Set up things for viewing an Activity Log like document upload.
+         * @param addNewDocumentUrl URL to upload document to.
+         * @param activityLogId The ID of the Activity Log to attach to.
+         * @param buttonSelector Selector for the "Add" document button.
+         * @param activityLogDocument
+         */
+        ActivityLog.prototype.initView = function (addNewDocumentUrl, activityLogId, buttonSelector, activityLogDocument) {
+            new Belletrix.Document().initActivityLog(addNewDocumentUrl, activityLogId, buttonSelector, activityLogDocument.refreshList);
         };
         return ActivityLog;
     }());

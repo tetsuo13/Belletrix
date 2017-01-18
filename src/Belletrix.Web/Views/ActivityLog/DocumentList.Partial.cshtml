@@ -1,0 +1,36 @@
+﻿@using Belletrix.Entity.ViewModel;
+
+@model IEnumerable<DocumentViewModel>
+
+<table class="table table-condensed" id="documents-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Modified</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (DocumentViewModel document in Model)
+        {
+            DateTime lastModifiedDate = document.LastModified.HasValue ? document.LastModified.Value : document.Created;
+
+            <tr>
+                <td>
+                    <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
+                    @Html.ActionLink(document.Title, "ViewDocument",
+                        new { PublicId = document.PublicId }, new { target = "_blank" })
+                </td>
+                <td data-order="@lastModifiedDate.ToString("yyyy-MM-dd HH:mm:ss")">@lastModifiedDate</td>
+                <td>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-xs btn-danger document-list-delete"
+                                data-documentpublicid="@document.PublicId">
+                            <i class="glyphicon glyphicon-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

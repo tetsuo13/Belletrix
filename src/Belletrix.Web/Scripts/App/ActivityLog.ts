@@ -1,4 +1,6 @@
-﻿module Belletrix {
+﻿/// <reference path="..\typings\jquery\jquery.d.ts" />
+
+module Belletrix {
     export class ActivityLog {
         /** Selector for panel that contains each each participant line item. */
         private participantsPanelSelector: string = "#participants-panel";
@@ -30,7 +32,8 @@
          * @param removePersonIdUrl URL to remove existing select person from session.
          * @param sessionId Current activity session ID.
          */
-        constructor(addPersonUrl: string, addPersonIdUrl: string, removePersonIdUrl: string, sessionId: string) {
+        public initAddEdit(addPersonUrl: string, addPersonIdUrl: string, removePersonIdUrl: string,
+            sessionId: string): void {
             this.removeExistingPersonIdUrl = removePersonIdUrl;
             this.sessionId = sessionId;
 
@@ -295,6 +298,20 @@
                     }
                 })
             });
+        }
+
+        /**
+         * Set up things for viewing an Activity Log like document upload.
+         * @param addNewDocumentUrl URL to upload document to.
+         * @param activityLogId The ID of the Activity Log to attach to.
+         * @param buttonSelector Selector for the "Add" document button.
+         * @param activityLogDocument
+         */
+        public initView(addNewDocumentUrl: string, activityLogId: number, buttonSelector: string,
+            activityLogDocument: Belletrix.ActivityLogDocument): void {
+
+            new Belletrix.Document().initActivityLog(addNewDocumentUrl, activityLogId, buttonSelector,
+                activityLogDocument.refreshList);
         }
     }
 }

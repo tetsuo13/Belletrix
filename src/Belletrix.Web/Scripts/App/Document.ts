@@ -11,7 +11,7 @@ module Belletrix {
          * @param buttonSelector Selector for the "Add" button.
          */
         public initActivityLog(addNewDocumentUrl: string, activityLogId: number,
-            buttonSelector: string): void {
+            buttonSelector: string, successFunction: Function): void {
             $(buttonSelector).fileupload({
                 url: addNewDocumentUrl,
                 dataType: "json",
@@ -24,7 +24,7 @@ module Belletrix {
                     console.log(e);
                     console.log(data);
 
-                    // TODO: Add data.files[0].name to the list.
+                    successFunction();
                 }
             });
         }

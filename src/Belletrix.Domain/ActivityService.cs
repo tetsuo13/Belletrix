@@ -61,6 +61,7 @@ namespace Belletrix.Domain
             viewModel.ActivityLog = activityLogModel;
             viewModel.Participants = await ActivityLogPersonRepository.FindActivityParticipants(id);
             viewModel.CreatedBy = await UserRepository.GetUser(activityLogModel.CreatedBy);
+            viewModel.HasDocuments = (await DocumentRepository.GetActivityLogDocumentsList(id)).Any();
 
             return viewModel;
         }
@@ -319,6 +320,11 @@ namespace Belletrix.Domain
             result.Result = await DocumentRepository.InsertActivityLogDocument(model.ActivityLogId,
                 (session["User"] as UserModel).Id, model.File);
             return result;
+        }
+
+        public async Task<DocumentViewModel> GetDocument(Guid id)
+        {
+            return await DocumentRepository.FindByPublicId(id);
         }
     }
 }

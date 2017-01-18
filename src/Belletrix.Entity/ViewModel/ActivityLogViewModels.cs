@@ -131,6 +131,6 @@ namespace Belletrix.Entity.ViewModel
 
         public UserModel CreatedBy { get; set; }
 
-        public IEnumerable<DocumentViewModel> Documents { get; set; }
+        public bool HasDocuments { get; set; }
     }
 }

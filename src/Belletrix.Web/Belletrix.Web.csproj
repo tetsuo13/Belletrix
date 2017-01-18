@@ -302,6 +302,7 @@
     <Content Include="Views\StudyAbroad\Edit.cshtml" />
     <Content Include="Views\StudyAbroad\EditFields.Partial.cshtml" />
     <Content Include="Views\ActivityLog\TitleCheck.Partial.cshtml" />
+    <Content Include="Views\ActivityLog\DocumentList.Partial.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -342,6 +343,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\App\ActivityLog.ts" />
+    <TypeScriptCompile Include="Scripts\App\ActivityLogDocument.ts" />
     <TypeScriptCompile Include="Scripts\App\Common.ts" />
     <TypeScriptCompile Include="Scripts\App\Document.ts" />
     <TypeScriptCompile Include="Scripts\App\StudyAbroad.ts" />

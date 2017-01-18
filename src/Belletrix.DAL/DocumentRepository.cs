@@ -20,6 +20,27 @@ namespace Belletrix.DAL
             UnitOfWork = unitOfWork;
         }
 
+        public async Task<DocumentViewModel> FindByPublicId(Guid id)
+        {
+            const string sql = @"
+                SELECT  [Guid] AS PublicId, [Title], [Size], [MimeType], [Created], [Content]
+                FROM    [dbo].[Documents]
+                WHERE   [Guid] = @PublicId";
+
+            try
+            {
+                return (await UnitOfWork.Context().QueryAsync<DocumentViewModel>(sql,
+                    new { PublicId = id })).Single();
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
+            }
+
+            return null;
+        }
+
         public async Task<IEnumerable<DocumentViewModel>> GetActivityLogDocumentsList(int id)
         {
             const string sql = @"

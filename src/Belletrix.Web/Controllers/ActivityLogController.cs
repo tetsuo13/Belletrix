@@ -7,7 +7,9 @@ using StackExchange.Profiling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Mvc;
 
 namespace Belletrix.Web.Controllers
@@ -46,11 +48,6 @@ namespace Belletrix.Web.Controllers
             using (profiler.Step("Get all label types"))
             {
                 ViewBag.TypeLabels = ActivityService.GetActivityTypeLabels();
-            }
-
-            using (profiler.Step("Get all documents"))
-            {
-                activity.Documents = await ActivityService.FindDocuments(id);
             }
 
             return View(activity);
@@ -178,6 +175,50 @@ namespace Belletrix.Web.Controllers
             }
 
             return Json(await ActivityService.AddDocument(Session, model));
+        }
+
+        [HttpPost]
+        public async Task<PartialViewResult> DocumentList(int id)
+        {
+            return PartialView("DocumentList.Partial", await ActivityService.FindDocuments(id));
+        }
+
+        public async Task<ActionResult> ViewDocument(Guid? PublicId)
+        {
+            if (!PublicId.HasValue)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Missing document ID");
+            }
+
+            DocumentViewModel document = await ActivityService.GetDocument(PublicId.Value);
+
+            if (document == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.NotFound, "Document not found");
+            }
+
+            try
+            {
+                Response.Clear();
+                Response.Buffer = true;
+                Response.Cache.SetCacheability(HttpCacheability.NoCache);
+                Response.ClearHeaders();
+                Response.ClearContent();
+                Response.ContentType = document.MimeType;
+
+                // TODO: Should have extension here. What does an upload from the Mac look like?
+                string filename = string.Concat(document.Title, ".", document.MimeType);
+                Response.AddHeader("Content-Disposition", string.Format("inline; filename=\"{0}\";", filename));
+
+                Response.BinaryWrite(document.Content);
+            }
+            catch (Exception e)
+            {
+                MvcApplication.LogException(e);
+                return new HttpStatusCodeResult(HttpStatusCode.InternalServerError);
+            }
+
+            return new EmptyResult();
         }
     }
 }

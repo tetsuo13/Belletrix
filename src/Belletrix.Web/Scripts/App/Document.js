@@ -12,7 +12,7 @@ var Belletrix;
          * @param activityLogId The ID of the Activity Log to attach to.
          * @param buttonSelector Selector for the "Add" button.
          */
-        Document.prototype.initActivityLog = function (addNewDocumentUrl, activityLogId, buttonSelector) {
+        Document.prototype.initActivityLog = function (addNewDocumentUrl, activityLogId, buttonSelector, successFunction) {
             $(buttonSelector).fileupload({
                 url: addNewDocumentUrl,
                 dataType: "json",
@@ -24,7 +24,7 @@ var Belletrix;
                 done: function (e, data) {
                     console.log(e);
                     console.log(data);
-                    // TODO: Add data.files[0].name to the list.
+                    successFunction();
                 }
             });
         };
