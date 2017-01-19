@@ -97,7 +97,9 @@ namespace Belletrix.DAL
                         [Size] = @Size,
                         [MimeType] = @MimeType,
                         [LastModified] = @LastModified,
-                        [LastModifiedBy] = @LastModifiedBy
+                        [LastModifiedBy] = @LastModifiedBy,
+                        [Deleted] = NULL,
+                        [DeletedBy] = NULL
                 WHERE   [ActivityLogId] = @ActivityLogId AND
                         [Title] = @Title
 
