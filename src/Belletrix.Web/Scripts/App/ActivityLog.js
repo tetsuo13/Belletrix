@@ -273,7 +273,9 @@ var Belletrix;
          * @param activityLogDocument
          */
         ActivityLog.prototype.initView = function (addNewDocumentUrl, activityLogId, buttonSelector, activityLogDocument) {
-            new Belletrix.Document().initActivityLog(addNewDocumentUrl, activityLogId, buttonSelector, activityLogDocument.refreshList);
+            new Belletrix.Document().initActivityLog(addNewDocumentUrl, activityLogId, buttonSelector, function () {
+                activityLogDocument.refreshList();
+            });
         };
         return ActivityLog;
     }());

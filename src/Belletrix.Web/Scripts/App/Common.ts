@@ -118,7 +118,9 @@ module Belletrix {
          * @param deleteId Resource ID to delete.
          * @param successCallback Function to call after a successful ajax request.
          */
-        public static handleDeleteCall(deleteUrl: string, deleteId: number, successCallback: Function): void {
+        public static handleDeleteCall(deleteUrl: string, deleteId: number | string,
+            successCallback: Function): void {
+
             $.ajax({
                 method: "DELETE",
                 url: deleteUrl,

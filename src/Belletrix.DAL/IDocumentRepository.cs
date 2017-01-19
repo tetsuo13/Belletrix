@@ -9,6 +9,7 @@ namespace Belletrix.DAL
     public interface IDocumentRepository
     {
         Task<DocumentViewModel> FindByPublicId(Guid id);
+        Task<bool> DeleteByPublicId(Guid id, int userId);
 
         Task<IEnumerable<DocumentViewModel>> GetActivityLogDocumentsList(int id);
         Task<bool> InsertActivityLogDocument(int activityLogId, int userId, HttpPostedFileBase document);

@@ -14,7 +14,7 @@
     $(function () {
         var activityLog = new Belletrix.ActivityLog();
         var activityLogDocument = new Belletrix.ActivityLogDocument('@Url.Action("DocumentList")',
-            '#document-list', @Model.ActivityLog.Id);
+            '#document-list', @Model.ActivityLog.Id, '@Url.Action("DeleteDocument")');
 
         activityLog.initView('@Url.Action("AddDocument")', @Model.ActivityLog.Id, '#add-document',
             activityLogDocument);

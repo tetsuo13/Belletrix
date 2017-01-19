@@ -53,6 +53,7 @@ namespace Belletrix.Domain
         Task<IEnumerable<DocumentViewModel>> FindDocuments(int id);
         Task<GenericResult> AddDocument(HttpSessionStateBase session, AddNewDocumentViewModel model);
         Task<DocumentViewModel> GetDocument(Guid id);
+        Task<GenericResult> DeleteDocument(HttpSessionStateBase session, Guid id);
 
         /// <summary>
         /// Manage the participants list for the selected activity.

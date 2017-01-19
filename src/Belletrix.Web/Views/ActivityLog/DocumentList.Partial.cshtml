@@ -19,13 +19,13 @@
                 <td>
                     <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
                     @Html.ActionLink(document.Title, "ViewDocument",
-                        new { PublicId = document.PublicId }, new { target = "_blank" })
+                        new { publicId = document.PublicId }, new { target = "_blank" })
                 </td>
                 <td data-order="@lastModifiedDate.ToString("yyyy-MM-dd HH:mm:ss")">@lastModifiedDate</td>
                 <td>
                     <div class="btn-group">
                         <button type="button" class="btn btn-xs btn-danger document-list-delete"
-                                data-documentpublicid="@document.PublicId">
+                                data-document-public-id="@document.PublicId">
                             <i class="glyphicon glyphicon-trash"></i>
                         </button>
                     </div>

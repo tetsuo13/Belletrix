@@ -1,15 +1,20 @@
-﻿/// <reference path="..\typings\jquery\jquery.d.ts" />
+﻿/// <reference path="Common.ts" />
+/// <reference path="..\typings\bootbox\bootbox.d.ts" />
+/// <reference path="..\typings\jquery\jquery.d.ts" />
 
 module Belletrix {
     export class ActivityLogDocument {
         private documentListUrl: string;
         private documentBlockSelector: string;
         private activityLogId: number;
+        private deleteDocumentUrl: string;
 
-        public constructor(documentListUrl: string, documentListSelector: string, activityLogId: number) {
+        public constructor(documentListUrl: string, documentListSelector: string, activityLogId: number,
+            deleteDocumentUrl: string) {
             this.documentListUrl = documentListUrl;
             this.documentBlockSelector = documentListSelector;
             this.activityLogId = activityLogId;
+            this.deleteDocumentUrl = deleteDocumentUrl;
         }
 
         /**
@@ -17,6 +22,8 @@ module Belletrix {
          * view.
          */
         public refreshList(): void {
+            const self = this;
+
             $(this.documentBlockSelector).load(this.documentListUrl, {
                 id: this.activityLogId
             }, function (): void {
@@ -34,6 +41,21 @@ module Belletrix {
                 });
 
                 // Bind the delete buttons.
+                $("button.document-list-delete").click(function (event: JQueryEventObject): void {
+                    const documentId: string = $(this).data("document-public-id");
+
+                    bootbox.confirm({
+                        size: "small",
+                        message: "Are you sure?",
+                        callback: function (result: boolean): void {
+                            if (result) {
+                                Belletrix.Common.handleDeleteCall(self.deleteDocumentUrl, documentId, function (): void {
+                                    self.refreshList();
+                                });
+                            }
+                        }
+                    });
+                });
             });
         }
     }

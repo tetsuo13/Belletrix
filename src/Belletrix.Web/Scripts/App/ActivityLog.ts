@@ -310,8 +310,9 @@ module Belletrix {
         public initView(addNewDocumentUrl: string, activityLogId: number, buttonSelector: string,
             activityLogDocument: Belletrix.ActivityLogDocument): void {
 
-            new Belletrix.Document().initActivityLog(addNewDocumentUrl, activityLogId, buttonSelector,
-                activityLogDocument.refreshList);
+            new Belletrix.Document().initActivityLog(addNewDocumentUrl, activityLogId, buttonSelector, function (): void {
+                activityLogDocument.refreshList();
+            });
         }
     }
 }

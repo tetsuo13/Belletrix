@@ -177,20 +177,35 @@ namespace Belletrix.Web.Controllers
             return Json(await ActivityService.AddDocument(Session, model));
         }
 
+        [HttpDelete]
+        public async Task<JsonResult> DeleteDocument(Guid? id)
+        {
+            if (!id.HasValue)
+            {
+                return Json(new GenericResult()
+                {
+                    Result = false,
+                    Message = "Missing document ID"
+                });
+            }
+
+            return Json(await ActivityService.DeleteDocument(Session, id.Value));
+        }
+
         [HttpPost]
         public async Task<PartialViewResult> DocumentList(int id)
         {
             return PartialView("DocumentList.Partial", await ActivityService.FindDocuments(id));
         }
 
-        public async Task<ActionResult> ViewDocument(Guid? PublicId)
+        public async Task<ActionResult> ViewDocument(Guid? publicId)
         {
-            if (!PublicId.HasValue)
+            if (!publicId.HasValue)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Missing document ID");
             }
 
-            DocumentViewModel document = await ActivityService.GetDocument(PublicId.Value);
+            DocumentViewModel document = await ActivityService.GetDocument(publicId.Value);
 
             if (document == null)
             {

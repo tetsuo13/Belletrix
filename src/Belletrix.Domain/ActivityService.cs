@@ -326,5 +326,12 @@ namespace Belletrix.Domain
         {
             return await DocumentRepository.FindByPublicId(id);
         }
+
+        public async Task<GenericResult> DeleteDocument(HttpSessionStateBase session, Guid id)
+        {
+            GenericResult result = new GenericResult();
+            result.Result = await DocumentRepository.DeleteByPublicId(id, (session["user"] as UserModel).Id);
+            return result;
+        }
     }
 }

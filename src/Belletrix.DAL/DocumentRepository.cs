@@ -41,6 +41,29 @@ namespace Belletrix.DAL
             return null;
         }
 
+        public async Task<bool> DeleteByPublicId(Guid id, int userId)
+        {
+            const string sql = @"
+                UPDATE  [dbo].[Documents]
+                SET     [Deleted] = @DeletedDate,
+                        [DeletedBy] = @UserId
+                WHERE   [Guid] = @PublicId";
+
+            try
+            {
+                int rows = await UnitOfWork.Context().ExecuteAsync(sql,
+                    new { DeletedDate = DateTime.Now.ToUniversalTime(), UserId = userId, PublicId = id });
+                return rows == 1;
+            }
+            catch (Exception e)
+            {
+                e.Data["SQL"] = sql;
+                ErrorStore.LogException(e, HttpContext.Current);
+            }
+
+            return false;
+        }
+
         public async Task<IEnumerable<DocumentViewModel>> GetActivityLogDocumentsList(int id)
         {
             const string sql = @"
