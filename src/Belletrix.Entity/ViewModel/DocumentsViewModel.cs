@@ -7,7 +7,7 @@ namespace Belletrix.Entity.ViewModel
 {
     public class DocumentViewModel
     {
-        public Guid PublicId { get; set; }
+        public Guid Id { get; set; }
         public string Title { get; set; }
         public int Size { get; set; }
         public string MimeType { get; set; }

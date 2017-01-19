@@ -727,8 +727,7 @@ CREATE TABLE [dbo].[ActivityLogParticipant] (
 
 
 CREATE TABLE [dbo].[Documents] (
-    [Id]                [int] NOT NULL IDENTITY,
-    [Guid]              [uniqueidentifier] NOT NULL,
+    [Id]                [uniqueidentifier] NOT NULL,
     [Created]           [datetime] NOT NULL,
     [CreatedBy]         [int] NOT NULL,
     [LastModified]      [datetime],

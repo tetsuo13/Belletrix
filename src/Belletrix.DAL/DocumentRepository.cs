@@ -23,14 +23,14 @@ namespace Belletrix.DAL
         public async Task<DocumentViewModel> FindByPublicId(Guid id)
         {
             const string sql = @"
-                SELECT  [Guid] AS PublicId, [Title], [Size], [MimeType], [Created], [Content]
+                SELECT  [Id], [Title], [Size], [MimeType], [Created], [Content]
                 FROM    [dbo].[Documents]
-                WHERE   [Guid] = @PublicId";
+                WHERE   [Id] = @Id";
 
             try
             {
                 return (await UnitOfWork.Context().QueryAsync<DocumentViewModel>(sql,
-                    new { PublicId = id })).Single();
+                    new { Id = id })).Single();
             }
             catch (Exception e)
             {
@@ -47,12 +47,12 @@ namespace Belletrix.DAL
                 UPDATE  [dbo].[Documents]
                 SET     [Deleted] = @DeletedDate,
                         [DeletedBy] = @UserId
-                WHERE   [Guid] = @PublicId";
+                WHERE   [Id] = @Id";
 
             try
             {
                 int rows = await UnitOfWork.Context().ExecuteAsync(sql,
-                    new { DeletedDate = DateTime.Now.ToUniversalTime(), UserId = userId, PublicId = id });
+                    new { DeletedDate = DateTime.Now.ToUniversalTime(), UserId = userId, Id = id });
                 return rows == 1;
             }
             catch (Exception e)
@@ -67,7 +67,7 @@ namespace Belletrix.DAL
         public async Task<IEnumerable<DocumentViewModel>> GetActivityLogDocumentsList(int id)
         {
             const string sql = @"
-                SELECT  [Guid] AS PublicId, [Title], [Size], [MimeType], [Created]
+                SELECT  [Id], [Title], [Size], [MimeType], [Created]
                 FROM    [dbo].[Documents]
                 WHERE   [ActivityLogId] = @Id AND
                         [Deleted] IS NULL";
@@ -109,12 +109,12 @@ namespace Belletrix.DAL
                 IF @@ROWCOUNT = 0
                     INSERT INTO [dbo].[Documents]
                     (
-                        [Guid], [Created], [CreatedBy], [ActivityLogId],
+                        [Id], [Created], [CreatedBy], [ActivityLogId],
                         [Title], [Size], [MimeType], [Content]
                     )
                     VALUES
                     (
-                        @Guid, @Created, @CreatedBy, @ActivityLogId,
+                        @Id, @Created, @CreatedBy, @ActivityLogId,
                         @Title, {0}, @MimeType, @Content
                     );",
                 document.ContentLength);
@@ -126,7 +126,7 @@ namespace Belletrix.DAL
                     Content = GetDocumentFromPostedFileBase(document.InputStream),
                     ActivityLogId = activityLogId,
                     Title = document.FileName,
-                    Guid = Guid.NewGuid(),
+                    Id = Guid.NewGuid(),
                     Created = DateTime.Now.ToUniversalTime(),
                     CreatedBy = userId,
                     MimeType = document.ContentType,

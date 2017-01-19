@@ -198,14 +198,14 @@ namespace Belletrix.Web.Controllers
             return PartialView("DocumentList.Partial", await ActivityService.FindDocuments(id));
         }
 
-        public async Task<ActionResult> ViewDocument(Guid? publicId)
+        public async Task<ActionResult> ViewDocument(Guid? id)
         {
-            if (!publicId.HasValue)
+            if (!id.HasValue)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Missing document ID");
             }
 
-            DocumentViewModel document = await ActivityService.GetDocument(publicId.Value);
+            DocumentViewModel document = await ActivityService.GetDocument(id.Value);
 
             if (document == null)
             {
