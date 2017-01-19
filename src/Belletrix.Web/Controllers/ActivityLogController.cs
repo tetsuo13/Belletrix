@@ -221,9 +221,8 @@ namespace Belletrix.Web.Controllers
                 Response.ClearContent();
                 Response.ContentType = document.MimeType;
 
-                // TODO: Should have extension here. What does an upload from the Mac look like?
-                string filename = string.Concat(document.Title, ".", document.MimeType);
-                Response.AddHeader("Content-Disposition", string.Format("inline; filename=\"{0}\";", filename));
+                string disposition = string.Format("inline; filename=\"{0}\";", document.Title);
+                Response.AddHeader("Content-Disposition", disposition);
 
                 Response.BinaryWrite(document.Content);
             }
