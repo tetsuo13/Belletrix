@@ -91,17 +91,20 @@ namespace Belletrix.DAL
         public async Task<bool> InsertActivityLogDocument(int activityLogId, int userId,
             HttpPostedFileBase document)
         {
-            const string sql = @"
+            // ContentLength hardcoded into SQL statements because as a
+            // parameter it's always zero. Unsure if it's Dapper or something
+            // else.
+            string sql = string.Format(@"
                 UPDATE  [dbo].[Documents]
                 SET     [Content] = @Content,
-                        [Size] = @Size,
+                        [Size] = {0},
                         [MimeType] = @MimeType,
                         [LastModified] = @LastModified,
                         [LastModifiedBy] = @LastModifiedBy,
                         [Deleted] = NULL,
                         [DeletedBy] = NULL
                 WHERE   [ActivityLogId] = @ActivityLogId AND
-                        [Title] = @Title
+                        LOWER([Title]) = LOWER(@Title)
 
                 IF @@ROWCOUNT = 0
                     INSERT INTO [dbo].[Documents]
@@ -112,15 +115,15 @@ namespace Belletrix.DAL
                     VALUES
                     (
                         @Guid, @Created, @CreatedBy, @ActivityLogId,
-                        @Title, @Size, @MimeType, @Content
-                    );";
+                        @Title, {0}, @MimeType, @Content
+                    );",
+                document.ContentLength);
 
             try
             {
                 await UnitOfWork.Context().ExecuteAsync(sql, new
                 {
                     Content = GetDocumentFromPostedFileBase(document.InputStream),
-                    Size = document.ContentLength, // TODO: This is always inserted/updated as zero
                     ActivityLogId = activityLogId,
                     Title = document.FileName,
                     Guid = Guid.NewGuid(),
