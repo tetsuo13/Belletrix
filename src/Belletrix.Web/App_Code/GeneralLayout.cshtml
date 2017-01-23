@@ -45,7 +45,7 @@
 
         @if (!string.IsNullOrEmpty(username))
         {
-            <text>_paq.push(['setCustomVariable', '1', 'username', '@username']);</text>
+            <text>_paq.push(['setUserId', '@username']);</text>
         }
 
         (function () {
