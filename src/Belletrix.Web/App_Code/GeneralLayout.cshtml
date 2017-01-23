@@ -32,14 +32,11 @@
 
 @helper RenderAnalyticsTag(string username = null)
 {
-    if (Request.IsLocal)
+    if (!Request.IsLocal)
     {
-        return;
-    }
-
-    <script type="text/javascript">
+        <script type="text/javascript">
         var _paq = _paq || [];
-        _paq.push(["setDomains", ["*.belletrix.org"]]);
+        _paq.push(['setDomains', ['*.belletrix.org']]);
         _paq.push(['trackPageView']);
         _paq.push(['enableLinkTracking']);
 
@@ -49,12 +46,13 @@
         }
 
         (function () {
-            var u="//analytics.belletrix.org/";
+            var u='//analytics.belletrix.org/';
             _paq.push(['setTrackerUrl', u+'piwik.php']);
             _paq.push(['setSiteId', '17']);
             var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
             g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
         })();
-    </script>
-    <noscript><p><img src="//analytics.belletrix.org/piwik.php?idsite=17" style="border:0;" alt="" /></p></noscript>
+        </script>
+        <noscript><p><img src="//analytics.belletrix.org/piwik.php?idsite=17" style="border:0;" alt="" /></p></noscript>
+    }
 }
