@@ -7,3 +7,4 @@ var Belletrix;
     }());
     Belletrix.GenericResult = GenericResult;
 })(Belletrix || (Belletrix = {}));
+//# sourceMappingURL=GenericResult.js.map

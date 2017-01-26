@@ -1,5 +1,5 @@
 /// <reference path="..\typings\jquery\jquery.d.ts" />
-/// <reference path="..\typings\bootstrap\bootstrap.d.ts" />
+/// <reference path="..\typings\bootstrap\index.d.ts" />
 /// <reference path="..\typings\bootstrap.multiselect\bootstrap.multiselect.d.ts" />
 var Belletrix;
 (function (Belletrix) {
@@ -109,3 +109,4 @@ var Belletrix;
     }());
     Belletrix.Common = Common;
 })(Belletrix || (Belletrix = {}));
+//# sourceMappingURL=Common.js.map
