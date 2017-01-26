@@ -1,4 +1,4 @@
-﻿/// <reference path="..\typings\bootbox\bootbox.d.ts" />
+﻿/// <reference path="..\typings\bootbox\index.d.ts" />
 
 module Belletrix {
     export class StudentNote {

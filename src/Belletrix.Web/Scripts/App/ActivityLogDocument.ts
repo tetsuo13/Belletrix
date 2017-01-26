@@ -1,5 +1,5 @@
 ﻿/// <reference path="Common.ts" />
-/// <reference path="..\typings\bootbox\bootbox.d.ts" />
+/// <reference path="..\typings\bootbox\index.d.ts" />
 /// <reference path="..\typings\jquery\jquery.d.ts" />
 
 module Belletrix {

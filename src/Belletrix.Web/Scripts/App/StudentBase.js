@@ -1,5 +1,5 @@
 /// <reference path="Common.ts" />
-/// <reference path="..\typings\bootbox\bootbox.d.ts" />
+/// <reference path="..\typings\bootbox\index.d.ts" />
 var Belletrix;
 (function (Belletrix) {
     var StudentBase = (function () {
@@ -129,4 +129,3 @@ var Belletrix;
     }());
     Belletrix.StudentBase = StudentBase;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=StudentBase.js.map

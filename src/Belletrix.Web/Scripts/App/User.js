@@ -1,5 +1,5 @@
 /// <reference path="..\typings\jquery\jquery.d.ts" />
-/// <reference path="..\typings\bootbox\bootbox.d.ts" />
+/// <reference path="..\typings\bootbox\index.d.ts" />
 var Belletrix;
 (function (Belletrix) {
     var User = (function () {
@@ -44,4 +44,3 @@ var Belletrix;
     }());
     Belletrix.User = User;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=User.js.map

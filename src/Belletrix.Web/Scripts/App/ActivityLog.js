@@ -281,4 +281,3 @@ var Belletrix;
     }());
     Belletrix.ActivityLog = ActivityLog;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=ActivityLog.js.map

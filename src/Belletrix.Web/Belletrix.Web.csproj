@@ -355,7 +355,7 @@
     <TypeScriptCompile Include="Scripts\App\StudentNote.ts" />
     <TypeScriptCompile Include="Scripts\App\StudentPromo.ts" />
     <TypeScriptCompile Include="Scripts\App\User.ts" />
-    <TypeScriptCompile Include="Scripts\typings\bootbox\bootbox.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\bootbox\index.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap.datepicker\bootstrap.datepicker.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap.multiselect\bootstrap.multiselect.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap\bootstrap.d.ts" />

@@ -3,13 +3,13 @@
 // Definitions by: Vincent Bortone <https://github.com/vbortone/>, Kon Pik <https://github.com/konpikwastaken/>, Anup Kattel <https://github.com/kanup/>, Dominik Schroeter <https://github.com/icereed/>, Troy McKinnon <https://github.com/trodi/>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
-/// <reference path="../jquery/jquery.d.ts" />
+/// <reference types="jquery" />
 
 /** Bootbox options shared by all modal types */
 interface BootboxBaseOptions {
 	title?: string | Element;
 	callback?: (result: boolean | string) => any;
-	onEscape?: () => any | boolean;
+	onEscape?: (() => any) | boolean;
 	show?: boolean;
 	backdrop?: boolean;
 	closeButton?: boolean;
@@ -40,6 +40,7 @@ interface BootboxConfirmOptions extends BootboxDialogOptions {
 interface BootboxPromptOptions extends BootboxBaseOptions {
 	title: string;
 	value?: string;
+	inputType?: string;
 	callback: (result: string) => any;
 	buttons?: BootboxConfirmPromptButtonMap;
 }
