@@ -3,7 +3,7 @@
 // Definitions by: Vincent Bortone <https://github.com/vbortone/>, Kon Pik <https://github.com/konpikwastaken/>, Anup Kattel <https://github.com/kanup/>, Dominik Schroeter <https://github.com/icereed/>, Troy McKinnon <https://github.com/trodi/>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
-/// <reference types="jquery" />
+/// <reference path="../jquery/jquery.d.ts" />
 
 /** Bootbox options shared by all modal types */
 interface BootboxBaseOptions {
