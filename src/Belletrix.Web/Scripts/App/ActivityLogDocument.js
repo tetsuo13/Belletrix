@@ -52,4 +52,3 @@ var Belletrix;
     }());
     Belletrix.ActivityLogDocument = ActivityLogDocument;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=ActivityLogDocument.js.map

@@ -49,4 +49,3 @@ var Belletrix;
     }());
     Belletrix.Promo = Promo;
 })(Belletrix || (Belletrix = {}));
-//# sourceMappingURL=Promo.js.map
