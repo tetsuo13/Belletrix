@@ -1,6 +1,6 @@
 ﻿/// <reference path="..\typings\bootbox\index.d.ts" />
 
-module Belletrix {
+namespace Belletrix {
     export class StudentNote {
         constructor() {
             const self = this;

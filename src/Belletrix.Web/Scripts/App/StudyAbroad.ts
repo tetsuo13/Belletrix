@@ -1,7 +1,7 @@
 ﻿/// <reference path="..\typings\jquery\jquery.d.ts"/>
 /// <reference path="..\typings\bootstrap.datepicker\bootstrap.datepicker.d.ts" />
 
-module Belletrix {
+namespace Belletrix {
     export class StudyAbroad {
         public initAddEdit(): void {
             Belletrix.Common.handleMvcEditor();

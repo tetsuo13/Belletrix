@@ -60,3 +60,4 @@ var Belletrix;
     }(Belletrix.StudentBase));
     Belletrix.StudentPromo = StudentPromo;
 })(Belletrix || (Belletrix = {}));
+//# sourceMappingURL=StudentPromo.js.map

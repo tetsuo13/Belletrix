@@ -1,7 +1,7 @@
 ﻿/// <reference path="Common.ts" />
 /// <reference path="..\typings\jquery\jquery.d.ts" />
 
-module Belletrix {
+namespace Belletrix {
     /**
      * Promo management only available to internal users.
      */

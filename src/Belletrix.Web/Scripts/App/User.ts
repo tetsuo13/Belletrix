@@ -1,7 +1,7 @@
 ﻿/// <reference path="..\typings\jquery\jquery.d.ts" />
 /// <reference path="..\typings\bootbox\index.d.ts" />
 
-module Belletrix {
+namespace Belletrix {
     export class User {
         /**
          * Initialize the user list page.

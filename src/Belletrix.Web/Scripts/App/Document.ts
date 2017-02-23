@@ -1,7 +1,7 @@
 ﻿/// <reference path="..\typings\jquery\jquery.d.ts" />
 /// <reference path="..\typings\jquery.fileupload\jquery.fileupload.d.ts" />
 
-module Belletrix {
+namespace Belletrix {
     export class Document {
         /**
          * Activity Log view page. Allows user to add a new document to the

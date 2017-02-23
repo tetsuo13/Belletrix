@@ -1,22 +1,22 @@
 ﻿/// <reference path="Common.ts" />
 /// <reference path="..\typings\bootbox\index.d.ts" />
 
-module Belletrix {
-    export class StudentBase {
+namespace Belletrix {
+    export abstract class StudentBase {
         /** Selector for first name input field. */
-        private firstNameSelector: string = "#FirstName";
+        private readonly firstNameSelector: string = "#FirstName";
 
         /** Selector for last name input field. */
-        private lastNameSelector: string = "#LastName";
+        private readonly lastNameSelector: string = "#LastName";
 
         /** Selector for both first and last name fields. */
-        private firstLastNamesSelector: string = this.firstNameSelector + ", " + this.lastNameSelector;
+        private readonly firstLastNamesSelector: string = this.firstNameSelector + ", " + this.lastNameSelector;
 
         /**
          * Selector for container that will get the partial view after
          * performing a unique name check.
          */
-        private nameCheckResultSelector: string = "#unique-name";
+        private readonly nameCheckResultSelector: string = "#unique-name";
 
         /**
          * Standard initialization for internal student form and public promo

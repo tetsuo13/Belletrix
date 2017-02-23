@@ -109,3 +109,4 @@ var Belletrix;
     Common.idleKillerInterval = 1000 * 60 * 10;
     Belletrix.Common = Common;
 })(Belletrix || (Belletrix = {}));
+//# sourceMappingURL=Common.js.map

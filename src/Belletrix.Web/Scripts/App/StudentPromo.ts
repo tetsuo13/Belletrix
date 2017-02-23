@@ -1,6 +1,6 @@
 ﻿/// <reference path="..\typings\jquery\jquery.d.ts" />
 
-module Belletrix {
+namespace Belletrix {
     /**
      * User portal side of Promo.
      */

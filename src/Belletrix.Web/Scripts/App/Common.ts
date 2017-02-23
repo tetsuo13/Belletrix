@@ -2,7 +2,7 @@
 /// <reference path="..\typings\bootstrap\index.d.ts" />
 /// <reference path="..\typings\bootstrap.multiselect\bootstrap.multiselect.d.ts" />
 
-module Belletrix {
+namespace Belletrix {
     /**
      * Generic utility methods used throughout application.
      */

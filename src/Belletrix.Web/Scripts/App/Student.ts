@@ -1,4 +1,4 @@
-﻿module Belletrix {
+﻿namespace Belletrix {
     export class Student extends StudentBase {
         /**
          * Initialize student add/edit page.

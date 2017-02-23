@@ -2,12 +2,12 @@
 /// <reference path="..\typings\bootbox\index.d.ts" />
 /// <reference path="..\typings\jquery\jquery.d.ts" />
 
-module Belletrix {
+namespace Belletrix {
     export class ActivityLogDocument {
-        private documentListUrl: string;
-        private documentBlockSelector: string;
-        private activityLogId: number;
-        private deleteDocumentUrl: string;
+        private readonly documentListUrl: string;
+        private readonly documentBlockSelector: string;
+        private readonly activityLogId: number;
+        private readonly deleteDocumentUrl: string;
 
         public constructor(documentListUrl: string, documentListSelector: string, activityLogId: number,
             deleteDocumentUrl: string) {

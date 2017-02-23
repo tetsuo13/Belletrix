@@ -30,3 +30,4 @@ var Belletrix;
     }());
     Belletrix.StudyAbroad = StudyAbroad;
 })(Belletrix || (Belletrix = {}));
+//# sourceMappingURL=StudyAbroad.js.map

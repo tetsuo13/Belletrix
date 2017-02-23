@@ -1,6 +1,6 @@
 ﻿/// <reference path="..\typings\jquery\jquery.d.ts" />
 
-module Belletrix {
+namespace Belletrix {
     export class ActivityLog {
         /** Selector for panel that contains each each participant line item. */
         private participantsPanelSelector: string = "#participants-panel";
